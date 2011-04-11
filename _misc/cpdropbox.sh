@@ -8,6 +8,9 @@ rm -f -r ../Dropbox/smoothio/_core/bin/windows/*
 rm -f -r ../Dropbox/smoothio/default/server/dbs/*
 rm -f -r ../Dropbox/smoothio/_misc/nodesetup/tmp/*
 
+cd ../gits/smoothio
+git rm * -r -f
+cd ../../smoothio/
 rm -f -r ../gits/smoothio/*
 cp -r -f * ../gits/smoothio/
 rm -f -r ../gits/smoothio/_core/bin/linux/*
@@ -16,4 +19,9 @@ rm -f -r ../gits/smoothio/_core/bin/osx/._*
 rm -f -r ../gits/smoothio/_core/bin/windows/*
 rm -f -r ../gits/smoothio/default/server/dbs/*
 rm -f -r ../gits/smoothio/_misc/nodesetup/tmp/*
+cd ../gits/smoothio
+git add .
+git commit -m "(automatic commit)"
+git push -f -u origin master
+cd ../../smoothio/
 
