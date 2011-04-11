@@ -21,7 +21,7 @@ rm -f -r ../gits/smoothio/default/server/dbs/*
 rm -f -r ../gits/smoothio/_misc/nodesetup/tmp/*
 cd ../gits/smoothio
 git add .
-git commit -m "(automatic commit)"
+git commit -m "$1"
 git push -f -u origin master
 cd ../../smoothio/
 
