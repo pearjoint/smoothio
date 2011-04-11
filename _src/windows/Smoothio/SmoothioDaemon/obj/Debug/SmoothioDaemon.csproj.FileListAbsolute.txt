@@ -1,0 +1,8 @@
+E:\smoothio\_src\windows\Smoothio\SmoothioDaemon\obj\Debug\ResolveAssemblyReference.cache
+E:\smoothio\_src\windows\Smoothio\SmoothioDaemon\obj\Debug\ResGen.read.1.tlog
+E:\smoothio\_src\windows\Smoothio\SmoothioDaemon\obj\Debug\ResGen.write.1.tlog
+E:\smoothio\_src\windows\Smoothio\SmoothioDaemon\bin\Debug\SmoothioDaemon.exe
+E:\smoothio\_src\windows\Smoothio\SmoothioDaemon\bin\Debug\SmoothioDaemon.pdb
+E:\smoothio\_src\windows\Smoothio\SmoothioDaemon\obj\Debug\SmoothioDaemon.Properties.Resources.resources
+E:\smoothio\_src\windows\Smoothio\SmoothioDaemon\obj\Debug\SmoothioDaemon.exe
+E:\smoothio\_src\windows\Smoothio\SmoothioDaemon\obj\Debug\SmoothioDaemon.pdb

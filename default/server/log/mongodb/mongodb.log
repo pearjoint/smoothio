@@ -1,26 +1,10 @@
-Mon Apr 11 18:12:23 [initandlisten] MongoDB starting : pid=7879 port=61234 dbpath=/home/roxor/smoothio/default/server/dbs/ 64-bit 
-Mon Apr 11 18:12:23 [initandlisten] db version v1.8.1-rc0, pdfile version 4.5
-Mon Apr 11 18:12:23 [initandlisten] git version: 674a1b857aa6a7cc591dd76b95e5e9b932e240e6
-Mon Apr 11 18:12:23 [initandlisten] build sys info: Linux bs-linux64.10gen.cc 2.6.21.7-2.ec2.v1.2.fc8xen #1 SMP Fri Nov 20 17:48:28 EST 2009 x86_64 BOOST_LIB_VERSION=1_41
-Mon Apr 11 18:12:23 [initandlisten] waiting for connections on port 61234
-Mon Apr 11 18:12:23 [websvr] web admin interface listening on port 62234
-Mon Apr 11 18:12:23 [initandlisten] connection accepted from 127.0.0.1:40075 #1
-Mon Apr 11 18:12:24 [initandlisten] connection accepted from 127.0.0.1:40076 #2
-Mon Apr 11 18:12:24 [initandlisten] connection accepted from 127.0.0.1:40077 #3
-Mon Apr 11 18:12:25 [initandlisten] connection accepted from 127.0.0.1:40078 #4
-Mon Apr 11 18:29:34 [conn4] terminating, shutdown command received
-Mon Apr 11 18:29:34 dbexit: shutdown called
-Mon Apr 11 18:29:34 [conn4] shutdown: going to close listening sockets...
-Mon Apr 11 18:29:34 [conn4] closing listening socket: 5
-Mon Apr 11 18:29:34 [conn4] closing listening socket: 7
-Mon Apr 11 18:29:34 [conn4] closing listening socket: 8
-Mon Apr 11 18:29:34 [conn4] closing listening socket: 9
-Mon Apr 11 18:29:34 [conn4] removing socket file: /tmp/mongodb-61234.sock
-Mon Apr 11 18:29:34 [conn4] removing socket file: /tmp/mongodb-62234.sock
-Mon Apr 11 18:29:34 [conn4] shutdown: going to flush diaglog...
-Mon Apr 11 18:29:34 [conn4] shutdown: going to close sockets...
-Mon Apr 11 18:29:34 [conn4] shutdown: waiting for fs preallocator...
-Mon Apr 11 18:29:34 [conn4] shutdown: closing all files...
-Mon Apr 11 18:29:34 closeAllFiles() finished
-Mon Apr 11 18:29:34 [conn4] shutdown: removing fs lock...
-Mon Apr 11 18:29:34 dbexit: really exiting now
+Tue Apr 12 00:53:35 [initandlisten] MongoDB starting : pid=9227 port=61234 dbpath=/home/roxor/smoothio/default/server/dbs/ 64-bit 
+Tue Apr 12 00:53:35 [initandlisten] db version v1.8.1-rc0, pdfile version 4.5
+Tue Apr 12 00:53:35 [initandlisten] git version: 674a1b857aa6a7cc591dd76b95e5e9b932e240e6
+Tue Apr 12 00:53:35 [initandlisten] build sys info: Linux bs-linux64.10gen.cc 2.6.21.7-2.ec2.v1.2.fc8xen #1 SMP Fri Nov 20 17:48:28 EST 2009 x86_64 BOOST_LIB_VERSION=1_41
+Tue Apr 12 00:53:35 [initandlisten] waiting for connections on port 61234
+Tue Apr 12 00:53:35 [websvr] web admin interface listening on port 62234
+Tue Apr 12 00:53:35 [initandlisten] connection accepted from 127.0.0.1:51349 #1
+Tue Apr 12 00:53:36 [initandlisten] connection accepted from 127.0.0.1:51350 #2
+Tue Apr 12 00:53:36 [initandlisten] connection accepted from 127.0.0.1:51351 #3
+Tue Apr 12 00:53:37 [initandlisten] connection accepted from 127.0.0.1:51352 #4

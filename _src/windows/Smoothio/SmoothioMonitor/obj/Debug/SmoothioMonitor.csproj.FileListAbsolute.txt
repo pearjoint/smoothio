@@ -1,0 +1,11 @@
+E:\smoothio\_src\windows\Smoothio\SmoothioMonitor\obj\Debug\ResolveAssemblyReference.cache
+E:\smoothio\_src\windows\Smoothio\SmoothioMonitor\obj\Debug\SmoothioMonitor.InstanceEditor.resources
+E:\smoothio\_src\windows\Smoothio\SmoothioMonitor\obj\Debug\SmoothioMonitor.InstanceSummary.resources
+E:\smoothio\_src\windows\Smoothio\SmoothioMonitor\obj\Debug\SmoothioMonitor.MainForm.resources
+E:\smoothio\_src\windows\Smoothio\SmoothioMonitor\obj\Debug\ResGen.read.1.tlog
+E:\smoothio\_src\windows\Smoothio\SmoothioMonitor\obj\Debug\ResGen.write.1.tlog
+E:\smoothio\_src\windows\Smoothio\SmoothioMonitor\bin\Debug\SmoothioMonitor.exe
+E:\smoothio\_src\windows\Smoothio\SmoothioMonitor\bin\Debug\SmoothioMonitor.pdb
+E:\smoothio\_src\windows\Smoothio\SmoothioMonitor\obj\Debug\SmoothioMonitor.Properties.Resources.resources
+E:\smoothio\_src\windows\Smoothio\SmoothioMonitor\obj\Debug\SmoothioMonitor.exe
+E:\smoothio\_src\windows\Smoothio\SmoothioMonitor\obj\Debug\SmoothioMonitor.pdb

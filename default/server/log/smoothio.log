@@ -29,3 +29,13 @@ all output going to: /home/roxor/smoothio/default/server/log/mongodb/mongodb.log
 "2011-04-11T10:29:34.874Z" - [default] Shutting down servers...
 "2011-04-11T10:29:35.133Z" - [default] Shutdown of all servers completed.
 
+"2011-04-11T16:53:35.077Z" - [default.packs.SmoothioCore] PAKET 'SmoothioCore': wird geladen...
+"2011-04-11T16:53:35.092Z" - [default.packs.SmoothioCore] PAKET 'SmoothioCore': erfolgreich geladen.
+"2011-04-11T16:53:35.099Z" - [default.mongodb] forked process: 9227
+all output going to: /home/roxor/smoothio/default/server/log/mongodb/mongodb.log
+"2011-04-11T16:53:35.117Z" - [default.servers.server1] SERVER 'server1' gestartet unter localhost:2020
+"2011-04-11T16:53:35.117Z" - [default.servers.server2] SERVER 'server2' gestartet unter localhost:4040
+"2011-04-11T16:53:35.613Z" - [default.mongodb.admin] Verbunden mit MongoDB Admin-Datenbank.
+"2011-04-11T16:53:36.110Z" - [default.mongodb.smoothio_shared] Verbunden mit smoothio Shared-Datenbank.
+"2011-04-11T16:53:36.620Z" - [default.mongodb.smoothio__server1] Verbunden mit smoothio server1-Datenbank.
+"2011-04-11T16:53:37.122Z" - [default.mongodb.smoothio__server2] Verbunden mit smoothio server2-Datenbank.
