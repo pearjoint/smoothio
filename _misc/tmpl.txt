@@ -1,0 +1,33 @@
+<%lang:
+	cscript or jscript
+
+<%=
+	eval
+
+<%control:alias ctlpath%>
+	register ctl
+
+<%controlx:alias packName ctlpath%>
+	register ctl
+
+<%ctl:alias args%>
+
+<%beginctl:alias args%>
+
+<%endctl%>
+
+<%arg:name%>
+	argument value
+
+<%stylus:
+	stylus
+
+<%script:
+	uses <%lang
+
+<%cscript:
+	coffee
+
+<%jscript:
+	javascript
+

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Smoothio</title>
+		<script type="text/javascript" language="JavaScript">
+			var smioGlobalTest, scriptErrors = [];
+			try {
+				smioGlobalTest = global;
+			} catch(err) {
+			}
+			if (!smioGlobalTest)
+				global = {};
+			if (!global['smoothio'])
+				global['smoothio'] = {}
+
+			function onLoadCheckScriptErrors() {
+				if (scriptErrors.length)
+					document.getElementById('smio_body').innerHTML = '<br/><br/><br/><br/><hr size="1" noshade="noshade"/>Required core script <span style="font-weight: bold;">' + scriptErrors[0] + '</span> could not be loaded and hence this application will not load.<br/><br/>You should completely reload the page via CTRL+R in case this was a temporary disruption.<hr size="1" noshade="noshade"/>Erforderliches Kernscript <span style="font-weight: bold;">' + scriptErrors[0] + '</span> konnte nicht geladen werden und somit wird auch diese Anwendung nicht geladen.<br/><br/>Sie sollten diese Seite mit STRG+R komplett neu laden, falls dies nur eine vorr&uuml;bergehende / tempor&auml;re St&ouml;rung war.<hr size="1" noshade="noshade"/>';
+			}
+
+			function onScriptError(scriptName) {
+				scriptErrors.push(scriptName);
+			}
+		</script>
+		<script type="text/javascript" language="JavaScript" src="/_/file/scripts/json2.js" onerror="onScriptError('json2.js');"></script>
+		<script type="text/javascript" language="JavaScript" src="/_/file/scripts/jquery.min.js" onerror="onScriptError('jquery.min.js');"></script>
+		<script type="text/javascript" language="JavaScript" src="/_/file/_scripts/shared/Util.js" onerror="onScriptError('shared/Util.js');"></script>
+		<script type="text/javascript" language="JavaScript" src="/_/file/_scripts/Client.js" onerror="onScriptError('Client.js');"></script>
+		<link rel="stylesheet" href="/_/file/styles/reset.css"/>
+		<link rel="stylesheet" href="/_/file/_styles/smoothio.css"/>
+		<link rel="shortcut icon" href="/_/file/images/smoothio.png" />
+	</head>
+	<body id="smio_body" onblur="document.title='gone';" onfocus="document.title='active';" onload="onLoadCheckScriptErrors();">
+		<div class="smio-main">
+			<div class="smio-console smio-console-top">
+				<div class="smio-console-ever">header</div>
+				<div class="smio-console-hover" style="display: none;">hover</div>
+				<div class="smio-console-detail" style="display: none;">details</div>
+			</div>
+			<div class="smio-console smio-console-main"><br/><br/>foo zeh content</div>
+			<div class="smio-console smio-console-bottom">
+				<div class="smio-console-detail" style="display: none;">details</div>
+				<div class="smio-console-hover" style="display: none;">hover</div>
+				<div class="smio-console-ever">footer</div>
+			</div>
+		</div>
+	</body>
+</html>

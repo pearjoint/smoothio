@@ -1,0 +1,8 @@
+E:\metaleap\_src\windows\MetaLeap\MetaLeapService\bin\Debug\MetaLeapService.exe
+E:\metaleap\_src\windows\MetaLeap\MetaLeapService\bin\Debug\MetaLeapService.pdb
+E:\metaleap\_src\windows\MetaLeap\MetaLeapService\obj\Debug\ResolveAssemblyReference.cache
+E:\metaleap\_src\windows\MetaLeap\MetaLeapService\obj\Debug\MetaLeapService.Properties.Resources.resources
+E:\metaleap\_src\windows\MetaLeap\MetaLeapService\obj\Debug\ResGen.read.1.tlog
+E:\metaleap\_src\windows\MetaLeap\MetaLeapService\obj\Debug\ResGen.write.1.tlog
+E:\metaleap\_src\windows\MetaLeap\MetaLeapService\obj\Debug\MetaLeapService.exe
+E:\metaleap\_src\windows\MetaLeap\MetaLeapService\obj\Debug\MetaLeapService.pdb
