@@ -3,13 +3,16 @@ var $j = jQuery.noConflict(),
 	$t = Titanium,
 	res = {
 	"_"					:	""
+,	"tabs_title1"		:	"'"
+,	"tabs_title2"		:	"' Instance"
 ,	"tray_hint"			:	"smoothio Monitor"
 ,	"tray_menu_exit"	:	"Exit smoothio Monitor"
 ,	"tray_menu_show"	:	"Show smoothio Monitor"
-,	"toolbar_restart"	:	"Restart smoothio Daemon:"
-,	"toolbar_start"		:	"Start smoothio Daemon:"
+,	"toolbar_refresh"	:	"Refresh All"
+,	"toolbar_restart"	:	"Restart smoothio Daemon"
+,	"toolbar_start"		:	"Start smoothio Daemon"
 ,	"toolbar_status"	:	"smoothio Daemon Status:"
-,	"toolbar_stop"		:	"Stop smoothio Daemon:"
+,	"toolbar_stop"		:	"Stop smoothio Daemon"
 , 	"toolbar_wait"		:	"(Wait...)"
 	},
 	smio = {
@@ -36,6 +39,35 @@ var $j = jQuery.noConflict(),
 			smio.win.hide();
 			return false;
 		},
+		refreshView: function() {
+			var dirName, subFile, lastID, subDirs, subTabPanel, tab= smio.win.tabPanel.getActiveTab();
+			try {
+				if (tab)
+					lastID = tab.id;
+				smio.win.viewPort.hide();
+				smio.win.tabPanel.beginUpdate();
+				smio.win.tabPanel.removeAll(true);
+				if ((subDirs = smio.rootDir.getDirectoryListing()) && subDirs.length)
+					for (var i = 0; i < subDirs.length; i++)
+						if (subDirs[i].isDirectory() && subDirs[i]['name'] && (dirName = subDirs[i].name()) && dirName.length && (dirName.substr(0, 1) != '_') && (dirName != 'node_modules') && (subFile = $t.Filesystem.getFile(subDirs[i], 'instance.config')) && subFile.exists() && subFile.isFile()) {
+							subTabPanel = new Ext.TabPanel({ tabPosition: 'bottom', border: false, plain: true, activeTab: 0, style: { backgroundColor: "buttonhighlight", padding: "0px 0px 32px 0px" } });
+							subTabPanel.add({ title: "Configuration", items: new Ext.Panel({ layout: 'fit' }), id: "tab_" + dirName + "_config" });
+							subTabPanel.add({ title: "'default_server' Server", html: "Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>Server Details<br/>", id: "tab_" + dirName + "_server" });
+							subTabPanel.add({ title: "Logs", html: "Log Details", id: "tab_" + dirName + "_logs" });
+							tab = smio.win.tabPanel.add({ title: (res.tabs_title1 + dirName + res.tabs_title2), items: subTabPanel, layout: 'fit', id: "tab_" + dirName });
+							if (!lastID)
+								lastID = tab.id;
+						}
+				if (lastID)
+					smio.win.tabPanel.setActiveTab(lastID);
+			} catch(err) {
+				alert(err + "");
+			} finally {
+				smio.win.tabPanel.endUpdate();
+				smio.win.tabPanel.doLayout();
+				smio.win.viewPort.show();
+			}
+		},
 		show: function() {
 			if (!smio.win.isVisible())
 						smio.win.show();
@@ -51,21 +83,23 @@ jQuery(document).ready(function() {
 	smio.tray = $t.UI.addTray("app://smoothio.png", smio.show);
 	smio.tray.setHint(res.tray_hint);
 	smio.tray.setMenu(smio.trayMenu);
-	smio.rootPath = smio.getRootPath($t.Filesystem.getApplicationDirectory());
+	smio.rootDir = smio.getRootPath($t.Filesystem.getApplicationDirectory());
 });
 
 Ext.BLANK_IMAGE_URL = '../../resources/images/default/s.gif';
 Ext.onReady(function() {
-	Ext.QuickTips.init();
-	smio.win.toolBar = new Ext.Toolbar({ renderTo: 'toolbar' });
-	smio.win.toolBar.add(new Ext.Toolbar.TextItem({ text: res.toolbar_status, style: { color: "GrayText", padding: "8px" } }));
-	smio.win.toolBar.add({ text: res.toolbar_wait, menu: { xtype: "menu", plain: true, items: [ { text: res.toolbar_start, disabled: true }, { text: res.toolbar_stop, disabled: true }, { text: res.toolbar_restart, disabled: true }] } });
-	smio.win.toolBar.addFill();
-	smio.win.toolBar.doLayout();
-	smio.win.tabMain = { title: 'Instances & Servers', html: "My content was added during construction.<br/>" },
-	smio.win.tabInst = { title: '"default" Instance', html: "Yet another test... My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>" },
-	smio.win.tabInst2 = { title: '"default2" Instance', html: "Yet another test... My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>" },
-	smio.win.tabInst1 = { title: '"default1" Instance', html: "Yet another test... My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>My content was added during construction.<br/>" },
-	smio.win.tabPanel = new Ext.TabPanel({ renderTo: document.body, enableTabScroll: true, plain: true, activeTab: 0, style: { padding: "8px" }, items: [smio.win.tabMain, smio.win.tabInst, smio.win.tabInst1, smio.win.tabInst2] });
+	try {
+		smio.win.toolBar = new Ext.Toolbar({ xrenderTo: 'xxxtoolbar' });
+		smio.win.toolBar.add(new Ext.Toolbar.TextItem({ text: res.toolbar_status, style: { color: "GrayText", padding: "8px" } }));
+		smio.win.toolBar.add({ text: res.toolbar_wait, disabled: true, menu: { xtype: "menu", plain: true, items: [ { text: res.toolbar_start, disabled: true }, { text: res.toolbar_stop, disabled: true }, { text: res.toolbar_restart, disabled: true }] } });
+		smio.win.toolBar.addFill();
+		smio.win.toolBar.add({ text: res.toolbar_refresh, handler: smio.refreshView });
+		smio.win.toolBar.doLayout();
+		smio.win.tabPanel = new Ext.TabPanel({ enableTabScroll: true, plain: true, activeTab: 0, border: false, style: { padding: "8px", backgroundColor: "buttonhighlight" } });
+		smio.win.viewPort = new Ext.Viewport({ layout: 'border', defaults: { collapsible: false, split: false, border: false }, items: [{ items: smio.win.toolBar, region: 'north', autoHeight: true }, { items: smio.win.tabPanel, region: 'center', layout: 'fit' }] });
+		setTimeout(smio.refreshView, 250);
+	} catch(err) {
+		alert(err + '');
+	}
 });
 
