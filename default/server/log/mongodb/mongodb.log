@@ -8,3 +8,19 @@ Tue Apr 12 00:53:35 [initandlisten] connection accepted from 127.0.0.1:51349 #1
 Tue Apr 12 00:53:36 [initandlisten] connection accepted from 127.0.0.1:51350 #2
 Tue Apr 12 00:53:36 [initandlisten] connection accepted from 127.0.0.1:51351 #3
 Tue Apr 12 00:53:37 [initandlisten] connection accepted from 127.0.0.1:51352 #4
+Tue Apr 12 03:36:24 [conn4] terminating, shutdown command received
+Tue Apr 12 03:36:24 dbexit: shutdown called
+Tue Apr 12 03:36:24 [conn4] shutdown: going to close listening sockets...
+Tue Apr 12 03:36:24 [conn4] closing listening socket: 5
+Tue Apr 12 03:36:24 [conn4] closing listening socket: 7
+Tue Apr 12 03:36:24 [conn4] closing listening socket: 8
+Tue Apr 12 03:36:24 [conn4] closing listening socket: 9
+Tue Apr 12 03:36:24 [conn4] removing socket file: /tmp/mongodb-61234.sock
+Tue Apr 12 03:36:24 [conn4] removing socket file: /tmp/mongodb-62234.sock
+Tue Apr 12 03:36:24 [conn4] shutdown: going to flush diaglog...
+Tue Apr 12 03:36:24 [conn4] shutdown: going to close sockets...
+Tue Apr 12 03:36:24 [conn4] shutdown: waiting for fs preallocator...
+Tue Apr 12 03:36:24 [conn4] shutdown: closing all files...
+Tue Apr 12 03:36:24 closeAllFiles() finished
+Tue Apr 12 03:36:24 [conn4] shutdown: removing fs lock...
+Tue Apr 12 03:36:24 dbexit: really exiting now

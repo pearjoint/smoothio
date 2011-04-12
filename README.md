@@ -1,7 +1,17 @@
 smooth.io -- pre-alpha, unstable, just beginning.
 ===
 
-Run under Linux:
+Right now just a NodeJS HTTP server that shows not even Hello World.
+
+So no point in running it yet, it doesn't do much at present.
+
+No ready-to-run packages for Linux/OSX/Windows yet but these are forthcoming.
+
+If you must, you can run under Linux:
+
+Download MongoDB 64 bit for Linux and copy its bin binaries to _core/bin/linux so that _core/bin/linux/mongod exists.
+Grab NodeJS and copy the node binary to _core/bin/linux so that _core/bin/linux/node exists.
+Then...
 
 	chmod -f +x _misc/setup.sh
 	cd _misc
@@ -9,9 +19,6 @@ Run under Linux:
 	cd ../default
 	./instance.sh
 
-Run under Windows / Mac OSX:
-
-    coming soon...
 
 Directory Structure
 ---
@@ -47,5 +54,5 @@ Directory Structure
 	- *instance.js* -- NodeJS entry point / bootstrap script. Performs compiles, sets up file watching, starts the ../_cscript/Instance.cs
 	- *instance.sh* -- respawning daemon-like terminal-based runner for instance.js (for development; in the end user-deployable distribution SmoothioDaemon will be used instead)
 - **_misc** -- random development helpers that will not be included in the end user-deployable distribution
-- **_src** -- OS-specific source code that is not compiled at runtime but at buid time and will not be included in the end user-deployable distribution
+- **_src** -- OS-specific source code that is not compiled at runtime (like the _cscript CoffeeScripts etc.) but at buid time and will not be included in the end user-deployable distribution
 
