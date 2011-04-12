@@ -4,7 +4,7 @@
 <id>SmoothioMonitor</id>
 <name>SmoothioMonitor</name>
 <version>1.0</version>
-<publisher>pearjoint</publisher>
+<publisher>PearJoint</publisher>
 <url>http://smooth.io</url>
 <icon>smoothio.png</icon>
 <copyright>Copyright (C) 2011 PearJoint</copyright>
@@ -25,5 +25,6 @@
 	<maximizable>true</maximizable>
 	<minimizable>true</minimizable>
 	<closeable>true</closeable>
+	<xvisible>false</xvisible>
 </window>
 </ti:app>

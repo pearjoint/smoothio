@@ -1,10 +1,10 @@
 #appname:SmoothioMonitor
 #appid:SmoothioMonitor
-#publisher:roxor
+#publisher:PearJoint
 #image:smoothio.png
 #url:http://smooth.io
 #guid:53178ab6-2628-45aa-994b-64e846aa44b0
-#desc:No description provided
+#desc:smoothio Monitor
 #type:desktop
 runtime:1.0.0
 javascript:1.0.0

@@ -1,0 +1,9 @@
+.x-toolbar .x-btn-text, .xtb-text {
+	font-size: 14px !important;
+	font-family: Helvetica, Arial, Helvetica Neue, FreeSans, Sans-Serif !important;
+}
+.x-tab-strip-text, .x-panel-body {
+	font-size: 12px !important;
+	font-family: Helvetica, Arial, Helvetica Neue, FreeSans, Sans-Serif !important;
+}
+
