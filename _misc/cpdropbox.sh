@@ -1,6 +1,7 @@
 #!/bin/bash
 rm -f -r ../Dropbox/smoothio/*
 cp -r -f * ../Dropbox/smoothio/
+rm -f -r ../Dropbox/smoothio/_src/titanium/SmoothioMonitor/dist/linux/*
 rm -f -r ../Dropbox/smoothio/_core/bin/linux/*
 rm -f -r ../Dropbox/smoothio/_core/bin/osx/*
 rm -f -r ../Dropbox/smoothio/_core/bin/osx/._*
@@ -13,6 +14,7 @@ git rm * -r -f
 cd ../../smoothio/
 rm -f -r ../gits/smoothio/*
 cp -r -f * ../gits/smoothio/
+rm -f -r ../gits/smoothio/_src/titanium/SmoothioMonitor/dist/linux/*
 rm -f -r ../gits/smoothio/_core/bin/linux/*
 rm -f -r ../gits/smoothio/_core/bin/osx/*
 rm -f -r ../gits/smoothio/_core/bin/osx/._*
