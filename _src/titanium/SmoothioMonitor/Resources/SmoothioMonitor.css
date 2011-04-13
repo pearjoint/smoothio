@@ -5,7 +5,7 @@ del, dfn, em, img, ins, kbd, q, s, samp,
 small, strike, strong, sub, sup, tt, var,
 b, u, i, center,
 dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
+form, label,
 table, caption, tbody, tfoot, thead, tr, th, td,
 article, aside, canvas, details, figcaption, figure, 
 footer, header, hgroup, menu, nav, section, summary,
@@ -27,10 +27,20 @@ body {
 background: url('bg.png') fixed center center;
 line-height: 1;
 }
+fieldset {
+padding: 1em;
+margin-bottom: 1em;
+}
+fieldset legend {
+font-weight: bold;
+color: #909090;
+}
 h1 {
+color: #909090;
 font-size: 1.25em;
 overflow: hidden;
 margin-bottom: 1em;
+text-shadow: 0px 1px 1px #f0f0f0;
 }
 .smon-main a, .smon-main a:active, .smon-main a:visited, .smon-main a:hover, .smon-main a:link {
 color: green;
@@ -45,6 +55,8 @@ cursor: default !important;
 text-decoration: none !important;
 }
 .smon-main {
+background: url('smoothio.png') fixed right bottom no-repeat;
+color: #303030;
 font-size: 0.9em;
 position: absolute;
 top: 0;
@@ -63,10 +75,27 @@ height: 2em;
 overflow: hidden;
 white-space: nowrap;
 }
+.smon-toolbar-spacer {
+display: inline-block;
+width: 4%;
+}
 .smon-toolbar-item {
 display: inline-block;
 padding: 0.5em 0.25em 0.5em 0.25em;
-text-shadow: 0px 1px 1px #ffffff;
+text-shadow: 0px 1px 1px #f0f0f0;
+}
+.smon-instnav-info {
+position: absolute;
+width: 24%;
+bottom: 0em;
+left: 4%;
+color: #606060;
+font-size: 0.8em;
+padding: 2em 0.5em 2em 0.5em;
+text-shadow: 0px 1px 1px #f0f0f0;
+}
+.smon-instnav-info div {
+padding: 0.5em 0 0.5em 0;
 }
 .smon-instnav {
 position: absolute;
@@ -80,19 +109,19 @@ list-style-type: none;
 -webkit-box-shadow: 0.5em 0.75em 1em -0.5em #606060;
 }
 .smon-instnav ul li a {
-background: rgba(0,0,0,0.7);
+background: rgba(0,0,0,0.35);
 color: #f0f0f0 !important;
 display: block;
 padding: 0.8em;
 text-decoration: none;
 border-bottom: 0.1em solid #909090;
 border-left: 0.1em solid #909090;
-text-shadow: 0px -1px 1px #000000;
+text-shadow: 0px -1px 1px #303030;
 }
 .smon-instnav ul li a.smon-instnav-active, .smon-instnav ul li a:active, .smon-instnav ul li a:hover {
 background: rgba(255,255,255,0.6);
 color: #303030 !important;
-text-shadow: 0px 1px 1px #ffffff;
+text-shadow: 0px 1px 1px #f0f0f0;
 }
 .smon-instnav ul li:first-child a {
 border-top: 0.1em solid #909090;
@@ -101,6 +130,15 @@ border-top-left-radius: 0.5em;
 .smon-instnav ul li:last-child a {
 border-bottom-left-radius: 0.5em;
 }
+ul.smon-summary {
+margin: 2em 0em 2em 2em;
+}
+ul.smon-summary li {
+padding: 0.5em 0em 0.5em 0em;
+}
+ul.smon-summary ul {
+margin: 0.5em 0em 0.5em 2em;
+}
 .smon-instbox {
 border: 0.1em solid #909090;
 border-left: 0px none red;
@@ -108,7 +146,7 @@ border-left: 0px none red;
 background: rgba(255,255,255,0.6);
 border-top-right-radius: 0.5em;
 border-bottom-right-radius: 0.5em;
-padding: 0.6em 1.5em 1.5em 1.5em;
+padding: 0.7em 1.5em 1.5em 1.5em;
 position: absolute;
 top: 4em;
 left: 28%;
@@ -142,15 +180,16 @@ border-top-right-radius: 0.5em;
 border-top: 0.1em solid #707070;
 color: #f0f0f0 !important;
 background: rgba(0,0,0,0.35);
-text-shadow: 0px -1px 1px #000000;
+text-shadow: 0px -1px 1px #303030;
+-webkit-box-shadow: 0em 0.075em 0.4em -0.1em #606060 inset;
 }
 .smon-insttabs-tab {
 display: none;
 }
 .smon-insttabs-box {
 border: 0 none red;
--webkit-box-shadow: 0em 0.075em 0.4em -0.1em #606060 inset;
-background: rgba(0,0,0,0.1);
+-webkit-box-shadow: 0em 0.075em 0.4em -0.1em #303030 inset;
+background: rgba(0,0,0,0.075);
 padding: 1em;
 }
 

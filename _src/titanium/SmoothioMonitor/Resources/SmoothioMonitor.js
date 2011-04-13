@@ -4,9 +4,20 @@ var $j = jQuery.noConflict(),
 	res,
 	resources = {},
 	smio = {
+		configDesc: {
+			"smoothio": {
+				
+			},
+			"mongodb": {
+			},
+			"cygwin": {
+			}
+		},
 		curTabID: '_welcome',
 		exiting: false,
+		instances: {},
 		lastWinPos : null,
+		winActive: true,
 		daemonGetStatus: function() {
 			return 10;
 		},
@@ -41,19 +52,39 @@ var $j = jQuery.noConflict(),
 			return false;
 		},
 		refreshUI: function(locs, status, instances) {
-			var dirName, subFile, lastTab = smio.curTabID, lastTabFound = false, locChanged = false, subDirs;
+			var config, dirName, subFile, subFileStream, lastTab = smio.curTabID, lastTabFound = false, locChanged = false, subDirs, line;
 			if (instances) {
 				smio.selectTab('_welcome');
 				$j('.smon-instnav-institem').remove();
-				if ((subDirs = smio.rootDir.getDirectoryListing()) && subDirs.length)
-					for (var i = 0; i < subDirs.length; i++)
-						if (subDirs[i].isDirectory() && subDirs[i]['name'] && (dirName = subDirs[i].name()) && dirName.length && (dirName.substr(0, 1) != '_') && (dirName != 'node_modules') && (subFile = $t.Filesystem.getFile(subDirs[i], 'instance.config')) && subFile.exists() && subFile.isFile()) {
-							if (lastTab == dirName)
-								lastTabFound = true;
-							$j('.smon-instnav ul').append('<li class="smon-instnav-institem"><a href="#" onclick="smio.selectTab(\'' + dirName + '\');" id="smon_tab_' + dirName + '">' + res.tabs_title1 + dirName + res.tabs_title2 + '</a></li>');
-						}
-				if (lastTabFound)
-					smio.selectTab(lastTab);
+				smio.instances = {};
+				try {
+					$j('#smon_main').css({ visibility: 'hidden' });
+					if ((subDirs = smio.rootDir.getDirectoryListing()) && subDirs.length)
+						for (var i = 0; i < subDirs.length; i++)
+							if (subDirs[i].isDirectory() && subDirs[i]['name'] && (dirName = subDirs[i].name()) && dirName.length && (dirName.substr(0, 1) != '_') && (dirName != 'node_modules') && (subFile = $t.Filesystem.getFile(subDirs[i], 'instance.config')) && subFile.exists() && subFile.isFile())
+								try {
+									subFileStream = null;
+									config = '';
+									subFileStream = subFile.open($t.Filesystem.MODE_READ, false, false);
+									while (line = subFileStream.readLine())
+										config += (line + '');
+									config = $t.JSON.parse(config);
+									if (lastTab == dirName)
+										lastTabFound = true;
+									$j('.smon-instnav ul').append('<li class="smon-instnav-institem"><a href="#" onclick="smio.selectTab(\'' + dirName + '\');" id="smon_tab_' + dirName + '">' + res.tabs_title1 + dirName + res.tabs_title2 + '</a></li>');
+								} catch(err) {
+									alert(res.tabs_insterror1 + dirName + res.tabs_insterror2 + '\n\n' + err);
+								} finally {
+									if (subFileStream != null)
+										subFileStream.close();
+								}
+				} catch(err2) {
+					alert(err2 + "");
+				} finally {
+					if (lastTabFound)
+						smio.selectTab(lastTab);
+					$j('#smon_main').css({ visibility: 'visible' });
+				}
 			}
 			if (status) {
 				locChanged = true;
@@ -61,9 +92,15 @@ var $j = jQuery.noConflict(),
 			}
 			if (locs || locChanged)
 				$j('[smon-loc]').each(function(i, el) {
-					var $el = $j(el);
-					$el.html(res[$el.attr('smon-loc')]);
+					var $el = $j(el), rk = $el.attr('smon-loc');
+					$el.html(res[rk] + ((rk == 'tabs_welcome') ? (', <b>' + $t.Platform.getUsername() + '</b>') : ''));
 				});
+		},
+		selectSubTab: function(tabID) {
+			$j('.smon-subnav').removeClass('smon-subnav-active');
+			$j("[smon-loc='subtab_" + tabID + "']").addClass('smon-subnav-active');
+			$j('.smon-insttabs-tab').css({ 'display': 'none' });
+			setTimeout(function() { $j('#subtab_' + tabID).css({ 'display': 'block' }); }, 10);
 		},
 		selectTab: function(tabID) {
 			var otherID = ((tabID == '_welcome') ? '_inst' : '_welcome'), panelID = ((tabID == '_welcome') ? '_welcome' : '_inst');
@@ -89,7 +126,7 @@ var $j = jQuery.noConflict(),
 			smio.win.focus();
 		},
 		toggle: function() {
-			if (smio.win.isVisible())
+			if (smio.win.isVisible() && smio.winActive && !smio.win.isMinimized())
 				smio.win.close();
 			else
 				smio.show();
@@ -97,7 +134,10 @@ var $j = jQuery.noConflict(),
 	};
 
 jQuery(document).ready(function() {
-	smio.setLang('de');
+	var l;
+	smio.setLang('en');
+	if (navigator.language && navigator.language.length && res[l = navigator.language.substr(0, 2)])
+		smio.setLang(l);
 	smio.win = $t.UI.getCurrentWindow();
 	smio.win.addEventListener($t.CLOSE, smio.onClose);
 	smio.trayMenu = $t.UI.createMenu();
@@ -107,6 +147,19 @@ jQuery(document).ready(function() {
 	smio.tray.setHint(res.tray_hint);
 	smio.tray.setMenu(smio.trayMenu);
 	smio.rootDir = smio.getRootPath($t.Filesystem.getApplicationDirectory());
+	$j('#smon_os').text($t.Platform.getName());
+	$j('#smon_ov').text($t.Platform.getVersion());
+	$j('#smon_tv').text($t.getVersion());
+	$j('#smon_ar').text($t.Platform.getArchitecture());
+	$j('#smon_pc').text($t.Platform.getProcessorCount());
+	$j('#smon_pn').text(smio.platform = $t.getPlatform().toLowerCase());
+	if (smio.platform.substr(0, 3) != 'win')
+		$j('#subtab_config_win').css({ 'display': 'none' });
+	else
+		smio.platform = 'windows';
+});
+
+jQuery(window).load(function() {
 	smio.refreshUI(true, true, true);
 	setInterval(function() { smio.refreshUI(false, true, false); }, 1000);
 });

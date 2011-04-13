@@ -3,18 +3,19 @@
 	<head>
 		<title>smoothio Monitor</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link rel="stylesheet" type="text/css" href="SmoothioMonitor.css"/>
 		<script type="text/javascript" language="JavaScript" src="jquery.min.js"></script>
 		<script type="text/javascript" language="JavaScript" src="SmoothioMonitor.js"></script>
 		<script type="text/javascript" language="JavaScript" src="res.en.js"></script>
 		<script type="text/javascript" language="JavaScript" src="res.de.js"></script>
-		<link rel="stylesheet" type="text/css" href="SmoothioMonitor.css"/>
 	</head>
-	<body>
-		<div id="smon_main" class="smon-main" style="background: url('smoothio.png') fixed right bottom no-repeat;">
+	<body onfocus="smio.winActive=true;" onblur="smio.winActive=false;">
+		<div id="smon_main" class="smon-main">
 			<div class="smon-toolbar">
+				<div class="smon-toolbar-spacer"></div>
 				<div class="smon-toolbar-item smon-disabled" smon-loc="toolbar_status"></div>
 				<div class="smon-toolbar-item" id="smon_status" smon-loc="toolbar_wait"></div>
-				<div class="smon-toolbar-item" style="padding: 0 0 0 0; float: right;">
+				<div class="smon-toolbar-item" style="padding: 0 4% 0 0; float: right;">
 					<div class="smon-toolbar-item"><a class="smon-disabled" href="#" smon-loc="toolbar_start"></a></div>
 					<div class="smon-toolbar-item"><a class="smon-disabled" href="#" smon-loc="toolbar_stop"></a></div>
 					<div class="smon-toolbar-item"><a class="smon-disabled" href="#" smon-loc="toolbar_restart"></a></div>
@@ -26,8 +27,25 @@
 					<li><a href="#" onclick="smio.selectTab('_welcome');" class="smon-instnav-active" smon-loc="tabs_welcome" id="smon_tab__welcome"></a></li>
 				</ul>
 			</div>
+			<div class="smon-instnav-info">
+				<div><b>smoothio 0.1 <span smon-loc="info_for"></span> <span id="smon_os">OS</span></b></div>
+				<div>Titanium: <span id="smon_tv">...</span></div>
+				<div><span smon-loc="info_arch"></span> <span id="smon_ar">...</span></div>
+				<div><span smon-loc="info_procs"></span> <span id="smon_pc">0</span></div>
+				<div><span id="smon_pn"></span>: <span id="smon_ov">...</span></div>
+			</div>
 			<div class="smon-instbox">
 				<div class="smon-instbox-panel" id="smon_box__welcome">
+					<h1 smon-loc="welcome_summary"></h1>
+					<p>
+						<ul class="smon-summary">
+							<li><a href="#" onclick="smio.selectTab('default');"><b>default</b> Instance:</a>
+								<ul>
+									<li>Server <b>default_server</b> at <a href="http://localhost:2020" target="_blank">localhost:2020</a></li>
+								</ul>
+							</li>
+						</ul>
+					</p>
 					<h1 smon-loc="welcome_headline"></h1>
 					<p smon-loc="welcome_para1"></p>
 					<p smon-loc="welcome_para2"></p>
@@ -37,17 +55,37 @@
 				<div class="smon-instbox-panel" id="smon_box__inst" style="display: none; padding-top: 0.5em;">
 					<div class="smon-insttabs">
 						<div class="smon-insttabs-row">
-							<div><a href="#" onclick="selectSubTab('overview');" class="smon-subnav-active">Overview</a></div>
-							<div><a href="#" onclick="selectSubTab('config');">Configuration</a></div>
-							<div><a href="#" onclick="selectSubTab('servers');">Servers</a></div>
-							<div><a href="#" onclick="selectSubTab('logs');">Logs</a></div>
+							<div><a href="#" onclick="smio.selectSubTab('overview');" class="smon-subnav smon-subnav-active" smon-loc="subtab_overview"></a></div>
+							<div><a href="#" onclick="smio.selectSubTab('config');" class="smon-subnav" smon-loc="subtab_config"></a></div>
+							<div><a href="#" onclick="smio.selectSubTab('servers');" class="smon-subnav" smon-loc="subtab_servers"></a></div>
+							<div><a href="#" onclick="smio.selectSubTab('logs');" class="smon-subnav" smon-loc="subtab_logs"></a></div>
 						</div>
 						<div class="smon-insttabs-box">
 							<div class="smon-insttabs-tab" id="subtab_overview" style="display: block;">
 								the overview
 							</div>
 							<div class="smon-insttabs-tab" id="subtab_config">
-								the configuration
+								<fieldset>
+									<legend>General</legend>
+									config stuff...
+									<br/>
+									<br/>
+									more config...
+								</fieldset>
+								<fieldset>
+									<legend>Database Access Mode</legend>
+									config stuff...
+									<br/>
+									<br/>
+									more config...
+								</fieldset>
+								<fieldset id="subtab_config_win">
+									<legend>Windows-specific</legend>
+									config stuff...
+									<br/>
+									<br/>
+									more config...
+								</fieldset>
 							</div>
 							<div class="smon-insttabs-tab" id="subtab_servers">
 								the server details

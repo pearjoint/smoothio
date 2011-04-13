@@ -30,7 +30,7 @@ class smio.Instance
 		@mongos['admin'] = new smio.Database @, @mongo, 'admin', 'MongoDB Admin', null, lastInterval += 500
 		@mongos['smoothio_shared'] = new smio.Database @, @mongo, 'smoothio_shared', 'smoothio Shared', null, lastInterval += 500
 		for sname, scfg of @config.servers
-			if sname? and scfg? and scfg['host']? and scfg['port']?
+			if sname? and scfg? and scfg['host']? and scfg['port']? and (not (scfg['disabled'] is true))
 				server = new smio.Server @, sname, scfg.host, scfg.port, @config.smoothio.processes
 				@servers.push server
 				@mongos["smoothio__#{sname}"] = new smio.Database @, @mongo, "smoothio__#{sname}", "smoothio #{sname}", server, lastInterval += 500
