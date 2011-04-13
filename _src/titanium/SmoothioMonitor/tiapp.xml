@@ -26,5 +26,6 @@
 	<minimizable>true</minimizable>
 	<closeable>true</closeable>
 	<xvisible>false</xvisible>
+	<analytics>false</analytics>
 </window>
 </ti:app>

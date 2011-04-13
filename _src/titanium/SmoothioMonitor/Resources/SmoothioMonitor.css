@@ -1,9 +1,93 @@
-.x-toolbar .x-btn-text, .xtb-text {
-	font-size: 14px !important;
-	font-family: Helvetica, Arial, Helvetica Neue, FreeSans, Sans-Serif !important;
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
+margin: 0;
+padding: 0;
+border: 0;
+outline: 0;
+font-size: 1em;
+font-family: Helvetica, Arial, Helvetica Neue, FreeSans, Sans-Serif;
+vertical-align: baseline;
 }
-.x-tab-strip-text, .x-panel-body {
-	font-size: 12px !important;
-	font-family: Helvetica, Arial, Helvetica Neue, FreeSans, Sans-Serif !important;
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+display: block;
+}
+body {
+line-height: 1;
+}
+table {
+border-collapse: collapse;
+border-spacing: 0;
+}
+.smon-main {
+background: url('bg.png') fixed center center;
+position: absolute;
+top: 0px;
+bottom: 0px;
+left: 0px;
+right: 0px;
+overflow: hidden;
+}
+.smon-toolbar {
+background: rgba(255,255,255,0.6);
+-webkit-box-shadow: 0px 0px 16px #606060;
+position: absolute;
+width: 100%;
+top: 0px;
+height: 2em;
+}
+.smon-instnav {
+position: absolute;
+width: 24%;
+top: 4em;
+bottom: 1em;
+left: 4%;
+}
+.smon-instnav ul {
+-webkit-box-shadow: 8px 12px 16px -8px #606060;
+}
+.smon-instnav ul li a {
+background: rgba(0,0,0,0.7);
+color: #f0f0f0;
+display: block;
+padding: 0.8em;
+text-decoration: none;
+border-bottom: 0.1em solid #909090;
+border-left: 0.1em solid #909090;
+}
+.smon-instnav ul li a.smon-instnav-active, .smon-instnav ul li a:active, .smon-instnav ul li a:hover {
+background: rgba(255,255,255,0.6);
+color: #303030;
+}
+.smon-instnav ul li:first-child a {
+border-top: 0.1em solid #909090;
+border-top-left-radius: 0.5em;
+}
+.smon-instnav ul li:last-child a {
+border-bottom-left-radius: 0.5em;
+}
+.smon-instbox {
+border: 0.1em solid #909090;
+border-left: 0px none red;
+-webkit-box-shadow: 0px 12px 16px -8px #606060;
+background: rgba(255,255,255,0.6);
+border-top-right-radius: 0.5em;
+border-bottom-right-radius: 0.5em;
+position: absolute;
+top: 4em;
+left: 28%;
+right: 4%;
+bottom: 1em;
 }
 

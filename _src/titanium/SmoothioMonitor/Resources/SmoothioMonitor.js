@@ -17,6 +17,7 @@ var $j = jQuery.noConflict(),
 	},
 	smio = {
 		exiting: false,
+		lastWinPos : null,
 		exit: function() {
 			smio.exiting = true;
 			smio.tray.remove();
@@ -32,11 +33,13 @@ var $j = jQuery.noConflict(),
 			return null;
 		},
 		onClose: function(ev) {
+			smio.lastWinPos = [smio.win.getX(), smio.win.getY()]
 			if (smio.exiting)
 				return true;
 			if (ev && ev['preventDefault'])
 				ev.preventDefault();
-			smio.win.hide();
+			smio.win.minimize();
+			setTimeout(smio.win.hide, 500);
 			return false;
 		},
 		refreshView: function() {
@@ -69,8 +72,15 @@ var $j = jQuery.noConflict(),
 			}
 		},
 		show: function() {
-			if (!smio.win.isVisible())
-						smio.win.show();
+			var doShow = !smio.win.isVisible();
+			if (doShow) {
+				smio.win.show();
+				if (smio.lastWinPos) {
+					smio.win.setX(smio.lastWinPos[0]);
+					smio.win.setY(smio.lastWinPos[1]);
+				}
+			}
+			smio.win.focus();
 		}
 	};
 
@@ -88,8 +98,9 @@ jQuery(document).ready(function() {
 
 Ext.BLANK_IMAGE_URL = '../../resources/images/default/s.gif';
 Ext.onReady(function() {
+	return;
 	try {
-		smio.win.toolBar = new Ext.Toolbar({ xrenderTo: 'xxxtoolbar' });
+		smio.win.toolBar = new Ext.Toolbar();
 		smio.win.toolBar.add(new Ext.Toolbar.TextItem({ text: res.toolbar_status, style: { color: "GrayText", padding: "8px" } }));
 		smio.win.toolBar.add({ text: res.toolbar_wait, disabled: true, menu: { xtype: "menu", plain: true, items: [ { text: res.toolbar_start, disabled: true }, { text: res.toolbar_stop, disabled: true }, { text: res.toolbar_restart, disabled: true }] } });
 		smio.win.toolBar.addFill();
