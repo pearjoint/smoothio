@@ -4,29 +4,62 @@
 		<title>smoothio Monitor</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<script type="text/javascript" language="JavaScript" src="jquery.min.js"></script>
-        <script type="text/javascript" src="extjs/adapter/ext/ext-base.js"></script>
-        <script type="text/javascript" src="extjs/ext-all.js"></script>
 		<script type="text/javascript" language="JavaScript" src="SmoothioMonitor.js"></script>
-        <link rel="stylesheet" type="text/css" href="extjs/resources/css/ext-all.css" />
-		<link rel="stylesheet" type="text/css" title="gray" href="extjs/resources/css/xtheme-gray.css">
+		<script type="text/javascript" language="JavaScript" src="res.en.js"></script>
+		<script type="text/javascript" language="JavaScript" src="res.de.js"></script>
 		<link rel="stylesheet" type="text/css" href="SmoothioMonitor.css"/>
 	</head>
 	<body>
-		<div id="smon_main" class="smon-main">
+		<div id="smon_main" class="smon-main" style="background: url('smoothio.png') fixed right bottom no-repeat;">
 			<div class="smon-toolbar">
-			toolbar
+				<div class="smon-toolbar-item smon-disabled" smon-loc="toolbar_status"></div>
+				<div class="smon-toolbar-item" id="smon_status" smon-loc="toolbar_wait"></div>
+				<div class="smon-toolbar-item" style="padding: 0 0 0 0; float: right;">
+					<div class="smon-toolbar-item"><a class="smon-disabled" href="#" smon-loc="toolbar_start"></a></div>
+					<div class="smon-toolbar-item"><a class="smon-disabled" href="#" smon-loc="toolbar_stop"></a></div>
+					<div class="smon-toolbar-item"><a class="smon-disabled" href="#" smon-loc="toolbar_restart"></a></div>
+					<div class="smon-toolbar-item"><a href="#" onclick="smio.refreshUI(false, false, true);" smon-loc="toolbar_refresh"></a></div>
+				</div>
 			</div>
 			<div class="smon-instnav">
 				<ul>
-					<li><a href="#" class="smon-instnav-active">Welcome:</a></li>
-					<li><a href="#"><b>default</b> instance</a></li>
-					<li><a href="#"><b>test1</b> instance</a></li>
-					<li><a href="#"><b>other2</b> instance</a></li>
+					<li><a href="#" onclick="smio.selectTab('_welcome');" class="smon-instnav-active" smon-loc="tabs_welcome" id="smon_tab__welcome"></a></li>
 				</ul>
 			</div>
 			<div class="smon-instbox">
-			inst config
+				<div class="smon-instbox-panel" id="smon_box__welcome">
+					<h1 smon-loc="welcome_headline"></h1>
+					<p smon-loc="welcome_para1"></p>
+					<p smon-loc="welcome_para2"></p>
+					<p smon-loc="welcome_para3"></p>
+					<p smon-loc="welcome_para4"></p>
+				</div>
+				<div class="smon-instbox-panel" id="smon_box__inst" style="display: none; padding-top: 0.5em;">
+					<div class="smon-insttabs">
+						<div class="smon-insttabs-row">
+							<div><a href="#" onclick="selectSubTab('overview');" class="smon-subnav-active">Overview</a></div>
+							<div><a href="#" onclick="selectSubTab('config');">Configuration</a></div>
+							<div><a href="#" onclick="selectSubTab('servers');">Servers</a></div>
+							<div><a href="#" onclick="selectSubTab('logs');">Logs</a></div>
+						</div>
+						<div class="smon-insttabs-box">
+							<div class="smon-insttabs-tab" id="subtab_overview" style="display: block;">
+								the overview
+							</div>
+							<div class="smon-insttabs-tab" id="subtab_config">
+								the configuration
+							</div>
+							<div class="smon-insttabs-tab" id="subtab_servers">
+								the server details
+							</div>
+							<div class="smon-insttabs-tab" id="subtab_logs">
+								the logs
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</body>
 </html>
+
