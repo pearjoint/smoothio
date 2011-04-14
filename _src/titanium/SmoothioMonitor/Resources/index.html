@@ -16,23 +16,25 @@
 				<div class="smon-toolbar-item smon-disabled" smon-loc="toolbar_status"></div>
 				<div class="smon-toolbar-item" id="smon_status" smon-loc="toolbar_wait"></div>
 				<div class="smon-toolbar-item" style="padding: 0 4% 0 0; float: right;">
-					<div class="smon-toolbar-item"><a class="smon-disabled" href="#" smon-loc="toolbar_start"></a></div>
-					<div class="smon-toolbar-item"><a class="smon-disabled" href="#" smon-loc="toolbar_stop"></a></div>
-					<div class="smon-toolbar-item"><a class="smon-disabled" href="#" smon-loc="toolbar_restart"></a></div>
+					<div class="smon-toolbar-item"><a class="smon-disabled" href="#" onclick="smio.daemonStart();" smon-loc="toolbar_start"></a></div>
+					<div class="smon-toolbar-item"><a class="smon-disabled" href="#" onclick="smio.daemonStop();" smon-loc="toolbar_stop"></a></div>
+					<div class="smon-toolbar-item"><a class="smon-disabled" href="#" onclick="smio.daemonRestart();" smon-loc="toolbar_restart"></a></div>
 					<div class="smon-toolbar-item"><a href="#" onclick="smio.refreshUI(false, false, true);" smon-loc="toolbar_refresh"></a></div>
 				</div>
 			</div>
-			<div class="smon-instnav">
-				<ul>
-					<li><a href="#" onclick="smio.selectTab('_welcome');" class="smon-instnav-active" smon-loc="tabs_welcome" id="smon_tab__welcome"></a></li>
-				</ul>
-			</div>
 			<div class="smon-instnav-info">
+				<div><input type="checkbox" checked="checked" id="smon_promptreset" name="smon_promptreset"/> <label for="smon_promptreset" smon-loc="daemon_warnreset" style="color: #303030;"></label></div>
+				<br/><br/>
 				<div><b>smoothio 0.1 <span smon-loc="info_for"></span> <span id="smon_os">OS</span></b></div>
 				<div>Titanium: <span id="smon_tv">...</span></div>
 				<div><span smon-loc="info_arch"></span> <span id="smon_ar">...</span></div>
 				<div><span smon-loc="info_procs"></span> <span id="smon_pc">0</span></div>
 				<div><span id="smon_pn"></span>: <span id="smon_ov">...</span></div>
+			</div>
+			<div class="smon-instnav">
+				<ul>
+					<li><a href="#" onclick="smio.selectTab('_welcome');" class="smon-instnav-active" smon-loc="tabs_welcome" id="smon_tab__welcome"></a></li>
+				</ul>
 			</div>
 			<div class="smon-instbox">
 				<div class="smon-instbox-panel" id="smon_box__welcome">
@@ -65,27 +67,27 @@
 								the overview
 							</div>
 							<div class="smon-insttabs-tab" id="subtab_config">
+								<div class="smon-info" smon-loc="config_unsaved"></div>
 								<fieldset>
-									<legend>General</legend>
+									<legend smon-loc="config_general">General</legend>
 									config stuff...
 									<br/>
 									<br/>
 									more config...
 								</fieldset>
 								<fieldset>
-									<legend>Database Access Mode</legend>
-									config stuff...
-									<br/>
-									<br/>
-									more config...
+									<legend smon-loc="config_db"></legend>
+									<div><a smon-loc="config_db_am"></a> <input type="radio" id="config_db_am_em" name="config_db_am"/><label for="config_db_am_em" smon-loc="config_db_am_em"></label> <input type="radio" id="config_db_am_ex" name="config_db_am"/><label for="config_db_am_ex" smon-loc="config_db_am_ex"></label></div>
+									<div><a smon-loc="config_db_host"></a> <input type="text" style="width: 47%;"/> <a smon-loc="config_db_port" style="width: auto !important;"></a> <input type="text" size="5"/></div>
+									<div><a smon-loc="config_db_path"></a> <input type="text" class="smon-textbox"/></div>
+									<div><a smon-loc="config_db_log"></a> <input type="text" class="smon-textbox"/></div>
+									<div><a style="visibility: hidden;">&nbsp;</a> <input type="checkbox" id="config_db_ar" name="config_db_ar" onclick="$j('#span_config_db_ar')[this.checked?'show':'hide']();"/><label for="config_db_ar" smon-loc="config_db_ar"></label></div>
+									<span id="span_config_db_ar" style="display: none;">
+										<div><a smon-loc="config_db_au"></a> <input type="text" class="smon-textbox"/></div>
+										<div><a smon-loc="config_db_ap"></a> <input type="password" class="smon-textbox"/></div>
+									</span>
 								</fieldset>
-								<fieldset id="subtab_config_win">
-									<legend>Windows-specific</legend>
-									config stuff...
-									<br/>
-									<br/>
-									more config...
-								</fieldset>
+								<div class="smon-info" smon-loc="config_info"></div>
 							</div>
 							<div class="smon-insttabs-tab" id="subtab_servers">
 								the server details

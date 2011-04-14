@@ -21,6 +21,10 @@ var $j = jQuery.noConflict(),
 		daemonGetStatus: function() {
 			return 10;
 		},
+		daemonPrompt: function(temporary) {
+			if (confirm(res.daemon_confirm1 + res['daemon_confirm' + (temporary ? 2 : 3)] + res.daemon_confirm4)) {
+			}
+		},		
 		daemonRestart: function() {
 		},
 		daemonStart: function() {
@@ -136,8 +140,9 @@ var $j = jQuery.noConflict(),
 jQuery(document).ready(function() {
 	var l;
 	smio.setLang('en');
-	if (navigator.language && navigator.language.length && res[l = navigator.language.substr(0, 2)])
+	if (navigator.language && navigator.language.length && resources[l = navigator.language.substr(0, 2)])
 		smio.setLang(l);
+	smio.setLang('de');
 	smio.win = $t.UI.getCurrentWindow();
 	smio.win.addEventListener($t.CLOSE, smio.onClose);
 	smio.trayMenu = $t.UI.createMenu();
@@ -153,10 +158,15 @@ jQuery(document).ready(function() {
 	$j('#smon_ar').text($t.Platform.getArchitecture());
 	$j('#smon_pc').text($t.Platform.getProcessorCount());
 	$j('#smon_pn').text(smio.platform = $t.getPlatform().toLowerCase());
-	if (smio.platform.substr(0, 3) != 'win')
-		$j('#subtab_config_win').css({ 'display': 'none' });
-	else
+	if (smio.platform.substr(0, 3) == 'win')
 		smio.platform = 'windows';
+	$j('fieldset div a').each(function(i, a) {
+		var $a = $j(a);
+		$a.click(function() {
+			var att = $a.attr('smon-loc');
+			alert(res[att] + '\n\n' + res['h_' + att], 'foo');
+		});
+	}).attr('href', '#');
 });
 
 jQuery(window).load(function() {

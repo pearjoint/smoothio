@@ -97,16 +97,14 @@ class smio.Instance
 					"processes": 1,
 					"autorestart": { "on_files_changed": false, "on_crash_after_uptime_secs": 300 },
 					"logging": { "details": false, "stack": false, "path": "server/log/smoothio.log" },
-					"language": "en"
+					"language": "en",
+					"dns_preresolve": { "enabled": (process.platform is 'cygwin'), "hostnames": { "localhost": defHost, "$localhostname": defHost } }
 				},
 				"mongodb": {
 					"host": defHost,
 					"port": 61234,
 					"dbpath": "server/dbs/",
 					"logpath": "server/log/mongodb/mongodb.log"
-				},
-				"cygwin": {
-					"dns_preresolve": { "localhost": defHost, "$localhostname": defHost }
 				}
 			}
 		catch err

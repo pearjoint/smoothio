@@ -12,8 +12,8 @@ class smio.Server
 	constructor: (@inst, @serverName, @hostName, @port, @processes) ->
 		hostName = @hostName
 		localHostName = node_os.hostname()
-		if process.platform is 'cygwin'
-			for host, ip of @inst.config.cygwin.dns_preresolve
+		if @inst.config.smoothio.dns_preresolve.enabled or process.platform is 'cygwin'
+			for host, ip of @inst.config.smoothio.dns_preresolve.hostnames
 				if (hostName is host) or ((host is '$localhostname') and hostName is localHostName)
 					hostName = ip
 					break
