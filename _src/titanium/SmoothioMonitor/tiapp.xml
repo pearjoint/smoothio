@@ -14,9 +14,9 @@
 	<title>smoothio Monitor</title>
 	<url>app://index.html</url>
 	<width>760</width>
+	<height>560</height>
 	<max-width>5000</max-width>
 	<min-width>600</min-width>
-	<height>500</height>
 	<max-height>5000</max-height>
 	<min-height>200</min-height>
 	<fullscreen>false</fullscreen>

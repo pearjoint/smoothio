@@ -18,6 +18,8 @@ var $j = jQuery.noConflict(),
 		instances: {},
 		lastWinPos : null,
 		winActive: true,
+		configUpdateDataMode: function() {
+		},
 		daemonGetStatus: function() {
 			return 10;
 		},
@@ -51,8 +53,7 @@ var $j = jQuery.noConflict(),
 				return true;
 			if (ev && ev['preventDefault'])
 				ev.preventDefault();
-			smio.win.minimize();
-			setTimeout(smio.win.hide, 500);
+			setTimeout(smio.win.hide, 250);
 			return false;
 		},
 		refreshUI: function(locs, status, instances) {
@@ -127,7 +128,7 @@ var $j = jQuery.noConflict(),
 					smio.win.setY(smio.lastWinPos[1]);
 				}
 			}
-			smio.win.focus();
+			setTimeout(function() { smio.win.focus(); }, 250);
 		},
 		toggle: function() {
 			if (smio.win.isVisible() && smio.winActive && !smio.win.isMinimized())

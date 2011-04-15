@@ -23,8 +23,6 @@
 				</div>
 			</div>
 			<div class="smon-instnav-info">
-				<div><input type="checkbox" checked="checked" id="smon_promptreset" name="smon_promptreset"/> <label for="smon_promptreset" smon-loc="daemon_warnreset" style="color: #303030;"></label></div>
-				<br/><br/>
 				<div><b>smoothio 0.1 <span smon-loc="info_for"></span> <span id="smon_os">OS</span></b></div>
 				<div>Titanium: <span id="smon_tv">...</span></div>
 				<div><span smon-loc="info_arch"></span> <span id="smon_ar">...</span></div>
@@ -39,15 +37,17 @@
 			<div class="smon-instbox">
 				<div class="smon-instbox-panel" id="smon_box__welcome">
 					<h1 smon-loc="welcome_summary"></h1>
-					<p>
-						<ul class="smon-summary">
-							<li><a href="#" onclick="smio.selectTab('default');"><b>default</b> Instance:</a>
-								<ul>
-									<li>Server <b>default_server</b> at <a href="http://localhost:2020" target="_blank">localhost:2020</a></li>
-								</ul>
-							</li>
-						</ul>
-					</p>
+					<p><b>default</b> Instance:</p>
+					<ul class="smon-summary">
+						<li>Server <b>default_server</b> at <a href="http://localhost:2020" target="_blank">localhost:2020</a></li>
+						<li>Server <b>test_server</b> at <a href="http://localhost:3030" target="_blank">localhost:3030</a></li>
+					</ul>
+					<p><b>experiments</b> Instance:</p>
+					<ul class="smon-summary">
+						<li>Server <b>default_server</b> at <a href="http://localhost:2020" target="_blank">localhost:2020</a></li>
+						<li>Server <b>test_server</b> at <a href="http://localhost:3030" target="_blank">localhost:3030</a></li>
+					</ul>
+					<br/><br/>
 					<h1 smon-loc="welcome_headline"></h1>
 					<p smon-loc="welcome_para1"></p>
 					<p smon-loc="welcome_para2"></p>
