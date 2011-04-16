@@ -16,13 +16,20 @@ class smio.Instance
 	constructor: ->
 		@logFile = null
 		@util = new smio.Util
-		@firstRequestTime = null
+		@initTime = new Date
 		@lastRequestTime = null
+		@restartMinUptime = 60
 		@resourceSets = {}
 		@servers = []
 		@mongos = {}
 		if (resErrs = @loadResourceSets '../_core/res', false) and resErrs.length
 			throw resErrs[0]
+
+	expandLogPath: (path) ->
+		if path and ((pos = path.indexOf '*') > 0)
+			dt = new Date
+			path = "#{path.substr 0, pos}#{@util.formatDate dt}#{path.substr pos + 1}"
+		path
 
 	finalizeStart: () ->
 		lastInterval = 0
@@ -37,6 +44,9 @@ class smio.Instance
 
 	formatError: (err) ->
 		@util.formatError err, @config.smoothio.logging.details, @config.smoothio.logging.stack
+
+	getUptime: () ->
+		((new Date).getTime() / 1000) - (@initTime.getTime() / 1000)
 
 	haveAllStopped: ->
 		for server in @servers
@@ -95,7 +105,7 @@ class smio.Instance
 				"smoothio": {
 					"enabled": true,
 					"processes": 1,
-					"autorestart": { "on_files_changed": false, "on_crash_after_uptime_secs": 300 },
+					"autorestart": { "on_files_changed": false, "on_crash_after_uptime_secs": @restartMinUptime },
 					"logging": { "details": false, "stack": false, "path": "server/log/smoothio.log" },
 					"language": "en",
 					"dns_preresolve": { "enabled": (process.platform is 'cygwin'), "hostnames": { "localhost": defHost, "$localhostname": defHost } }
@@ -111,24 +121,30 @@ class smio.Instance
 			err.ml_error_filepath = 'instance.config'
 			err.message = 'ERROR parsing instance.config: ' + err.message
 			throw err
-		if @config.smoothio.logging.path
+		if (logPath = @expandLogPath @config.smoothio.logging.path)
 			try
-				node_fs.unlinkSync @config.instance.logging.path
+				node_fs.unlinkSync logPath
 			oldLogFunc = smio.logit
-			smio.logit = (line, cat) =>
-				if @logFile and not @logFile.writable
-					try
-						@logFile.end()
-					try
-						@logFile.destroySoon()
-					@logFile = null
-				if not @logFile
-					@logFile = node_fs.createWriteStream @config.smoothio.logging.path, flags: 'a', encoding: 'utf-8', mode: 0666
-					@logFile.on 'close', fn = () => @logFile = null
-					@logFile.on 'error', fn
-				line = JSON.stringify(new Date()) + ' - ' + oldLogFunc(line, cat) + '\n'
+			closeLog = () =>
 				try
-					@logFile.write line
+					@logFile.end()
+				try
+					@logFile.destroySoon()
+				@logFile = null
+			smio.logit = (line, cat) =>
+				full = ''
+				if smio['logBuffer']
+					full = smio.logBuffer.join('\n') + '\n'
+					delete smio.logBuffer
+				if @logFile and not @logFile.writable
+					closeLog
+				if not @logFile
+					@logFile = node_fs.createWriteStream logPath, encoding: 'utf-8', mode: 0666
+					@logFile.on 'close', closeLog
+					@logFile.on 'error', closeLog
+				full += (line = JSON.stringify(new Date()) + ' - ' + oldLogFunc(line, cat) + '\n')
+				try
+					@logFile.write full
 		if not @config.smoothio.enabled
 			smio.logit "This smoothio instance has been disabled in instance.config."
 			return 0
@@ -138,14 +154,12 @@ class smio.Instance
 			return 1
 		@mongoConfig = @config.mongodb
 		@autoRestart = if (@config.smoothio.autorestart.on_files_changed is true and @config.smoothio.processes is 1) then true else false
+		@restartMinUptime = @config.smoothio.autorestart.on_crash_after_uptime_secs
 		if @mongoIsLocal = (process.platform isnt 'cygwin') and @mongoConfig.host is defHost
-			mongoLogPath = @mongoConfig.logpath
-			if (pos = mongoLogPath.indexOf '*') > 0
-				dt = new Date
-				mongoLogPath = "#{mongoLogPath.substr 0, pos}#{@util.formatDate dt}#{mongoLogPath.substr pos + 1}"
+			mongoLogPath = @expandLogPath @mongoConfig.logpath
 			try
 				node_fs.unlinkSync node_path.join @mongoConfig.dbpath, "mongod.lock"
-			node_proc.exec "../_core/bin/#{if process.platform is 'darwin' then 'osx' else 'linux'}/mongod --fork --rest --dbpath #{@mongoConfig.dbpath} --port #{@mongoConfig.port} --logpath #{mongoLogPath}", (err, stdout, stderr) =>
+			node_proc.exec "../_core/bin/#{if process.platform is 'darwin' then 'osx' else 'linux'}/mongod --fork --rest --dbpath #{@mongoConfig.dbpath} --port #{@mongoConfig.port} " + (if mongoLogPath then "--logpath #{mongoLogPath}" else ''), (err, stdout, stderr) =>
 				if err
 					smio.logit (@r 'log_mongo_error_start', @formatError err), 'mongodb'
 					return 1

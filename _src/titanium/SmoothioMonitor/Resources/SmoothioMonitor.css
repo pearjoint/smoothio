@@ -60,7 +60,7 @@ overflow: hidden;
 white-space: nowrap;
 text-decoration: none;
 }
-fieldset div input.smon-textbox {
+fieldset div .smon-textbox {
 width: 70%;
 }
 fieldset div a:hover {

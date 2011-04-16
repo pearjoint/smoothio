@@ -67,24 +67,29 @@
 								the overview
 							</div>
 							<div class="smon-insttabs-tab" id="subtab_config">
-								<div class="smon-info" smon-loc="config_unsaved"></div>
+								<div class="smon-info" smon-loc="config_unsaved" id="config_unsaved" style="display: none;"></div>
 								<fieldset>
 									<legend smon-loc="config_general">General</legend>
-									config stuff...
-									<br/>
-									<br/>
-									more config...
+									<div><a smon-loc="config_rs_cf"></a> <input type="checkbox" id="config_rs_cf" name="config_rs_cf" onclick="smio.configOnChanged();"/><label for="config_rs_cf" smon-loc="config_rs_cfl"></label></div>
+									<div><a smon-loc="config_rs_fc"></a> <span smon-loc="config_rs_fcl"></span> <input type="text" size="3" onchange="smio.configOnChanged();"/></div>
+									<div><a smon-loc="config_log_path"></a> <input type="text" class="smon-textbox" onchange="smio.configOnChanged();"/></div>
+									<div><a style="visibility: hidden;">&nbsp;</a> <input type="checkbox" id="config_log_d" name="config_log_d"/><label for="config_log_d" smon-loc="config_log_d"></label></div>
+									<div><a style="visibility: hidden;">&nbsp;</a> <input type="checkbox" id="config_log_s" name="config_log_s"/><label for="config_log_s" smon-loc="config_log_s"></label></div>
+									<div><a style="visibility: hidden;">&nbsp;</a> <input type="checkbox" id="config_dns" name="config_dns" onclick="$j('#span_config_dns')[this.checked?'show':'hide']();"/><label for="config_dns" smon-loc="config_dns"></label></div>
+									<span id="span_config_dns" style="display: none;">
+										<div><a smon-loc="config_dns_p"></a> <textarea rows="2" class="smon-textbox" id="config_dns_p" onchange="smio.configOnChanged();"></textarea></div>
+									</span>
 								</fieldset>
 								<fieldset>
 									<legend smon-loc="config_db"></legend>
-									<div><a smon-loc="config_db_am"></a> <input type="radio" id="config_db_am_em" name="config_db_am"/><label for="config_db_am_em" smon-loc="config_db_am_em"></label> <input type="radio" id="config_db_am_ex" name="config_db_am"/><label for="config_db_am_ex" smon-loc="config_db_am_ex"></label></div>
-									<div><a smon-loc="config_db_host"></a> <input type="text" style="width: 47%;"/> <a smon-loc="config_db_port" style="width: auto !important;"></a> <input type="text" size="5"/></div>
-									<div><a smon-loc="config_db_path"></a> <input type="text" class="smon-textbox"/></div>
-									<div><a smon-loc="config_db_log"></a> <input type="text" class="smon-textbox"/></div>
-									<div><a style="visibility: hidden;">&nbsp;</a> <input type="checkbox" id="config_db_ar" name="config_db_ar" onclick="$j('#span_config_db_ar')[this.checked?'show':'hide']();"/><label for="config_db_ar" smon-loc="config_db_ar"></label></div>
+									<div><a smon-loc="config_db_am"></a> <input type="radio" id="config_db_am_em" name="config_db_am" onclick="smio.configOnChanged();"/><label for="config_db_am_em" smon-loc="config_db_am_em"></label> <input type="radio" id="config_db_am_ex" name="config_db_am" onclick="smio.configOnChanged();"/><label for="config_db_am_ex" smon-loc="config_db_am_ex"></label></div>
+									<div><a smon-loc="config_db_host"></a> <input type="text" style="width: 47%;" onchange="smio.configOnChanged();"/> <a smon-loc="config_db_port" style="width: auto !important;"></a> <input type="text" size="5" onchange="smio.configOnChanged();"/></div>
+									<div><a smon-loc="config_db_path"></a> <input type="text" class="smon-textbox" onchange="smio.configOnChanged();"/></div>
+									<div><a smon-loc="config_db_log"></a> <input type="text" class="smon-textbox" onchange="smio.configOnChanged();"/></div>
+									<div><a style="visibility: hidden;">&nbsp;</a> <input type="checkbox" id="config_db_ar" name="config_db_ar" onclick="$j('#span_config_db_ar')[this.checked?'show':'hide']();if(!this.checked){$j('#config_db_au, #config_db_ap').val('');}"/><label for="config_db_ar" smon-loc="config_db_ar"></label></div>
 									<span id="span_config_db_ar" style="display: none;">
-										<div><a smon-loc="config_db_au"></a> <input type="text" class="smon-textbox"/></div>
-										<div><a smon-loc="config_db_ap"></a> <input type="password" class="smon-textbox"/></div>
+										<div><a smon-loc="config_db_au"></a> <input type="text" class="smon-textbox" id="config_db_au" onchange="smio.configOnChanged();"/></div>
+										<div><a smon-loc="config_db_ap"></a> <input type="password" class="smon-textbox" id="config_db_ap" onchange="smio.configOnChanged();"/></div>
 									</span>
 								</fieldset>
 								<div class="smon-info" smon-loc="config_info"></div>

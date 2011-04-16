@@ -19,11 +19,15 @@ var coffee = require('coffee-script'),
 	watchedFiles = [];
 
 smio.instName = node_path.basename(process.cwd());
+smio.logBuffer = [];
 
 smio.logit = function(line, cat) {
 	line = '[' + smio.instName + (cat ? ('.' + cat) : '') + '] ' + line;
-	if (!noLogging)
+	if (!noLogging) {
+		if (smio['logBuffer'])
+			smio.logBuffer.push(JSON.stringify(new Date()) + ' - ' + line);
 		node_util.log(line);
+	}
 	return line;
 }
 
@@ -205,7 +209,7 @@ function watchFile(filePath) {
 
 process.on('uncaughtException', function (err) {
 	smio.logit('ERROR unhandled:\n' + JSON.stringify(err));
-	exitCode = 1;
+	exitCode = (smio.inst && smio.inst.restartMinUptime && (smio.getUptime() >= smio.inst.restartMinUptime)) ? 1000 : 1;
 	stopSmoothio();
 });
 process.on('SIGINT', stopSmoothio);

@@ -7,10 +7,7 @@ class smio.RequestContext
 		@inst = @server.inst
 
 	handleRequest: ->
-		now = new Date
-		if not @inst.firstRequestTime
-			@inst.firstRequestTime = now
-		@inst.lastRequestTime = now
+		@inst.lastRequestTime = new Date
 		if hasHandler = @uri.pathItems.length and @uri.pathItems[0] is '_' and @uri.pathItems.length > 2
 			switch @uri.pathItems[1]
 				when "file"

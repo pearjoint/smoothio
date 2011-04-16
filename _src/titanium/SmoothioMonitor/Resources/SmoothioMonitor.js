@@ -18,6 +18,12 @@ var $j = jQuery.noConflict(),
 		instances: {},
 		lastWinPos : null,
 		winActive: true,
+		configOnChanged: function() {
+			$j('#config_unsaved').css({ "display": "block" });
+		},
+		configSaveChanges: function() {
+			smio.daemonPrompt(true);
+		},
 		configUpdateDataMode: function() {
 		},
 		daemonGetStatus: function() {
@@ -63,6 +69,7 @@ var $j = jQuery.noConflict(),
 				$j('.smon-instnav-institem').remove();
 				smio.instances = {};
 				try {
+					$j('#config_unsaved').css({ "display": "none" });
 					$j('#smon_main').css({ visibility: 'hidden' });
 					if ((subDirs = smio.rootDir.getDirectoryListing()) && subDirs.length)
 						for (var i = 0; i < subDirs.length; i++)

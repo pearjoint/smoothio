@@ -1,44 +1,15 @@
-"2011-04-10T10:36:45.609Z" - [default.packs.MetaLeapCore] PAKET 'MetaLeapCore': wird geladen...
-"2011-04-10T10:36:45.622Z" - [default.packs.MetaLeapCore] PAKET 'MetaLeapCore': erfolgreich geladen.
-"2011-04-10T10:36:45.631Z" - [default.mongodb] forked process: 9221
-all output going to: /home/roxor/metaleap/default/server/log/mongodb/mongodb.log
-"2011-04-10T10:36:45.634Z" - [default.servers.server1] SERVER 'server1' gestartet unter localhost:2020
-"2011-04-10T10:36:45.634Z" - [default.servers.server2] SERVER 'server2' gestartet unter localhost:4040
-"2011-04-10T10:36:46.153Z" - [default.mongodb.admin] Verbunden mit MongoDB Admin-Datenbank.
-"2011-04-10T10:36:46.634Z" - [default.mongodb.metaleap_shared] Verbunden mit MetaLeap Shared-Datenbank.
-"2011-04-10T10:36:47.135Z" - [default.mongodb.metaleap__server1] Verbunden mit MetaLeap server1-Datenbank.
-"2011-04-10T10:36:47.636Z" - [default.mongodb.metaleap__server2] Verbunden mit MetaLeap server2-Datenbank.
-"2011-04-10T10:36:48.763Z" - [default] Shutting down servers...
-"2011-04-10T10:36:49.022Z" - [default] Shutdown of all servers completed.
-
-"2011-04-11T10:11:36.557Z" - [default] ERROR unhandled:
-{"stack":"ReferenceError: smioPacks is not defined\n    at Instance.start (/home/roxor/smoothio/default/server/_jscript/Instance.js:209:7)\n    at startSmoothio (/home/roxor/smoothio/default/instance.js:172:69)\n    at Object.<anonymous> (/home/roxor/smoothio/default/instance.js:213:1)\n    at Module._compile (module.js:404:26)\n    at Object..js (module.js:410:10)\n    at Module.load (module.js:336:31)\n    at Function._load (module.js:297:12)\n    at Array.<anonymous> (module.js:423:10)\n    at EventEmitter._tickCallback (node.js:126:26)","arguments":["smioPacks"],"type":"not_defined","message":"smioPacks is not defined"}
-"2011-04-11T10:11:36.558Z" - [default] Shutting down servers...
-"2011-04-11T10:11:36.813Z" - [default] Shutdown of all servers completed.
-
-"2011-04-11T10:12:23.053Z" - [default.packs.SmoothioCore] PAKET 'SmoothioCore': wird geladen...
-"2011-04-11T10:12:23.065Z" - [default.packs.SmoothioCore] PAKET 'SmoothioCore': erfolgreich geladen.
-"2011-04-11T10:12:23.077Z" - [default.mongodb] forked process: 7879
+"2011-04-16T07:27:21.623Z" - [default] Compiling Stylus sheets...
+"2011-04-16T07:27:21.653Z" - [default] Compiling CoffeeScripts...
+"2011-04-16T07:27:21.807Z" - [default.packs.SmoothioCore] PAKET 'SmoothioCore': wird geladen...
+"2011-04-16T07:27:21.821Z" - [default.packs.SmoothioCore] PAKET 'SmoothioCore': erfolgreich geladen.
+"2011-04-16T07:27:21.830Z" - [default.mongodb] forked process: 8399
 all output going to: /home/roxor/smoothio/default/server/log/mongodb/mongodb.log
-"2011-04-11T10:12:23.081Z" - [default.servers.server1] SERVER 'server1' gestartet unter localhost:2020
-"2011-04-11T10:12:23.081Z" - [default.servers.server2] SERVER 'server2' gestartet unter localhost:4040
-"2011-04-11T10:12:23.587Z" - [default.mongodb.admin] Verbunden mit MongoDB Admin-Datenbank.
-"2011-04-11T10:12:24.084Z" - [default.mongodb.smoothio_shared] Verbunden mit smoothio Shared-Datenbank.
-"2011-04-11T10:12:24.584Z" - [default.mongodb.smoothio__server1] Verbunden mit smoothio server1-Datenbank.
-"2011-04-11T10:12:25.084Z" - [default.mongodb.smoothio__server2] Verbunden mit smoothio server2-Datenbank.
-"2011-04-11T10:29:34.874Z" - [default] Shutting down servers...
-"2011-04-11T10:29:35.133Z" - [default] Shutdown of all servers completed.
-
-"2011-04-11T16:53:35.077Z" - [default.packs.SmoothioCore] PAKET 'SmoothioCore': wird geladen...
-"2011-04-11T16:53:35.092Z" - [default.packs.SmoothioCore] PAKET 'SmoothioCore': erfolgreich geladen.
-"2011-04-11T16:53:35.099Z" - [default.mongodb] forked process: 9227
-all output going to: /home/roxor/smoothio/default/server/log/mongodb/mongodb.log
-"2011-04-11T16:53:35.117Z" - [default.servers.server1] SERVER 'server1' gestartet unter localhost:2020
-"2011-04-11T16:53:35.117Z" - [default.servers.server2] SERVER 'server2' gestartet unter localhost:4040
-"2011-04-11T16:53:35.613Z" - [default.mongodb.admin] Verbunden mit MongoDB Admin-Datenbank.
-"2011-04-11T16:53:36.110Z" - [default.mongodb.smoothio_shared] Verbunden mit smoothio Shared-Datenbank.
-"2011-04-11T16:53:36.620Z" - [default.mongodb.smoothio__server1] Verbunden mit smoothio server1-Datenbank.
-"2011-04-11T16:53:37.122Z" - [default.mongodb.smoothio__server2] Verbunden mit smoothio server2-Datenbank.
-"2011-04-11T19:36:24.039Z" - [default] Shutting down servers...
-"2011-04-11T19:36:24.299Z" - [default] Shutdown of all servers completed.
+"2011-04-16T07:27:21.834Z" - [default.servers.server1] SERVER 'server1' gestartet unter localhost:2020
+"2011-04-16T07:27:21.835Z" - [default.servers.server2] SERVER 'server2' gestartet unter localhost:4040
+"2011-04-16T07:27:22.336Z" - [default.mongodb.admin] Verbunden mit MongoDB Admin-Datenbank.
+"2011-04-16T07:27:22.835Z" - [default.mongodb.smoothio_shared] Verbunden mit smoothio Shared-Datenbank.
+"2011-04-16T07:27:23.344Z" - [default.mongodb.smoothio__server1] Verbunden mit smoothio server1-Datenbank.
+"2011-04-16T07:27:23.844Z" - [default.mongodb.smoothio__server2] Verbunden mit smoothio server2-Datenbank.
+"2011-04-16T07:49:19.803Z" - [default] Shutting down servers...
+"2011-04-16T07:49:20.061Z" - [default] Shutdown of all servers completed.
 

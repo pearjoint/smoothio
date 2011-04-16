@@ -19,6 +19,7 @@
       this.util = new smio.Util;
       this.firstRequestTime = null;
       this.lastRequestTime = null;
+      this.restartMinUptime = 300;
       this.resourceSets = {};
       this.servers = [];
       this.mongos = {};
@@ -26,6 +27,14 @@
         throw resErrs[0];
       }
     }
+    Instance.prototype.expandLogPath = function(path) {
+      var dt, pos;
+      if (path && ((pos = path.indexOf('*')) > 0)) {
+        dt = new Date;
+        path = "" + (path.substr(0, pos)) + (this.util.formatDate(dt)) + (path.substr(pos + 1));
+      }
+      return path;
+    };
     Instance.prototype.finalizeStart = function() {
       var lastInterval, scfg, server, sname, _ref, _results;
       lastInterval = 0;
@@ -39,12 +48,15 @@
       _results = [];
       for (sname in _ref) {
         scfg = _ref[sname];
-        _results.push((sname != null) && (scfg != null) && (scfg['host'] != null) && (scfg['port'] != null) ? (server = new smio.Server(this, sname, scfg.host, scfg.port, this.config.smoothio.processes), this.servers.push(server), this.mongos["smoothio__" + sname] = new smio.Database(this, this.mongo, "smoothio__" + sname, "smoothio " + sname, server, lastInterval += 500)) : void 0);
+        _results.push((sname != null) && (scfg != null) && (scfg['host'] != null) && (scfg['port'] != null) && (!(scfg['disabled'] === true)) ? (server = new smio.Server(this, sname, scfg.host, scfg.port, this.config.smoothio.processes), this.servers.push(server), this.mongos["smoothio__" + sname] = new smio.Database(this, this.mongo, "smoothio__" + sname, "smoothio " + sname, server, lastInterval += 500)) : void 0);
       }
       return _results;
     };
     Instance.prototype.formatError = function(err) {
       return this.util.formatError(err, this.config.smoothio.logging.details, this.config.smoothio.logging.stack);
+    };
+    Instance.prototype.getUptime = function() {
+      return ((lastRequestTime ? lastRequestTime.getTime() : 0) / 1000) - ((firstRequestTime ? firstRequestTime.getTime() : 0) / 1000);
     };
     Instance.prototype.haveAllStopped = function() {
       var server, _i, _len, _ref;
@@ -133,7 +145,7 @@
       return val;
     };
     Instance.prototype.start = function() {
-      var defHost, dt, mongoLogPath, oldLogFunc, pos;
+      var closeLog, defHost, logPath, mongoLogPath, oldLogFunc;
       defHost = '127.0.0.1';
       try {
         this.config = this.util.mergeConfigWithDefaults(JSON.parse(this.util.fs.readTextFile('instance.config')), {
@@ -142,26 +154,27 @@
             "processes": 1,
             "autorestart": {
               "on_files_changed": false,
-              "on_crash_after_uptime_secs": 300
+              "on_crash_after_uptime_secs": this.restartMinUptime
             },
             "logging": {
               "details": false,
               "stack": false,
               "path": "server/log/smoothio.log"
             },
-            "language": "en"
+            "language": "en",
+            "dns_preresolve": {
+              "enabled": process.platform === 'cygwin',
+              "hostnames": {
+                "localhost": defHost,
+                "$localhostname": defHost
+              }
+            }
           },
           "mongodb": {
             "host": defHost,
             "port": 61234,
             "dbpath": "server/dbs/",
             "logpath": "server/log/mongodb/mongodb.log"
-          },
-          "cygwin": {
-            "dns_preresolve": {
-              "localhost": defHost,
-              "$localhostname": defHost
-            }
           }
         });
       } catch (err) {
@@ -169,36 +182,41 @@
         err.message = 'ERROR parsing instance.config: ' + err.message;
         throw err;
       }
-      if (this.config.smoothio.logging.path) {
+      if ((logPath = this.expandLogPath(this.config.smoothio.logging.path))) {
         try {
-          node_fs.unlinkSync(this.config.instance.logging.path);
+          node_fs.unlinkSync(logPath);
         } catch (_e) {}
         oldLogFunc = smio.logit;
+        closeLog = __bind(function() {
+          try {
+            this.logFile.end();
+          } catch (_e) {}
+          try {
+            this.logFile.destroySoon();
+          } catch (_e) {}
+          return this.logFile = null;
+        }, this);
         smio.logit = __bind(function(line, cat) {
-          var fn;
+          var full;
+          full = '';
+          if (smio['logBuffer']) {
+            full = smio.logBuffer.join('\n') + '\n';
+            delete smio.logBuffer;
+          }
           if (this.logFile && !this.logFile.writable) {
-            try {
-              this.logFile.end();
-            } catch (_e) {}
-            try {
-              this.logFile.destroySoon();
-            } catch (_e) {}
-            this.logFile = null;
+            closeLog;
           }
           if (!this.logFile) {
-            this.logFile = node_fs.createWriteStream(this.config.smoothio.logging.path, {
-              flags: 'a',
+            this.logFile = node_fs.createWriteStream(logPath, {
               encoding: 'utf-8',
               mode: 0666
             });
-            this.logFile.on('close', fn = __bind(function() {
-              return this.logFile = null;
-            }, this));
-            this.logFile.on('error', fn);
+            this.logFile.on('close', closeLog);
+            this.logFile.on('error', closeLog);
           }
-          line = JSON.stringify(new Date()) + ' - ' + oldLogFunc(line, cat) + '\n';
+          full += (line = JSON.stringify(new Date()) + ' - ' + oldLogFunc(line, cat) + '\n');
           try {
-            return this.logFile.write(line);
+            return this.logFile.write(full);
           } catch (_e) {}
         }, this);
       }
@@ -213,16 +231,13 @@
       }
       this.mongoConfig = this.config.mongodb;
       this.autoRestart = this.config.smoothio.autorestart.on_files_changed === true && this.config.smoothio.processes === 1 ? true : false;
+      this.restartMinUptime = this.config.smoothio.autorestart.on_crash_after_uptime_secs;
       if (this.mongoIsLocal = (process.platform !== 'cygwin') && this.mongoConfig.host === defHost) {
-        mongoLogPath = this.mongoConfig.logpath;
-        if ((pos = mongoLogPath.indexOf('*')) > 0) {
-          dt = new Date;
-          mongoLogPath = "" + (mongoLogPath.substr(0, pos)) + (this.util.formatDate(dt)) + (mongoLogPath.substr(pos + 1));
-        }
+        mongoLogPath = this.expandLogPath(this.mongoConfig.logpath);
         try {
           node_fs.unlinkSync(node_path.join(this.mongoConfig.dbpath, "mongod.lock"));
         } catch (_e) {}
-        node_proc.exec("../_core/bin/" + (process.platform === 'darwin' ? 'osx' : 'linux') + "/mongod --fork --rest --dbpath " + this.mongoConfig.dbpath + " --port " + this.mongoConfig.port + " --logpath " + mongoLogPath, __bind(function(err, stdout, stderr) {
+        node_proc.exec(("../_core/bin/" + (process.platform === 'darwin' ? 'osx' : 'linux') + "/mongod --fork --rest --dbpath " + this.mongoConfig.dbpath + " --port " + this.mongoConfig.port + " ") + (mongoLogPath ? "--logpath " + mongoLogPath : ''), __bind(function(err, stdout, stderr) {
           if (err) {
             smio.logit(this.r('log_mongo_error_start', this.formatError(err)), 'mongodb');
             return 1;

@@ -19,8 +19,8 @@
       this.processes = processes;
       hostName = this.hostName;
       localHostName = node_os.hostname();
-      if (process.platform === 'cygwin') {
-        _ref = this.inst.config.cygwin.dns_preresolve;
+      if (this.inst.config.smoothio.dns_preresolve.enabled || process.platform === 'cygwin') {
+        _ref = this.inst.config.smoothio.dns_preresolve.hostnames;
         for (host in _ref) {
           ip = _ref[host];
           if ((hostName === host) || ((host === '$localhostname') && hostName === localHostName)) {
