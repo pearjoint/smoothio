@@ -4,22 +4,86 @@ var $j = jQuery.noConflict(),
 	res,
 	resources = {},
 	smio = {
-		configDesc: {
-			"smoothio": {
-				
-			},
-			"mongodb": {
-			},
-			"cygwin": {
-			}
-		},
 		curTabID: '_welcome',
+		defs: {
+			host: '127.0.0.1',
+			port: 61234,
+			uptime: 60
+		},
 		exiting: false,
 		instances: {},
 		lastWinPos : null,
 		winActive: true,
-		configOnChanged: function() {
-			$j('#config_unsaved').css({ "display": "block" });
+		configOnChanged: function(noModified) {
+			var tmp;
+			$j('#config_log_lang_o').attr('disabled', !$j('#config_log_lang_other').attr('checked'));
+			if ($j('#config_log_lang_en').attr('checked'))
+				$j('#config_log_lang_o').val('en');
+			else if ($j('#config_log_lang_de').attr('checked'))
+				$j('#config_log_lang_o').val('de');
+			else if ($j('#config_log_lang_o').val() == 'de')
+				$j('#config_log_lang_de').attr('checked', true);
+			else if ($j('#config_log_lang_o').val() == 'en')
+				$j('#config_log_lang_en').attr('checked', true);
+			if (isNaN(parseInt($j('#config_rs_fc').val())))
+				$j('#config_rs_fc').val(smio.defs.uptime);
+			$j('#span_config_dns')[$j('#config_dns').attr('checked') ? 'show' : 'hide']();
+			if ($j('#config_db_host').val() == smio.defs.host)
+				$j('#config_db_am_em').attr('checked', true);
+			if ($j('#config_db_am_ex').attr('checked')) {
+				$j('#config_db_host').attr('disabled', false);
+				$j('#config_db_path, #config_db_log').attr('disabled', true);
+				$j('#config_db_ar').attr('disabled', false);
+			} else {
+				$j('#config_db_am_em').attr('checked', true);
+				$j('#config_db_host').val(smio.defs.host).attr('disabled', true);
+				$j('#config_db_path, #config_db_log').attr('disabled', false);
+				$j('#config_db_ar').attr('disabled', true).attr('checked', false);
+			}
+			if (isNaN(parseInt($j('#config_db_port').val())))
+				$j('#config_rs_fc').val(smio.defs.port);
+			$j('#span_config_db_ar')[(tmp = $j('#config_db_ar').attr('checked')) ? 'show' : 'hide']();
+			if(!tmp)
+				$j('#config_db_au, #config_db_ap').val('');
+			if (!noModified) {
+				$j('#config_unsaved').css({ "display": "block" });
+				$j('#config_info').css({ "display": "none" });
+			}
+		},
+		configRefreshUI: function(instName, config) {
+			var tmp = config.smoothio.language;
+			$j('#config_log_lang_o').val(tmp);
+			if (tmp == 'en')
+				$j('#config_log_lang_en').attr('checked', true);
+			else if (tmp == 'de')
+				$j('#config_log_lang_de').attr('checked', true);
+			else
+				$j('#config_log_lang_other').attr('checked', true);
+			$j('#config_log_path').val(config.smoothio.logging.path);
+			$j('#config_log_d').attr('checked', config.smoothio.logging.details);
+			$j('#config_log_s').attr('checked', config.smoothio.logging.stack);
+			$j('#config_rs_cf').attr('checked', config.smoothio.autorestart.on_files_changed);
+			$j('#config_rs_fc').val(config.smoothio.autorestart.on_crash_after_uptime_secs + '');
+			$j('#config_dns').attr('checked', (smio.platform == 'windows') || config.smoothio.dns_preresolve.enabled);
+			if (smio.platform == 'windows')
+				$j('#config_dns').attr('disabled', true);
+			tmp = '';
+			if (config.smoothio.dns_preresolve.hostnames)
+				for (var p in config.smoothio.dns_preresolve.hostnames)
+					tmp += (p + ':' + config.smoothio.dns_preresolve.hostnames[p] + '\n');
+			$j('#config_dns_p').val(tmp).text(tmp);
+			$j('#config_db_am_em').attr('checked', config.mongodb.host == smio.defs.host);
+			$j('#config_db_am_ex').attr('checked', config.mongodb.host != smio.defs.host);
+			$j('#config_db_host').val(config.mongodb.host);
+			$j('#config_db_port').val(config.mongodb.port);
+			$j('#config_db_path').val(config.mongodb.dbpath);
+			$j('#config_db_log').val(config.mongodb.logpath);
+			$j('#config_db_ar').attr('checked', config.mongodb.auth);
+			if (config.mongodb.auth) {
+				$j('#config_db_au').val(config.mongodb.auth.user);
+				$j('#config_db_ap').val(config.mongodb.auth.pass);
+			}
+			smio.configOnChanged(true);
 		},
 		configSaveChanges: function() {
 			smio.daemonPrompt(true);
@@ -41,8 +105,7 @@ var $j = jQuery.noConflict(),
 		},
 		exit: function() {
 			smio.exiting = true;
-			smio.tray.remove();
-			$t.UI.clearTray();
+			smio.unload();
 			smio.win.hide();
 			setTimeout(function() { $t.App.exit(); }, 125);
 		},
@@ -52,6 +115,17 @@ var $j = jQuery.noConflict(),
 				if ((dirName == '_src') || (dirName == '_core'))
 					return dir.parent();
 			return null;
+		},
+    	mergeDefaults: function(cfg, defs) {
+			var defKey, defVal;
+			for (defKey in defs) {
+				defVal = defs[defKey];
+				if ((!(cfg[defKey] != null)) || (typeof cfg[defKey] !== typeof defVal))
+					cfg[defKey] = defVal;
+				else if ((typeof cfg[defKey] === 'object') && (typeof defVal === 'object'))
+					cfg[defKey] = smio.mergeDefaults(cfg[defKey], defVal);
+			}
+			return cfg;
 		},
 		onClose: function(ev) {
 			smio.lastWinPos = [smio.win.getX(), smio.win.getY()]
@@ -69,8 +143,9 @@ var $j = jQuery.noConflict(),
 				$j('.smon-instnav-institem').remove();
 				smio.instances = {};
 				try {
-					$j('#config_unsaved').css({ "display": "none" });
 					$j('#smon_main').css({ visibility: 'hidden' });
+					$j('#config_unsaved').css({ "display": "none" });
+					$j('#config_info').css({ "display": "block" });
 					if ((subDirs = smio.rootDir.getDirectoryListing()) && subDirs.length)
 						for (var i = 0; i < subDirs.length; i++)
 							if (subDirs[i].isDirectory() && subDirs[i]['name'] && (dirName = subDirs[i].name()) && dirName.length && (dirName.substr(0, 1) != '_') && (dirName != 'node_modules') && (subFile = $t.Filesystem.getFile(subDirs[i], 'instance.config')) && subFile.exists() && subFile.isFile())
@@ -80,7 +155,23 @@ var $j = jQuery.noConflict(),
 									subFileStream = subFile.open($t.Filesystem.MODE_READ, false, false);
 									while (line = subFileStream.readLine())
 										config += (line + '');
-									config = $t.JSON.parse(config);
+									config = smio.mergeDefaults($t.JSON.parse(config), {
+										"smoothio": {
+											"enabled": true,
+											"processes": 1,
+											"autorestart": { "on_files_changed": false, "on_crash_after_uptime_secs": smio.defs.uptime },
+											"logging": { "details": false, "stack": false, "path": "server/log/smoothio.log" },
+											"language": "en",
+											"dns_preresolve": { "enabled": (smio.platform == 'windows'), "hostnames": { "localhost": smio.defs.host, "$localhostname": smio.defs.host } }
+										},
+										"mongodb": {
+											"host": smio.defs.host,
+											"port": smio.defs.port,
+											"dbpath": "server/dbs/",
+											"logpath": "server/log/mongodb/mongodb.log"
+										}
+									});
+									smio.configRefreshUI(dirName, (smio.instances[dirName] = config));
 									if (lastTab == dirName)
 										lastTabFound = true;
 									$j('.smon-instnav ul').append('<li class="smon-instnav-institem"><a href="#" onclick="smio.selectTab(\'' + dirName + '\');" id="smon_tab_' + dirName + '">' + res.tabs_title1 + dirName + res.tabs_title2 + '</a></li>');
@@ -138,10 +229,19 @@ var $j = jQuery.noConflict(),
 			setTimeout(function() { smio.win.focus(); }, 250);
 		},
 		toggle: function() {
-			if (smio.win.isVisible() && smio.winActive && !smio.win.isMinimized())
+			if (smio.win.isVisible() && smio.winActive && !smio.win.isMinimized()) {
+				smio.lastWinPos = [smio.win.getX(), smio.win.getY()]
 				smio.win.close();
-			else
+			} else
 				smio.show();
+		},
+		unload: function() {
+			try {
+				smio.tray.remove();
+			} catch(err) {
+			} finally {
+				$t.UI.clearTray();
+			}
 		}
 	};
 
@@ -150,7 +250,7 @@ jQuery(document).ready(function() {
 	smio.setLang('en');
 	if (navigator.language && navigator.language.length && resources[l = navigator.language.substr(0, 2)])
 		smio.setLang(l);
-	smio.setLang('de');
+	//smio.setLang('de');
 	smio.win = $t.UI.getCurrentWindow();
 	smio.win.addEventListener($t.CLOSE, smio.onClose);
 	smio.trayMenu = $t.UI.createMenu();
@@ -172,7 +272,7 @@ jQuery(document).ready(function() {
 		var $a = $j(a);
 		$a.click(function() {
 			var att = $a.attr('smon-loc');
-			alert(res[att] + '\n\n' + res['h_' + att], 'foo');
+			alert($a.text() + '\n\n' + res['h_' + att]);
 		});
 	}).attr('href', '#');
 });

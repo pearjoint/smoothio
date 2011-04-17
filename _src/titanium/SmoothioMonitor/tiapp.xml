@@ -13,8 +13,8 @@
 	<id>initial</id>
 	<title>smoothio Monitor</title>
 	<url>app://index.html</url>
-	<width>760</width>
-	<height>560</height>
+	<width>764</width>
+	<height>568</height>
 	<max-width>5000</max-width>
 	<min-width>600</min-width>
 	<max-height>5000</max-height>

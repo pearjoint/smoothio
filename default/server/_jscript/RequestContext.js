@@ -15,12 +15,8 @@
       this.inst = this.server.inst;
     }
     RequestContext.prototype.handleRequest = function() {
-      var filePath, hasHandler, now;
-      now = new Date;
-      if (!this.inst.firstRequestTime) {
-        this.inst.firstRequestTime = now;
-      }
-      this.inst.lastRequestTime = now;
+      var filePath, hasHandler;
+      this.inst.lastRequestTime = new Date;
       if (hasHandler = this.uri.pathItems.length && this.uri.pathItems[0] === '_' && this.uri.pathItems.length > 2) {
         switch (this.uri.pathItems[1]) {
           case "file":

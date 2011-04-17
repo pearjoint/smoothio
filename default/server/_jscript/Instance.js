@@ -17,9 +17,9 @@
       var resErrs;
       this.logFile = null;
       this.util = new smio.Util;
-      this.firstRequestTime = null;
+      this.initTime = new Date;
       this.lastRequestTime = null;
-      this.restartMinUptime = 300;
+      this.restartMinUptime = 60;
       this.resourceSets = {};
       this.servers = [];
       this.mongos = {};
@@ -56,7 +56,7 @@
       return this.util.formatError(err, this.config.smoothio.logging.details, this.config.smoothio.logging.stack);
     };
     Instance.prototype.getUptime = function() {
-      return ((lastRequestTime ? lastRequestTime.getTime() : 0) / 1000) - ((firstRequestTime ? firstRequestTime.getTime() : 0) / 1000);
+      return ((new Date).getTime() / 1000) - (this.initTime.getTime() / 1000);
     };
     Instance.prototype.haveAllStopped = function() {
       var server, _i, _len, _ref;

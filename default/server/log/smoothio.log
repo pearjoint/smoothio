@@ -1,15 +1,15 @@
-"2011-04-16T07:27:21.623Z" - [default] Compiling Stylus sheets...
-"2011-04-16T07:27:21.653Z" - [default] Compiling CoffeeScripts...
-"2011-04-16T07:27:21.807Z" - [default.packs.SmoothioCore] PAKET 'SmoothioCore': wird geladen...
-"2011-04-16T07:27:21.821Z" - [default.packs.SmoothioCore] PAKET 'SmoothioCore': erfolgreich geladen.
-"2011-04-16T07:27:21.830Z" - [default.mongodb] forked process: 8399
+"2011-04-16T12:32:20.559Z" - [default] Compiling Stylus sheets...
+"2011-04-16T12:32:20.590Z" - [default] Compiling CoffeeScripts...
+"2011-04-16T12:32:20.744Z" - [default.packs.SmoothioCore] PAKET 'SmoothioCore': wird geladen...
+"2011-04-16T12:32:20.760Z" - [default.packs.SmoothioCore] PAKET 'SmoothioCore': erfolgreich geladen.
+"2011-04-16T12:32:20.768Z" - [default.mongodb] forked process: 17885
 all output going to: /home/roxor/smoothio/default/server/log/mongodb/mongodb.log
-"2011-04-16T07:27:21.834Z" - [default.servers.server1] SERVER 'server1' gestartet unter localhost:2020
-"2011-04-16T07:27:21.835Z" - [default.servers.server2] SERVER 'server2' gestartet unter localhost:4040
-"2011-04-16T07:27:22.336Z" - [default.mongodb.admin] Verbunden mit MongoDB Admin-Datenbank.
-"2011-04-16T07:27:22.835Z" - [default.mongodb.smoothio_shared] Verbunden mit smoothio Shared-Datenbank.
-"2011-04-16T07:27:23.344Z" - [default.mongodb.smoothio__server1] Verbunden mit smoothio server1-Datenbank.
-"2011-04-16T07:27:23.844Z" - [default.mongodb.smoothio__server2] Verbunden mit smoothio server2-Datenbank.
-"2011-04-16T07:49:19.803Z" - [default] Shutting down servers...
-"2011-04-16T07:49:20.061Z" - [default] Shutdown of all servers completed.
+"2011-04-16T12:32:20.771Z" - [default.servers.server1] SERVER 'server1' gestartet unter localhost:2020
+"2011-04-16T12:32:20.772Z" - [default.servers.server2] SERVER 'server2' gestartet unter localhost:4040
+"2011-04-16T12:32:21.277Z" - [default.mongodb.admin] Verbunden mit MongoDB Admin-Datenbank.
+"2011-04-16T12:32:21.777Z" - [default.mongodb.smoothio_shared] Verbunden mit smoothio Shared-Datenbank.
+"2011-04-16T12:32:22.275Z" - [default.mongodb.smoothio__server1] Verbunden mit smoothio server1-Datenbank.
+"2011-04-16T12:32:22.774Z" - [default.mongodb.smoothio__server2] Verbunden mit smoothio server2-Datenbank.
+"2011-04-16T12:32:32.423Z" - [default] Shutting down servers...
+"2011-04-16T12:32:32.676Z" - [default] Shutdown of all servers completed.
 
