@@ -86,16 +86,47 @@ var $j = jQuery.noConflict(),
 			smio.configOnChanged(true);
 		},
 		configSaveChanges: function() {
-			smio.daemonPrompt(true);
-		},
-		configUpdateDataMode: function() {
+			var instName = smio.curTabID;
+			var config = smio.instances[instName], tmp, tmp2, tmp3, file, fileStream;
+			if (config && smio.daemonPrompt(true) && (file = $t.Filesystem.getFile(smio.rootDir, instName, 'instance.config')))
+				try {
+					config.smoothio.logging.path = $j('#config_log_path').val();
+					config.smoothio.logging.details = $j('#config_log_d').attr('checked');
+					config.smoothio.logging.stack = $j('#config_log_s').attr('checked');
+					config.smoothio.autorestart.on_files_changed = $j('#config_rs_cf').attr('checked');
+					config.smoothio.autorestart.on_crash_after_uptime_secs = parseInt($j('#config_rs_fc').val());
+					config.smoothio.dns_preresolve.enabled = (smio.platform == 'windows') || $j('#config_dns').attr('checked');
+					tmp = {};
+					if ((tmp2 = $j('#config_dns_p').val().split('\n')) && tmp2.length)
+						for (var i = 0, l = tmp2.length; i < l; i++)
+							if ((tmp3 = tmp2[i].split(':')) && tmp3.length)
+								tmp[tmp3[0]] = tmp3[1];
+					config.smoothio.dns_preresolve.hostnames = tmp;
+					config.mongodb.host = $j('#config_db_host').val();
+					config.mongodb.port = parseInt($j('#config_db_port').val());
+					config.mongodb.dbpath = $j('#config_db_path').val();
+					config.mongodb.logpath = $j('#config_db_log').val();
+					if (tmp = $j('#config_db_ar').attr('checked') ? {} : null) {
+						tmp['user'] = $j('#config_db_au').val();
+						tmp['pass'] = $j('#config_db_ap').val();
+						config.mongodb.auth = tmp;
+					} else
+						delete config.mongodb['auth'];
+					if (fileStream = file.open($t.Filesystem.MODE_WRITE, false, false))
+						fileStream.write(smio.jsonPrettify($t.JSON.stringify(config)));
+				} catch(err) {
+					alert(err);
+				} finally {
+					if (fileStream)
+						fileStream.close();
+					setTimeout(function() { smio.refreshUI(false, false, true); }, 750);
+				}
 		},
 		daemonGetStatus: function() {
 			return 10;
 		},
 		daemonPrompt: function(temporary) {
-			if (confirm(res.daemon_confirm1 + res['daemon_confirm' + (temporary ? 2 : 3)] + res.daemon_confirm4)) {
-			}
+			return confirm(res.daemon_confirm1 + res['daemon_confirm' + (temporary ? 2 : 3)] + res.daemon_confirm4);
 		},		
 		daemonRestart: function() {
 		},
@@ -115,6 +146,41 @@ var $j = jQuery.noConflict(),
 				if ((dirName == '_src') || (dirName == '_core'))
 					return dir.parent();
 			return null;
+		},
+		jsonPrettify: function(s) {
+			var p = [], il = 0, c, e, q = false, t;
+			for (var i = 0, l = s.length; i < l; i++)
+				if (!(e = ((c = s.substr(i, 1)) == '\\')))
+					if (c == '{') {
+						il++;
+						if (il > 2)
+							p.push(c + ' ');
+						else {
+							p.push(c + '\n');
+							for (var j = 0; j < il; j++)
+								p.push('\t');
+						}
+					} else if (c == '}') {
+						il--;
+						if (il >= 2)
+							p.push(' ');
+						else {
+							p.push('\n');
+							for (var j = 0; j < il; j++)
+								p.push('\t');
+						}
+						p.push(c);
+					} else if (c == '"') {
+						q = !q;
+						p.push(c);
+					} else if ((!q) && ((c == ':') || (c == ','))) {
+						p.push(c + ((t = ((c == ',') && (il <= 2))) ? '\n' : ' '));
+						if (t)
+							for (var j = 0; j < il; j++)
+								p.push('\t');
+					} else
+						p.push(c);
+			return p.join('');
 		},
     	mergeDefaults: function(cfg, defs) {
 			var defKey, defVal;
@@ -250,7 +316,7 @@ jQuery(document).ready(function() {
 	smio.setLang('en');
 	if (navigator.language && navigator.language.length && resources[l = navigator.language.substr(0, 2)])
 		smio.setLang(l);
-	//smio.setLang('de');
+	smio.setLang('de');
 	smio.win = $t.UI.getCurrentWindow();
 	smio.win.addEventListener($t.CLOSE, smio.onClose);
 	smio.trayMenu = $t.UI.createMenu();
