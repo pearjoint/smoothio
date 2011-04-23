@@ -51,7 +51,7 @@ var $j = jQuery.noConflict(),
 			}
 		},
 		configRefreshUI: function(instName, config) {
-			var tmp = config.smoothio.language;
+			var tmp = config.smoothio.language, lastLang = lang, nuLang;
 			$j('#config_log_lang_o').val(tmp);
 			if (tmp == 'en')
 				$j('#config_log_lang_en').attr('checked', true);
@@ -84,11 +84,15 @@ var $j = jQuery.noConflict(),
 				$j('#config_db_ap').val(config.mongodb.auth.pass);
 			}
 			smio.configOnChanged(true);
+			if (lastLang != (nuLang = $j('#config_log_lang_o').val())) {
+				smio.setLang(resources[nuLang] ? nuLang : 'en');
+				smio.refreshUI(true, false, false);
+			}
 		},
-		configSaveChanges: function() {
+		configSaveChanges: function(notToFile) {
 			var instName = smio.curTabID;
 			var config = smio.instances[instName], tmp, tmp2, tmp3, file, fileStream;
-			if (config && smio.daemonPrompt(true) && (file = $t.Filesystem.getFile(smio.rootDir, instName, 'instance.config')))
+			if (config && (notToFile || (smio.daemonPrompt(true) && (file = $t.Filesystem.getFile(smio.rootDir, instName, 'instance.config')))))
 				try {
 					config.smoothio.logging.path = $j('#config_log_path').val();
 					config.smoothio.logging.details = $j('#config_log_d').attr('checked');
@@ -112,14 +116,15 @@ var $j = jQuery.noConflict(),
 						config.mongodb.auth = tmp;
 					} else
 						delete config.mongodb['auth'];
-					if (fileStream = file.open($t.Filesystem.MODE_WRITE, false, false))
+					if ((!notToFile) && (fileStream = file.open($t.Filesystem.MODE_WRITE, false, false)))
 						fileStream.write(smio.jsonPrettify($t.JSON.stringify(config)));
 				} catch(err) {
 					alert(err);
 				} finally {
-					if (fileStream)
+					if (fileStream) {
 						fileStream.close();
-					setTimeout(function() { smio.refreshUI(false, false, true); }, 750);
+						setTimeout(function() { smio.refreshUI(false, false, true); }, 750);
+					}
 				}
 		},
 		daemonGetStatus: function() {
@@ -237,7 +242,7 @@ var $j = jQuery.noConflict(),
 											"logpath": "server/log/mongodb/mongodb.log"
 										}
 									});
-									smio.configRefreshUI(dirName, (smio.instances[dirName] = config));
+									smio.instances[dirName] = config;
 									if (lastTab == dirName)
 										lastTabFound = true;
 									$j('.smon-instnav ul').append('<li class="smon-instnav-institem"><a href="#" onclick="smio.selectTab(\'' + dirName + '\');" id="smon_tab_' + dirName + '">' + res.tabs_title1 + dirName + res.tabs_title2 + '</a></li>');
@@ -279,6 +284,10 @@ var $j = jQuery.noConflict(),
 			$j('#smon_box_' + panelID).slideDown();
 			$j('#inst_headline').html($j('#smon_tab_' + tabID).html());
 			smio.curTabID = tabID;
+			$j('#config_unsaved').css({ "display": "none" });
+			$j('#config_info').css({ "display": "block" });
+			if (tabID.substr(0, 1) != '_')
+				smio.configRefreshUI(tabID, (smio.instances[tabID]));
 		},
 		setLang: function(language) {
 			res = resources[lang = language];
@@ -316,7 +325,6 @@ jQuery(document).ready(function() {
 	smio.setLang('en');
 	if (navigator.language && navigator.language.length && resources[l = navigator.language.substr(0, 2)])
 		smio.setLang(l);
-	smio.setLang('de');
 	smio.win = $t.UI.getCurrentWindow();
 	smio.win.addEventListener($t.CLOSE, smio.onClose);
 	smio.trayMenu = $t.UI.createMenu();
