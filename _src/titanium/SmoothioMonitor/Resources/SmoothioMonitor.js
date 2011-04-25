@@ -90,10 +90,10 @@ var $j = jQuery.noConflict(),
 			}
 		},
 		configSaveChanges: function(notToFile) {
-			var instName = smio.curTabID;
-			var config = smio.instances[instName], tmp, tmp2, tmp3, file, fileStream;
+			var instName = smio.curTabID, config = smio.instances[instName], tmp, tmp2, tmp3, file, fileStream;
 			if (config && (notToFile || (smio.daemonPrompt(true) && (file = $t.Filesystem.getFile(smio.rootDir, instName, 'instance.config')))))
 				try {
+					config.smoothio.language = ((tmp = $j('#config_log_lang_o').val()) ? tmp : 'en');
 					config.smoothio.logging.path = $j('#config_log_path').val();
 					config.smoothio.logging.details = $j('#config_log_d').attr('checked');
 					config.smoothio.logging.stack = $j('#config_log_s').attr('checked');
@@ -245,7 +245,8 @@ var $j = jQuery.noConflict(),
 									smio.instances[dirName] = config;
 									if (lastTab == dirName)
 										lastTabFound = true;
-									$j('.smon-instnav ul').append('<li class="smon-instnav-institem"><a href="#" onclick="smio.selectTab(\'' + dirName + '\');" id="smon_tab_' + dirName + '">' + res.tabs_title1 + dirName + res.tabs_title2 + '</a></li>');
+									$j('.smon-instnav ul').append('<li class="smon-instnav-institem"><a href="#" onclick="smio.selectTab(\'' + dirName + '\');" id="smon_tab_' + dirName + '"><span smon-loc="tabs_title1"></span>' + dirName + '<span smon-loc="tabs_title2"></span></a></li>');
+									locChanged = true;
 								} catch(err) {
 									alert(res.tabs_insterror1 + dirName + res.tabs_insterror2 + '\n\n' + err);
 								} finally {
@@ -261,7 +262,6 @@ var $j = jQuery.noConflict(),
 				}
 			}
 			if (status) {
-				locChanged = true;
 				$j('#smon_status').attr('smon-loc', 'toolbar_status_' + smio.daemonGetStatus());
 			}
 			if (locs || locChanged)

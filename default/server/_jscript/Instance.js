@@ -48,7 +48,7 @@
       _results = [];
       for (sname in _ref) {
         scfg = _ref[sname];
-        _results.push((sname != null) && (scfg != null) && (scfg['host'] != null) && (scfg['port'] != null) && (!(scfg['disabled'] === true)) ? (server = new smio.Server(this, sname, scfg.host, scfg.port, this.config.smoothio.processes), this.servers.push(server), this.mongos["smoothio__" + sname] = new smio.Database(this, this.mongo, "smoothio__" + sname, "smoothio " + sname, server, lastInterval += 500)) : void 0);
+        _results.push((sname != null) && (scfg != null) && (scfg['host'] != null) && (scfg['port'] != null) && (!(scfg['disabled'] === true)) ? (server = new smio.Server(this, sname, scfg.host, scfg.port, 1), this.servers.push(server), this.mongos["smoothio__" + sname] = new smio.Database(this, this.mongo, "smoothio__" + sname, "smoothio " + sname, server, lastInterval += 500)) : void 0);
       }
       return _results;
     };

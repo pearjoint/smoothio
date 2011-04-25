@@ -24,7 +24,7 @@ resources['en'] = {
 ,	"config_log_path"	:	"Log file path"
 ,	"h_config_log_path"	:	"Specifies the file path (always relative to the Instance directory) to store the smoothio Instance log messages.\n\nTo avoid overwriting of old log files, you can include one asterisk [*] in the file path (to be expanded into date+time in the file name when the log file is created)."
 ,	"config_log_d"		:	"When logging errors, include their details"
-,	"config_log_s"		:	"When logging errors, include their stack trace"
+,	"config_log_s"		:	"When logging errors, include stack trace"
 ,	"config_log_lang"	:	"Default language"
 ,	"config_log_lang_o"	:	"Other:"
 ,	"h_config_log_lang"	:	"Specifies the language used for all log output produced by this smoothio Instance; at the same time this setting indicates the initial content language to be applied to newly created Servers and Sites in this Instance."

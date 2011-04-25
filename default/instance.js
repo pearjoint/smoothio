@@ -31,15 +31,15 @@ smio.logit = function(line, cat) {
 	return line;
 }
 
-smio.walkDir = function(dirPath, files, fileFunc, errs, dontRecurse, rootDirPath, folderFuncFirst, folderFunc) {
-	var subFiles, subPath, isRoot = !rootDirPath;
+smio.walkDir = function(dirPath, files, fileFunc, errs, dontRecurse, rootDirPath, folderFuncFirst, folderFunc, allFilesFirst) {
+	var subFiles, subPath, isRoot = !rootDirPath, subDirs = [];
 	if (isRoot)
 		rootDirPath = dirPath;
 	if (folderFuncFirst && folderFunc && !isRoot)
 		folderFunc(dirPath, rootDirPath, dirPath.substr(rootDirPath.length + 1));
 	if (!files)
 		files = node_fs.readdirSync(dirPath);
-	for (var i = 0; i < files.length; i++) {
+	for (var i = 0, l = files.length; i < l; i++) {
 		subFiles = null;
 		subPath = node_path.join(dirPath, files[i]);
 		try {
@@ -55,8 +55,14 @@ smio.walkDir = function(dirPath, files, fileFunc, errs, dontRecurse, rootDirPath
 					errs.push(err);
 			}
 		else if (!dontRecurse)
-			smio.walkDir(subPath, subFiles, fileFunc, errs, false, rootDirPath, folderFuncFirst, folderFunc);
+			if (allFilesFirst)
+				subDirs.push([subPath, subFiles]);
+			else
+				smio.walkDir(subPath, subFiles, fileFunc, errs, false, rootDirPath, folderFuncFirst, folderFunc, allFilesFirst);
 	}
+	if (subDirs.length)
+		for (var i = 0, l = subDirs.length; i <  l; i++)
+			smio.walkDir(subDirs[i][0], subDirs[i][1], fileFunc, errs, false, rootDirPath, folderFuncFirst, folderFunc, allFilesFirst);
 	if (folderFunc && !(folderFuncFirst || isRoot))
 		folderFunc(dirPath, rootDirPath, dirPath.substr(rootDirPath.length + 1));
 }
@@ -105,6 +111,19 @@ function compileStylusSheets(dirPath, outDirPath) {
 			})(i, filePath));
 		}
 	}
+}
+
+function mergeFiles(ext, outFilePath, dirPaths) {
+	var outFileContent = '';
+	if (!dirPaths)
+		dirPaths = ['server/pub'];
+	for (var i = 0, l = dirPaths.length; i < l; i++)
+		smio.walkDir(dirPaths[i], null, function(filePath) {
+			if ((filePath != outFilePath) && (filePath.lastIndexOf(ext) == (filePath.length - ext.length)))
+				outFileContent += ('/** ' + filePath + ' **/\n' + node_fs.readFileSync(filePath, 'utf-8') + '\n');
+		}, null, false, null, false, null, true);
+	if (outFileContent)
+		node_fs.writeFileSync(outFilePath, outFileContent);
 }
 
 function onFileChange(cur, prev) {
@@ -174,6 +193,8 @@ function startSmoothio() {
 	if (coffeeDone || !hasCoffee) {
 		require('./server/_jscript/Instance');
 		if ((smio.inst = new smio.Instance()) && ((returnCode = smio.inst.start()) < 0)) {
+			mergeFiles('.css', 'server/pub/smoothio.css');
+			mergeFiles('.js', 'server/pub/smoothio.js', ['../_core/scripts', 'server/pub/_scripts']);
 			if (smio.inst.autoRestart) {
 				smio.walkDir('../_core/packs', null, watchSelective);
 				smio.walkDir('packs', null, watchSelective);

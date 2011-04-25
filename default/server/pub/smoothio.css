@@ -1,3 +1,18 @@
+/** server/pub/_packs/SmoothioCore/anothertest.css **/
+body {
+	ljhsf invalidshit
+}
+
+
+/** server/pub/_packs/SmoothioCore/InitialServerSetup/whoa.css **/
+tmpl { color: green; }
+
+/** server/pub/_packs/SmoothioCore/InitialServerSetup/test.css **/
+.foo {
+  background: #f00;
+}
+
+/** server/pub/_styles/smoothio.css **/
 html,
 body,
 div,
@@ -149,3 +164,4 @@ body {
   -webkit-box-shadow: 0px 0px 16px #303030;
   box-shadow: 0px 0px 16px #303030;
 }
+
