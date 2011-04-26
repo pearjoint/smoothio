@@ -1,4 +1,6 @@
 
+_ = require 'underscore'
+_.mixin require 'underscore.string'
 mongodb = require 'mongodb'
 node_fs = require 'fs'
 node_os = require 'os'
@@ -43,7 +45,7 @@ class smio.Instance
 				@mongos["smoothio__#{sname}"] = new smio.Database @, @mongo, "smoothio__#{sname}", "smoothio #{sname}", server, lastInterval += 500
 
 	formatError: (err) ->
-		@util.formatError err, @config.smoothio.logging.details, @config.smoothio.logging.stack
+		@util.inst.formatError err, @config.smoothio.logging.details, @config.smoothio.logging.stack
 
 	getUptime: () ->
 		((new Date).getTime() / 1000) - (@initTime.getTime() / 1000)
@@ -57,7 +59,7 @@ class smio.Instance
 	loadResourceSets: (dirPath, recurse) ->
 		errs = []
 		smio.walkDir dirPath, null, (fpath, fname) =>
-			if @util.string.endsWith fname, '.res'
+			if _.isEndsWith fname, '.res'
 				resBaseName = fname.substr 0, pos = fname.indexOf '.'
 				if 'en' is (resLang = if pos is (lpos = fname.lastIndexOf '.') then '' else fname.substr pos + 1, lpos - pos - 1)
 					resLang = ''
@@ -101,7 +103,7 @@ class smio.Instance
 	start: ->
 		defHost = '127.0.0.1'
 		try
-			@config = @.util.mergeConfigWithDefaults (JSON.parse @util.fs.readTextFile 'instance.config'), {
+			@config = @.util.inst.mergeConfigWithDefaults (JSON.parse @util.fs.readTextFile 'instance.config'), {
 				"smoothio": {
 					"enabled": true,
 					"processes": 1,

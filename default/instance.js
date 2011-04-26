@@ -11,6 +11,7 @@ var _ = require('underscore'),
 	node_path = require('path'),
 	node_proc = require('child_process'),
 	node_util = require('util'),
+	uglify = require('uglify-js'),
 	smio = (global.smoothio = {}),
 	stylus = require('stylus'),
 	exitCode = 0,
@@ -135,7 +136,7 @@ function mergeFiles(ext, outFilePath, dirPaths, minify) {
 }
 
 function minifyCss(outc) {
-	var mini = '', inqd = false, inqs = false, inc = false, inr = false, lc = '', c, skips = ['\t', '\r', '\n'];
+	var mini = '', inqd = false, inqs = false, inc = false, inb = false, inr = false, lc = '', lr = '', c, skips = ['\t', '\r', '\n'];
 	for (var i = 0, l = outc.length; i < l; i++) {
 		c = outc.substr(i, 1);
 		if ((c == '"') && !inqs)
@@ -144,18 +145,30 @@ function minifyCss(outc) {
 			inqs = !inqs;
 		if ((!inqs) && (!inqd) && (!inc) && (c == '/') && (i < (l - 1)) && (outc.substr(i + 1, 1) == '*'))
 			inc = true;
-		if ((!inqs) && (!inqd) && (!inc)
-		if ((!inc) && (inqd || inqs || (_.indexOf(skips, c) < 0)))
+		if ((!inqs) && (!inqd) && (!inc) && (c == '{')) {
+			inb = true;
+			mini = _.trim(mini);
+		}
+		if (inb && (!(inr || inqs || inqd || inc)) && (c == ':'))
+			inr = true;
+		if ((!inc) && (inqd || inqs || (_.indexOf(skips, c) < 0)) && ((c != ' ') || inqd || inqs || (!inb) || (inr && (lr != ':'))))
 			mini += c;
+		if (inb && inr && (!(inqs || inqd || inc)) && (c == ';'))
+			inr = false;
 		if ((!inqs) && (!inqd) && (lc == '*') && (c == '/') && inc)
 			inc = false;
+		if ((!inqs) && (!inqd) && (c == '}') && inb)
+			inb = false;
 		lc = c;
+		if ((c != ' ') && (_.indexOf(skips, c) < 0))
+			lr = c;
 	}
 	return mini;
 }
 
 function minifyJs(outc) {
-	return outc;
+	var mini = uglify.uglify;
+	return mini.gen_code(mini.ast_squeeze(mini.ast_mangle(uglify.parser.parse(outc))));
 }
 
 function onFileChange(cur, prev) {
@@ -262,7 +275,7 @@ function watchFile(filePath) {
 
 process.on('uncaughtException', function (err) {
 	smio.logit('ERROR unhandled:\n' + JSON.stringify(err));
-	exitCode = (smio.inst && smio.inst.restartMinUptime && (smio.getUptime() >= smio.inst.restartMinUptime)) ? 1000 : 1;
+	exitCode = (smio.inst && smio.inst.restartMinUptime && (smio.inst.getUptime() >= smio.inst.restartMinUptime)) ? 1000 : 1;
 	stopSmoothio();
 });
 process.on('SIGINT', stopSmoothio);

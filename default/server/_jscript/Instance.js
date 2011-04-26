@@ -1,6 +1,8 @@
 (function() {
-  var mongodb, node_fs, node_os, node_path, node_proc, node_util, smio;
+  var mongodb, node_fs, node_os, node_path, node_proc, node_util, smio, _;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __slice = Array.prototype.slice;
+  _ = require('underscore');
+  _.mixin(require('underscore.string'));
   mongodb = require('mongodb');
   node_fs = require('fs');
   node_os = require('os');
@@ -53,7 +55,7 @@
       return _results;
     };
     Instance.prototype.formatError = function(err) {
-      return this.util.formatError(err, this.config.smoothio.logging.details, this.config.smoothio.logging.stack);
+      return this.util.inst.formatError(err, this.config.smoothio.logging.details, this.config.smoothio.logging.stack);
     };
     Instance.prototype.getUptime = function() {
       return ((new Date).getTime() / 1000) - (this.initTime.getTime() / 1000);
@@ -78,7 +80,7 @@
       errs = [];
       smio.walkDir(dirPath, null, __bind(function(fpath, fname) {
         var generic, lpos, name, pos, resBaseName, resLang, resSet, specific, val, _ref, _results;
-        if (this.util.string.endsWith(fname, '.res')) {
+        if (_.isEndsWith(fname, '.res')) {
           resBaseName = fname.substr(0, pos = fname.indexOf('.'));
           if ('en' === (resLang = pos === (lpos = fname.lastIndexOf('.')) ? '' : fname.substr(pos + 1, lpos - pos - 1))) {
             resLang = '';
@@ -148,7 +150,7 @@
       var closeLog, defHost, logPath, mongoLogPath, oldLogFunc;
       defHost = '127.0.0.1';
       try {
-        this.config = this.util.mergeConfigWithDefaults(JSON.parse(this.util.fs.readTextFile('instance.config')), {
+        this.config = this.util.inst.mergeConfigWithDefaults(JSON.parse(this.util.fs.readTextFile('instance.config')), {
           "smoothio": {
             "enabled": true,
             "processes": 1,

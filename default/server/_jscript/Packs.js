@@ -1,6 +1,8 @@
 (function() {
-  var coffee, node_fs, node_path, node_util, smio, stylus;
+  var coffee, node_fs, node_path, node_util, smio, stylus, _;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  _ = require('underscore');
+  _.mixin(require('underscore.string'));
   coffee = require('coffee-script');
   node_fs = require('fs');
   node_path = require('path');
@@ -25,7 +27,7 @@
         try {
           smio.logit(this.inst.r('log_pack_loading', this.packName), 'packs.' + this.packName);
           lastFilePath = cfgFilePath = node_path.join(this.packPath, 'pack.config');
-          this.config = this.inst.util.mergeConfigWithDefaults(JSON.parse(this.inst.util.fs.readTextFile(cfgFilePath)), {
+          this.config = this.inst.util.inst.mergeConfigWithDefaults(JSON.parse(this.inst.util.fs.readTextFile(cfgFilePath)), {
             "pack": {
               "dontcopy": ["*.config"]
             }
@@ -51,7 +53,7 @@
           smio.walkDir(this.packPath, null, __bind(function(fpath, fname, relPath) {
             var args, ccsContent, csContent, ignore, jsContent, line, outDirPath, pattern, stylContent, tmplContent, _i, _len, _ref, _ref2;
             outDirPath = node_path.join("server/pub/_packs/" + this.packName, relPath.substr(0, relPath.lastIndexOf('/')));
-            if ((this.inst.util.string.endsWith(fname, '.styl')) && (stylContent = this.inst.util.fs.readTextFile(fpath))) {
+            if ((_.isEndsWith(fname, '.styl')) && (stylContent = this.inst.util.fs.readTextFile(fpath))) {
               lastFilePath = fpath;
               return stylus(stylContent).set('filename', fpath).render(__bind(function(err, css) {
                 if (err) {
@@ -61,14 +63,14 @@
                   return node_fs.writeFileSync(node_path.join(outDirPath, (fname.substr(0, fname.lastIndexOf('.'))) + '.css'), css);
                 }
               }, this));
-            } else if ((this.inst.util.string.endsWith(fname, '.cs')) && (csContent = this.inst.util.fs.readTextFile(fpath))) {
+            } else if ((_.isEndsWith(fname, '.cs')) && (csContent = this.inst.util.fs.readTextFile(fpath))) {
               _ref = [fpath, '', false], lastFilePath = _ref[0], ccsContent = _ref[1], ignore = _ref[2];
               _ref2 = csContent.split('\n');
               for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
                 line = _ref2[_i];
-                if (this.inst.util.string.beginsWith(line, '#if server')) {
+                if (_.isStartsWith(line, '#if server')) {
                   ignore = true;
-                } else if (this.inst.util.string.beginsWith(line, '#endif')) {
+                } else if (_.isStartsWith(line, '#endif')) {
                   ignore = false;
                 } else if (!ignore) {
                   ccsContent += line + '\n';
@@ -77,7 +79,7 @@
               if ((ccsContent = ccsContent.trim()) && (jsContent = coffee.compile(ccsContent))) {
                 return node_fs.writeFileSync(node_path.join(outDirPath, (fname.substr(0, fname.lastIndexOf('.'))) + '.js'), jsContent);
               }
-            } else if ((this.inst.util.string.endsWith(fname, '.ctl')) && (tmplContent = this.inst.util.fs.readTextFile(fpath))) {
+            } else if ((_.isEndsWith(fname, '.ctl')) && (tmplContent = this.inst.util.fs.readTextFile(fpath))) {
               outDirPath = node_path.join("server/_packs/" + this.packName, relPath.substr(0, relPath.lastIndexOf('/')));
               lastFilePath = fpath;
               if (jsContent = smio.Control.compile(this.inst, tmplContent, node_path.join(this.packName, relPath))) {
@@ -94,7 +96,7 @@
                 }
                 return _results;
               }).call(this);
-              if (!this.inst.util.trueForSome(args)) {
+              if (!_.any(args)) {
                 return node_fs.linkSync(fpath, node_path.join(outDirPath, fname));
               }
             }

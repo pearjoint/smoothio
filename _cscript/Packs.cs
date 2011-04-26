@@ -1,4 +1,6 @@
 
+_ = require 'underscore'
+_.mixin require 'underscore.string'
 coffee = require 'coffee-script'
 node_fs = require 'fs'
 node_path = require 'path'
@@ -20,7 +22,7 @@ class smio.Pack
 			try
 				smio.logit (@inst.r 'log_pack_loading', @packName), 'packs.' + @packName
 				lastFilePath = cfgFilePath = node_path.join @packPath, 'pack.config'
-				@config = @inst.util.mergeConfigWithDefaults (JSON.parse @inst.util.fs.readTextFile cfgFilePath), {
+				@config = @inst.util.inst.mergeConfigWithDefaults (JSON.parse @inst.util.fs.readTextFile cfgFilePath), {
 					"pack": {
 						"dontcopy": ["*.config"]
 					}
@@ -37,7 +39,7 @@ class smio.Pack
 								throw new Error @inst.r 'log_pack_error_depends2', dep
 				smio.walkDir @packPath, null, (fpath, fname, relPath) =>
 					outDirPath = node_path.join "server/pub/_packs/#{@packName}", (relPath.substr 0, relPath.lastIndexOf '/')
-					if (@inst.util.string.endsWith fname, '.styl') and (stylContent = @inst.util.fs.readTextFile fpath)
+					if (_.isEndsWith fname, '.styl') and (stylContent = @inst.util.fs.readTextFile fpath)
 						lastFilePath = fpath
 						stylus(stylContent).set('filename', fpath).render (err, css) =>
 							if err
@@ -45,25 +47,25 @@ class smio.Pack
 								smio.logit (@inst.r 'log_pack_error_compile', fpath, @inst.formatError err), 'packs.' + @packName
 							else if css
 								node_fs.writeFileSync (node_path.join outDirPath, (fname.substr 0, fname.lastIndexOf '.') + '.css'), css
-					else if (@inst.util.string.endsWith fname, '.cs') and (csContent = @inst.util.fs.readTextFile fpath)
+					else if (_.isEndsWith fname, '.cs') and (csContent = @inst.util.fs.readTextFile fpath)
 						[lastFilePath, ccsContent, ignore] = [fpath, '', false]
 						for line in csContent.split '\n'
-							if @inst.util.string.beginsWith line, '#if server'
+							if _.isStartsWith line, '#if server'
 								ignore = true
-							else if @inst.util.string.beginsWith line, '#endif'
+							else if _.isStartsWith line, '#endif'
 								ignore = false
 							else if not ignore
 								ccsContent += (line + '\n')
 						if (ccsContent = ccsContent.trim()) and jsContent = coffee.compile ccsContent
 							node_fs.writeFileSync (node_path.join outDirPath, (fname.substr 0, fname.lastIndexOf '.') + '.js'), jsContent
-					else if (@inst.util.string.endsWith fname, '.ctl') and (tmplContent = @inst.util.fs.readTextFile fpath)
+					else if (_.isEndsWith fname, '.ctl') and (tmplContent = @inst.util.fs.readTextFile fpath)
 						outDirPath = node_path.join "server/_packs/#{@packName}", (relPath.substr 0, relPath.lastIndexOf '/')
 						lastFilePath = fpath
 						if jsContent = smio.Control.compile @inst, tmplContent, node_path.join @packName, relPath
 							node_fs.writeFileSync (node_path.join outDirPath, (fname.substr 0, fname.lastIndexOf '.') + '.cs'), jsContent
 					else
 						args = ((@inst.util.fs.isPathMatch fname, pattern) for pattern in @config.pack.dontcopy)
-						if not @inst.util.trueForSome args
+						if not _.any args
 							node_fs.linkSync fpath, node_path.join outDirPath, fname
 				smio.logit (@inst.r 'log_pack_loaded', @packName), 'packs.' + @packName
 				@loaded = true

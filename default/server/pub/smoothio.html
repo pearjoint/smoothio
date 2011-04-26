@@ -3,8 +3,6 @@
 	<head>
 		<title>smoothio</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<link rel="stylesheet" href="/_/file/_smoothio.css"/>
-		<link rel="shortcut icon" href="/_/file/images/smoothio.png" />
 		<script type="text/javascript" language="JavaScript">
 			var smioGlobalTest, smioScriptError;
 			try {
@@ -18,7 +16,7 @@
 
 			function onLoadCheckScriptErrors() {
 				if (smioScriptError)
-					document.getElementById('smio_body').innerHTML = '<br/><br/><br/><br/><hr size="1" noshade="noshade"/>Required core script <span style="font-weight: bold;">' + smioScriptError + '</span> could not be loaded and hence this application will not load.<br/><br/>Try a complete reload (press CTRL+R) as this was probably just a temporary disruption.<hr size="1" noshade="noshade"/>Erforderliches Kernscript <span style="font-weight: bold;">' + smioScriptError + '</span> konnte nicht geladen werden und somit wird auch diese Anwendung nicht geladen.<br/><br/>Versuchen Sie ein Komplett-Neuladen (STRG+R), da dies wahrscheinlich nur eine kurzzeitige St&ouml;rung war.<hr size="1" noshade="noshade"/>';
+					document.getElementById('smio_body').innerHTML = '<br/><br/><br/><br/><hr/>Required core script <b>' + smioScriptError + '</b> could not be loaded and hence this application will not load.<br/><br/>Try a complete reload (press CTRL+R) as this was probably just a temporary disruption.<hr/>Erforderliches Kernscript <b>' + smioScriptError + '</b> konnte nicht geladen werden und somit wird auch diese Anwendung nicht geladen.<br/><br/>Versuchen Sie ein Komplett-Neuladen (STRG+R), da dies wahrscheinlich nur eine kurzzeitige St&ouml;rung war.<hr/>';
 			}
 
 			function onScriptError(scriptName) {
@@ -26,6 +24,8 @@
 			}
 		</script>
 		<script type="text/javascript" language="JavaScript" src="/_/file/_smoothio.js" onerror="onScriptError('_smoothio.js');"></script>
+		<link rel="stylesheet" href="/_/file/_smoothio.css"/>
+		<link rel="shortcut icon" href="/_/file/images/smoothio.png" />
 	</head>
 	<body id="smio_body" onload="onLoadCheckScriptErrors();">
 		<div class="smio-main">

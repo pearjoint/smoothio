@@ -1,15 +1,15 @@
-"2011-04-26T09:18:22.688Z" - [default] Compiling Stylus sheets...
-"2011-04-26T09:18:22.721Z" - [default] Compiling CoffeeScripts...
-"2011-04-26T09:18:22.890Z" - [default.packs.SmoothioCore] PACKAGE 'SmoothioCore': loading...
-"2011-04-26T09:18:22.902Z" - [default.packs.SmoothioCore] PACKAGE 'SmoothioCore': successfully loaded.
-"2011-04-26T09:18:22.917Z" - [default.mongodb] forked process: 9577
+"2011-04-26T13:51:37.168Z" - [default] Compiling Stylus sheets...
+"2011-04-26T13:51:37.195Z" - [default] Compiling CoffeeScripts...
+"2011-04-26T13:51:37.362Z" - [default.packs.SmoothioCore] PACKAGE 'SmoothioCore': loading...
+"2011-04-26T13:51:37.412Z" - [default.packs.SmoothioCore] PACKAGE 'SmoothioCore': successfully loaded.
+"2011-04-26T13:51:38.018Z" - [default.mongodb] forked process: 9685
 all output going to: /home/roxor/smoothio/default/server/log/mongodb/mongodb.log
-"2011-04-26T09:18:22.921Z" - [default.servers.server1] SERVER 'server1' listening at localhost:2020
-"2011-04-26T09:18:22.921Z" - [default.servers.server2] SERVER 'server2' listening at localhost:4040
-"2011-04-26T09:18:23.429Z" - [default.mongodb.admin] Connected to MongoDB Admin database.
-"2011-04-26T09:18:23.923Z" - [default.mongodb.smoothio_shared] Connected to smoothio Shared database.
-"2011-04-26T09:18:24.423Z" - [default.mongodb.smoothio__server1] Connected to smoothio server1 database.
-"2011-04-26T09:18:24.926Z" - [default.mongodb.smoothio__server2] Connected to smoothio server2 database.
-"2011-04-26T09:37:34.302Z" - [default] Shutting down servers...
-"2011-04-26T09:37:34.562Z" - [default] Shutdown of all servers completed.
+"2011-04-26T13:51:38.021Z" - [default.servers.server1] SERVER 'server1' listening at localhost:2020
+"2011-04-26T13:51:38.021Z" - [default.servers.server2] SERVER 'server2' listening at localhost:4040
+"2011-04-26T13:51:38.522Z" - [default.mongodb.admin] Connected to MongoDB Admin database.
+"2011-04-26T13:51:39.020Z" - [default.mongodb.smoothio_shared] Connected to smoothio Shared database.
+"2011-04-26T13:51:39.531Z" - [default.mongodb.smoothio__server1] Connected to smoothio server1 database.
+"2011-04-26T13:51:40.021Z" - [default.mongodb.smoothio__server2] Connected to smoothio server2 database.
+"2011-04-26T16:19:13.059Z" - [default] Shutting down servers...
+"2011-04-26T16:19:13.318Z" - [default] Shutdown of all servers completed.
 
