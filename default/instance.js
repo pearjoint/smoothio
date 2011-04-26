@@ -5,7 +5,8 @@
 	Then runs the main CoffeeScript.
  */
 
-var coffee = require('coffee-script'),
+var _ = require('underscore'),
+	coffee = require('coffee-script'),
 	node_fs = require('fs'),
 	node_path = require('path'),
 	node_proc = require('child_process'),
@@ -18,6 +19,7 @@ var coffee = require('coffee-script'),
 	restartInterval = null,
 	watchedFiles = [];
 
+_.mixin(require('underscore.string'));
 smio.instName = node_path.basename(process.cwd());
 smio.logBuffer = [];
 
@@ -113,17 +115,47 @@ function compileStylusSheets(dirPath, outDirPath) {
 	}
 }
 
-function mergeFiles(ext, outFilePath, dirPaths) {
-	var outFileContent = '';
+function mergeFiles(ext, outFilePath, dirPaths, minify) {
+	var outc = '';
 	if (!dirPaths)
 		dirPaths = ['server/pub'];
 	for (var i = 0, l = dirPaths.length; i < l; i++)
 		smio.walkDir(dirPaths[i], null, function(filePath) {
 			if ((filePath != outFilePath) && (filePath.lastIndexOf(ext) == (filePath.length - ext.length)))
-				outFileContent += ('/** ' + filePath + ' **/\n' + node_fs.readFileSync(filePath, 'utf-8') + '\n');
+				outc += ('/** ' + filePath + ' **/\n' + node_fs.readFileSync(filePath, 'utf-8') + '\n');
 		}, null, false, null, false, null, true);
-	if (outFileContent)
-		node_fs.writeFileSync(outFilePath, outFileContent);
+	if (outc) {
+		if (minify)
+			if (ext == '.css')
+				outc = minifyCss(outc);
+			else if (ext == '.js')
+				outc = minifyJs(outc);
+		node_fs.writeFileSync(outFilePath, outc);
+	}
+}
+
+function minifyCss(outc) {
+	var mini = '', inqd = false, inqs = false, inc = false, inr = false, lc = '', c, skips = ['\t', '\r', '\n'];
+	for (var i = 0, l = outc.length; i < l; i++) {
+		c = outc.substr(i, 1);
+		if ((c == '"') && !inqs)
+			inqd = !inqd;
+		if ((c == "'") && !inqd)
+			inqs = !inqs;
+		if ((!inqs) && (!inqd) && (!inc) && (c == '/') && (i < (l - 1)) && (outc.substr(i + 1, 1) == '*'))
+			inc = true;
+		if ((!inqs) && (!inqd) && (!inc)
+		if ((!inc) && (inqd || inqs || (_.indexOf(skips, c) < 0)))
+			mini += c;
+		if ((!inqs) && (!inqd) && (lc == '*') && (c == '/') && inc)
+			inc = false;
+		lc = c;
+	}
+	return mini;
+}
+
+function minifyJs(outc) {
+	return outc;
 }
 
 function onFileChange(cur, prev) {
@@ -193,8 +225,8 @@ function startSmoothio() {
 	if (coffeeDone || !hasCoffee) {
 		require('./server/_jscript/Instance');
 		if ((smio.inst = new smio.Instance()) && ((returnCode = smio.inst.start()) < 0)) {
-			mergeFiles('.css', 'server/pub/smoothio.css');
-			mergeFiles('.js', 'server/pub/smoothio.js', ['../_core/scripts', 'server/pub/_scripts']);
+			mergeFiles('.css', 'server/pub/_smoothio.css', ['server/pub/_styles', 'server/pub/_packs'], true);
+			mergeFiles('.js', 'server/pub/_smoothio.js', ['../_core/scripts', 'server/pub/_scripts'], true);
 			if (smio.inst.autoRestart) {
 				smio.walkDir('../_core/packs', null, watchSelective);
 				smio.walkDir('packs', null, watchSelective);
