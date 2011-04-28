@@ -238,8 +238,9 @@ function startSmoothio() {
 	if (coffeeDone || !hasCoffee) {
 		require('./server/_jscript/Instance');
 		if ((smio.inst = new smio.Instance()) && ((returnCode = smio.inst.start()) < 0)) {
-			mergeFiles('.css', 'server/pub/_smoothio.css', ['server/pub/_styles', 'server/pub/_packs'], true);
-			mergeFiles('.js', 'server/pub/_smoothio.js', ['../_core/scripts', 'server/pub/_scripts'], true);
+			smio.logit('Merging client scripts and style sheets...');
+			mergeFiles('.css', 'server/pub/_smoothio.css', ['server/pub/_styles', 'server/pub/_packs'], smio.inst.config.smoothio.minify);
+			mergeFiles('.js', 'server/pub/_smoothio.js', ['../_core/scripts', 'server/pub/_scripts'], smio.inst.config.smoothio.minify);
 			if (smio.inst.autoRestart) {
 				smio.walkDir('../_core/packs', null, watchSelective);
 				smio.walkDir('packs', null, watchSelective);

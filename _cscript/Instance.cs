@@ -110,6 +110,7 @@ class smio.Instance
 					"autorestart": { "on_files_changed": false, "on_crash_after_uptime_secs": @restartMinUptime },
 					"logging": { "details": false, "stack": false, "path": "server/log/smoothio.log" },
 					"language": "en",
+					"minify": true,
 					"dns_preresolve": { "enabled": (process.platform is 'cygwin'), "hostnames": { "localhost": defHost, "$localhostname": defHost } }
 				},
 				"mongodb": {

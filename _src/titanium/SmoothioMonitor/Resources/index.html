@@ -4,10 +4,14 @@
 		<title>smoothio Monitor</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<link rel="stylesheet" type="text/css" href="SmoothioMonitor.css"/>
-		<script type="text/javascript" language="JavaScript" src="jquery.min.js"></script>
+		<script type="text/javascript" language="JavaScript" src="jquery.js"></script>
+		<script type="text/javascript" language="JavaScript" src="underscore.string.js"></script>
 		<script type="text/javascript" language="JavaScript" src="SmoothioMonitor.js"></script>
 		<script type="text/javascript" language="JavaScript" src="res.en.js"></script>
 		<script type="text/javascript" language="JavaScript" src="res.de.js"></script>
+		<script type="text/javascript" language="JavaScript">
+			var _s = _;
+		</script>
 	</head>
 	<body onfocus="smio.winActive=true;" onblur="smio.winActive=false;" onunload="smio.unload();">
 		<div id="smon_main" class="smon-main">
@@ -77,6 +81,7 @@
 									<div><a style="visibility: hidden;">&nbsp;</a> <input type="checkbox" id="config_log_s" name="config_log_s" onclick="smio.configOnChanged();"/><label for="config_log_s" smon-loc="config_log_s"></label></div>
 									<div><a smon-loc="config_rs_cf"></a> <input type="checkbox" id="config_rs_cf" name="config_rs_cf" onclick="smio.configOnChanged();"/><label for="config_rs_cf" smon-loc="config_rs_cfl"></label></div>
 									<div><a smon-loc="config_rs_fc"></a> <span smon-loc="config_rs_fcl"></span> <input type="text" size="3" id="config_rs_fc" onchange="smio.configOnChanged();"/></div>
+									<div><a smon-loc="config_min"></a> <input type="checkbox" id="config_min" name="config_min" onclick="smio.configOnChanged();"/><label for="config_min" smon-loc="config_minl"></label></div>
 									<div><a smon-loc="config_dns_p"></a> <input type="checkbox" id="config_dns" name="config_dns" onclick="smio.configOnChanged();"/><label for="config_dns" smon-loc="config_dns"></label></div>
 									<span id="span_config_dns" style="display: none;">
 										<div><a style="visibility: hidden;">&nbsp;</a> <textarea rows="4" class="smon-textbox" id="config_dns_p" onchange="smio.configOnChanged();"></textarea></div>
@@ -99,7 +104,10 @@
 								the server details
 							</div>
 							<div class="smon-insttabs-tab" id="subtab_logs">
-								the logs
+								<select size="2" id="subtab_logs_select" onchange="smio.configRefreshLog(this.options[this.selectedIndex].value);">
+								</select>
+								<div id="subtab_logs_table">
+								</div>
 							</div>
 						</div>
 					</div>

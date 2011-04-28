@@ -41,7 +41,7 @@ var $j = jQuery.noConflict(),
 				$j('#config_db_ar').attr('disabled', true).attr('checked', false);
 			}
 			if (isNaN(parseInt($j('#config_db_port').val())))
-				$j('#config_rs_fc').val(smio.defs.port);
+				$j('#config_db_port').val(smio.defs.port);
 			$j('#span_config_db_ar')[(tmp = $j('#config_db_ar').attr('checked')) ? 'show' : 'hide']();
 			if(!tmp)
 				$j('#config_db_au, #config_db_ap').val('');
@@ -50,8 +50,58 @@ var $j = jQuery.noConflict(),
 				$j('#config_info').css({ "display": "none" });
 			}
 		},
+		configRefreshLog: function(logFilePath) {
+			var html = '', file, fileStream, lines = [], isQ, ld, lc, lm, ln, lp, lp1, lp2, skip;
+			if (logFilePath && (file = $t.Filesystem.getFile(logFilePath)) && file.exists() && file.isFile() && (fileStream = file.open($t.Filesystem.MODE_READ, false, false)))
+				try {
+					while (line = fileStream.readLine())
+						lines.push(line);
+					if (lines.length) {
+						isQ = ('"' == lines[0].substr(0, 1));
+						for (var i = 0; i < lines.length; i++) {
+							ln = lines[i];
+							skip = false;
+							if (isQ) {
+								if (skip = (ln.substr(0, 1) != '"'))
+									lines[i - 1][2] += ('\n' + ln);
+								else {
+									ld = ln.substr(1, ln.indexOf('"', 1) - 6);
+									lc = ln.substr(lp = ln.indexOf('['), (ln.lastIndexOf(']')) - lp + 1);
+									lm = ln.substr(ln.lastIndexOf(']') + 2);
+								}
+							} else {
+								ld = ln.substr(0, (lp = ln.indexOf(':', ln.indexOf(':') + 1) + 3));
+								if (((lp1 = ln.indexOf('[', lp)) > 0) && ((lp2 = ln.indexOf(']', lp1)) > lp1)) {
+									lc = ln.substr(lp1, lp2 - lp1 + 1);
+									lm = ln.substr(lp2 + 2);
+								} else {
+									lc = "";
+									lm = ln.substr(lp + 2);
+								}
+							}
+							if (skip)
+								lines[i] = null;
+							else
+								lines[i] = [ld, lc, lm];
+						}
+					}
+				} catch(err) {
+					alert(err + '');
+				} finally {
+					if (fileStream)
+						fileStream.close();
+				}
+			if (lines && lines.length) {
+				html += '<table border="0"><tr><td>Date/Time</td><td>Category</td><td>Message</td></tr>';
+				for (var i = 0; i < lines.length; i++)
+					if (lines[i])
+						html += ('<tr><td>' + _s.escapeHTML(lines[i][0]) + '</td><td>' + _s.escapeHTML(lines[i][1]) + '</td><td>' + _s.escapeHTML(lines[i][2]) + '</td></tr>');
+				html += '</table>';
+			}
+			$j('#subtab_logs_table').html(html);
+		},
 		configRefreshUI: function(instName, config) {
-			var tmp = config.smoothio.language, lastLang = lang, nuLang;
+			var tmp = config.smoothio.language, lastLang = lang, nuLang, arr1, arr2, html;
 			$j('#config_log_lang_o').val(tmp);
 			if (tmp == 'en')
 				$j('#config_log_lang_en').attr('checked', true);
@@ -62,6 +112,7 @@ var $j = jQuery.noConflict(),
 			$j('#config_log_path').val(config.smoothio.logging.path);
 			$j('#config_log_d').attr('checked', config.smoothio.logging.details);
 			$j('#config_log_s').attr('checked', config.smoothio.logging.stack);
+			$j('#config_min').attr('checked', config.smoothio.minify);
 			$j('#config_rs_cf').attr('checked', config.smoothio.autorestart.on_files_changed);
 			$j('#config_rs_fc').val(config.smoothio.autorestart.on_crash_after_uptime_secs + '');
 			$j('#config_dns').attr('checked', (smio.platform == 'windows') || config.smoothio.dns_preresolve.enabled);
@@ -88,12 +139,21 @@ var $j = jQuery.noConflict(),
 				smio.setLang(resources[nuLang] ? nuLang : 'en');
 				smio.refreshUI(true, false, false);
 			}
+			html = '';
+			for (var j = 0, l = (arr1 = [config.smoothio.logging.path, config.mongodb.logpath]).length; j < l; j++)
+				if (arr1[j] && (arr2 = $t.Filesystem.getFile(smio.rootDir, instName, arr1[j]).parent().getDirectoryListing()))
+					for (var k = 0, ll = arr2.length; k < ll; k++)
+						if (arr2[k] && arr2[k].isFile())
+							html += ('<option value="' + arr2[k] + '">' + _s.escapeHTML((arr2[k] + '').substr(2 + instName.length + (smio.rootDir + '').length)) + '</option>');
+			$j('#subtab_logs_select').html(html);
+			smio.configRefreshLog();
 		},
 		configSaveChanges: function(notToFile) {
 			var instName = smio.curTabID, config = smio.instances[instName], tmp, tmp2, tmp3, file, fileStream;
 			if (config && (notToFile || (smio.daemonPrompt(true) && (file = $t.Filesystem.getFile(smio.rootDir, instName, 'instance.config')))))
 				try {
 					config.smoothio.language = ((tmp = $j('#config_log_lang_o').val()) ? tmp : 'en');
+					config.smoothio.minify = $j('#config_min').attr('checked');
 					config.smoothio.logging.path = $j('#config_log_path').val();
 					config.smoothio.logging.details = $j('#config_log_d').attr('checked');
 					config.smoothio.logging.stack = $j('#config_log_s').attr('checked');
@@ -233,6 +293,7 @@ var $j = jQuery.noConflict(),
 											"autorestart": { "on_files_changed": false, "on_crash_after_uptime_secs": smio.defs.uptime },
 											"logging": { "details": false, "stack": false, "path": "server/log/smoothio.log" },
 											"language": "en",
+											"minify": true,
 											"dns_preresolve": { "enabled": (smio.platform == 'windows'), "hostnames": { "localhost": smio.defs.host, "$localhostname": smio.defs.host } }
 										},
 										"mongodb": {
@@ -250,7 +311,7 @@ var $j = jQuery.noConflict(),
 								} catch(err) {
 									alert(res.tabs_insterror1 + dirName + res.tabs_insterror2 + '\n\n' + err);
 								} finally {
-									if (subFileStream != null)
+									if (subFileStream)
 										subFileStream.close();
 								}
 				} catch(err2) {

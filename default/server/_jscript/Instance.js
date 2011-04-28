@@ -164,6 +164,7 @@
               "path": "server/log/smoothio.log"
             },
             "language": "en",
+            "minify": true,
             "dns_preresolve": {
               "enabled": process.platform === 'cygwin',
               "hostnames": {
