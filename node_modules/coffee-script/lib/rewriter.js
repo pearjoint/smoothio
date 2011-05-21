@@ -121,7 +121,10 @@
         return ((tag === 'TERMINATOR' || tag === 'OUTDENT') && !((two != null ? two[0] : void 0) === ':' || (one != null ? one[0] : void 0) === '@' && (three != null ? three[0] : void 0) === ':')) || (tag === ',' && one && ((_ref2 = one[0]) !== 'IDENTIFIER' && _ref2 !== 'NUMBER' && _ref2 !== 'STRING' && _ref2 !== '@' && _ref2 !== 'TERMINATOR' && _ref2 !== 'OUTDENT'));
       };
       action = function(token, i) {
-        return this.tokens.splice(i, 0, ['}', '}', token[2]]);
+        var tok;
+        tok = ['}', '}', token[2]];
+        tok.generated = true;
+        return this.tokens.splice(i, 0, tok);
       };
       return this.scanTokens(function(token, i, tokens) {
         var ago, idx, tag, tok, value, _ref, _ref2;
@@ -173,12 +176,15 @@
         if (prev && !prev.spaced && tag === '?') {
           token.call = true;
         }
+        if (token.fromThen) {
+          return 1;
+        }
         if (!(callObject || (prev != null ? prev.spaced : void 0) && (prev.call || (_ref3 = prev[0], __indexOf.call(IMPLICIT_FUNC, _ref3) >= 0)) && (__indexOf.call(IMPLICIT_CALL, tag) >= 0 || !(token.spaced || token.newLine) && __indexOf.call(IMPLICIT_UNSPACED_CALL, tag) >= 0))) {
           return 1;
         }
         tokens.splice(i, 0, ['CALL_START', '(', token[2]]);
         this.detectEnd(i + 1, function(token, i) {
-          var post, _ref;
+          var post, _ref4;
           tag = token[0];
           if (!seenSingle && token.fromThen) {
             return true;
@@ -189,7 +195,7 @@
           if ((tag === '.' || tag === '?.' || tag === '::') && this.tag(i - 1) === 'OUTDENT') {
             return true;
           }
-          return !token.generated && this.tag(i - 1) !== ',' && __indexOf.call(IMPLICIT_END, tag) >= 0 && (tag !== 'INDENT' || (this.tag(i - 2) !== 'CLASS' && (_ref = this.tag(i - 1), __indexOf.call(IMPLICIT_BLOCK, _ref) < 0) && !((post = this.tokens[i + 1]) && post.generated && post[0] === '{')));
+          return !token.generated && this.tag(i - 1) !== ',' && __indexOf.call(IMPLICIT_END, tag) >= 0 && (tag !== 'INDENT' || (this.tag(i - 2) !== 'CLASS' && (_ref4 = this.tag(i - 1), __indexOf.call(IMPLICIT_BLOCK, _ref4) < 0) && !((post = this.tokens[i + 1]) && post.generated && post[0] === '{')));
         }, action);
         if (prev[0] === '?') {
           prev[0] = 'FUNC_EXIST';
@@ -222,8 +228,8 @@
           indent.generated = outdent.generated = true;
           tokens.splice(i + 1, 0, indent);
           condition = function(token, i) {
-            var _ref;
-            return token[1] !== ';' && (_ref = token[0], __indexOf.call(SINGLE_CLOSERS, _ref) >= 0) && !(token[0] === 'ELSE' && (starter !== 'IF' && starter !== 'THEN'));
+            var _ref3;
+            return token[1] !== ';' && (_ref3 = token[0], __indexOf.call(SINGLE_CLOSERS, _ref3) >= 0) && !(token[0] === 'ELSE' && (starter !== 'IF' && starter !== 'THEN'));
           };
           action = function(token, i) {
             return this.tokens.splice((this.tag(i - 1) === ',' ? i - 1 : i), 0, outdent);

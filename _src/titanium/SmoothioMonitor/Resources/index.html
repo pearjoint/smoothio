@@ -101,7 +101,16 @@
 								</fieldset>
 							</div>
 							<div class="smon-insttabs-tab" id="subtab_servers">
-								the server details
+								<fieldset>
+									<legend>server1</legend>
+									<div><a smon-loc="config_sr_name"></a> <input id="config_sr_name" type="text" class="smon-textbox" onchange="smio.configOnChanged();"/></div>
+									<div><a style="visibility: hidden;">&nbsp;</a> <input type="checkbox" id="config_sr_active" name="config_sr_active" onclick="smio.configOnChanged(true);"/><label for="config_sr_active" smon-loc="config_sr_active"></label></div>
+									<div><a smon-loc="config_sr_host"></a> <input type="text" style="width: 42%;" onchange="smio.configOnChanged();" id="config_sr_host"/> <a smon-loc="config_sr_port" style="width: auto !important;"></a> <input id="config_sr_port" type="text" size="5" onchange="smio.configOnChanged();"/></div>
+									<div><a style="visibility: hidden;">&nbsp;</a> <input type="checkbox" id="config_sr_dbc" name="config_sr_dbc" onclick="smio.configOnChanged(true);"/><label for="config_sr_dbc" smon-loc="config_sr_dbc"></label></div>
+									<span id="span_config_sr_db" style="display: none;">
+										<div><a smon-loc="config_sr_db"></a> <input type="text" class="smon-textbox" id="config_sr_db" onchange="smio.configOnChanged();"/></div>
+									</span>
+								</fieldset>
 							</div>
 							<div class="smon-insttabs-tab" id="subtab_logs">
 								<select size="2" id="subtab_logs_select" onchange="smio.configRefreshLog(this.options[this.selectedIndex].value);">

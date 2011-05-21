@@ -21,8 +21,55 @@ var _ = require('underscore'),
 	watchedFiles = [];
 
 _.mixin(require('underscore.string'));
+
 smio.instName = node_path.basename(process.cwd());
 smio.logBuffer = [];
+
+smio.compileCoffeeScripts = function(dirOrFilePath, srvOutDirPath, cltOutDirPath, noWatch, lazyClient, nameIfSource) {
+	var files = (nameIfSource || node_fs.statSync(dirOrFilePath).isFile()) ? [null] : node_fs.readdirSync(dirOrFilePath), fileContent, fileContentClient = '', fileContentServer = '', javaScript, filePath, lines, ignore, doClient = !lazyClient;
+	for (var i = 0; i < files.length; i++) {
+		if (!files[i])
+			if (nameIfSource)
+				files[i] = nameIfSource;
+			else {
+				files[i] = node_path.basename(dirOrFilePath);
+				dirOrFilePath = node_path.dirname(dirOrFilePath);
+			}
+		if ((nameIfSource || node_fs.statSync(filePath = node_path.join(dirOrFilePath, files[i])).isFile()) && (fileContent = (nameIfSource ? dirOrFilePath : node_fs.readFileSync(filePath, 'utf-8')))) {
+			if (!noWatch)
+				watchFile(lastFilePath = filePath);
+			lines = fileContent.split('\n');
+			if (lazyClient)
+				for (var j = 0; j < lines.length; j++)
+					if (doClient = ((lines[j] == '#if client') || (lines[j] == '#if server')))
+						break;
+			if (srvOutDirPath) {
+				ignore = false;
+				for (var j = 0; j < lines.length; j++)
+					if (lines[j] == '#if client')
+						ignore = true;
+					else if (lines[j] == '#endif')
+						ignore = false;
+					else if (!ignore)
+						fileContentServer += (lines[j] + '\n');
+			}
+			if (doClient && cltOutDirPath) {
+				ignore = false;
+				for (var j = 0; j < lines.length; j++)
+					if (lines[j] == '#if server')
+						ignore = true;
+					else if (lines[j] == '#endif')
+						ignore = false;
+					else if (!ignore)
+						fileContentClient += (lines[j] + '\n');
+			}
+			if (srvOutDirPath && (javaScript = coffee.compile(fileContentServer)))
+				node_fs.writeFileSync(node_path.join(srvOutDirPath, files[i].substr(0, files[i].lastIndexOf('.')) + '.js'), javaScript);
+			if (doClient && cltOutDirPath && (javaScript = coffee.compile(fileContentClient)))
+				node_fs.writeFileSync(node_path.join(cltOutDirPath, files[i].substr(0, files[i].lastIndexOf('.')) + '.js'), javaScript);
+		}
+	}
+}
 
 smio.logit = function(line, cat) {
 	line = '[' + smio.instName + (cat ? ('.' + cat) : '') + '] ' + line;
@@ -72,30 +119,6 @@ smio.walkDir = function(dirPath, files, fileFunc, errs, dontRecurse, rootDirPath
 
 function clearDirectory(dirPath, removeDirs) {
 	smio.walkDir(dirPath, null, node_fs.unlinkSync, null, false, null, false, removeDirs ? node_fs.rmdirSync : null);
-}
-
-function compileCoffeeScripts(dirPath, outDirPath, outDirPath2) {
-	var files = node_fs.readdirSync(dirPath), fileContent, fileContentClient = '', javaScript, javaScriptClient, filePath, lines, ignore = false;
-	for (var i = 0; i < files.length; i++) {
-		if (node_fs.statSync(filePath = node_path.join(dirPath, files[i])).isFile() && (fileContent = node_fs.readFileSync(filePath, 'utf-8'))) {
-			watchFile(lastFilePath = filePath);
-			if (outDirPath2) {
-				lines = fileContent.split('\n');
-				for (var j = 0; j < lines.length; j++)
-					if (lines[j] == '#if server')
-						ignore = true;
-					else if (lines[j] == '#endif')
-						ignore = false;
-					else if (!ignore)
-						fileContentClient += (lines[j] + '\n');
-			}
-			if (javaScript = coffee.compile(fileContent)) {
-				node_fs.writeFileSync(node_path.join(outDirPath, files[i].substr(0, files[i].lastIndexOf('.')) + '.js'), javaScript);
-				if (outDirPath2 && (javaScriptClient = coffee.compile(fileContentClient)))
-					node_fs.writeFileSync(node_path.join(outDirPath2, files[i].substr(0, files[i].lastIndexOf('.')) + '.js'), javaScriptClient);
-			}
-		}
-	}
 }
 
 function compileStylusSheets(dirPath, outDirPath) {
@@ -227,9 +250,9 @@ function startSmoothio() {
 	if (hasCoffee)
 		try {
 			smio.logit('Compiling CoffeeScripts...');
-			compileCoffeeScripts('../_cscript', 'server/_jscript');
-			compileCoffeeScripts('../_cscript/shared', 'server/_jscript/shared', 'server/pub/_scripts/shared');
-			compileCoffeeScripts('../_cscript/client', 'server/pub/_scripts');
+			smio.compileCoffeeScripts('../_cscript', 'server/_jscript');
+			smio.compileCoffeeScripts('../_cscript/shared', 'server/_jscript/shared', 'server/pub/_scripts/shared');
+			smio.compileCoffeeScripts('../_cscript/client', 'server/pub/_scripts');
 			coffeeDone = true;
 		} catch (err) {
 			err.ml_error_filepath = lastFilePath;
@@ -240,7 +263,7 @@ function startSmoothio() {
 		if ((smio.inst = new smio.Instance()) && ((returnCode = smio.inst.start()) < 0)) {
 			smio.logit('Merging client scripts and style sheets...');
 			mergeFiles('.css', 'server/pub/_smoothio.css', ['server/pub/_styles', 'server/pub/_packs'], smio.inst.config.smoothio.minify);
-			mergeFiles('.js', 'server/pub/_smoothio.js', ['../_core/scripts', 'server/pub/_scripts'], smio.inst.config.smoothio.minify);
+			mergeFiles('.js', 'server/pub/_smoothio.js', ['../_core/scripts', 'server/pub/_scripts', 'server/pub/_packs'], smio.inst.config.smoothio.minify);
 			if (smio.inst.autoRestart) {
 				smio.walkDir('../_core/packs', null, watchSelective);
 				smio.walkDir('packs', null, watchSelective);
@@ -264,7 +287,8 @@ function stopSmoothio() {
 		smio.logit("Shutting down servers...");
 		smio.inst.stop();
 		restartInterval = setInterval(restartSmoothio, 250);
-	}
+	} else
+		process.exit(exitCode);
 }
 
 function watchFile(filePath) {

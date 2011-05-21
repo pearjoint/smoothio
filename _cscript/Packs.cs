@@ -7,7 +7,7 @@ node_path = require 'path'
 node_util = require 'util'
 stylus = require 'stylus'
 
-require './Control'
+require './shared/Control'
 smio = global.smoothio
 
 class smio.Pack
@@ -27,6 +27,8 @@ class smio.Pack
 						"dontcopy": ["*.config"]
 					}
 				}
+				if (_.indexOf @config.pack.dontcopy, '*.config') < 0
+					@config.pack.dontcopy.push '*.config'
 				if @config.pack['depends_on']? and @config.pack.depends_on.length
 					for dep in @config.pack.depends_on	
 						@dependsOn[dep] = pack = @packs.all[dep]
@@ -38,7 +40,8 @@ class smio.Pack
 							if pack.loadError
 								throw new Error @inst.r 'log_pack_error_depends2', dep
 				smio.walkDir @packPath, null, (fpath, fname, relPath) =>
-					outDirPath = node_path.join "server/pub/_packs/#{@packName}", (relPath.substr 0, relPath.lastIndexOf '/')
+					outDirPathClient = node_path.join "server/pub/_packs/#{@packName}", (relPath.substr 0, relPath.lastIndexOf '/')
+					outDirPathServer = node_path.join "server/_packs/#{@packName}", (relPath.substr 0, relPath.lastIndexOf '/')
 					if (_.isEndsWith fname, '.styl') and (stylContent = @inst.util.fs.readTextFile fpath)
 						lastFilePath = fpath
 						stylus(stylContent).set('filename', fpath).render (err, css) =>
@@ -46,27 +49,18 @@ class smio.Pack
 								err['ml_error_filepath'] = fpath
 								smio.logit (@inst.r 'log_pack_error_compile', fpath, @inst.formatError err), 'packs.' + @packName
 							else if css
-								node_fs.writeFileSync (node_path.join outDirPath, (fname.substr 0, fname.lastIndexOf '.') + '.css'), css
-					else if (_.isEndsWith fname, '.cs') and (csContent = @inst.util.fs.readTextFile fpath)
-						[lastFilePath, ccsContent, ignore] = [fpath, '', false]
-						for line in csContent.split '\n'
-							if _.isStartsWith line, '#if server'
-								ignore = true
-							else if _.isStartsWith line, '#endif'
-								ignore = false
-							else if not ignore
-								ccsContent += (line + '\n')
-						if (ccsContent = ccsContent.trim()) and jsContent = coffee.compile ccsContent
-							node_fs.writeFileSync (node_path.join outDirPath, (fname.substr 0, fname.lastIndexOf '.') + '.js'), jsContent
+								node_fs.writeFileSync (node_path.join outDirPathClient, (fname.substr 0, fname.lastIndexOf '.') + '.css'), css
+					else if _.isEndsWith fname, '.cs'
+						smio.compileCoffeeScripts fpath, outDirPathServer, outDirPathClient, true, true
 					else if (_.isEndsWith fname, '.ctl') and (tmplContent = @inst.util.fs.readTextFile fpath)
-						outDirPath = node_path.join "server/_packs/#{@packName}", (relPath.substr 0, relPath.lastIndexOf '/')
 						lastFilePath = fpath
-						if jsContent = smio.Control.compile @inst, tmplContent, node_path.join @packName, relPath
-							node_fs.writeFileSync (node_path.join outDirPath, (fname.substr 0, fname.lastIndexOf '.') + '.cs'), jsContent
+						if (ccsContent = smio.Control.compile @inst, tmplContent, node_path.join @packName, relPath)
+							node_fs.writeFileSync (node_path.join outDirPathServer, "_smioctl_" + (fname.substr 0, (fname.lastIndexOf '.')) + '.cs'), ccsContent
+							smio.compileCoffeeScripts ccsContent, outDirPathServer, outDirPathClient, true, false, "_smioctl_" + fname
 					else
 						args = ((@inst.util.fs.isPathMatch fname, pattern) for pattern in @config.pack.dontcopy)
 						if not _.any args
-							node_fs.linkSync fpath, node_path.join outDirPath, fname
+							node_fs.linkSync fpath, node_path.join outDirPathClient, fname
 				smio.logit (@inst.r 'log_pack_loaded', @packName), 'packs.' + @packName
 				@loaded = true
 			catch err

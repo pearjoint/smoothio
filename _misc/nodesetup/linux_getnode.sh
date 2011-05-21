@@ -1,6 +1,6 @@
 #!/bin/bash
 
-node_version="node-v0.4.5"
+node_version="node-v0.4.7"
 apt-get install build-essential g++ curl libssl-dev apache2-utils pkg-config
 mkdir -p tmp
 rm -f -r tmp/*

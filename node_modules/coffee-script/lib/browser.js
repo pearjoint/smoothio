@@ -12,10 +12,10 @@
     options.bare = true;
     return Function(CoffeeScript.compile(code, options))();
   };
-  if (typeof window == "undefined" || window === null) {
+  if (typeof window === "undefined" || window === null) {
     return;
   }
-  CoffeeScript.load = function(url, options) {
+  CoffeeScript.load = function(url, callback) {
     var xhr;
     xhr = new (window.ActiveXObject || XMLHttpRequest)('Microsoft.XMLHTTP');
     xhr.open('GET', url, true);
@@ -23,25 +23,48 @@
       xhr.overrideMimeType('text/plain');
     }
     xhr.onreadystatechange = function() {
+      var _ref;
       if (xhr.readyState === 4) {
-        return CoffeeScript.run(xhr.responseText, options);
+        if ((_ref = xhr.status) === 0 || _ref === 200) {
+          CoffeeScript.run(xhr.responseText);
+        } else {
+          throw new Error("Could not load " + url);
+        }
+        if (callback) {
+          return callback();
+        }
       }
     };
     return xhr.send(null);
   };
   runScripts = function() {
-    var script, _i, _len, _ref;
-    _ref = document.getElementsByTagName('script');
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      script = _ref[_i];
-      if (script.type === 'text/coffeescript') {
-        if (script.src) {
-          CoffeeScript.load(script.src);
-        } else {
-          CoffeeScript.run(script.innerHTML);
+    var coffees, execute, index, length, s, scripts;
+    scripts = document.getElementsByTagName('script');
+    coffees = (function() {
+      var _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = scripts.length; _i < _len; _i++) {
+        s = scripts[_i];
+        if (s.type === 'text/coffeescript') {
+          _results.push(s);
         }
       }
-    }
+      return _results;
+    })();
+    index = 0;
+    length = coffees.length;
+    (execute = function() {
+      var script;
+      script = coffees[index++];
+      if ((script != null ? script.type : void 0) === 'text/coffeescript') {
+        if (script.src) {
+          return CoffeeScript.load(script.src, execute);
+        } else {
+          CoffeeScript.run(script.innerHTML);
+          return execute();
+        }
+      }
+    })();
     return null;
   };
   if (window.addEventListener) {

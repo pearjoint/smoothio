@@ -39,7 +39,7 @@ var QueryCommand = require('./commands/query_command').QueryCommand,
  * @see Collection#find
  * @see Db#eval
  */
-var Cursor = exports.Cursor = function(db, collection, selector, fields, skip, limit, sort, hint, explain, snapshot, timeout, tailable, batchSize) {
+var Cursor = exports.Cursor = function(db, collection, selector, fields, skip, limit, sort, hint, explain, snapshot, timeout, tailable, batchSize, slaveOk) {
   this.db = db;
   this.collection = collection;
   this.selector = selector;
@@ -53,6 +53,7 @@ var Cursor = exports.Cursor = function(db, collection, selector, fields, skip, l
   this.timeout = timeout == null ? true : timeout;
   this.tailable = tailable;
   this.batchSizeValue = batchSize == null ? 0 : batchSize;
+  this.slaveOk = slaveOk == null ? false : slaveOk;
 
   this.totalNumberOfRecords = 0;
   this.items = [];
@@ -110,21 +111,25 @@ Cursor.prototype.rewind = function() {
 Cursor.prototype.toArray = function(callback) {
   var self = this;
 
+  if (!callback) {
+    throw Error('callback is mandatory');
+  }
+
   try {
     if(this.tailable) {
       callback(new Error("Tailable cursor cannot be converted to array"), null);
     } else if(this.state != Cursor.CLOSED) {
       var items = [];
       this.each(function(err, item) {
-          if (item != null) {
-              items.push(item);
-          } else {
-              callback(err, items);
-              
-              items = null;
-          }
-          
-          item = null;
+        if (item != null) {
+          items.push(item);
+        } else {
+          callback(err, items);
+
+          items = null;
+        }
+
+        item = null;
       });
     } else {
       callback(new Error("Cursor is closed"), null);
@@ -154,6 +159,10 @@ Cursor.prototype.toArray = function(callback) {
 Cursor.prototype.each = function(callback) {
   var self = this;
 
+  if (!callback) {
+    throw Error('callback is mandatory');
+  }
+
   if(this.state != Cursor.CLOSED) {
     //FIX: stack overflow (on deep callback) (cred: https://github.com/limp/node-mongodb-native/commit/27da7e4b2af02035847f262b29837a94bbbf6ce2)
     process.nextTick(function(){
@@ -166,7 +175,7 @@ Cursor.prototype.each = function(callback) {
           self.state = Cursor.CLOSED;
           callback(err, null);
         }
-        
+
         item = null;
       });
     });
@@ -357,6 +366,10 @@ Cursor.prototype.generateQueryCommand = function() {
       queryOptions += QueryCommand.OPTS_TAILABLE_CURSOR;
       this.skipValue = this.limitValue = 0;
   }
+  if (this.slaveOk) {
+      queryOptions += QueryCommand.OPTS_SLAVE;
+  }
+
 
   // limitValue of -1 is a special case used by Db#eval
   var numberToReturn = this.limitValue == -1 ? -1 : this.limitRequest();
@@ -616,14 +629,20 @@ Cursor.prototype.close = function(callback) {
   if(this.cursorId instanceof self.db.bson_serializer.Long && this.cursorId.greaterThan(self.db.bson_serializer.Long.fromInt(0))) {
     try {
       var command = new KillCursorCommand(this.db, [this.cursorId]);
-      this.db.executeCommand(command, null);      
+      this.db.executeCommand(command, null);
     } catch(err) {}
   }
 
   this.cursorId = self.db.bson_serializer.Long.fromInt(0);
   this.state    = Cursor.CLOSED;
-  if (callback) callback(null, this);
-  
+
+  // callback for backward compatibility
+  if (callback) {
+    callback(null, this);
+  } else {
+    return this;
+  }
+
   this.items = null;
 };
 

@@ -1,6 +1,19 @@
 (function() {
   var smio;
   smio = global.smoothio;
+  smio.Control = (function() {
+    function Control() {
+      this._html = '';
+    }
+    Control.prototype.renderHtml = function() {
+      return this._html;
+    };
+    Control.prototype.renderTag = function(name, sarg, jarg) {
+      return name;
+    };
+    return Control;
+  })();
+  smio = global.smoothio;
   smio.Util = (function() {
     function Util() {
       this.array = {
@@ -8,13 +21,13 @@
           var i, index, _ref, _ref2;
           if (pos <= arr.length && (index = arr.indexOf(val)) !== pos) {
             if (index >= 0) {
-              for (i = index, _ref = arr.length; (index <= _ref ? i < _ref : i > _ref); (index <= _ref ? i += 1 : i -= 1)) {
+              for (i = index, _ref = arr.length; index <= _ref ? i < _ref : i > _ref; index <= _ref ? i++ : i--) {
                 arr[i] = arr[i + 1];
               }
               arr.length--;
             }
             arr.length++;
-            for (i = _ref2 = arr.length - 1; (_ref2 <= pos ? i < pos : i > pos); (_ref2 <= pos ? i += 1 : i -= 1)) {
+            for (i = _ref2 = arr.length - 1; _ref2 <= pos ? i < pos : i > pos; _ref2 <= pos ? i++ : i--) {
               arr[i] = arr[i - 1];
             }
             arr[pos] = val;
@@ -68,7 +81,7 @@
         times: function(str, times) {
           var a, x;
           a = new Array(times);
-          for (x = 0; (0 <= times ? x < times : x > times); (0 <= times ? x += 1 : x -= 1)) {
+          for (x = 0; 0 <= times ? x < times : x > times; 0 <= times ? x++ : x--) {
             a[x] = str;
           }
           return a.join('');
