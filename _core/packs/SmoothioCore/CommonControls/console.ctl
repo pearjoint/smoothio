@@ -1,7 +1,7 @@
 <%
-	if args['topDown']
+	if @args['topDown']
 %>
-<div class="smio-console smio-console-<%arg:id%>">
+<div id="<%=@id()%>" class="smio-console smio-console-top">
 	<div class="smio-console-ever">header</div>
 	<div class="smio-console-hover" style="display: none;">hover</div>
 	<div class="smio-console-detail" style="display: none;">details</div>
@@ -9,7 +9,7 @@
 <%
 	else
 %>
-<div class="smio-console smio-console-<%arg:id%>">
+<div id="<%=@id()%>" class="smio-console smio-console-bottom">
 	<div class="smio-console-detail" style="display: none;">details</div>
 	<div class="smio-console-hover" style="display: none;">hover</div>
 	<div class="smio-console-ever">footer</div>

@@ -6,4 +6,5 @@ smio.init = ->
 
 $(document).ready ->
 	smio.init()
+	$('#smio_body').html (new smio.Packs_SmoothioCore_CommonControls_mainframe { id: 'sm' }).renderHtml()
 

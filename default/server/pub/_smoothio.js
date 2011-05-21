@@ -10331,7 +10331,10 @@ window.jQuery = window.$ = jQuery;
     }), 5000);
   };
   $(document).ready(function() {
-    return smio.init();
+    smio.init();
+    return $('#smio_body').html((new smio.Packs_SmoothioCore_CommonControls_mainframe({
+      id: 'sm'
+    })).renderHtml());
   });
 }).call(this);
 
@@ -10340,14 +10343,48 @@ window.jQuery = window.$ = jQuery;
   var smio;
   smio = global.smoothio;
   smio.Control = (function() {
-    function Control() {
+    Control.tagRenderers = {
+      "arg": function(ctl, name) {
+        return ctl.args[name];
+      },
+      "ctl": function(ctl, className, args) {
+        var ctor;
+        if ((!ctl.controls[args.id]) && (ctor = smio['Packs_' + ctl.baseName + '_' + className])) {
+          ctl.controls[args.id] = new ctor(args);
+        }
+        if (ctl.controls[args.id]) {
+          return ctl.controls[args.id].renderHtml();
+        } else {
+          return "CONTROL_NOT_FOUND:" + className;
+        }
+      }
+    };
+    function Control(args, baseName, className) {
+      this.args = args;
+      this.ctlID = args.id;
+      this.baseName = baseName;
+      this.className = className;
+      this.controls = {};
       this._html = '';
     }
+    Control.prototype.id = function(subID) {
+      if (subID) {
+        return this.ctlID + '_' + subID;
+      } else {
+        return this.ctlID;
+      }
+    };
     Control.prototype.renderHtml = function() {
       return this._html;
     };
     Control.prototype.renderTag = function(name, sarg, jarg) {
-      return name;
+      var renderer;
+      renderer = smio.Control.tagRenderers[name];
+      if (renderer) {
+        return renderer(this, sarg, jarg);
+      } else {
+        return "UNKNOWN_TAG:" + name;
+      }
     };
     return Control;
   })();
@@ -10435,14 +10472,48 @@ window.jQuery = window.$ = jQuery;
   var smio;
   smio = global.smoothio;
   smio.Control = (function() {
-    function Control() {
+    Control.tagRenderers = {
+      "arg": function(ctl, name) {
+        return ctl.args[name];
+      },
+      "ctl": function(ctl, className, args) {
+        var ctor;
+        if ((!ctl.controls[args.id]) && (ctor = smio['Packs_' + ctl.baseName + '_' + className])) {
+          ctl.controls[args.id] = new ctor(args);
+        }
+        if (ctl.controls[args.id]) {
+          return ctl.controls[args.id].renderHtml();
+        } else {
+          return "CONTROL_NOT_FOUND:" + className;
+        }
+      }
+    };
+    function Control(args, baseName, className) {
+      this.args = args;
+      this.ctlID = args.id;
+      this.baseName = baseName;
+      this.className = className;
+      this.controls = {};
       this._html = '';
     }
+    Control.prototype.id = function(subID) {
+      if (subID) {
+        return this.ctlID + '_' + subID;
+      } else {
+        return this.ctlID;
+      }
+    };
     Control.prototype.renderHtml = function() {
       return this._html;
     };
     Control.prototype.renderTag = function(name, sarg, jarg) {
-      return name;
+      var renderer;
+      renderer = smio.Control.tagRenderers[name];
+      if (renderer) {
+        return renderer(this, sarg, jarg);
+      } else {
+        return "UNKNOWN_TAG:" + name;
+      }
     };
     return Control;
   })();
@@ -10464,21 +10535,21 @@ window.jQuery = window.$ = jQuery;
   smio = smoothio = global.smoothio;
   smio.Packs_SmoothioCore_CommonControls_console = (function() {
     __extends(Packs_SmoothioCore_CommonControls_console, smio.Control);
-    function Packs_SmoothioCore_CommonControls_console() {
-      Packs_SmoothioCore_CommonControls_console.__super__.constructor.apply(this, arguments);
+    function Packs_SmoothioCore_CommonControls_console(args) {
+      Packs_SmoothioCore_CommonControls_console.__super__.constructor.call(this, args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_console");
     }
     Packs_SmoothioCore_CommonControls_console.prototype.renderHtml = function() {
       var parts;
       if (!this._html) {
         parts = [];
-        if (args['topDown']) {
-          parts.push("\n<div class=\"smio-console smio-console-");
-          parts.push(this.renderTag("arg", "id", null));
-          parts.push("\">\n\t<div class=\"smio-console-ever\">header</div>\n\t<div class=\"smio-console-hover\" style=\"display: none;\">hover</div>\n\t<div class=\"smio-console-detail\" style=\"display: none;\">details</div>\n</div>\n");
+        if (this.args['topDown']) {
+          parts.push("\n<div id=\"");
+          parts.push(this.id());
+          parts.push("\" class=\"smio-console smio-console-top\">\n\t<div class=\"smio-console-ever\">header</div>\n\t<div class=\"smio-console-hover\" style=\"display: none;\">hover</div>\n\t<div class=\"smio-console-detail\" style=\"display: none;\">details</div>\n</div>\n");
         } else {
-          parts.push("\n<div class=\"smio-console smio-console-");
-          parts.push(this.renderTag("arg", "id", null));
-          parts.push("\">\n\t<div class=\"smio-console-detail\" style=\"display: none;\">details</div>\n\t<div class=\"smio-console-hover\" style=\"display: none;\">hover</div>\n\t<div class=\"smio-console-ever\">footer</div>\n</div>\n\n");
+          parts.push("\n<div id=\"");
+          parts.push(this.id());
+          parts.push("\" class=\"smio-console smio-console-bottom\">\n\t<div class=\"smio-console-detail\" style=\"display: none;\">details</div>\n\t<div class=\"smio-console-hover\" style=\"display: none;\">hover</div>\n\t<div class=\"smio-console-ever\">footer</div>\n</div>\n\n");
         }
         this._html = parts.join('');
       }
@@ -10504,27 +10575,27 @@ window.jQuery = window.$ = jQuery;
   smio = smoothio = global.smoothio;
   smio.Packs_SmoothioCore_CommonControls_mainframe = (function() {
     __extends(Packs_SmoothioCore_CommonControls_mainframe, smio.Control);
-    function Packs_SmoothioCore_CommonControls_mainframe() {
-      Packs_SmoothioCore_CommonControls_mainframe.__super__.constructor.apply(this, arguments);
-    }
     Packs_SmoothioCore_CommonControls_mainframe.prototype.test = function() {
       var xy;
       return xy = "clientside";
     };
+    function Packs_SmoothioCore_CommonControls_mainframe(args) {
+      Packs_SmoothioCore_CommonControls_mainframe.__super__.constructor.call(this, args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_mainframe");
+    }
     Packs_SmoothioCore_CommonControls_mainframe.prototype.renderHtml = function() {
       var parts;
       if (!this._html) {
         parts = [];
         parts.push("\n<div class=\"smio-main\" id=\"");
-        parts.push(id);
+        parts.push(this.id());
         parts.push("\">\n\t");
         parts.push(this.renderTag("ctl", "console", {
-          id: 'top',
+          id: this.id('ctop'),
           topDown: true
         }));
         parts.push("\n\t<div class=\"smio-console smio-console-main\"><br/><br/>foo zeh content</div>\n\t");
         parts.push(this.renderTag("ctl", "console", {
-          id: 'bottom',
+          id: this.id('cbottom'),
           topDown: false
         }));
         parts.push("\n</div>\n\n");

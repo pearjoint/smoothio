@@ -13,21 +13,21 @@
   smio = smoothio = global.smoothio;
   smio.Packs_SmoothioCore_CommonControls_console = (function() {
     __extends(Packs_SmoothioCore_CommonControls_console, smio.Control);
-    function Packs_SmoothioCore_CommonControls_console() {
-      Packs_SmoothioCore_CommonControls_console.__super__.constructor.apply(this, arguments);
+    function Packs_SmoothioCore_CommonControls_console(args) {
+      Packs_SmoothioCore_CommonControls_console.__super__.constructor.call(this, args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_console");
     }
     Packs_SmoothioCore_CommonControls_console.prototype.renderHtml = function() {
       var parts;
       if (!this._html) {
         parts = [];
-        if (args['topDown']) {
-          parts.push("\n<div class=\"smio-console smio-console-");
-          parts.push(this.renderTag("arg", "id", null));
-          parts.push("\">\n\t<div class=\"smio-console-ever\">header</div>\n\t<div class=\"smio-console-hover\" style=\"display: none;\">hover</div>\n\t<div class=\"smio-console-detail\" style=\"display: none;\">details</div>\n</div>\n");
+        if (this.args['topDown']) {
+          parts.push("\n<div id=\"");
+          parts.push(this.id());
+          parts.push("\" class=\"smio-console smio-console-top\">\n\t<div class=\"smio-console-ever\">header</div>\n\t<div class=\"smio-console-hover\" style=\"display: none;\">hover</div>\n\t<div class=\"smio-console-detail\" style=\"display: none;\">details</div>\n</div>\n");
         } else {
-          parts.push("\n<div class=\"smio-console smio-console-");
-          parts.push(this.renderTag("arg", "id", null));
-          parts.push("\">\n\t<div class=\"smio-console-detail\" style=\"display: none;\">details</div>\n\t<div class=\"smio-console-hover\" style=\"display: none;\">hover</div>\n\t<div class=\"smio-console-ever\">footer</div>\n</div>\n\n");
+          parts.push("\n<div id=\"");
+          parts.push(this.id());
+          parts.push("\" class=\"smio-console smio-console-bottom\">\n\t<div class=\"smio-console-detail\" style=\"display: none;\">details</div>\n\t<div class=\"smio-console-hover\" style=\"display: none;\">hover</div>\n\t<div class=\"smio-console-ever\">footer</div>\n</div>\n\n");
         }
         this._html = parts.join('');
       }

@@ -13,27 +13,27 @@
   smio = smoothio = global.smoothio;
   smio.Packs_SmoothioCore_CommonControls_mainframe = (function() {
     __extends(Packs_SmoothioCore_CommonControls_mainframe, smio.Control);
-    function Packs_SmoothioCore_CommonControls_mainframe() {
-      Packs_SmoothioCore_CommonControls_mainframe.__super__.constructor.apply(this, arguments);
-    }
     Packs_SmoothioCore_CommonControls_mainframe.prototype.test = function() {
       var xy;
       return xy = "clientside";
     };
+    function Packs_SmoothioCore_CommonControls_mainframe(args) {
+      Packs_SmoothioCore_CommonControls_mainframe.__super__.constructor.call(this, args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_mainframe");
+    }
     Packs_SmoothioCore_CommonControls_mainframe.prototype.renderHtml = function() {
       var parts;
       if (!this._html) {
         parts = [];
         parts.push("\n<div class=\"smio-main\" id=\"");
-        parts.push(id);
+        parts.push(this.id());
         parts.push("\">\n\t");
         parts.push(this.renderTag("ctl", "console", {
-          id: 'top',
+          id: this.id('ctop'),
           topDown: true
         }));
         parts.push("\n\t<div class=\"smio-console smio-console-main\"><br/><br/>foo zeh content</div>\n\t");
         parts.push(this.renderTag("ctl", "console", {
-          id: 'bottom',
+          id: this.id('cbottom'),
           topDown: false
         }));
         parts.push("\n</div>\n\n");

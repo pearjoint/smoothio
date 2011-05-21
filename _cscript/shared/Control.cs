@@ -11,6 +11,7 @@ class smio.Control
 	@compile: (@inst, ctlContent, controlPath) ->
 		[inDyn, oneUp, contentParts, decls, renderParts, lastChar, lastContent, obj] = [false, '../', [], '', [], '', '', {}]
 		pathParts = ((controlPath.substr 0, controlPath.lastIndexOf '.').split '/')
+		baseName = pathParts[0...(pathParts.length - 1)].join '_'
 		className = pathParts.join '_'
 		for c in ctlContent
 			if ((lastChar + c) is '<%') and not inDyn
@@ -58,6 +59,9 @@ smio = smoothio = global.smoothio
 class smio.Packs_#{className} extends smio.Control
 #{decls}
 #{"#if client"}
+	constructor: (args) ->
+		super args, #{JSON.stringify baseName}, #{JSON.stringify className}
+
 	renderHtml: ->
 		if not @_html
 			parts = []
@@ -96,13 +100,39 @@ class smio.Packs_#{className} extends smio.Control
 		coffeeScript
 #endif
 #if client
-	constructor: ->
+	@tagRenderers:
+		"arg": (ctl, name) ->
+			ctl.args[name]
+		"ctl": (ctl, className, args) ->
+			if (not ctl.controls[args.id]) and (ctor = smio['Packs_' + ctl.baseName + '_' + className])
+				ctl.controls[args.id] = new ctor args
+			if ctl.controls[args.id]
+				ctl.controls[args.id].renderHtml()
+			else
+				"CONTROL_NOT_FOUND:" + className
+
+	constructor: (args, baseName, className) ->
+		@args = args
+		@ctlID = args.id
+		@baseName = baseName
+		@className = className
+		@controls = {}
 		@_html = ''
+
+	id: (subID) ->
+		if (subID)
+			@ctlID + '_' + subID
+		else
+			@ctlID
 
 	renderHtml: ->
 		@_html
 
 	renderTag: (name, sarg, jarg) ->
-		name
+		renderer = smio.Control.tagRenderers[name]
+		if renderer
+			renderer(@, sarg, jarg)
+		else
+			"UNKNOWN_TAG:" + name
 #endif
 

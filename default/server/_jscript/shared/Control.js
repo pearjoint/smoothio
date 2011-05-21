@@ -7,10 +7,11 @@
   smio.Control = (function() {
     function Control() {}
     Control.compile = function(inst, ctlContent, controlPath) {
-      var c, className, coffeeScript, contentParts, decls, dyn, dynCmd, i, inDyn, ind, indent, isCmd, jarg, l, lastChar, lastContent, lines, obj, oneUp, part, pathParts, pos, posC, posS, renderParts, rind, rp, sarg, stimes, tmpPos, tmpPos2, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref, _ref2, _ref3, _ref4;
+      var baseName, c, className, coffeeScript, contentParts, decls, dyn, dynCmd, i, inDyn, ind, indent, isCmd, jarg, l, lastChar, lastContent, lines, obj, oneUp, part, pathParts, pos, posC, posS, renderParts, rind, rp, sarg, stimes, tmpPos, tmpPos2, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref, _ref2, _ref3, _ref4;
       this.inst = inst;
       _ref = [false, '../', [], '', [], '', '', {}], inDyn = _ref[0], oneUp = _ref[1], contentParts = _ref[2], decls = _ref[3], renderParts = _ref[4], lastChar = _ref[5], lastContent = _ref[6], obj = _ref[7];
       pathParts = (controlPath.substr(0, controlPath.lastIndexOf('.'))).split('/');
+      baseName = pathParts.slice(0, pathParts.length - 1).join('_');
       className = pathParts.join('_');
       for (_i = 0, _len = ctlContent.length; _i < _len; _i++) {
         c = ctlContent[_i];
@@ -78,7 +79,7 @@
           }
         }
       }
-      coffeeScript = "###\nAuto-generated from " + controlPath + "\n###\n" + "#if server" + "\nrequire '" + (this.inst.util.string.times(oneUp, pathParts.length)) + "_jscript/Control'\n" + "#endif" + "\nsmio = smoothio = global.smoothio\nclass smio.Packs_" + className + " extends smio.Control\n" + decls + "\n" + "#if client" + "\n	renderHtml: ->\n		if not @_html\n			parts = []";
+      coffeeScript = "###\nAuto-generated from " + controlPath + "\n###\n" + "#if server" + "\nrequire '" + (this.inst.util.string.times(oneUp, pathParts.length)) + "_jscript/Control'\n" + "#endif" + "\nsmio = smoothio = global.smoothio\nclass smio.Packs_" + className + " extends smio.Control\n" + decls + "\n" + "#if client" + "\n	constructor: (args) ->\n		super args, " + (JSON.stringify(baseName)) + ", " + (JSON.stringify(className)) + "\n\n	renderHtml: ->\n		if not @_html\n			parts = []";
       _ref3 = [-1, 3, 3, this.inst.util.string.times], ind = _ref3[0], indent = _ref3[1], rind = _ref3[2], stimes = _ref3[3];
       for (_k = 0, _len3 = renderParts.length; _k < _len3; _k++) {
         rp = renderParts[_k];

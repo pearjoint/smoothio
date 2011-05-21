@@ -10,6 +10,9 @@
     }), 5000);
   };
   $(document).ready(function() {
-    return smio.init();
+    smio.init();
+    return $('#smio_body').html((new smio.Packs_SmoothioCore_CommonControls_mainframe({
+      id: 'sm'
+    })).renderHtml());
   });
 }).call(this);
