@@ -1,18 +1,32 @@
 (function() {
   var smio;
   smio = global.smoothio;
-  smio.init = function() {
-    smio.util = new smio.Util;
-    return setInterval((function() {
-      return $('#smio_body').css({
-        "background-image": "url('/_/file/images/bg" + (smio.util.math.randomInt(4)) + ".jpg')"
+  smio.Client = (function() {
+    function Client() {
+      this.mainFrame = new smio.Packs_SmoothioCore_CommonControls_mainframe({
+        id: 'sm'
       });
-    }), 5000);
-  };
+      this.sessionID = '';
+      this.socket = new smio.Socket(this);
+    }
+    Client.prototype.init = function() {
+      var $el;
+      this.sessionID = $.cookie('smiosessid');
+      $el = $('#smio_body');
+      this.mainFrame.renderHtml($el);
+      this.mainFrame.onLoad($el);
+      this.socket.connect();
+      return setInterval((function() {
+        return $('#smio_body').css({
+          "background-image": "url('/_/file/images/bg" + (smio.util.math.randomInt(4)) + ".jpg')"
+        });
+      }), 5000);
+    };
+    return Client;
+  })();
   $(document).ready(function() {
-    smio.init();
-    return $('#smio_body').html((new smio.Packs_SmoothioCore_CommonControls_mainframe({
-      id: 'sm'
-    })).renderHtml());
+    smio.util = new smio.Util;
+    smio.client = new smio.Client();
+    return smio.client.init();
   });
 }).call(this);

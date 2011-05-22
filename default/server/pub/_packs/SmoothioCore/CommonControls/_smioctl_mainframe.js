@@ -19,8 +19,9 @@
     };
     function Packs_SmoothioCore_CommonControls_mainframe(args) {
       Packs_SmoothioCore_CommonControls_mainframe.__super__.constructor.call(this, args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_mainframe");
+      this.init();
     }
-    Packs_SmoothioCore_CommonControls_mainframe.prototype.renderHtml = function() {
+    Packs_SmoothioCore_CommonControls_mainframe.prototype.renderHtml = function($el) {
       var parts;
       if (!this._html) {
         parts = [];
@@ -31,13 +32,16 @@
           id: this.id('ctop'),
           topDown: true
         }));
-        parts.push("\n\t<div class=\"smio-console smio-console-main\"><br/><br/>foo zeh content</div>\n\t");
+        parts.push("\n\t<div class=\"smio-console smio-console-main\"></div>\n\t");
         parts.push(this.renderTag("ctl", "console", {
           id: this.id('cbottom'),
           topDown: false
         }));
         parts.push("\n</div>\n\n");
         this._html = parts.join('');
+      }
+      if ($el) {
+        $el.html(this._html);
       }
       return this._html;
     };

@@ -70,12 +70,21 @@ class smio.Util
 				else
 					(if err['ml_error_filepath']? then ('[ ' + err['ml_error_filepath'] + ' ] -- ') else '') + err
 			mergeConfigWithDefaults: (cfg, defs) ->
+				if not cfg
+					cfg = {}
 				for defKey, defVal of defs
 					if (not cfg[defKey]?) or (typeof cfg[defKey] isnt typeof defVal)
 						cfg[defKey] = defVal
 					else if (typeof cfg[defKey] is 'object') and (typeof defVal is 'object')
 						cfg[defKey] = @mergeConfigWithDefaults cfg[defKey], defVal
 				cfg
+			parseCookies: (cookies) ->
+				c = {}
+				if cookies
+					for cookie in cookies.split ';'
+						if (parts = cookie.split '=') and parts.length
+							c[parts[0]] = if parts.length > 1 then parts[1] else ''
+				c
 #endif
 
 		@math =

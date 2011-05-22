@@ -21,17 +21,20 @@ class smio.Packs_SmoothioCore_CommonControls_mainframe extends smio.Control
 #if client
 	constructor: (args) ->
 		super args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_mainframe"
+		@init()
 
-	renderHtml: ->
+	renderHtml: ($el) ->
 		if not @_html
 			parts = []
 			parts.push "\n<div class=\"smio-main\" id=\""
 			parts.push @id()
 			parts.push "\">\n\t"
 			parts.push @renderTag "ctl", "console", { id: (@id 'ctop'), topDown: true }
-			parts.push "\n\t<div class=\"smio-console smio-console-main\"><br/><br/>foo zeh content</div>\n\t"
+			parts.push "\n\t<div class=\"smio-console smio-console-main\"></div>\n\t"
 			parts.push @renderTag "ctl", "console", { id: (@id 'cbottom'), topDown: false }
 			parts.push "\n</div>\n\n"
 			@_html = parts.join ''
+		if $el
+			$el.html @_html
 		@_html
 #endif

@@ -79,7 +79,7 @@
           }
         }
       }
-      coffeeScript = "###\nAuto-generated from " + controlPath + "\n###\n" + "#if server" + "\nrequire '" + (this.inst.util.string.times(oneUp, pathParts.length)) + "_jscript/Control'\n" + "#endif" + "\nsmio = smoothio = global.smoothio\nclass smio.Packs_" + className + " extends smio.Control\n" + decls + "\n" + "#if client" + "\n	constructor: (args) ->\n		super args, " + (JSON.stringify(baseName)) + ", " + (JSON.stringify(className)) + "\n\n	renderHtml: ->\n		if not @_html\n			parts = []";
+      coffeeScript = "###\nAuto-generated from " + controlPath + "\n###\n" + "#if server" + "\nrequire '" + (this.inst.util.string.times(oneUp, pathParts.length)) + "_jscript/Control'\n" + "#endif" + "\nsmio = smoothio = global.smoothio\nclass smio.Packs_" + className + " extends smio.Control\n" + decls + "\n" + "#if client" + "\n	constructor: (args) ->\n		super args, " + (JSON.stringify(baseName)) + ", " + (JSON.stringify(className)) + "\n		@init()\n\n	renderHtml: ($el) ->\n		if not @_html\n			parts = []";
       _ref3 = [-1, 3, 3, this.inst.util.string.times], ind = _ref3[0], indent = _ref3[1], rind = _ref3[2], stimes = _ref3[3];
       for (_k = 0, _len3 = renderParts.length; _k < _len3; _k++) {
         rp = renderParts[_k];
@@ -122,7 +122,7 @@
           }
         }
       }
-      coffeeScript += "\n" + (stimes('\t', indent)) + "@_html = parts.join ''\n" + (stimes('\t', indent - 1)) + "@_html\n" + "#endif" + "\n";
+      coffeeScript += "\n" + (stimes('\t', indent)) + "@_html = parts.join ''\n" + (stimes('\t', indent - 1)) + "if $el\n" + (stimes('\t', indent)) + "$el.html @_html\n" + (stimes('\t', indent - 1)) + "@_html\n" + "#endif" + "\n";
       return coffeeScript;
     };
     return Control;

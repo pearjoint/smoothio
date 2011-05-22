@@ -61,8 +61,9 @@ class smio.Packs_#{className} extends smio.Control
 #{"#if client"}
 	constructor: (args) ->
 		super args, #{JSON.stringify baseName}, #{JSON.stringify className}
+		@init()
 
-	renderHtml: ->
+	renderHtml: ($el) ->
 		if not @_html
 			parts = []
 """
@@ -96,7 +97,7 @@ class smio.Packs_#{className} extends smio.Control
 						jarg = sarg.substr pos
 						sarg = _.trim sarg.substr 0, pos
 					coffeeScript += "\n#{stimes '\t', rind}parts.push @renderTag #{JSON.stringify rp[0]}, #{JSON.stringify sarg}, #{jarg}"
-		coffeeScript += "\n#{stimes '\t', indent}@_html = parts.join ''\n#{stimes '\t', indent - 1}@_html\n#{"#endif"}\n"
+		coffeeScript += "\n#{stimes '\t', indent}@_html = parts.join ''\n#{stimes '\t', indent - 1}if $el\n#{stimes '\t', indent}$el.html @_html\n#{stimes '\t', indent - 1}@_html\n#{"#endif"}\n"
 		coffeeScript
 #endif
 #if client
@@ -117,6 +118,7 @@ class smio.Packs_#{className} extends smio.Control
 		@baseName = baseName
 		@className = className
 		@controls = {}
+		@el = null
 		@_html = ''
 
 	id: (subID) ->
@@ -125,7 +127,16 @@ class smio.Packs_#{className} extends smio.Control
 		else
 			@ctlID
 
-	renderHtml: ->
+	init: ->
+
+	onLoad: ($root) ->
+		@el = $('#' + @ctlID)
+		for id, ctl of @controls
+			ctl.onLoad $root
+
+	renderHtml: ($el) ->
+		if $el
+			$el.html @_html
 		@_html
 
 	renderTag: (name, sarg, jarg) ->

@@ -24,6 +24,7 @@
       this.baseName = baseName;
       this.className = className;
       this.controls = {};
+      this.el = null;
       this._html = '';
     }
     Control.prototype.id = function(subID) {
@@ -33,7 +34,22 @@
         return this.ctlID;
       }
     };
-    Control.prototype.renderHtml = function() {
+    Control.prototype.init = function() {};
+    Control.prototype.onLoad = function($root) {
+      var ctl, id, _ref, _results;
+      this.el = $('#' + this.ctlID);
+      _ref = this.controls;
+      _results = [];
+      for (id in _ref) {
+        ctl = _ref[id];
+        _results.push(ctl.onLoad($root));
+      }
+      return _results;
+    };
+    Control.prototype.renderHtml = function($el) {
+      if ($el) {
+        $el.html(this._html);
+      }
       return this._html;
     };
     Control.prototype.renderTag = function(name, sarg, jarg) {

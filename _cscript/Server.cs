@@ -6,6 +6,7 @@ node_os = require 'os'
 node_static = require 'node-static'
 node_url = require 'url'
 node_util = require 'util'
+socketio = require 'socket.io'
 smio = global.smoothio
 
 class smio.Server
@@ -27,6 +28,10 @@ class smio.Server
 			@httpServer.listen @port, hostName, => @onBind()
 		else
 			node_multi.listen { "port": @port, "nodes": @processes }, @httpServer
+		@socket = socketio.listen @httpServer, resource: '/_/sockio/', flashPolicyServer: false, log: (line) -> smio.logit line, 'sockets'
+		@socket.on 'clientConnect', (client) => @onSocketConnect client
+		@socket.on 'clientDisconnect', (client) => @onSocketDisconnect client
+		@socket.on 'clientMessage', (msg, client) => @onSocketMessage msg, client
 
 	onBind: ->
 		@status = 1
@@ -51,6 +56,15 @@ class smio.Server
 		uri.url = url
 		ctx = new smio.RequestContext @, uri, request, response, @inst.mongos['admin'], @inst.mongos['smoothio_shared'], @inst.mongos["smoothio__#{@serverName}"]
 		ctx.handleRequest()
+
+	onSocketConnect: (client) ->
+		client.send 'foobar'
+
+	onSocketDisconnect: (client) ->
+		smio.logit "SOCKET_DISCONN: #{client.sessionId}"
+
+	onSocketMessage: (message, client) ->
+		smio.logit "SOCKET_MESSAGE: #{message}"
 
 	stop: ->
 		@status = 0
