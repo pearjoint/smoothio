@@ -17,7 +17,6 @@ smio = global.smoothio
 class smio.Instance
 	constructor: ->
 		@logFile = null
-		@util = new smio.Util
 		@initTime = new Date
 		@lastRequestTime = null
 		@restartMinUptime = 60
@@ -30,7 +29,7 @@ class smio.Instance
 	expandLogPath: (path) ->
 		if path and ((pos = path.indexOf '*') > 0)
 			dt = new Date
-			path = "#{path.substr 0, pos}#{@util.formatDate dt}#{path.substr pos + 1}"
+			path = "#{path.substr 0, pos}#{smio.Util.DateTime.toString dt}#{path.substr pos + 1}"
 		path
 
 	finalizeStart: () ->
@@ -45,7 +44,7 @@ class smio.Instance
 				@mongos["smoothio__#{sname}"] = new smio.Database @, @mongo, "smoothio__#{sname}", "smoothio #{sname}", server, lastInterval += 500
 
 	formatError: (err) ->
-		@util.inst.formatError err, @config.smoothio.logging.details, @config.smoothio.logging.stack
+		smio.Util.Server.formatError err, @config.smoothio.logging.details, @config.smoothio.logging.stack
 
 	getUptime: () ->
 		((new Date).getTime() / 1000) - (@initTime.getTime() / 1000)
@@ -72,7 +71,7 @@ class smio.Instance
 				if resLang and not @resourceSets[resBaseName][resLang]
 					@resourceSets[resBaseName][resLang] = {}
 				try
-					for name, val of resSet = JSON.parse @util.fs.readTextFile fpath
+					for name, val of resSet = JSON.parse smio.Util.FileSystem.readTextFile fpath
 						@resourceSets[resBaseName][if resLang then resLang else 'en'][name] = val
 				catch err
 					err['ml_error_filepath'] = fpath
@@ -95,7 +94,7 @@ class smio.Instance
 				lang = 'en'
 			val = @resourceSets[resSet][lang][resName] + ''
 		if args and args.length
-			val = @util.string.replace val, @util.array.toObject args, (_, i) -> '{' + i + '}'
+			val = smio.Util.String.replace val, smio.Util.Array.toObject args, (_, i) -> '{' + i + '}'
 		if (not val) and lang isnt 'en'
 			val = @res resSet, resName, 'en', args...
 		val
@@ -103,7 +102,7 @@ class smio.Instance
 	start: ->
 		defHost = '127.0.0.1'
 		try
-			@config = @.util.inst.mergeConfigWithDefaults (JSON.parse @util.fs.readTextFile 'instance.config'), {
+			@config = smio.Util.Server.mergeConfigWithDefaults (JSON.parse smio.Util.FileSystem.readTextFile 'instance.config'), {
 				"smoothio": {
 					"enabled": true,
 					"processes": 1,
@@ -112,6 +111,13 @@ class smio.Instance
 					"language": "en",
 					"minify": true,
 					"dns_preresolve": { "enabled": (process.platform is 'cygwin'), "hostnames": { "localhost": defHost, "$localhostname": defHost } }
+				},
+				"session": {
+					"timeout": 20
+				},
+				"sockets": {
+					"xdomain_swf": false,
+					"logpath": "server/log/sockets.log"
 				},
 				"mongodb": {
 					"host": defHost,
@@ -125,29 +131,7 @@ class smio.Instance
 			err.message = 'ERROR parsing instance.config: ' + err.message
 			throw err
 		if (logPath = @expandLogPath @config.smoothio.logging.path)
-			try
-				node_fs.unlinkSync logPath
-			oldLogFunc = smio.logit
-			closeLog = () =>
-				try
-					@logFile.end()
-				try
-					@logFile.destroySoon()
-				@logFile = null
-			smio.logit = (line, cat) =>
-				full = ''
-				if smio['logBuffer']
-					full = smio.logBuffer.join('\n') + '\n'
-					delete smio.logBuffer
-				if @logFile and not @logFile.writable
-					closeLog
-				if not @logFile
-					@logFile = node_fs.createWriteStream logPath, encoding: 'utf-8', mode: 0666
-					@logFile.on 'close', closeLog
-					@logFile.on 'error', closeLog
-				full += (line = JSON.stringify(new Date()) + ' - ' + oldLogFunc(line, cat) + '\n')
-				try
-					@logFile.write full
+			smio.logit = smio.Util.Server.setupLogFile @, 'logFile', true, logPath, smio.logit
 		if not @config.smoothio.enabled
 			smio.logit "This smoothio instance has been disabled in instance.config."
 			return 0

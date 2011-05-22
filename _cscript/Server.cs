@@ -18,6 +18,7 @@ class smio.Server
 				if (hostName is host) or ((host is '$localhostname') and hostName is localHostName)
 					hostName = ip
 					break
+		@sockLogFile = null
 		@status = 0
 		@isHttps = false
 		@httpServer = node_http.createServer (request, response) => @onRequest request, response
@@ -28,7 +29,12 @@ class smio.Server
 			@httpServer.listen @port, hostName, => @onBind()
 		else
 			node_multi.listen { "port": @port, "nodes": @processes }, @httpServer
-		@socket = socketio.listen @httpServer, resource: '/_/sockio/', flashPolicyServer: false, log: (line) -> smio.logit line, 'sockets'
+		@sockLogFile = null
+		if sockLogPath = @inst.expandLogPath @inst.config.sockets.logpath
+			sockLogger = smio.Util.Server.setupLogFile @, 'sockLogFile', false, sockLogPath, (msg) -> msg
+		else
+			sockLogger = () ->
+		@socket = socketio.listen @httpServer, resource: '/_/sockio/', flashPolicyServer: false, log: sockLogger
 		@socket.on 'clientConnect', (client) => @onSocketConnect client
 		@socket.on 'clientDisconnect', (client) => @onSocketDisconnect client
 		@socket.on 'clientMessage', (msg, client) => @onSocketMessage msg, client

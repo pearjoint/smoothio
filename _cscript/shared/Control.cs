@@ -53,7 +53,7 @@ class smio.Control
 Auto-generated from #{controlPath}
 ###
 #{"#if server"}
-require '#{@inst.util.string.times oneUp, pathParts.length}_jscript/Control'
+require '#{smio.Util.String.times oneUp, pathParts.length}_jscript/Control'
 #{"#endif"}
 smio = smoothio = global.smoothio
 class smio.Packs_#{className} extends smio.Control
@@ -67,7 +67,7 @@ class smio.Packs_#{className} extends smio.Control
 		if not @_html
 			parts = []
 """
-		[ind, indent, rind, stimes] = [-1, 3, 3, @inst.util.string.times]
+		[ind, indent, rind, stimes] = [-1, 3, 3, smio.Util.String.times]
 		for rp in renderParts
 			if _.isString rp
 				coffeeScript += "\n#{stimes '\t', rind}parts.push #{JSON.stringify rp}"

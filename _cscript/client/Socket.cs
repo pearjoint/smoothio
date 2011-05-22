@@ -1,9 +1,8 @@
 smio = global.smoothio
 
-
 class smio.Socket
-	constructor: (client, host) ->
-		@client = client
+	constructor: (@client, host) ->
+		@sessionID = ''
 		@socket = new io.Socket host, resource: '/_/sockio/', rememberTransport: false, connectTimeout: 2000
 		@socket.on 'connect', => @onSocketConnect()
 		@socket.on 'connect_failed', => @onSocketConnectFailed()
@@ -13,31 +12,34 @@ class smio.Socket
 		@socket.on 'reconnect', (type, attempts) => @onSocketReconnect type, attempts
 		@socket.on 'reconnect_failed', => @onSocketReconnectFailed()
 		@socket.on 'reconnecting', (delay, attempts) => @onSocketReconnecting delay, attempts
-		@sessionID = ''
 
 	connect: ->
 		@socket.connect()
 
 	onSocketConnect: ->
-		alert JSON.stringify @socket.transport
+		if (not @sessionID) and @socket.transport['sessionid']
+			@sessionID = @socket.transport.sessionid
 
 	onSocketConnectFailed: ->
+		@sessionID = ''
 
 	onSocketConnecting: (type) ->
+		@sessionID = ''
 
 	onSocketDisconnect: ->
 		@sessionID = ''
 
 	onSocketMessage: (msg) ->
-		@sessionID = @socket.transport.sessionid
-		alert msg + '\n' + @sessionID
-		#if not @sessionID
-		#	@sessionID = msg
+		if (not @sessionID) and @socket.transport['sessionid']
+			@sessionID = @socket.transport.sessionid
 
 	onSocketReconnect: (type, attempts) ->
+		if (not @sessionID) and @socket.transport['sessionid']
+			@sessionID = @socket.transport.sessionid
 
 	onSocketReconnectFailed: ->
+		@sessionID = ''
 
 	onSocketReconnecting: (delay,attempts) ->
-
+		@sessionID = ''
 

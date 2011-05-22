@@ -12,7 +12,7 @@
   smio = global.smoothio;
   smio.Server = (function() {
     function Server(inst, serverName, hostName, port, processes) {
-      var host, ip, localHostName, _ref;
+      var host, ip, localHostName, sockLogPath, sockLogger, _ref;
       this.inst = inst;
       this.serverName = serverName;
       this.hostName = hostName;
@@ -30,6 +30,7 @@
           }
         }
       }
+      this.sockLogFile = null;
       this.status = 0;
       this.isHttps = false;
       this.httpServer = node_http.createServer(__bind(function(request, response) {
@@ -52,12 +53,18 @@
           "nodes": this.processes
         }, this.httpServer);
       }
+      this.sockLogFile = null;
+      if (sockLogPath = this.inst.expandLogPath(this.inst.config.sockets.logpath)) {
+        sockLogger = smio.Util.Server.setupLogFile(this, 'sockLogFile', false, sockLogPath, function(msg) {
+          return msg;
+        });
+      } else {
+        sockLogger = function() {};
+      }
       this.socket = socketio.listen(this.httpServer, {
         resource: '/_/sockio/',
         flashPolicyServer: false,
-        log: function(line) {
-          return smio.logit(line, 'sockets');
-        }
+        log: sockLogger
       });
       this.socket.on('clientConnect', __bind(function(client) {
         return this.onSocketConnect(client);

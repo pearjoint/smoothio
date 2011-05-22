@@ -18,7 +18,6 @@
     function Instance() {
       var resErrs;
       this.logFile = null;
-      this.util = new smio.Util;
       this.initTime = new Date;
       this.lastRequestTime = null;
       this.restartMinUptime = 60;
@@ -33,7 +32,7 @@
       var dt, pos;
       if (path && ((pos = path.indexOf('*')) > 0)) {
         dt = new Date;
-        path = "" + (path.substr(0, pos)) + (this.util.formatDate(dt)) + (path.substr(pos + 1));
+        path = "" + (path.substr(0, pos)) + (smio.Util.DateTime.toString(dt)) + (path.substr(pos + 1));
       }
       return path;
     };
@@ -55,7 +54,7 @@
       return _results;
     };
     Instance.prototype.formatError = function(err) {
-      return this.util.inst.formatError(err, this.config.smoothio.logging.details, this.config.smoothio.logging.stack);
+      return smio.Util.Server.formatError(err, this.config.smoothio.logging.details, this.config.smoothio.logging.stack);
     };
     Instance.prototype.getUptime = function() {
       return ((new Date).getTime() / 1000) - (this.initTime.getTime() / 1000);
@@ -99,7 +98,7 @@
             this.resourceSets[resBaseName][resLang] = {};
           }
           try {
-            _ref = resSet = JSON.parse(this.util.fs.readTextFile(fpath));
+            _ref = resSet = JSON.parse(smio.Util.FileSystem.readTextFile(fpath));
             _results = [];
             for (name in _ref) {
               val = _ref[name];
@@ -137,7 +136,7 @@
         val = this.resourceSets[resSet][lang][resName] + '';
       }
       if (args && args.length) {
-        val = this.util.string.replace(val, this.util.array.toObject(args, function(_, i) {
+        val = smio.Util.String.replace(val, smio.Util.Array.toObject(args, function(_, i) {
           return '{' + i + '}';
         }));
       }
@@ -147,10 +146,10 @@
       return val;
     };
     Instance.prototype.start = function() {
-      var closeLog, defHost, logPath, mongoLogPath, oldLogFunc;
+      var defHost, logPath, mongoLogPath;
       defHost = '127.0.0.1';
       try {
-        this.config = this.util.inst.mergeConfigWithDefaults(JSON.parse(this.util.fs.readTextFile('instance.config')), {
+        this.config = smio.Util.Server.mergeConfigWithDefaults(JSON.parse(smio.Util.FileSystem.readTextFile('instance.config')), {
           "smoothio": {
             "enabled": true,
             "processes": 1,
@@ -173,6 +172,13 @@
               }
             }
           },
+          "session": {
+            "timeout": 20
+          },
+          "sockets": {
+            "xdomain_swf": false,
+            "logpath": "server/log/sockets.log"
+          },
           "mongodb": {
             "host": defHost,
             "port": 61234,
@@ -186,42 +192,7 @@
         throw err;
       }
       if ((logPath = this.expandLogPath(this.config.smoothio.logging.path))) {
-        try {
-          node_fs.unlinkSync(logPath);
-        } catch (_e) {}
-        oldLogFunc = smio.logit;
-        closeLog = __bind(function() {
-          try {
-            this.logFile.end();
-          } catch (_e) {}
-          try {
-            this.logFile.destroySoon();
-          } catch (_e) {}
-          return this.logFile = null;
-        }, this);
-        smio.logit = __bind(function(line, cat) {
-          var full;
-          full = '';
-          if (smio['logBuffer']) {
-            full = smio.logBuffer.join('\n') + '\n';
-            delete smio.logBuffer;
-          }
-          if (this.logFile && !this.logFile.writable) {
-            closeLog;
-          }
-          if (!this.logFile) {
-            this.logFile = node_fs.createWriteStream(logPath, {
-              encoding: 'utf-8',
-              mode: 0666
-            });
-            this.logFile.on('close', closeLog);
-            this.logFile.on('error', closeLog);
-          }
-          full += (line = JSON.stringify(new Date()) + ' - ' + oldLogFunc(line, cat) + '\n');
-          try {
-            return this.logFile.write(full);
-          } catch (_e) {}
-        }, this);
+        smio.logit = smio.Util.Server.setupLogFile(this, 'logFile', true, logPath, smio.logit);
       }
       if (!this.config.smoothio.enabled) {
         smio.logit("This smoothio instance has been disabled in instance.config.");

@@ -2,7 +2,7 @@
 /*
 	smoothio bootstrap script / NodeJS entry point.
 	Compiles CoffeeScripts and Stylus sheets, starts monitoring them for changes (if set in instance.config).
-	Then runs the main CoffeeScript.
+	Then runs the main CoffeeScript (_cscript/Instance.cs).
  */
 
 var _ = require('underscore'),

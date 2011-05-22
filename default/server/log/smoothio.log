@@ -1,23 +1,15 @@
-"2011-05-22T17:38:31.160Z" - [default] Compiling Stylus sheets...
-"2011-05-22T17:38:31.184Z" - [default] Compiling CoffeeScripts...
-"2011-05-22T17:38:31.447Z" - [default.packs.SmoothioCore] PACKAGE 'SmoothioCore': loading...
-"2011-05-22T17:38:31.460Z" - [default.packs.SmoothioCore] PACKAGE 'SmoothioCore': successfully loaded.
-"2011-05-22T17:38:31.462Z" - [default] Merging client scripts and style sheets...
-"2011-05-22T17:38:31.479Z" - [default.mongodb] forked process: 23837
+"2011-05-22T22:54:08.868Z" - [default] Compiling Stylus sheets...
+"2011-05-22T22:54:08.892Z" - [default] Compiling CoffeeScripts...
+"2011-05-22T22:54:09.107Z" - [default.packs.SmoothioCore] PACKAGE 'SmoothioCore': loading...
+"2011-05-22T22:54:09.149Z" - [default.packs.SmoothioCore] PACKAGE 'SmoothioCore': successfully loaded.
+"2011-05-22T22:54:09.151Z" - [default] Merging client scripts and style sheets...
+"2011-05-22T22:54:09.164Z" - [default.mongodb] forked process: 11872
 all output going to: /home/roxor/smoothio/default/server/log/mongodb/mongodb.log
-"2011-05-22T17:38:31.503Z" - [default.sockets] socket.io ready - accepting connections
-"2011-05-22T17:38:31.503Z" - [default.servers.server1] SERVER 'server1' listening at localhost:2020
-"2011-05-22T17:38:31.990Z" - [default.mongodb.admin] Connected to MongoDB Admin database.
-"2011-05-22T17:38:32.484Z" - [default.mongodb.smoothio_shared] Connected to smoothio Shared database.
-"2011-05-22T17:38:33.013Z" - [default.mongodb.smoothio__server1] Connected to smoothio server1 database.
-"2011-05-22T17:39:09.886Z" - [default.sockets] Initializing client with transport "websocket"
-"2011-05-22T17:39:09.888Z" - [default.sockets] Client 5310070947743952 connected
-"2011-05-22T17:41:11.018Z" - [default.sockets] Client 5310070947743952 disconnected
-"2011-05-22T17:41:11.018Z" - [default] SOCKET_DISCONN: 5310070947743952
-"2011-05-22T17:41:30.624Z" - [default.sockets] Initializing client with transport "xhr-polling"
-"2011-05-22T17:41:30.624Z" - [default.sockets] Client 09363152366131544 connected
-"2011-05-22T17:41:38.633Z" - [default.sockets] Client 09363152366131544 disconnected
-"2011-05-22T17:41:38.633Z" - [default] SOCKET_DISCONN: 09363152366131544
-"2011-05-22T17:42:06.692Z" - [default] Shutting down servers...
-"2011-05-22T17:42:06.953Z" - [default] Shutdown of all servers completed.
+"2011-05-22T22:54:09.173Z" - [default.servers.server1] SERVER 'server1' listening at localhost:2020
+"2011-05-22T22:54:09.684Z" - [default.mongodb.admin] Connected to MongoDB Admin database.
+"2011-05-22T22:54:10.170Z" - [default.mongodb.smoothio_shared] Connected to smoothio Shared database.
+"2011-05-22T22:54:10.679Z" - [default.mongodb.smoothio__server1] Connected to smoothio server1 database.
+"2011-05-22T22:54:32.021Z" - [default] SOCKET_DISCONN: 40118819777853787
+"2011-05-22T22:54:33.058Z" - [default] Shutting down servers...
+"2011-05-22T22:54:33.310Z" - [default] Shutdown of all servers completed.
 

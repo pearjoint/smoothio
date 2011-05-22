@@ -15,7 +15,7 @@
     };
     SocketSession.getBySocketClient = function(inst, client) {
       var cookies, _ref, _ref2, _ref3;
-      cookies = inst.util.inst.parseCookies((_ref = client['listener']) != null ? (_ref2 = _ref['request']) != null ? (_ref3 = _ref2['headers']) != null ? _ref3['cookie'] : void 0 : void 0 : void 0);
+      cookies = smio.Util.Server.parseCookies((_ref = client['listener']) != null ? (_ref2 = _ref['request']) != null ? (_ref3 = _ref2['headers']) != null ? _ref3['cookie'] : void 0 : void 0 : void 0);
       return smio.SocketSession.getBySessionID(cookies['smiosessid']);
     };
     function SocketSession(server, sessionID, socket) {

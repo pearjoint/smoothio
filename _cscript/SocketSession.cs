@@ -12,7 +12,7 @@ class smio.SocketSession
 		sess
 
 	@getBySocketClient: (inst, client) ->
-		cookies = inst.util.inst.parseCookies client['listener']?['request']?['headers']?['cookie']
+		cookies = smio.Util.Server.parseCookies client['listener']?['request']?['headers']?['cookie']
 		smio.SocketSession.getBySessionID cookies['smiosessid']
 
 	constructor: (@server, @sessionID, @socket) ->

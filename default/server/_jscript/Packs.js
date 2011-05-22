@@ -27,7 +27,7 @@
         try {
           smio.logit(this.inst.r('log_pack_loading', this.packName), 'packs.' + this.packName);
           lastFilePath = cfgFilePath = node_path.join(this.packPath, 'pack.config');
-          this.config = this.inst.util.inst.mergeConfigWithDefaults(JSON.parse(this.inst.util.fs.readTextFile(cfgFilePath)), {
+          this.config = smio.Util.Server.mergeConfigWithDefaults(JSON.parse(smio.Util.FileSystem.readTextFile(cfgFilePath)), {
             "pack": {
               "dontcopy": ["*.config"]
             }
@@ -57,7 +57,7 @@
             var args, ccsContent, outDirPathClient, outDirPathServer, pattern, stylContent, tmplContent;
             outDirPathClient = node_path.join("server/pub/_packs/" + this.packName, relPath.substr(0, relPath.lastIndexOf('/')));
             outDirPathServer = node_path.join("server/_packs/" + this.packName, relPath.substr(0, relPath.lastIndexOf('/')));
-            if ((_.isEndsWith(fname, '.styl')) && (stylContent = this.inst.util.fs.readTextFile(fpath))) {
+            if ((_.isEndsWith(fname, '.styl')) && (stylContent = smio.Util.FileSystem.readTextFile(fpath))) {
               lastFilePath = fpath;
               return stylus(stylContent).set('filename', fpath).render(__bind(function(err, css) {
                 if (err) {
@@ -69,7 +69,7 @@
               }, this));
             } else if (_.isEndsWith(fname, '.cs')) {
               return smio.compileCoffeeScripts(fpath, outDirPathServer, outDirPathClient, true, true);
-            } else if ((_.isEndsWith(fname, '.ctl')) && (tmplContent = this.inst.util.fs.readTextFile(fpath))) {
+            } else if ((_.isEndsWith(fname, '.ctl')) && (tmplContent = smio.Util.FileSystem.readTextFile(fpath))) {
               lastFilePath = fpath;
               if ((ccsContent = smio.Control.compile(this.inst, tmplContent, node_path.join(this.packName, relPath)))) {
                 node_fs.writeFileSync(node_path.join(outDirPathServer, "_smioctl_" + (fname.substr(0, fname.lastIndexOf('.'))) + '.cs'), ccsContent);
@@ -82,7 +82,7 @@
                 _results = [];
                 for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
                   pattern = _ref2[_j];
-                  _results.push(this.inst.util.fs.isPathMatch(fname, pattern));
+                  _results.push(smio.Util.FileSystem.isPathMatch(fname, pattern));
                 }
                 return _results;
               }).call(this);
@@ -109,11 +109,11 @@
       var p, pack, pp, _i, _j, _len, _len2, _ref, _ref2, _ref3;
       this.inst = inst;
       this.all = {};
-      this.inst.util.fs.ensureDirs('../_core/packs', 'server/pub/_packs');
-      this.inst.util.fs.ensureDirs('../_core/packs', 'server/_packs');
-      this.inst.util.fs.ensureDirs('packs', 'server/pub/_packs');
-      this.inst.util.fs.ensureDirs('packs', 'server/_packs');
-      _ref = this.inst.util.array.ensurePos(node_fs.readdirSync('../_core/packs', 'SmoothioCore', 0));
+      smio.Util.FileSystem.ensureDirs('../_core/packs', 'server/pub/_packs');
+      smio.Util.FileSystem.ensureDirs('../_core/packs', 'server/_packs');
+      smio.Util.FileSystem.ensureDirs('packs', 'server/pub/_packs');
+      smio.Util.FileSystem.ensureDirs('packs', 'server/_packs');
+      _ref = smio.Util.Array.ensurePos(node_fs.readdirSync('../_core/packs', 'SmoothioCore', 0));
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         p = _ref[_i];
         if ((node_fs.statSync(pp = node_path.join('../_core/packs', p))).isDirectory()) {

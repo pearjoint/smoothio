@@ -1,6 +1,5 @@
 smio = global.smoothio
 
-
 class smio.Client
 
 	constructor: ->
@@ -14,11 +13,10 @@ class smio.Client
 		@mainFrame.renderHtml $el
 		@mainFrame.onLoad $el
 		@socket.connect()
-		setInterval (-> $('#smio_body').css "background-image": "url('/_/file/images/bg#{smio.util.math.randomInt(4)}.jpg')"), 5000
+		setInterval (-> $('#smio_body').css "background-image": "url('/_/file/images/bg#{smio.Util.Number.randomInt(4)}.jpg')"), 5000
 
 
 $(document).ready ->
-	smio.util = new smio.Util
 	smio.client = new smio.Client()
 	smio.client.init()
 

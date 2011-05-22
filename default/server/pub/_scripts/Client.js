@@ -18,14 +18,13 @@
       this.socket.connect();
       return setInterval((function() {
         return $('#smio_body').css({
-          "background-image": "url('/_/file/images/bg" + (smio.util.math.randomInt(4)) + ".jpg')"
+          "background-image": "url('/_/file/images/bg" + (smio.Util.Number.randomInt(4)) + ".jpg')"
         });
       }), 5000);
     };
     return Client;
   })();
   $(document).ready(function() {
-    smio.util = new smio.Util;
     smio.client = new smio.Client();
     return smio.client.init();
   });

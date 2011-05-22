@@ -12348,6 +12348,7 @@ ASProxy.prototype =
   smio.Socket = (function() {
     function Socket(client, host) {
       this.client = client;
+      this.sessionID = '';
       this.socket = new io.Socket(host, {
         resource: '/_/sockio/',
         rememberTransport: false,
@@ -12377,26 +12378,40 @@ ASProxy.prototype =
       this.socket.on('reconnecting', __bind(function(delay, attempts) {
         return this.onSocketReconnecting(delay, attempts);
       }, this));
-      this.sessionID = '';
     }
     Socket.prototype.connect = function() {
       return this.socket.connect();
     };
     Socket.prototype.onSocketConnect = function() {
-      return alert(JSON.stringify(this.socket.transport));
+      if ((!this.sessionID) && this.socket.transport['sessionid']) {
+        return this.sessionID = this.socket.transport.sessionid;
+      }
     };
-    Socket.prototype.onSocketConnectFailed = function() {};
-    Socket.prototype.onSocketConnecting = function(type) {};
+    Socket.prototype.onSocketConnectFailed = function() {
+      return this.sessionID = '';
+    };
+    Socket.prototype.onSocketConnecting = function(type) {
+      return this.sessionID = '';
+    };
     Socket.prototype.onSocketDisconnect = function() {
       return this.sessionID = '';
     };
     Socket.prototype.onSocketMessage = function(msg) {
-      this.sessionID = this.socket.transport.sessionid;
-      return alert(msg + '\n' + this.sessionID);
+      if ((!this.sessionID) && this.socket.transport['sessionid']) {
+        return this.sessionID = this.socket.transport.sessionid;
+      }
     };
-    Socket.prototype.onSocketReconnect = function(type, attempts) {};
-    Socket.prototype.onSocketReconnectFailed = function() {};
-    Socket.prototype.onSocketReconnecting = function(delay, attempts) {};
+    Socket.prototype.onSocketReconnect = function(type, attempts) {
+      if ((!this.sessionID) && this.socket.transport['sessionid']) {
+        return this.sessionID = this.socket.transport.sessionid;
+      }
+    };
+    Socket.prototype.onSocketReconnectFailed = function() {
+      return this.sessionID = '';
+    };
+    Socket.prototype.onSocketReconnecting = function(delay, attempts) {
+      return this.sessionID = '';
+    };
     return Socket;
   })();
 }).call(this);
@@ -12422,14 +12437,13 @@ ASProxy.prototype =
       this.socket.connect();
       return setInterval((function() {
         return $('#smio_body').css({
-          "background-image": "url('/_/file/images/bg" + (smio.util.math.randomInt(4)) + ".jpg')"
+          "background-image": "url('/_/file/images/bg" + (smio.Util.Number.randomInt(4)) + ".jpg')"
         });
       }), 5000);
     };
     return Client;
   })();
   $(document).ready(function() {
-    smio.util = new smio.Util;
     smio.client = new smio.Client();
     return smio.client.init();
   });
@@ -12440,79 +12454,94 @@ ASProxy.prototype =
   var smio;
   smio = global.smoothio;
   smio.Util = (function() {
-    function Util() {
-      this.array = {
-        ensurePos: function(arr, val, pos) {
-          var i, index, _ref, _ref2;
-          if (pos <= arr.length && (index = arr.indexOf(val)) !== pos) {
-            if (index >= 0) {
-              for (i = index, _ref = arr.length; index <= _ref ? i < _ref : i > _ref; index <= _ref ? i++ : i--) {
-                arr[i] = arr[i + 1];
-              }
-              arr.length--;
+    function Util() {}
+    Util.Array = {
+      ensurePos: function(arr, val, pos) {
+        var i, index, _ref, _ref2;
+        if (pos <= arr.length && (index = arr.indexOf(val)) !== pos) {
+          if (index >= 0) {
+            for (i = index, _ref = arr.length; index <= _ref ? i < _ref : i > _ref; index <= _ref ? i++ : i--) {
+              arr[i] = arr[i + 1];
             }
-            arr.length++;
-            for (i = _ref2 = arr.length - 1; _ref2 <= pos ? i < pos : i > pos; _ref2 <= pos ? i++ : i--) {
-              arr[i] = arr[i - 1];
-            }
-            arr[pos] = val;
+            arr.length--;
           }
-          return arr;
-        },
-        toObject: function(arr, keyGen) {
-          var i, obj, v, _len;
-          obj = {};
-          for (i = 0, _len = arr.length; i < _len; i++) {
-            v = arr[i];
-            obj[keyGen(v, i)] = v;
+          arr.length++;
+          for (i = _ref2 = arr.length - 1; _ref2 <= pos ? i < pos : i > pos; _ref2 <= pos ? i++ : i--) {
+            arr[i] = arr[i - 1];
           }
-          return obj;
+          arr[pos] = val;
         }
-      };
-      this.datetime = {
-        toString: function(dt) {
-          var pad;
-          pad = function(fn, inc) {
-            var v;
-            v = typeof fn !== 'function' ? fn : fn.apply(dt);
-            if ((inc != null) && inc > 0) {
-              v = v + inc;
-            }
-            if ((v + '').length !== 1) {
-              return v;
-            } else {
-              return '0' + v;
-            }
-          };
-          return "" + (dt.getFullYear()) + "-" + (pad(dt.getMonth, 1)) + "-" + (pad(dt.getDate)) + "-" + (pad(dt.getHours)) + "-" + (dt.getMinutes()) + "-" + (dt.getSeconds());
+        return arr;
+      },
+      toObject: function(arr, keyGen) {
+        var i, obj, v, _len;
+        obj = {};
+        for (i = 0, _len = arr.length; i < _len; i++) {
+          v = arr[i];
+          obj[keyGen(v, i)] = v;
         }
-      };
-      this.math = {
-        randomInt: function(max) {
-          return Math.floor(Math.random() * (max + 1));
+        return obj;
+      }
+    };
+    Util.DateTime = {
+      addMinutes: function(minutes, dt) {
+        if (!dt) {
+          dt = new Date();
         }
-      };
-      this.string = {
-        replace: function(str, replace) {
-          var pos, repl, val;
-          for (val in replace) {
-            repl = replace[val];
-            while ((pos = str.indexOf(val)) >= 0) {
-              str = (str.substr(0, pos)) + repl + (str.substr(pos + val.length));
-            }
+        dt.setTime(dt.getTime() + (minutes * 60 * 1000));
+        return dt;
+      },
+      toString: function(dt) {
+        var pad;
+        pad = function(fn, inc) {
+          var v;
+          v = typeof fn !== 'function' ? fn : fn.apply(dt);
+          if ((inc != null) && inc > 0) {
+            v = v + inc;
           }
-          return str;
-        },
-        times: function(str, times) {
-          var a, x;
-          a = new Array(times);
-          for (x = 0; 0 <= times ? x < times : x > times; 0 <= times ? x++ : x--) {
-            a[x] = str;
+          if ((v + '').length !== 1) {
+            return v;
+          } else {
+            return '0' + v;
           }
-          return a.join('');
+        };
+        return "" + (dt.getFullYear()) + "-" + (pad(dt.getMonth, 1)) + "-" + (pad(dt.getDate)) + "-" + (pad(dt.getHours)) + "-" + (dt.getMinutes()) + "-" + (dt.getSeconds());
+      }
+    };
+    Util.Number = {
+      randomInt: function(max) {
+        return Math.floor(Math.random() * (max + 1));
+      },
+      tryParseInt: function(val, def) {
+        var num;
+        num = parseInt(val + '');
+        if (_.isNumber(num)) {
+          return num;
+        } else {
+          return def;
         }
-      };
-    }
+      }
+    };
+    Util.String = {
+      replace: function(str, replace) {
+        var pos, repl, val;
+        for (val in replace) {
+          repl = replace[val];
+          while ((pos = str.indexOf(val)) >= 0) {
+            str = (str.substr(0, pos)) + repl + (str.substr(pos + val.length));
+          }
+        }
+        return str;
+      },
+      times: function(str, times) {
+        var a, x;
+        a = new Array(times);
+        for (x = 0; 0 <= times ? x < times : x > times; 0 <= times ? x++ : x--) {
+          a[x] = str;
+        }
+        return a.join('');
+      }
+    };
     return Util;
   })();
 }).call(this);

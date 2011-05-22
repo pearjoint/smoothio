@@ -5,6 +5,7 @@
   smio.Socket = (function() {
     function Socket(client, host) {
       this.client = client;
+      this.sessionID = '';
       this.socket = new io.Socket(host, {
         resource: '/_/sockio/',
         rememberTransport: false,
@@ -34,26 +35,40 @@
       this.socket.on('reconnecting', __bind(function(delay, attempts) {
         return this.onSocketReconnecting(delay, attempts);
       }, this));
-      this.sessionID = '';
     }
     Socket.prototype.connect = function() {
       return this.socket.connect();
     };
     Socket.prototype.onSocketConnect = function() {
-      return alert(JSON.stringify(this.socket.transport));
+      if ((!this.sessionID) && this.socket.transport['sessionid']) {
+        return this.sessionID = this.socket.transport.sessionid;
+      }
     };
-    Socket.prototype.onSocketConnectFailed = function() {};
-    Socket.prototype.onSocketConnecting = function(type) {};
+    Socket.prototype.onSocketConnectFailed = function() {
+      return this.sessionID = '';
+    };
+    Socket.prototype.onSocketConnecting = function(type) {
+      return this.sessionID = '';
+    };
     Socket.prototype.onSocketDisconnect = function() {
       return this.sessionID = '';
     };
     Socket.prototype.onSocketMessage = function(msg) {
-      this.sessionID = this.socket.transport.sessionid;
-      return alert(msg + '\n' + this.sessionID);
+      if ((!this.sessionID) && this.socket.transport['sessionid']) {
+        return this.sessionID = this.socket.transport.sessionid;
+      }
     };
-    Socket.prototype.onSocketReconnect = function(type, attempts) {};
-    Socket.prototype.onSocketReconnectFailed = function() {};
-    Socket.prototype.onSocketReconnecting = function(delay, attempts) {};
+    Socket.prototype.onSocketReconnect = function(type, attempts) {
+      if ((!this.sessionID) && this.socket.transport['sessionid']) {
+        return this.sessionID = this.socket.transport.sessionid;
+      }
+    };
+    Socket.prototype.onSocketReconnectFailed = function() {
+      return this.sessionID = '';
+    };
+    Socket.prototype.onSocketReconnecting = function(delay, attempts) {
+      return this.sessionID = '';
+    };
     return Socket;
   })();
 }).call(this);
