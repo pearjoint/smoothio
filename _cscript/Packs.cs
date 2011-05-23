@@ -20,15 +20,13 @@ class smio.Pack
 	load: ->
 		if (not @loaded) and (not @loadError?)
 			try
+				dontCopy = ['*.config', '*.res']
 				smio.logit (@inst.r 'log_pack_loading', @packName), 'packs.' + @packName
 				lastFilePath = cfgFilePath = node_path.join @packPath, 'pack.config'
-				@config = smio.Util.Server.mergeConfigWithDefaults (JSON.parse smio.Util.FileSystem.readTextFile cfgFilePath), {
-					"pack": {
-						"dontcopy": ["*.config"]
-					}
-				}
-				if (_.indexOf @config.pack.dontcopy, '*.config') < 0
-					@config.pack.dontcopy.push '*.config'
+				@config = smio.Util.Object.mergeDefaults (JSON.parse smio.Util.FileSystem.readTextFile cfgFilePath), "pack": "dontcopy": dontCopy
+				for dc in dontCopy
+					if (_.indexOf @config.pack.dontcopy, dc) < 0
+						@config.pack.dontcopy.push dc
 				if @config.pack['depends_on']? and @config.pack.depends_on.length
 					for dep in @config.pack.depends_on	
 						@dependsOn[dep] = pack = @packs.all[dep]
@@ -42,7 +40,7 @@ class smio.Pack
 				smio.walkDir @packPath, null, (fpath, fname, relPath) =>
 					outDirPathClient = node_path.join "server/pub/_packs/#{@packName}", (relPath.substr 0, relPath.lastIndexOf '/')
 					outDirPathServer = node_path.join "server/_packs/#{@packName}", (relPath.substr 0, relPath.lastIndexOf '/')
-					if (_.isEndsWith fname, '.styl') and (stylContent = smio.Util.FileSystem.readTextFile fpath)
+					if (_.isEndsWith fname, '.styl') and stylContent = smio.Util.FileSystem.readTextFile fpath
 						lastFilePath = fpath
 						stylus(stylContent).set('filename', fpath).render (err, css) =>
 							if err
@@ -52,7 +50,7 @@ class smio.Pack
 								node_fs.writeFileSync (node_path.join outDirPathClient, (fname.substr 0, fname.lastIndexOf '.') + '.css'), css
 					else if _.isEndsWith fname, '.cs'
 						smio.compileCoffeeScripts fpath, outDirPathServer, outDirPathClient, true, true
-					else if (_.isEndsWith fname, '.ctl') and (tmplContent = smio.Util.FileSystem.readTextFile fpath)
+					else if (_.isEndsWith fname, '.ctl') and tmplContent = smio.Util.FileSystem.readTextFile fpath
 						lastFilePath = fpath
 						if (ccsContent = smio.Control.compile @inst, tmplContent, node_path.join @packName, relPath)
 							node_fs.writeFileSync (node_path.join outDirPathServer, "_smioctl_" + (fname.substr 0, (fname.lastIndexOf '.')) + '.cs'), ccsContent

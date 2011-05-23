@@ -11,9 +11,12 @@ class smio.SocketSession
 				@all[sessionID] = sess = new smio.SocketSession server, sessionID, server.socket
 		sess
 
-	@getBySocketClient: (inst, client) ->
-		cookies = smio.Util.Server.parseCookies client['listener']?['request']?['headers']?['cookie']
-		smio.SocketSession.getBySessionID cookies['smiosessid']
+	@getBySocketClient: (server, client) ->
+		smio.SocketSession.getBySessionID server, client.sessionId
 
 	constructor: (@server, @sessionID, @socket) ->
+
+	onEnd: ->
+
+	onMessage: (msg) ->
 

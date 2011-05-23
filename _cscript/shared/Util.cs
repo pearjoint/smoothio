@@ -41,6 +41,43 @@ class smio.Util
 				if (v + '').length isnt 1 then v else '0' + v
 			"#{dt.getFullYear()}-#{pad dt.getMonth, 1}-#{pad dt.getDate}-#{pad dt.getHours}-#{dt.getMinutes()}-#{dt.getSeconds()}"
 
+	@Number:
+		randomInt: (max) ->
+			Math.floor Math.random() * (max + 1)
+		tryParseInt: (val, def) ->
+			num = parseInt val + ''
+			if _.isNumber num then num else def
+
+	@Object:
+		mergeDefaults: (cfg, defs) ->
+			if not cfg
+				cfg = {}
+			for defKey, defVal of defs
+				if (not cfg[defKey]?) or (typeof cfg[defKey] isnt typeof defVal)
+					cfg[defKey] = defVal
+				else if (typeof cfg[defKey] is 'object') and (typeof defVal is 'object')
+					cfg[defKey] = smio.Util.Object.mergeDefaults cfg[defKey], defVal
+			cfg
+		select: (obj, path) ->
+			parts = if path then path.split '.' else null
+			last = if path then obj else null
+			if parts and last
+				for p in parts
+					if not (last = last[p])
+						break
+			last
+
+	@String:
+		replace: (str, replace) ->
+			for val, repl of replace
+				while (pos = str.indexOf val) >= 0
+					str = (str.substr 0, pos) + repl + (str.substr pos + val.length)
+			str
+		times: (str, times) ->
+			a = new Array times
+			(a[x] = str) for x in [0...times]
+			a.join ''
+
 #if server
 	@FileSystem:
 		mkdirMode: 0777
@@ -48,7 +85,7 @@ class smio.Util
 			smio.walkDir srcDirPath, null, null, null, null, null, true, (curDirPath, _, relDirPath) =>
 				path = node_path.join outDirPath, relDirPath
 				if not node_path.existsSync path = node_path.join outDirPath, relDirPath
-					node_fs.mkdirSync path, @mkdirMode
+					node_fs.mkdirSync path, smio.Util.FileSystem.mkdirMode
 		isPathMatch: (path, pattern) =>
 			if (begins = _.isStartsWith pattern, '*') and (ends = _.isEndsWith pattern, '*')
 				path.indexOf (pattern.substr 1, pattern.length - 2) >= 0
@@ -73,15 +110,6 @@ class smio.Util
 				(if err['ml_error_filepath']? then ('[ ' + err['ml_error_filepath'] + ' ] -- ') else '') + err.stack
 			else
 				(if err['ml_error_filepath']? then ('[ ' + err['ml_error_filepath'] + ' ] -- ') else '') + err
-		mergeConfigWithDefaults: (cfg, defs) ->
-			if not cfg
-				cfg = {}
-			for defKey, defVal of defs
-				if (not cfg[defKey]?) or (typeof cfg[defKey] isnt typeof defVal)
-					cfg[defKey] = defVal
-				else if (typeof cfg[defKey] is 'object') and (typeof defVal is 'object')
-					cfg[defKey] = @mergeConfigWithDefaults cfg[defKey], defVal
-			cfg
 		parseCookies: (cookies) ->
 			c = {}
 			if cookies
@@ -114,22 +142,4 @@ class smio.Util
 					try
 						owner[propName].write full
 #endif
-
-	@Number:
-		randomInt: (max) ->
-			Math.floor Math.random() * (max + 1)
-		tryParseInt: (val, def) ->
-			num = parseInt val + ''
-			if _.isNumber num then num else def
-
-	@String:
-		replace: (str, replace) ->
-			for val, repl of replace
-				while (pos = str.indexOf val) >= 0
-					str = (str.substr 0, pos) + repl + (str.substr pos + val.length)
-			str
-		times: (str, times) ->
-			a = new Array times
-			(a[x] = str) for x in [0...times]
-			a.join ''
 

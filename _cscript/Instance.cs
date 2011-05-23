@@ -23,7 +23,7 @@ class smio.Instance
 		@resourceSets = {}
 		@servers = []
 		@mongos = {}
-		if (resErrs = @loadResourceSets '../_core/res', false) and resErrs.length
+		if (resErrs = @loadResourceSets '../_core/res/server', false) and resErrs.length
 			throw resErrs[0]
 
 	expandLogPath: (path) ->
@@ -102,7 +102,7 @@ class smio.Instance
 	start: ->
 		defHost = '127.0.0.1'
 		try
-			@config = smio.Util.Server.mergeConfigWithDefaults (JSON.parse smio.Util.FileSystem.readTextFile 'instance.config'), {
+			@config = smio.Util.Object.mergeDefaults (JSON.parse smio.Util.FileSystem.readTextFile 'instance.config'), {
 				"smoothio": {
 					"enabled": true,
 					"processes": 1,

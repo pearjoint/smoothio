@@ -22,23 +22,27 @@
       this.config = {};
     }
     Pack.prototype.load = function() {
-      var cfgFilePath, dep, lastFilePath, pack, _i, _len, _ref;
+      var cfgFilePath, dc, dep, dontCopy, lastFilePath, pack, _i, _j, _len, _len2, _ref;
       if ((!this.loaded) && (!(this.loadError != null))) {
         try {
+          dontCopy = ['*.config', '*.res'];
           smio.logit(this.inst.r('log_pack_loading', this.packName), 'packs.' + this.packName);
           lastFilePath = cfgFilePath = node_path.join(this.packPath, 'pack.config');
-          this.config = smio.Util.Server.mergeConfigWithDefaults(JSON.parse(smio.Util.FileSystem.readTextFile(cfgFilePath)), {
+          this.config = smio.Util.Object.mergeDefaults(JSON.parse(smio.Util.FileSystem.readTextFile(cfgFilePath)), {
             "pack": {
-              "dontcopy": ["*.config"]
+              "dontcopy": dontCopy
             }
           });
-          if ((_.indexOf(this.config.pack.dontcopy, '*.config')) < 0) {
-            this.config.pack.dontcopy.push('*.config');
+          for (_i = 0, _len = dontCopy.length; _i < _len; _i++) {
+            dc = dontCopy[_i];
+            if ((_.indexOf(this.config.pack.dontcopy, dc)) < 0) {
+              this.config.pack.dontcopy.push(dc);
+            }
           }
           if ((this.config.pack['depends_on'] != null) && this.config.pack.depends_on.length) {
             _ref = this.config.pack.depends_on;
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              dep = _ref[_i];
+            for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
+              dep = _ref[_j];
               this.dependsOn[dep] = pack = this.packs.all[dep];
               if (!(pack != null)) {
                 throw new Error(this.inst.r('log_pack_error_depends1', dep));
@@ -77,11 +81,11 @@
               }
             } else {
               args = (function() {
-                var _j, _len2, _ref2, _results;
+                var _k, _len3, _ref2, _results;
                 _ref2 = this.config.pack.dontcopy;
                 _results = [];
-                for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
-                  pattern = _ref2[_j];
+                for (_k = 0, _len3 = _ref2.length; _k < _len3; _k++) {
+                  pattern = _ref2[_k];
                   _results.push(smio.Util.FileSystem.isPathMatch(fname, pattern));
                 }
                 return _results;

@@ -4,7 +4,7 @@
 		<title>smoothio</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<script type="text/javascript" language="JavaScript">
-			var smioGlobalTest, smioScriptError, WEB_SOCKET_SWF_LOCATION = '/_/dynfile?config=sockets.xdomain_swf&true=bin/WebSocketMainInsecure.swf&false=bin/WebSocketMain.swf';
+			var smioGlobalTest, smio, WEB_SOCKET_SWF_LOCATION = '/_/dynfile/?type=application/x-shockwave-flash&config=sockets.xdomain_swf&true=bin/websockx.swf&false=bin/websock.swf';
 			try {
 				smioGlobalTest = global;
 			} catch(err) {
@@ -13,22 +13,29 @@
 				global = {};
 			if (!global['smoothio'])
 				global['smoothio'] = {}
+			smio = global.smoothio;
+			smio.pageLoadError = null;
+			smio.resources = {};
 
-			function onLoadCheckScriptErrors() {
-				alert(document.cookie);
-				if (smioScriptError)
-					document.getElementById('smio_body').innerHTML = '<br/><br/><br/><br/><hr/>Required core script <b>' + smioScriptError + '</b> could not be loaded and hence this application will not load.<br/><br/>Try a complete reload (press CTRL+R) as this was probably just a temporary disruption.<hr/>Erforderliches Kernscript <b>' + smioScriptError + '</b> konnte nicht geladen werden und somit wird auch diese Anwendung nicht geladen.<br/><br/>Versuchen Sie ein Komplett-Neuladen (STRG+R), da dies wahrscheinlich nur eine kurzzeitige St&ouml;rung war.<hr/>';
+			function onSmoothioPageLoad() {
+				if (smio.pageLoadError)
+					document.getElementById('smio_body').innerHTML = '<br/><br/><br/><br/><hr/>Required core script <b>' + smio.pageLoadError + '</b> could not be loaded and hence this application will not load.<br/><br/>Try a complete reload (press CTRL+R) as this was probably just a temporary disruption.<hr/>Erforderliches Kernscript <b>' + smio.pageLoadError + '</b> konnte nicht geladen werden und somit wird auch diese Anwendung nicht geladen.<br/><br/>Versuchen Sie ein Komplett-Neuladen (STRG+R), da dies wahrscheinlich nur eine kurzzeitige St&ouml;rung war.<hr/>';
+				else
+					(smio.client = new smio.Client()).init();
 			}
 
 			function onScriptError(scriptName) {
-				smioScriptError = scriptName;
+				smio.pageLoadError = scriptName;
 			}
 		</script>
 		<script type="text/javascript" language="JavaScript" src="/_/file/_smoothio.js" onerror="onScriptError('_smoothio.js');"></script>
+		<script type="text/javascript" language="JavaScript" src="/_/dynfile/?config=_res.js" onerror="onScriptError('_res.js');"></script>
 		<link rel="stylesheet" href="/_/file/_smoothio.css"/>
 		<link rel="shortcut icon" href="/_/file/images/smoothio.png" />
 	</head>
-	<body id="smio_body" onload="onLoadCheckScriptErrors();">
+	<body id="smio_body" onload="onSmoothioPageLoad();">
+		<div id="smio_log">
+		</div>
 	</body>
 </html>
 

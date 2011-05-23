@@ -13,16 +13,16 @@
       }
       return sess;
     };
-    SocketSession.getBySocketClient = function(inst, client) {
-      var cookies, _ref, _ref2, _ref3;
-      cookies = smio.Util.Server.parseCookies((_ref = client['listener']) != null ? (_ref2 = _ref['request']) != null ? (_ref3 = _ref2['headers']) != null ? _ref3['cookie'] : void 0 : void 0 : void 0);
-      return smio.SocketSession.getBySessionID(cookies['smiosessid']);
+    SocketSession.getBySocketClient = function(server, client) {
+      return smio.SocketSession.getBySessionID(server, client.sessionId);
     };
     function SocketSession(server, sessionID, socket) {
       this.server = server;
       this.sessionID = sessionID;
       this.socket = socket;
     }
+    SocketSession.prototype.onEnd = function() {};
+    SocketSession.prototype.onMessage = function(msg) {};
     return SocketSession;
   })();
 }).call(this);

@@ -2,6 +2,7 @@
   var node_http, node_multi, node_os, node_static, node_url, node_util, smio, socketio;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   require('./RequestContext');
+  require('./SocketSession');
   node_http = require('http');
   node_multi = require('multi-node');
   node_os = require('os');
@@ -117,13 +118,33 @@
       return ctx.handleRequest();
     };
     Server.prototype.onSocketConnect = function(client) {
-      return client.send('foobar');
+      var sess;
+      if ((sess = smio.SocketSession.getBySocketClient(this, client))) {
+        client.send(sess.sessionID);
+        return sess.onInit();
+      } else {
+        return client.send(JSON.stringify({
+          "errors": ["YO session could not be obtained or created."]
+        }));
+      }
     };
     Server.prototype.onSocketDisconnect = function(client) {
-      return smio.logit("SOCKET_DISCONN: " + client.sessionId);
+      var sess;
+      if ((sess = smio.SocketSession.all[client.sessionId])) {
+        sess.onEnd();
+        smio.SocketSession.all[client.sessionId] = null;
+        return delete smio.SocketSession.all[client.sessionId];
+      }
     };
     Server.prototype.onSocketMessage = function(message, client) {
-      return smio.logit("SOCKET_MESSAGE: " + message);
+      var sess;
+      if ((sess = smio.SocketSession.getBySocketClient(this, client))) {
+        return sess.onMessage(message);
+      } else {
+        return client.send(JSON.stringify({
+          "errors": ["Your session could not be obtained or created."]
+        }));
+      }
     };
     Server.prototype.stop = function() {
       this.status = 0;

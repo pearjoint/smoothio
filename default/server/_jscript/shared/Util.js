@@ -62,6 +62,71 @@
         return "" + (dt.getFullYear()) + "-" + (pad(dt.getMonth, 1)) + "-" + (pad(dt.getDate)) + "-" + (pad(dt.getHours)) + "-" + (dt.getMinutes()) + "-" + (dt.getSeconds());
       }
     };
+    Util.Number = {
+      randomInt: function(max) {
+        return Math.floor(Math.random() * (max + 1));
+      },
+      tryParseInt: function(val, def) {
+        var num;
+        num = parseInt(val + '');
+        if (_.isNumber(num)) {
+          return num;
+        } else {
+          return def;
+        }
+      }
+    };
+    Util.Object = {
+      mergeDefaults: function(cfg, defs) {
+        var defKey, defVal;
+        if (!cfg) {
+          cfg = {};
+        }
+        for (defKey in defs) {
+          defVal = defs[defKey];
+          if ((!(cfg[defKey] != null)) || (typeof cfg[defKey] !== typeof defVal)) {
+            cfg[defKey] = defVal;
+          } else if ((typeof cfg[defKey] === 'object') && (typeof defVal === 'object')) {
+            cfg[defKey] = smio.Util.Object.mergeDefaults(cfg[defKey], defVal);
+          }
+        }
+        return cfg;
+      },
+      select: function(obj, path) {
+        var last, p, parts, _i, _len;
+        parts = path ? path.split('.') : null;
+        last = path ? obj : null;
+        if (parts && last) {
+          for (_i = 0, _len = parts.length; _i < _len; _i++) {
+            p = parts[_i];
+            if (!(last = last[p])) {
+              break;
+            }
+          }
+        }
+        return last;
+      }
+    };
+    Util.String = {
+      replace: function(str, replace) {
+        var pos, repl, val;
+        for (val in replace) {
+          repl = replace[val];
+          while ((pos = str.indexOf(val)) >= 0) {
+            str = (str.substr(0, pos)) + repl + (str.substr(pos + val.length));
+          }
+        }
+        return str;
+      },
+      times: function(str, times) {
+        var a, x;
+        a = new Array(times);
+        for (x = 0; 0 <= times ? x < times : x > times; 0 <= times ? x++ : x--) {
+          a[x] = str;
+        }
+        return a.join('');
+      }
+    };
     Util.FileSystem = {
       mkdirMode: 0777,
       ensureDirs: function(srcDirPath, outDirPath) {
@@ -69,7 +134,7 @@
           var path;
           path = node_path.join(outDirPath, relDirPath);
           if (!node_path.existsSync(path = node_path.join(outDirPath, relDirPath))) {
-            return node_fs.mkdirSync(path, this.mkdirMode);
+            return node_fs.mkdirSync(path, smio.Util.FileSystem.mkdirMode);
           }
         }, this));
       },
@@ -106,21 +171,6 @@
         } else {
           return (err['ml_error_filepath'] != null ? '[ ' + err['ml_error_filepath'] + ' ] -- ' : '') + err;
         }
-      },
-      mergeConfigWithDefaults: function(cfg, defs) {
-        var defKey, defVal;
-        if (!cfg) {
-          cfg = {};
-        }
-        for (defKey in defs) {
-          defVal = defs[defKey];
-          if ((!(cfg[defKey] != null)) || (typeof cfg[defKey] !== typeof defVal)) {
-            cfg[defKey] = defVal;
-          } else if ((typeof cfg[defKey] === 'object') && (typeof defVal === 'object')) {
-            cfg[defKey] = this.mergeConfigWithDefaults(cfg[defKey], defVal);
-          }
-        }
-        return cfg;
       },
       parseCookies: function(cookies) {
         var c, cookie, parts, _i, _len, _ref;
@@ -174,40 +224,6 @@
             } catch (_e) {}
           };
         }
-      }
-    };
-    Util.Number = {
-      randomInt: function(max) {
-        return Math.floor(Math.random() * (max + 1));
-      },
-      tryParseInt: function(val, def) {
-        var num;
-        num = parseInt(val + '');
-        if (_.isNumber(num)) {
-          return num;
-        } else {
-          return def;
-        }
-      }
-    };
-    Util.String = {
-      replace: function(str, replace) {
-        var pos, repl, val;
-        for (val in replace) {
-          repl = replace[val];
-          while ((pos = str.indexOf(val)) >= 0) {
-            str = (str.substr(0, pos)) + repl + (str.substr(pos + val.length));
-          }
-        }
-        return str;
-      },
-      times: function(str, times) {
-        var a, x;
-        a = new Array(times);
-        for (x = 0; 0 <= times ? x < times : x > times; 0 <= times ? x++ : x--) {
-          a[x] = str;
-        }
-        return a.join('');
       }
     };
     return Util;

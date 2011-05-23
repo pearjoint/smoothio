@@ -1,5 +1,6 @@
 
 require './RequestContext'
+require './SocketSession'
 node_http = require 'http'
 node_multi = require 'multi-node'
 node_os = require 'os'
@@ -64,13 +65,23 @@ class smio.Server
 		ctx.handleRequest()
 
 	onSocketConnect: (client) ->
-		client.send 'foobar'
+		if (sess = smio.SocketSession.getBySocketClient @, client)
+			client.send sess.sessionID
+			sess.onInit()
+		else
+			client.send JSON.stringify "errors": ["YO session could not be obtained or created."]
 
 	onSocketDisconnect: (client) ->
-		smio.logit "SOCKET_DISCONN: #{client.sessionId}"
+		if (sess = smio.SocketSession.all[client.sessionId])
+			sess.onEnd()
+			smio.SocketSession.all[client.sessionId] = null
+			delete smio.SocketSession.all[client.sessionId]
 
 	onSocketMessage: (message, client) ->
-		smio.logit "SOCKET_MESSAGE: #{message}"
+		if (sess = smio.SocketSession.getBySocketClient @, client)
+			sess.onMessage message
+		else
+			client.send JSON.stringify "errors": ["Your session could not be obtained or created."]
 
 	stop: ->
 		@status = 0

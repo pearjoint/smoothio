@@ -24,7 +24,7 @@
       this.resourceSets = {};
       this.servers = [];
       this.mongos = {};
-      if ((resErrs = this.loadResourceSets('../_core/res', false)) && resErrs.length) {
+      if ((resErrs = this.loadResourceSets('../_core/res/server', false)) && resErrs.length) {
         throw resErrs[0];
       }
     }
@@ -149,7 +149,7 @@
       var defHost, logPath, mongoLogPath;
       defHost = '127.0.0.1';
       try {
-        this.config = smio.Util.Server.mergeConfigWithDefaults(JSON.parse(smio.Util.FileSystem.readTextFile('instance.config')), {
+        this.config = smio.Util.Object.mergeDefaults(JSON.parse(smio.Util.FileSystem.readTextFile('instance.config')), {
           "smoothio": {
             "enabled": true,
             "processes": 1,

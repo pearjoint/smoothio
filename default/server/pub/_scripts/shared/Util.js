@@ -70,6 +70,37 @@
         }
       }
     };
+    Util.Object = {
+      mergeDefaults: function(cfg, defs) {
+        var defKey, defVal;
+        if (!cfg) {
+          cfg = {};
+        }
+        for (defKey in defs) {
+          defVal = defs[defKey];
+          if ((!(cfg[defKey] != null)) || (typeof cfg[defKey] !== typeof defVal)) {
+            cfg[defKey] = defVal;
+          } else if ((typeof cfg[defKey] === 'object') && (typeof defVal === 'object')) {
+            cfg[defKey] = smio.Util.Object.mergeDefaults(cfg[defKey], defVal);
+          }
+        }
+        return cfg;
+      },
+      select: function(obj, path) {
+        var last, p, parts, _i, _len;
+        parts = path ? path.split('.') : null;
+        last = path ? obj : null;
+        if (parts && last) {
+          for (_i = 0, _len = parts.length; _i < _len; _i++) {
+            p = parts[_i];
+            if (!(last = last[p])) {
+              break;
+            }
+          }
+        }
+        return last;
+      }
+    };
     Util.String = {
       replace: function(str, replace) {
         var pos, repl, val;

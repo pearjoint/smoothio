@@ -1,5 +1,6 @@
 {
-	"___resource_file_intro"		:	"Mit dieser Formatierung werden von JSON erforderte Kommata oder Doppelpunkte nie mehr vergessen. Copy&Paste für neue Ressourcen"
+	"___resource_file_intro"		:	"Mit dieser Formatierung werden von JSON erforderte Kommata oder Doppelpunkte nie mehr vergessen. Für neue Ressourcen, copy&paste folgende Zeile."
+,	"x"								:	"y"
 ,	"log_mongo_dbconnected"			:	"Verbunden mit {0}-Datenbank."
 ,	"log_mongo_error_dbnoconnect"	:	"FEHLER beim Verbinden mit {0}-Datenbank:\n{1}"
 ,	"log_mongo_error_start"			:	"FEHLER beim Starten von MongoDB:\n{0}"

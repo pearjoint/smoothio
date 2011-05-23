@@ -1,5 +1,6 @@
 {
-	"___resource_file_intro"		:	"This formatting ensures no JSON-required commas or colons are ever missed. Copy & Paste for new resources."
+	"___resource_file_intro"		:	"This formatting ensures no JSON-required commas or colons are ever missed. To add new resources, copy&paste the next line."
+,	"x"								:	"y"
 ,	"log_mongo_dbconnected"			:	"Connected to {0} database."
 ,	"log_mongo_error_dbnoconnect"	:	"ERROR connecting to {0} database:\n{1}"
 ,	"log_mongo_error_start"			:	"ERROR starting MongoDB:\n{0}"
