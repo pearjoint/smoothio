@@ -1,6 +1,6 @@
 {
 	"___resource_file_intro"		:	"Mit dieser Formatierung werden von JSON erforderte Kommata oder Doppelpunkte nie mehr vergessen. Für neue Ressourcen, copy&paste folgende Zeile."
 ,	"x"								:	"y"
-,	"clienttest"					:	"Der Client-Test"
+,	"offline"						:	"Ihre Verbindung mit dieser Anwendung wurde getrennt. Die Verbindung wird so bald wie möglich automatisch wiederhergestellt."
 }
 

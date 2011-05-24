@@ -1,3 +1,24 @@
+Chrome
+{"x":{"readyState":0,"responseText":"","status":0,"statusText":"error"},"t":"error","e":""}
+
+Opera:
+{"x":{"readyState":0,"responseText":"","status":0,"statusText":"error"},"t":"error","e":""}
+
+Firefox:
+{"x":{"readyState":0,"responseText":"","status":0,"statusText":"error"},"t":"error","e":""}
+
+
+vs.
+
+{"x":{"readyState":4,"responseText
+":"500 Internal Server Error:\n\targuments: bar\n\ttype: not_defined\n\tmessage: bar is not 
+defined\n\tname: ReferenceError","status":500,"statusText":"error"},"t":"error","e":"Internal Server Error"}
+
+
+
+--
+
+
 <%lang:
 	cscript or jscript
 

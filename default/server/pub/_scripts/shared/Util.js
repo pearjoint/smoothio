@@ -39,8 +39,17 @@
         dt.setTime(dt.getTime() + (minutes * 60 * 1000));
         return dt;
       },
+      ticks: function(dt) {
+        if (!dt) {
+          dt = new Date();
+        }
+        return dt.getTime();
+      },
       toString: function(dt) {
         var pad;
+        if (!dt) {
+          dt = new Date();
+        }
         pad = function(fn, inc) {
           var v;
           v = typeof fn !== 'function' ? fn : fn.apply(dt);

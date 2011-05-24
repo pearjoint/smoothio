@@ -12656,9 +12656,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     function Socket(client, isSocketIO, host, secure, port) {
       var opts;
       this.client = client;
-      this.isSocketIO = isSocketIO;
-      this.sessionID = '';
-      if (this.isSocketIO) {
+      this.offline = false;
+      if (isSocketIO) {
         opts = {
           resource: '/_/sockio/',
           rememberTransport: false,
@@ -12685,7 +12684,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           return this.onSocketDisconnect();
         }, this));
         this.socket.on('message', __bind(function(msg) {
-          return this.onSocketMessage(msg);
+          return this.onMessage(msg);
         }, this));
         this.socket.on('reconnect', __bind(function(type, attempts) {
           return this.onSocketReconnect(type, attempts);
@@ -12696,62 +12695,144 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         this.socket.on('reconnecting', __bind(function(delay, attempts) {
           return this.onSocketReconnecting(delay, attempts);
         }, this));
+      } else {
+        this.poll = {
+          busy: false,
+          msg: {
+            last: null,
+            next: {}
+          },
+          intervals: {
+            heartbeat: {
+              val: 4500,
+              handle: null
+            },
+            fetch: {
+              val: 20000,
+              handle: null
+            },
+            sleepyFactor: 4
+          },
+          lastResponseTime: 0,
+          lastSendTime: 0,
+          send: __bind(function(heartbeat, force) {
+            var data;
+            if (force || !this.poll.busy) {
+              this.poll.busy = true;
+              if (heartbeat) {
+                data = null;
+              } else {
+                this.poll.msg.last = data = this.poll.msg.next;
+                this.poll.msg.next = {};
+              }
+              return ($.post("/_/poll/" + (heartbeat ? 'p' : 'f') + "/?t=" + (smio.Util.DateTime.ticks()), data, (__bind(function(m, t, x) {
+                return this.onMessage(m, t, x);
+              }, this)), 'html')).error(__bind(function(x, t, e) {
+                return this.onError(x, t, e);
+              }, this));
+            }
+          }, this)
+        };
       }
     }
-    Socket.prototype.ajaxHeartbeat = function() {};
-    Socket.prototype.ajaxPause = function() {};
-    Socket.prototype.ajaxPoll = function() {};
     Socket.prototype.connect = function() {
       if (this.socket) {
         return this.socket.connect();
-      } else {
-        ;
+      } else if (this.poll) {
+        this.setTimers();
+        return this.poll.send(false, true);
       }
     };
-    Socket.prototype.onSocketClose = function() {
-      return this.sockLog('Closed');
+    Socket.prototype.onError = function(xhr, textStatus, error, url) {
+      if (this.poll) {
+        if (xhr && (xhr.status === 0) && (xhr.readyState === 0)) {
+          this.onOffline();
+        } else {
+          this.onOnline();
+          if (xhr && xhr.responseText) {
+            alert(xhr.responseText);
+          } else {
+            alert("" + textStatus + "\n\n" + (JSON.stringify(error)) + "\n\n" + (JSON.stringify(xhr)));
+          }
+        }
+        return this.poll.busy = false;
+      }
     };
+    Socket.prototype.onOffline = function() {
+      if (!this.offline) {
+        this.offline = true;
+        return $('#smio_offline').show();
+      }
+    };
+    Socket.prototype.onOnline = function() {
+      if (this.offline) {
+        this.offline = false;
+        return $('#smio_offline').hide();
+      }
+    };
+    Socket.prototype.onMessage = function(msg, textStatus, xhr) {
+      var data;
+      data = null;
+      if (_.isString(msg)) {
+        try {
+          data = JSON.parse(msg);
+        } catch (err) {
+          this.onError(err);
+        }
+      }
+      if (this.poll) {
+        this.onOnline();
+        return this.poll.busy = false;
+      }
+    };
+    Socket.prototype.onSleepy = function(yeap) {
+      this.setTimers();
+      return $('#smio_sleepy')[yeap ? 'show' : 'hide']();
+    };
+    Socket.prototype.onSocketClose = function() {};
     Socket.prototype.onSocketConnect = function() {
-      this.sockLog('Connected');
-      if ((!this.sessionID) && this.socket.transport['sessionid']) {
-        return this.sessionID = this.socket.transport.sessionid;
-      }
+      return this.onOnline();
     };
     Socket.prototype.onSocketConnectFailed = function() {
-      this.sockLog('Connect Failed');
-      return this.sessionID = '';
+      return this.onOffline();
     };
     Socket.prototype.onSocketConnecting = function(type) {
-      this.sockLog("Connecting [" + type + "]");
-      return this.sessionID = '';
+      return this.onOffline();
     };
     Socket.prototype.onSocketDisconnect = function() {
-      this.sockLog('Disconnected');
-      return this.sessionID = '';
-    };
-    Socket.prototype.onSocketMessage = function(msg) {
-      this.sockLog("Message: [" + msg + "]");
-      if ((!this.sessionID) && this.socket.transport['sessionid']) {
-        return this.sessionID = this.socket.transport.sessionid;
-      }
+      return this.onOffline();
     };
     Socket.prototype.onSocketReconnect = function(type, attempts) {
-      this.sockLog("Reconnected: " + type + " after " + attempts + " attempts");
-      if ((!this.sessionID) && this.socket.transport['sessionid']) {
-        return this.sessionID = this.socket.transport.sessionid;
-      }
+      return this.onOnline();
     };
     Socket.prototype.onSocketReconnectFailed = function() {
-      this.sockLog('Reconnect Failed');
-      return this.sessionID = '';
+      return this.onOffline();
     };
     Socket.prototype.onSocketReconnecting = function(delay, attempts) {
-      this.sockLog("Reconnecting in " + delay + " ms, " + attempts + " attempts");
-      return this.sessionID = '';
+      return this.onOffline();
     };
-    Socket.prototype.sleepy = function(yeap) {};
-    Socket.prototype.sockLog = function(msg) {
-      return $('#smio_log').prepend("<div><b>" + (JSON.stringify(new Date())) + "</b> &mdash; " + msg + "</div>");
+    Socket.prototype.clearTimers = function() {
+      this.setTimer('heartbeat');
+      return this.setTimer('fetch');
+    };
+    Socket.prototype.setTimer = function(name, fn) {
+      var obj, val;
+      obj = this.poll.intervals[name];
+      val = this.client.sleepy ? obj.val * this.poll.intervals.sleepyFactor : obj.val;
+      if (obj['handle']) {
+        clearInterval(obj.handle);
+      }
+      if (fn) {
+        return obj.handle = setInterval(fn, val);
+      }
+    };
+    Socket.prototype.setTimers = function() {
+      this.setTimer('heartbeat', __bind(function() {
+        return this.poll.send(true);
+      }, this));
+      return this.setTimer('fetch', __bind(function() {
+        return this.poll.send(false);
+      }, this));
     };
     return Socket;
   })();
@@ -12763,25 +12844,22 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio = global.smoothio;
   smio.Client = (function() {
     function Client() {
-      var bod;
-      this.sessionID = '';
-      this.socket = new smio.Socket(this, false);
-      this.smioCookie = {};
-      bod = $('#smio_body');
-      bod.blur(function() {
-        return this.socket.sleepy(true);
-      });
-      bod.focus(function() {
-        return this.socket.sleepy(false);
-      });
-    }
-    Client.prototype.init = function() {
       var cookie;
+      this.socket = new smio.Socket(this, false);
+      this.sleepy = false;
+      $('#smio_offline').text(smio.resources.smoothio.offline);
       cookie = $.cookie('smoothio');
       try {
         this.smioCookie = JSON.parse(cookie);
-      } catch (_e) {}
+      } catch (err) {
+        this.smioCookie = null;
+      }
+      if (!this.smioCookie) {
+        this.smioCookie = {};
+      }
       this.sessionID = this.smioCookie['sessid'];
+    }
+    Client.prototype.init = function() {
       this.socket.connect();
       return setInterval((function() {
         return $('#smio_body').css({
@@ -12835,8 +12913,17 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         dt.setTime(dt.getTime() + (minutes * 60 * 1000));
         return dt;
       },
+      ticks: function(dt) {
+        if (!dt) {
+          dt = new Date();
+        }
+        return dt.getTime();
+      },
       toString: function(dt) {
         var pad;
+        if (!dt) {
+          dt = new Date();
+        }
         pad = function(fn, inc) {
           var v;
           v = typeof fn !== 'function' ? fn : fn.apply(dt);

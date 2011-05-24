@@ -186,7 +186,7 @@ function mergeFiles(ext, outFilePath, dirPaths, minify, first) {
 		smio.walkDir(dirPaths[i], null, function(filePath, fileName) {
 			if ((filePath != outFilePath) && (filePath.lastIndexOf(ext) == (filePath.length - ext.length))) {
 				tmp = ('/** ' + filePath + ' **/\n' + node_fs.readFileSync(filePath, 'utf-8') + '\n');
-				if (fileName.toLowerCase() == first.toLowerCase())
+				if (first && (fileName.toLowerCase() == first.toLowerCase()))
 					outc = tmp + outc;
 				else
 					outc += tmp;
@@ -282,6 +282,7 @@ function startSmoothio() {
 	node_util.log('INIT...');
 	clearDirectory('server/_packs', true);
 	clearDirectory('server/pub/_packs', true);
+	clearDirectory('server/pub/_merged', true);
 	if (hasCoffee) {
 		clearDirectory('server/_jscript');
 		clearDirectory('server/pub/_scripts');
@@ -306,8 +307,8 @@ function startSmoothio() {
 		require('./server/_jscript/Instance');
 		if ((smio.inst = new smio.Instance()) && ((returnCode = smio.inst.start()) < 0)) {
 			smio.logit('Merging client scripts and style sheets...');
-			mergeFiles('.css', 'server/pub/_smoothio.css', ['server/pub/_styles', 'server/pub/_packs'], smio.inst.config.smoothio.minify);
-			mergeFiles('.js', 'server/pub/_smoothio.js', ['../_core/scripts', 'server/pub/_scripts', 'server/pub/_packs'], smio.inst.config.smoothio.minify, 'jquery.js');
+			mergeFiles('.css', 'server/pub/_merged/_smoothio.css', ['server/pub/_styles', 'server/pub/_packs'], smio.inst.config.smoothio.minify);
+			mergeFiles('.js', 'server/pub/_merged/_smoothio.js', ['../_core/scripts', 'server/pub/_scripts', 'server/pub/_packs'], smio.inst.config.smoothio.minify, 'jquery.js');
 			compileClientResources(['../_core/res/client', '../_core/packs'], 'server/pub/_scripts', smio.inst.config.smoothio.minify, smio.inst.autoRestart);
 			if (smio.inst.autoRestart) {
 				smio.walkDir('../_core/packs', null, watchSelective);

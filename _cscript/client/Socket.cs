@@ -2,7 +2,7 @@ smio = global.smoothio
 
 class smio.Socket
 	constructor: (@client, isSocketIO, host, secure, port) ->
-		@sessionID = ''
+		@offline = false
 		if isSocketIO
 			opts = resource: '/_/sockio/', rememberTransport: false, connectTimeout: 5000, secure: secure is true
 			if port
@@ -20,20 +20,28 @@ class smio.Socket
 		else
 			@poll =
 				busy: false
-				paused: false
+				msg:
+					last: null
+					next: {}
 				intervals:
 					heartbeat:
-						val: 2000
+						val: 4500
 						handle: null
 					fetch:
-						val: 8000
+						val: 20000
 						handle: null
 					sleepyFactor: 4
 				lastResponseTime: 0
 				lastSendTime: 0
-				send: (heartbeat, force) ->
-					if force or not (@poll.busy or @poll.paused)
-						@poll.busy = @poll.paused = true
+				send: (heartbeat, force) =>
+					if force or not @poll.busy
+						@poll.busy = true
+						if heartbeat
+							data = null
+						else
+							@poll.msg.last = data = @poll.msg.next
+							@poll.msg.next = {}
+						($.post "/_/poll/#{if heartbeat then 'p' else 'f'}/?t=#{smio.Util.DateTime.ticks()}", data, ((m, t, x) => @onMessage m, t, x), 'html').error (x, t, e) => @onError x, t, e
 
 	connect: ->
 		if @socket
@@ -42,57 +50,65 @@ class smio.Socket
 			@setTimers()
 			@poll.send false, true
 
-	onError: (xhr, textStatus, error) ->
-		@poll.busy = false
-		@poll.paused = true
-		@poll.paused = not confirm "onError -- continue/retry?"
+	onError: (xhr, textStatus, error, url) ->
+		if @poll
+			if xhr and (xhr.status is 0) and (xhr.readyState is 0)
+				@onOffline()
+			else
+				@onOnline()
+				if xhr and xhr.responseText
+					alert xhr.responseText
+				else
+					alert "#{textStatus}\n\n#{JSON.stringify error}\n\n#{JSON.stringify xhr}"
+			@poll.busy = false
 
 	onOffline: ->
-		alert "onOffline"
+		if not @offline
+			@offline = true
+			$('#smio_offline').show()
 
 	onOnline: ->
-		alert "onOnline"
+		if @offline
+			@offline = false
+			$('#smio_offline').hide()
 
-	onMessage: (msg) ->
-		@sockLog "Message: [#{msg}]"
-		if (not @sessionID) and @socket.transport['sessionid']
-			@sessionID = @socket.transport.sessionid
+	onMessage: (msg, textStatus, xhr) ->
+		data = null
+		if _.isString msg
+			try
+				data = JSON.parse msg
+			catch err
+				@onError err
+		if @poll
+			@onOnline()
+			@poll.busy = false
 
 	onSleepy: (yeap) ->
 		@setTimers()
+		$('#smio_sleepy')[if yeap then 'show' else 'hide']()
 
 	onSocketClose: ->
-		@sockLog 'Closed'
 
 	onSocketConnect: ->
-		@sockLog 'Connected'
-		if (not @sessionID) and @socket.transport['sessionid']
-			@sessionID = @socket.transport.sessionid
+		@onOnline()
 
 	onSocketConnectFailed: ->
-		@sockLog 'Connect Failed'
-		@sessionID = ''
+		@onOffline()
 
 	onSocketConnecting: (type) ->
-		@sockLog "Connecting [#{type}]"
-		@sessionID = ''
+		@onOffline()
 
 	onSocketDisconnect: ->
-		@sockLog 'Disconnected'
-		@sessionID = ''
+		@onOffline()
 
 	onSocketReconnect: (type, attempts) ->
-		@sockLog "Reconnected: #{type} after #{attempts} attempts"
-		if (not @sessionID) and @socket.transport['sessionid']
-			@sessionID = @socket.transport.sessionid
+		@onOnline()
 
 	onSocketReconnectFailed: ->
-		@sockLog 'Reconnect Failed'
-		@sessionID = ''
+		@onOffline()
 
 	onSocketReconnecting: (delay,attempts) ->
-		@sockLog "Reconnecting in #{delay} ms, #{attempts} attempts"
-		@sessionID = ''
+		@onOffline()
 
 	clearTimers: () ->
 		@setTimer 'heartbeat'
@@ -109,7 +125,4 @@ class smio.Socket
 	setTimers: () ->
 		@setTimer 'heartbeat', () => @poll.send true
 		@setTimer 'fetch', () => @poll.send false
-
-	sockLog: (msg) ->
-		$('#smio_log').prepend "<div><b>#{JSON.stringify new Date()}</b> &mdash; #{msg}</div>"
 

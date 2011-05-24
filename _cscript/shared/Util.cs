@@ -34,7 +34,13 @@ class smio.Util
 				dt = new Date()
 			dt.setTime dt.getTime() + (minutes * 60 * 1000)
 			dt
+		ticks: (dt) ->
+			if not dt
+				dt = new Date()
+			dt.getTime()
 		toString: (dt) ->
+			if not dt
+				dt = new Date()
 			pad = (fn, inc) ->
 				v = if typeof fn isnt 'function' then fn else fn.apply dt
 				v = v + inc if inc? and inc > 0

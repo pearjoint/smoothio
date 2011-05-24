@@ -5,17 +5,13 @@ class smio.Client
 	constructor: ->
 		@socket = new smio.Socket @, false
 		@sleepy = false
-		bod = $ '#smio_body'
-		bod.blur () ->
-			if not @sleepy
-				@socket.onSleepy @sleepy = true
-		bod.focus () ->
-			if @sleepy
-				@socket.sleepy @sleepy false
+		$('#smio_offline').text smio.resources.smoothio.offline
 		cookie = $.cookie 'smoothio'
 		try
 			@smioCookie = JSON.parse cookie
 		catch err
+			@smioCookie = null
+		if not @smioCookie
 			@smioCookie = {}
 		@sessionID = @smioCookie['sessid']
 

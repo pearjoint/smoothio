@@ -23,7 +23,7 @@
       }
     }
     RequestContext.prototype.handleRequest = function() {
-      var cfgKey, cfgVal, ctype, fname, hasHandler, respHeaders;
+      var cfgKey, cfgVal, ctype, data, fname, hasHandler, respHeaders;
       this.inst.lastRequestTime = new Date;
       if (!this.smioCookie['sessid']) {
         this.smioCookie['sessid'] = node_uuid();
@@ -34,6 +34,15 @@
       try {
         if (hasHandler = this.uri.pathItems.length && this.uri.pathItems[0] === '_' && this.uri.pathItems.length >= 2) {
           switch (this.uri.pathItems[1]) {
+            case "poll":
+              data = {};
+              respHeaders['Content-Type'] = 'text/plain';
+              if (this.uri.pathItems[2] === 'f') {
+                data.foo = 'bar';
+              }
+              this.httpResponse.writeHead(200, respHeaders);
+              this.httpResponse.end(JSON.stringify(data));
+              break;
             case "dynfile":
               if ((cfgKey = this.uri.query['config'])) {
                 if (cfgKey === '_res.js') {

@@ -24,6 +24,13 @@ class smio.RequestContext
 		try
 			if hasHandler = @uri.pathItems.length and @uri.pathItems[0] is '_' and @uri.pathItems.length >= 2
 				switch @uri.pathItems[1]
+					when "poll"
+						data = {}
+						respHeaders['Content-Type'] = 'text/plain'
+						if @uri.pathItems[2] is 'f'
+							data.foo = 'bar'
+						@httpResponse.writeHead 200, respHeaders
+						@httpResponse.end JSON.stringify data
 					when "dynfile"
 						if (cfgKey = @uri.query['config'])
 							if cfgKey is '_res.js'
