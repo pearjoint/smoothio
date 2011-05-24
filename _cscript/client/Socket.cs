@@ -1,57 +1,115 @@
 smio = global.smoothio
 
 class smio.Socket
-	constructor: (@client, host) ->
+	constructor: (@client, isSocketIO, host, secure, port) ->
 		@sessionID = ''
-		@socket = new io.Socket host, resource: '/_/sockio/', rememberTransport: false, connectTimeout: 5000
-		@socket.on 'connect', => @onSocketConnect()
-		@socket.on 'connect_failed', => @onSocketConnectFailed()
-		@socket.on 'connecting', (type) => @onSocketConnecting type
-		@socket.on 'close', => @onSocketClose()
-		@socket.on 'disconnect', => @onSocketDisonnect()
-		@socket.on 'message', (msg) => @onSocketMessage msg
-		@socket.on 'reconnect', (type, attempts) => @onSocketReconnect type, attempts
-		@socket.on 'reconnect_failed', => @onSocketReconnectFailed()
-		@socket.on 'reconnecting', (delay, attempts) => @onSocketReconnecting delay, attempts
+		if isSocketIO
+			opts = resource: '/_/sockio/', rememberTransport: false, connectTimeout: 5000, secure: secure is true
+			if port
+				opts.port = port
+			@socket = new io.Socket host, opts
+			@socket.on 'connect', => @onSocketConnect()
+			@socket.on 'connect_failed', => @onSocketConnectFailed()
+			@socket.on 'connecting', (type) => @onSocketConnecting type
+			@socket.on 'close', => @onSocketClose()
+			@socket.on 'disconnect', => @onSocketDisconnect()
+			@socket.on 'message', (msg) => @onMessage msg
+			@socket.on 'reconnect', (type, attempts) => @onSocketReconnect type, attempts
+			@socket.on 'reconnect_failed', => @onSocketReconnectFailed()
+			@socket.on 'reconnecting', (delay, attempts) => @onSocketReconnecting delay, attempts
+		else
+			@poll =
+				busy: false
+				paused: false
+				intervals:
+					heartbeat:
+						val: 2000
+						handle: null
+					fetch:
+						val: 8000
+						handle: null
+					sleepyFactor: 4
+				lastResponseTime: 0
+				lastSendTime: 0
+				send: (heartbeat, force) ->
+					if force or not (@poll.busy or @poll.paused)
+						@poll.busy = @poll.paused = true
 
 	connect: ->
-		@socket.connect()
+		if @socket
+			@socket.connect()
+		else if @poll
+			@setTimers()
+			@poll.send false, true
+
+	onError: (xhr, textStatus, error) ->
+		@poll.busy = false
+		@poll.paused = true
+		@poll.paused = not confirm "onError -- continue/retry?"
+
+	onOffline: ->
+		alert "onOffline"
+
+	onOnline: ->
+		alert "onOnline"
+
+	onMessage: (msg) ->
+		@sockLog "Message: [#{msg}]"
+		if (not @sessionID) and @socket.transport['sessionid']
+			@sessionID = @socket.transport.sessionid
+
+	onSleepy: (yeap) ->
+		@setTimers()
 
 	onSocketClose: ->
-		$('#smio_log').append "<div>Closed</div>"
+		@sockLog 'Closed'
 
 	onSocketConnect: ->
-		$('#smio_log').append "<div>Connected</div>"
+		@sockLog 'Connected'
 		if (not @sessionID) and @socket.transport['sessionid']
 			@sessionID = @socket.transport.sessionid
 
 	onSocketConnectFailed: ->
-		$('#smio_log').append "<div>Connect failed</div>"
+		@sockLog 'Connect Failed'
 		@sessionID = ''
 
 	onSocketConnecting: (type) ->
-		$('#smio_log').append "<div>Connecting [#{type}]</div>"
+		@sockLog "Connecting [#{type}]"
 		@sessionID = ''
 
 	onSocketDisconnect: ->
-		$('#smio_log').append "<div>Disconnected</div>"
+		@sockLog 'Disconnected'
 		@sessionID = ''
 
-	onSocketMessage: (msg) ->
-		$('#smio_log').append "<div>Message: #{msg}</div>"
-		if (not @sessionID) and @socket.transport['sessionid']
-			@sessionID = @socket.transport.sessionid
-
 	onSocketReconnect: (type, attempts) ->
-		$('#smio_log').append "<div>Reconnected: #{type} after #{attempts} attempts</div>"
+		@sockLog "Reconnected: #{type} after #{attempts} attempts"
 		if (not @sessionID) and @socket.transport['sessionid']
 			@sessionID = @socket.transport.sessionid
 
 	onSocketReconnectFailed: ->
-		$('#smio_log').append "<div>Reconnect failed</div>"
+		@sockLog 'Reconnect Failed'
 		@sessionID = ''
 
 	onSocketReconnecting: (delay,attempts) ->
-		$('#smio_log').append "<div>Reconnecting in #{delay} ms, #{attempts} attempts</div>"
+		@sockLog "Reconnecting in #{delay} ms, #{attempts} attempts"
 		@sessionID = ''
+
+	clearTimers: () ->
+		@setTimer 'heartbeat'
+		@setTimer 'fetch'
+
+	setTimer: (name, fn) ->
+		obj = @poll.intervals[name]
+		val = if @client.sleepy then (obj.val * @poll.intervals.sleepyFactor) else obj.val
+		if obj['handle']
+			clearInterval obj.handle
+		if fn
+			obj.handle = setInterval fn, val
+
+	setTimers: () ->
+		@setTimer 'heartbeat', () => @poll.send true
+		@setTimer 'fetch', () => @poll.send false
+
+	sockLog: (msg) ->
+		$('#smio_log').prepend "<div><b>#{JSON.stringify new Date()}</b> &mdash; #{msg}</div>"
 

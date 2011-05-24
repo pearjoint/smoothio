@@ -138,7 +138,12 @@ class smio.Util
 						owner[propName] = node_fs.createWriteStream logPath, encoding: 'utf-8', mode: 0666
 						owner[propName].on 'close', closeLog
 						owner[propName].on 'error', closeLog
-					full += (line = JSON.stringify(new Date()) + ' - ' + oldLogFunc(line, cat) + '\n')
+					time = JSON.stringify(new Date())
+					if _.isEndsWith time, '"'
+						time = time.substr 0, time.length - 1
+					if _.isStartsWith time, '"'
+						time = time.substr 1
+					full += (line = time + ' - ' + oldLogFunc(line, cat) + '\n')
 					try
 						owner[propName].write full
 #endif

@@ -1,6 +1,6 @@
 
 require './RequestContext'
-require './SocketSession'
+require './Session'
 node_http = require 'http'
 node_multi = require 'multi-node'
 node_os = require 'os'

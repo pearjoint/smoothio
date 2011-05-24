@@ -192,7 +192,7 @@
             node_fs.unlinkSync(logPath);
           } catch (_e) {}
           return function(line, cat) {
-            var closeLog, full;
+            var closeLog, full, time;
             closeLog = function() {
               try {
                 owner[propName].end();
@@ -218,7 +218,14 @@
               owner[propName].on('close', closeLog);
               owner[propName].on('error', closeLog);
             }
-            full += (line = JSON.stringify(new Date()) + ' - ' + oldLogFunc(line, cat) + '\n');
+            time = JSON.stringify(new Date());
+            if (_.isEndsWith(time, '"')) {
+              time = time.substr(0, time.length - 1);
+            }
+            if (_.isStartsWith(time, '"')) {
+              time = time.substr(1);
+            }
+            full += (line = time + ' - ' + oldLogFunc(line, cat) + '\n');
             try {
               return owner[propName].write(full);
             } catch (_e) {}

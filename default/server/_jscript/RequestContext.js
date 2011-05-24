@@ -1,8 +1,9 @@
 (function() {
-  var node_path, node_uuid, smio;
+  var node_path, node_urlq, node_uuid, smio;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   node_path = require('path');
   node_uuid = require('node-uuid');
+  node_urlq = require('querystring');
   smio = global.smoothio;
   smio.RequestContext = (function() {
     function RequestContext(server, uri, httpRequest, httpResponse, adminDB, sharedDB, serverDB) {
@@ -15,11 +16,21 @@
       this.serverDB = serverDB;
       this.inst = this.server.inst;
       this.cookies = smio.Util.Server.parseCookies(this.httpRequest.headers['cookie']);
+      try {
+        this.smioCookie = JSON.parse(node_urlq.unescape(this.cookies['smoothio']));
+      } catch (err) {
+        this.smioCookie = {};
+      }
     }
     RequestContext.prototype.handleRequest = function() {
       var cfgKey, cfgVal, ctype, fname, hasHandler, respHeaders;
       this.inst.lastRequestTime = new Date;
-      respHeaders = {};
+      if (!this.smioCookie['sessid']) {
+        this.smioCookie['sessid'] = node_uuid();
+      }
+      respHeaders = {
+        'Set-Cookie': "smoothio=" + (node_urlq.escape(JSON.stringify(this.smioCookie))) + "; path=/"
+      };
       try {
         if (hasHandler = this.uri.pathItems.length && this.uri.pathItems[0] === '_' && this.uri.pathItems.length >= 2) {
           switch (this.uri.pathItems[1]) {

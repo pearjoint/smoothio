@@ -74,10 +74,17 @@ smio.compileCoffeeScripts = function(dirOrFilePath, srvOutDirPath, cltOutDirPath
 }
 
 smio.logit = function(line, cat) {
+	var time;
 	line = '[' + smio.instName + (cat ? ('.' + cat) : '') + '] ' + line;
 	if (!noLogging) {
-		if (smio['logBuffer'])
-			smio.logBuffer.push(JSON.stringify(new Date()) + ' - ' + line);
+		if (smio['logBuffer']) {
+			time = JSON.stringify(new Date());
+			if (_.isEndsWith(time, '"'))
+				time = time.substr(0, time.length - 1);
+			if (_.isStartsWith(time, '"'))
+				time = time.substr(1);
+			smio.logBuffer.push(time + ' - ' + line);
+		}
 		node_util.log(line);
 	}
 	return line;

@@ -2,7 +2,7 @@
   var node_http, node_multi, node_os, node_static, node_url, node_util, smio, socketio;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   require('./RequestContext');
-  require('./SocketSession');
+  require('./Session');
   node_http = require('http');
   node_multi = require('multi-node');
   node_os = require('os');

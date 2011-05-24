@@ -12653,85 +12653,105 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   smio = global.smoothio;
   smio.Socket = (function() {
-    function Socket(client, host) {
+    function Socket(client, isSocketIO, host, secure, port) {
+      var opts;
       this.client = client;
+      this.isSocketIO = isSocketIO;
       this.sessionID = '';
-      this.socket = new io.Socket(host, {
-        resource: '/_/sockio/',
-        rememberTransport: false,
-        connectTimeout: 5000
-      });
-      this.socket.on('connect', __bind(function() {
-        return this.onSocketConnect();
-      }, this));
-      this.socket.on('connect_failed', __bind(function() {
-        return this.onSocketConnectFailed();
-      }, this));
-      this.socket.on('connecting', __bind(function(type) {
-        return this.onSocketConnecting(type);
-      }, this));
-      this.socket.on('close', __bind(function() {
-        return this.onSocketClose();
-      }, this));
-      this.socket.on('disconnect', __bind(function() {
-        return this.onSocketDisonnect();
-      }, this));
-      this.socket.on('message', __bind(function(msg) {
-        return this.onSocketMessage(msg);
-      }, this));
-      this.socket.on('reconnect', __bind(function(type, attempts) {
-        return this.onSocketReconnect(type, attempts);
-      }, this));
-      this.socket.on('reconnect_failed', __bind(function() {
-        return this.onSocketReconnectFailed();
-      }, this));
-      this.socket.on('reconnecting', __bind(function(delay, attempts) {
-        return this.onSocketReconnecting(delay, attempts);
-      }, this));
+      if (this.isSocketIO) {
+        opts = {
+          resource: '/_/sockio/',
+          rememberTransport: false,
+          connectTimeout: 5000,
+          secure: secure === true
+        };
+        if (port) {
+          opts.port = port;
+        }
+        this.socket = new io.Socket(host, opts);
+        this.socket.on('connect', __bind(function() {
+          return this.onSocketConnect();
+        }, this));
+        this.socket.on('connect_failed', __bind(function() {
+          return this.onSocketConnectFailed();
+        }, this));
+        this.socket.on('connecting', __bind(function(type) {
+          return this.onSocketConnecting(type);
+        }, this));
+        this.socket.on('close', __bind(function() {
+          return this.onSocketClose();
+        }, this));
+        this.socket.on('disconnect', __bind(function() {
+          return this.onSocketDisconnect();
+        }, this));
+        this.socket.on('message', __bind(function(msg) {
+          return this.onSocketMessage(msg);
+        }, this));
+        this.socket.on('reconnect', __bind(function(type, attempts) {
+          return this.onSocketReconnect(type, attempts);
+        }, this));
+        this.socket.on('reconnect_failed', __bind(function() {
+          return this.onSocketReconnectFailed();
+        }, this));
+        this.socket.on('reconnecting', __bind(function(delay, attempts) {
+          return this.onSocketReconnecting(delay, attempts);
+        }, this));
+      }
     }
+    Socket.prototype.ajaxHeartbeat = function() {};
+    Socket.prototype.ajaxPause = function() {};
+    Socket.prototype.ajaxPoll = function() {};
     Socket.prototype.connect = function() {
-      return this.socket.connect();
+      if (this.socket) {
+        return this.socket.connect();
+      } else {
+        ;
+      }
     };
     Socket.prototype.onSocketClose = function() {
-      return $('#smio_log').append("<div>Closed</div>");
+      return this.sockLog('Closed');
     };
     Socket.prototype.onSocketConnect = function() {
-      $('#smio_log').append("<div>Connected</div>");
+      this.sockLog('Connected');
       if ((!this.sessionID) && this.socket.transport['sessionid']) {
         return this.sessionID = this.socket.transport.sessionid;
       }
     };
     Socket.prototype.onSocketConnectFailed = function() {
-      $('#smio_log').append("<div>Connect failed</div>");
+      this.sockLog('Connect Failed');
       return this.sessionID = '';
     };
     Socket.prototype.onSocketConnecting = function(type) {
-      $('#smio_log').append("<div>Connecting [" + type + "]</div>");
+      this.sockLog("Connecting [" + type + "]");
       return this.sessionID = '';
     };
     Socket.prototype.onSocketDisconnect = function() {
-      $('#smio_log').append("<div>Disconnected</div>");
+      this.sockLog('Disconnected');
       return this.sessionID = '';
     };
     Socket.prototype.onSocketMessage = function(msg) {
-      $('#smio_log').append("<div>Message: " + msg + "</div>");
+      this.sockLog("Message: [" + msg + "]");
       if ((!this.sessionID) && this.socket.transport['sessionid']) {
         return this.sessionID = this.socket.transport.sessionid;
       }
     };
     Socket.prototype.onSocketReconnect = function(type, attempts) {
-      $('#smio_log').append("<div>Reconnected: " + type + " after " + attempts + " attempts</div>");
+      this.sockLog("Reconnected: " + type + " after " + attempts + " attempts");
       if ((!this.sessionID) && this.socket.transport['sessionid']) {
         return this.sessionID = this.socket.transport.sessionid;
       }
     };
     Socket.prototype.onSocketReconnectFailed = function() {
-      $('#smio_log').append("<div>Reconnect failed</div>");
+      this.sockLog('Reconnect Failed');
       return this.sessionID = '';
     };
     Socket.prototype.onSocketReconnecting = function(delay, attempts) {
-      $('#smio_log').append("<div>Reconnecting in " + delay + " ms, " + attempts + " attempts</div>");
+      this.sockLog("Reconnecting in " + delay + " ms, " + attempts + " attempts");
       return this.sessionID = '';
+    };
+    Socket.prototype.sleepy = function(yeap) {};
+    Socket.prototype.sockLog = function(msg) {
+      return $('#smio_log').prepend("<div><b>" + (JSON.stringify(new Date())) + "</b> &mdash; " + msg + "</div>");
     };
     return Socket;
   })();
@@ -12743,11 +12763,25 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio = global.smoothio;
   smio.Client = (function() {
     function Client() {
-      this.socket = new smio.Socket(this);
+      var bod;
+      this.sessionID = '';
+      this.socket = new smio.Socket(this, false);
+      this.smioCookie = {};
+      bod = $('#smio_body');
+      bod.blur(function() {
+        return this.socket.sleepy(true);
+      });
+      bod.focus(function() {
+        return this.socket.sleepy(false);
+      });
     }
     Client.prototype.init = function() {
-      var $el;
-      $el = $('#smio_body');
+      var cookie;
+      cookie = $.cookie('smoothio');
+      try {
+        this.smioCookie = JSON.parse(cookie);
+      } catch (_e) {}
+      this.sessionID = this.smioCookie['sessid'];
       this.socket.connect();
       return setInterval((function() {
         return $('#smio_body').css({
