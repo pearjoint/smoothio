@@ -1,25 +1,25 @@
-Wed May 25 00:49:26 [initandlisten] MongoDB starting : pid=16480 port=61234 dbpath=/home/roxor/smoothio/default/server/dbs/ 64-bit 
-Wed May 25 00:49:26 [initandlisten] db version v1.8.1, pdfile version 4.5
-Wed May 25 00:49:26 [initandlisten] git version: a429cd4f535b2499cc4130b06ff7c26f41c00f04
-Wed May 25 00:49:26 [initandlisten] build sys info: Linux bs-linux64.10gen.cc 2.6.21.7-2.ec2.v1.2.fc8xen #1 SMP Fri Nov 20 17:48:28 EST 2009 x86_64 BOOST_LIB_VERSION=1_41
-Wed May 25 00:49:26 [initandlisten] waiting for connections on port 61234
-Wed May 25 00:49:26 [websvr] web admin interface listening on port 62234
-Wed May 25 00:49:27 [initandlisten] connection accepted from 127.0.0.1:56636 #1
-Wed May 25 00:49:27 [initandlisten] connection accepted from 127.0.0.1:56637 #2
-Wed May 25 00:49:28 [initandlisten] connection accepted from 127.0.0.1:56638 #3
-Wed May 25 00:52:42 [conn3] terminating, shutdown command received
-Wed May 25 00:52:42 dbexit: shutdown called
-Wed May 25 00:52:42 [conn3] shutdown: going to close listening sockets...
-Wed May 25 00:52:42 [conn3] closing listening socket: 5
-Wed May 25 00:52:42 [conn3] closing listening socket: 7
-Wed May 25 00:52:42 [conn3] closing listening socket: 8
-Wed May 25 00:52:42 [conn3] closing listening socket: 9
-Wed May 25 00:52:42 [conn3] removing socket file: /tmp/mongodb-61234.sock
-Wed May 25 00:52:42 [conn3] removing socket file: /tmp/mongodb-62234.sock
-Wed May 25 00:52:42 [conn3] shutdown: going to flush diaglog...
-Wed May 25 00:52:42 [conn3] shutdown: going to close sockets...
-Wed May 25 00:52:42 [conn3] shutdown: waiting for fs preallocator...
-Wed May 25 00:52:42 [conn3] shutdown: closing all files...
-Wed May 25 00:52:42 closeAllFiles() finished
-Wed May 25 00:52:42 [conn3] shutdown: removing fs lock...
-Wed May 25 00:52:42 dbexit: really exiting now
+Wed May 25 00:58:25 [initandlisten] MongoDB starting : pid=16705 port=61234 dbpath=/home/roxor/smoothio/default/server/dbs/ 64-bit 
+Wed May 25 00:58:25 [initandlisten] db version v1.8.1, pdfile version 4.5
+Wed May 25 00:58:25 [initandlisten] git version: a429cd4f535b2499cc4130b06ff7c26f41c00f04
+Wed May 25 00:58:25 [initandlisten] build sys info: Linux bs-linux64.10gen.cc 2.6.21.7-2.ec2.v1.2.fc8xen #1 SMP Fri Nov 20 17:48:28 EST 2009 x86_64 BOOST_LIB_VERSION=1_41
+Wed May 25 00:58:25 [initandlisten] waiting for connections on port 61234
+Wed May 25 00:58:25 [websvr] web admin interface listening on port 62234
+Wed May 25 00:58:25 [initandlisten] connection accepted from 127.0.0.1:49349 #1
+Wed May 25 00:58:26 [initandlisten] connection accepted from 127.0.0.1:49350 #2
+Wed May 25 00:58:26 [initandlisten] connection accepted from 127.0.0.1:49351 #3
+Wed May 25 01:12:48 [conn3] terminating, shutdown command received
+Wed May 25 01:12:48 dbexit: shutdown called
+Wed May 25 01:12:48 [conn3] shutdown: going to close listening sockets...
+Wed May 25 01:12:48 [conn3] closing listening socket: 5
+Wed May 25 01:12:48 [conn3] closing listening socket: 7
+Wed May 25 01:12:48 [conn3] closing listening socket: 8
+Wed May 25 01:12:48 [conn3] closing listening socket: 9
+Wed May 25 01:12:48 [conn3] removing socket file: /tmp/mongodb-61234.sock
+Wed May 25 01:12:48 [conn3] removing socket file: /tmp/mongodb-62234.sock
+Wed May 25 01:12:48 [conn3] shutdown: going to flush diaglog...
+Wed May 25 01:12:48 [conn3] shutdown: going to close sockets...
+Wed May 25 01:12:48 [conn3] shutdown: waiting for fs preallocator...
+Wed May 25 01:12:48 [conn3] shutdown: closing all files...
+Wed May 25 01:12:48 closeAllFiles() finished
+Wed May 25 01:12:48 [conn3] shutdown: removing fs lock...
+Wed May 25 01:12:48 dbexit: really exiting now
