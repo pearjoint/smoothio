@@ -40,6 +40,9 @@ class smio.Server
 		@socket.on 'clientDisconnect', (client) => @onSocketDisconnect client
 		@socket.on 'clientMessage', (msg, client) => @onSocketMessage msg, client
 
+	getSocketSessionID: (client) ->
+		(smio.RequestContext.parseSmioCookie client.listener.request.headers.cookie).sessid
+
 	onBind: ->
 		@status = 1
 		smio.logit (@inst.r 'log_server_listening', @serverName, @hostName, @port), 'servers.' + @serverName
@@ -62,26 +65,26 @@ class smio.Server
 		uri.rawUrl = request.url
 		uri.url = url
 		ctx = new smio.RequestContext @, uri, request, response, @inst.mongos['admin'], @inst.mongos['smoothio_shared'], @inst.mongos["smoothio__#{@serverName}"]
-		ctx.handleRequest()
 
 	onSocketConnect: (client) ->
-		if (sess = smio.SocketSession.getBySocketClient @, client)
-			client.send sess.sessionID
+		if (sessid = @getSocketSessionID client) and (sess = smio.Session.getBySessionID @, sessid)
 			sess.onInit()
+			client.send client.sessionId
 		else
-			client.send JSON.stringify "errors": ["YO session could not be obtained or created."]
+			client.send "smoonocookie"
 
 	onSocketDisconnect: (client) ->
-		if (sess = smio.SocketSession.all[client.sessionId])
+		if (sessid = @getSocketSessionID client) and (sess = smio.Session.all[sessid])
 			sess.onEnd()
-			smio.SocketSession.all[client.sessionId] = null
-			delete smio.SocketSession.all[client.sessionId]
+			smio.Session.all[sessid] = null
+			delete smio.Session.all[sessid]
 
 	onSocketMessage: (message, client) ->
-		if (sess = smio.SocketSession.getBySocketClient @, client)
-			sess.onMessage message
-		else
-			client.send JSON.stringify "errors": ["Your session could not be obtained or created."]
+		if message
+			if (sessid = @getSocketSessionID client) and (sess = smio.Session.getBySessionID @, sessid)
+				sess.handleFetch null, message, (data) -> client.send JSON.stringify data
+			else
+				client.send "smoonocookie"
 
 	stop: ->
 		@status = 0

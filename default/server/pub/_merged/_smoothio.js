@@ -12713,8 +12713,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
             },
             sleepyFactor: 4
           },
-          lastResponseTime: 0,
-          lastSendTime: 0,
+          lastFetchTime: 0,
+          lastMessageTime: 0,
           send: __bind(function(heartbeat, force) {
             var data;
             if (force || !this.poll.busy) {
@@ -12722,19 +12722,28 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
               if (heartbeat) {
                 data = null;
               } else {
-                this.poll.msg.last = data = this.poll.msg.next;
+                data = this.poll.msg.next;
                 this.poll.msg.next = {};
+                data['l'] = this.poll.lastFetchTime;
+                this.poll.msg.last = data;
               }
-              return ($.post("/_/poll/" + (heartbeat ? 'p' : 'f') + "/?t=" + (smio.Util.DateTime.ticks()), data, (__bind(function(m, t, x) {
+              ($.post("/_/poll/" + (heartbeat ? 'p' : 'f') + "/?t=" + (smio.Util.DateTime.ticks()), "" + (JSON.stringify(data)), (__bind(function(m, t, x) {
                 return this.onMessage(m, t, x);
-              }, this)), 'html')).error(__bind(function(x, t, e) {
+              }, this)), 'text')).error(__bind(function(x, t, e) {
                 return this.onError(x, t, e);
               }, this));
+              if (!heartbeat) {
+                return this.poll.lastFetchTime = smio.Util.DateTime.utcTicks();
+              }
             }
           }, this)
         };
       }
     }
+    Socket.prototype.clearTimers = function() {
+      this.setTimer('heartbeat');
+      return this.setTimer('fetch');
+    };
     Socket.prototype.connect = function() {
       if (this.socket) {
         return this.socket.connect();
@@ -12773,7 +12782,14 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     Socket.prototype.onMessage = function(msg, textStatus, xhr) {
       var data;
       data = null;
-      if (_.isString(msg)) {
+      if (msg === 'smoonocookie') {
+        this.socket.disconnect();
+        onSmoothioNoCookie();
+      }
+      if ((!msg) && textStatus && !_.isString(textStatus)) {
+        data = textStatus;
+      }
+      if (msg && (!data) && _.isString(msg)) {
         try {
           data = JSON.parse(msg);
         } catch (err) {
@@ -12782,12 +12798,17 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
       if (this.poll) {
         this.onOnline();
-        return this.poll.busy = false;
+        this.poll.busy = false;
+      }
+      if (data) {
+        if (this.poll) {
+          return this.poll.lastMessageTime = smio.Util.DateTime.utcTicks();
+        }
       }
     };
-    Socket.prototype.onSleepy = function(yeap) {
+    Socket.prototype.onSleepy = function(sleepy) {
       this.setTimers();
-      return $('#smio_sleepy')[yeap ? 'show' : 'hide']();
+      return $('#smio_sleepy')[sleepy ? 'show' : 'hide']();
     };
     Socket.prototype.onSocketClose = function() {};
     Socket.prototype.onSocketConnect = function() {
@@ -12810,10 +12831,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     };
     Socket.prototype.onSocketReconnecting = function(delay, attempts) {
       return this.onOffline();
-    };
-    Socket.prototype.clearTimers = function() {
-      this.setTimer('heartbeat');
-      return this.setTimer('fetch');
     };
     Socket.prototype.setTimer = function(name, fn) {
       var obj, val;
@@ -12848,7 +12865,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.socket = new smio.Socket(this, false);
       this.sleepy = false;
       $('#smio_offline').text(smio.resources.smoothio.offline);
-      cookie = $.cookie('smoothio');
+      cookie = $.cookie('smoo');
       try {
         this.smioCookie = JSON.parse(cookie);
       } catch (err) {
@@ -12937,6 +12954,12 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           }
         };
         return "" + (dt.getFullYear()) + "-" + (pad(dt.getMonth, 1)) + "-" + (pad(dt.getDate)) + "-" + (pad(dt.getHours)) + "-" + (dt.getMinutes()) + "-" + (dt.getSeconds());
+      },
+      utcTicks: function(dt) {
+        if (!dt) {
+          dt = new Date();
+        }
+        return Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate(), dt.getHours(), dt.getMinutes(), dt.getSeconds(), dt.getMilliseconds());
       }
     };
     Util.Number = {
@@ -13179,6 +13202,44 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       return this._html;
     };
     return Packs_SmoothioCore_CommonControls_mainframe;
+  })();
+}).call(this);
+
+/** server/pub/_packs/SmoothioCore/ServerSetup/_smioctl_initialserversetup.js **/
+(function() {
+  /*
+  Auto-generated from SmoothioCore/ServerSetup/initialserversetup.ctl
+  */  var smio, smoothio;
+  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
+  };
+  smio = smoothio = global.smoothio;
+  smio.Packs_SmoothioCore_ServerSetup_initialserversetup = (function() {
+    __extends(Packs_SmoothioCore_ServerSetup_initialserversetup, smio.Control);
+    function Packs_SmoothioCore_ServerSetup_initialserversetup(args) {
+      Packs_SmoothioCore_ServerSetup_initialserversetup.__super__.constructor.call(this, args, "SmoothioCore_ServerSetup", "SmoothioCore_ServerSetup_initialserversetup");
+      this.init();
+    }
+    Packs_SmoothioCore_ServerSetup_initialserversetup.prototype.renderHtml = function($el) {
+      var parts;
+      if (!this._html) {
+        parts = [];
+        parts.push("<div class=\"smio-setup\" id=\"");
+        parts.push(this.id());
+        parts.push("\">\n\t<div class=\"smio-setup-header\">Set up a new smoothio server:</div>\n\t<div class=\"smio-setup-header-desc\">Let us explain...</div>\n\t<div class=\"smio-setup-usersetup\">\n\t\tset up admin user...\n\t</div>\n\t<div class=\"smio-setup-templates\">\n\t\tselect template...\n\t</div>\n\t<div class=\"smio-setup-buttonarea\">\n\t\t<a disabled=\"disabled\" class=\"smio-setup-button\">Setup</a>\n\t</div>\n</div>\n");
+        this._html = parts.join('');
+      }
+      if ($el) {
+        $el.html(this._html);
+      }
+      return this._html;
+    };
+    return Packs_SmoothioCore_ServerSetup_initialserversetup;
   })();
 }).call(this);
 

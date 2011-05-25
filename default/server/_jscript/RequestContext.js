@@ -1,11 +1,32 @@
 (function() {
-  var node_path, node_urlq, node_uuid, smio;
+  var node_path, node_urlq, node_uuid, smio, _;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  require('./Session');
+  _ = require('underscore');
   node_path = require('path');
   node_uuid = require('node-uuid');
   node_urlq = require('querystring');
   smio = global.smoothio;
   smio.RequestContext = (function() {
+    RequestContext.parseSmioCookie = function(cookies, fail) {
+      var parse, smioCookie;
+      if (_.isString(cookies)) {
+        cookies = smio.Util.Server.parseCookies(cookies);
+      }
+      parse = function() {
+        return JSON.parse(node_urlq.unescape(cookies['smoothio']));
+      };
+      if (fail) {
+        smioCookie = parse();
+      } else {
+        try {
+          smioCookie = parse();
+        } catch (err) {
+          smioCookie = {};
+        }
+      }
+      return smioCookie;
+    };
     function RequestContext(server, uri, httpRequest, httpResponse, adminDB, sharedDB, serverDB) {
       this.server = server;
       this.uri = uri;
@@ -15,33 +36,42 @@
       this.sharedDB = sharedDB;
       this.serverDB = serverDB;
       this.inst = this.server.inst;
-      this.cookies = smio.Util.Server.parseCookies(this.httpRequest.headers['cookie']);
-      try {
-        this.smioCookie = JSON.parse(node_urlq.unescape(this.cookies['smoothio']));
-      } catch (err) {
-        this.smioCookie = {};
+      this.postData = null;
+      this.smioCookie = smio.RequestContext.parseSmioCookie(this.cookies = smio.Util.Server.parseCookies(this.httpRequest.headers['cookie']));
+      if (this.httpRequest.method === 'POST') {
+        this.httpRequest.on('end', __bind(function() {
+          return this.handleRequest();
+        }, this));
+        this.httpRequest.on('data', __bind(function(data) {
+          return this.postData += "" + data;
+        }, this));
+      } else {
+        this.handleRequest();
       }
     }
     RequestContext.prototype.handleRequest = function() {
-      var cfgKey, cfgVal, ctype, data, fname, hasHandler, respHeaders;
+      var cfgKey, cfgVal, ctype, finish, fname, hasHandler, respHeaders;
       this.inst.lastRequestTime = new Date;
       if (!this.smioCookie['sessid']) {
         this.smioCookie['sessid'] = node_uuid();
       }
       respHeaders = {
-        'Set-Cookie': "smoothio=" + (node_urlq.escape(JSON.stringify(this.smioCookie))) + "; path=/"
+        'Set-Cookie': "smoo=" + (node_urlq.escape(JSON.stringify(this.smioCookie))) + "; path=/"
       };
       try {
         if (hasHandler = this.uri.pathItems.length && this.uri.pathItems[0] === '_' && this.uri.pathItems.length >= 2) {
           switch (this.uri.pathItems[1]) {
             case "poll":
-              data = {};
               respHeaders['Content-Type'] = 'text/plain';
+              finish = __bind(function(data) {
+                this.httpResponse.writeHead(200, respHeaders);
+                return this.httpResponse.end(JSON.stringify(data));
+              }, this);
               if (this.uri.pathItems[2] === 'f') {
-                data.foo = 'bar';
+                (smio.Session.getBySessionID(this.server, this.smioCookie['sessid'])).handleFetch(this, null, finish);
+              } else {
+                finish({});
               }
-              this.httpResponse.writeHead(200, respHeaders);
-              this.httpResponse.end(JSON.stringify(data));
               break;
             case "dynfile":
               if ((cfgKey = this.uri.query['config'])) {

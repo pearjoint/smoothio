@@ -17,18 +17,22 @@
 			smio.pageLoadError = null;
 			smio.resources = {};
 
-			function onSmoothioSleepy(sleepy) {
-				if (smio.client && smio.client.socket && (sleepy != smio.client.sleepy))
-					smio.client.socket.onSleepy(smio.client.sleepy = sleepy);
+			function onSmoothioNoCookie() {
+				document.getElementById('smio_body').innerHTML = '<br/><br/><br/><br/><hr/>Either your session cookie expired or you have disabled browser cookies, and hence this application will not load.<br/><br/>Verify that cookies are enabled in your web browser, then try a complete reload (press CTRL+R).<hr/>Entweder ist Ihr Sitzungscookie abgelaufen oder Ihr Webbrowser unterst&uuml;tzt keine Cookies, und somit wird auch diese Anwendung nicht geladen.<br/><br/>Stellen Sie sicher, da&szlig; Ihr Webbrowser Cookies erlaubt, und versuchen Sie dann ein Komplett-Neuladen (STRG+R).<hr/>';
 			}
 
 			function onSmoothioPageLoad() {
 				if (smio.pageLoadError)
 					document.getElementById('smio_body').innerHTML = '<br/><br/><br/><br/><hr/>Required core script <b>' + smio.pageLoadError + '</b> could not be loaded and hence this application will not load.<br/><br/>Try a complete reload (press CTRL+R) as this was probably just a temporary disruption.<hr/>Erforderliches Kernscript <b>' + smio.pageLoadError + '</b> konnte nicht geladen werden und somit wird auch diese Anwendung nicht geladen.<br/><br/>Versuchen Sie ein Komplett-Neuladen (STRG+R), da dies wahrscheinlich nur eine kurzzeitige St&ouml;rung war.<hr/>';
 				else if (!(smio.client = new smio.Client()).sessionID)
-					document.getElementById('smio_body').innerHTML = '<br/><br/><br/><br/><hr/>Either your session cookie expired or you have disabled browser cookies, and hence this application will not load.<br/><br/>Verify that cookies are enabled in your web browser, then try a complete reload (press CTRL+R).<hr/>Entweder ist Ihr Sitzungscookie abgelaufen oder Ihr Webbrowser unterst&uuml;tzt keine Cookies, und somit wird auch diese Anwendung nicht geladen.<br/><br/>Stellen Sie sicher, da&szlig; Ihr Webbrowser Cookies erlaubt, und versuchen Sie dann ein Komplett-Neuladen (STRG+R).<hr/>';
+					onSmoothioNoCookie();
 				else
 					smio.client.init();
+			}
+
+			function onSmoothioSleepy(sleepy) {
+				if (smio.client && smio.client.socket && (sleepy != smio.client.sleepy))
+					smio.client.socket.onSleepy(smio.client.sleepy = sleepy);
 			}
 
 			function onScriptError(scriptName) {
@@ -41,10 +45,13 @@
 		<link rel="shortcut icon" href="/_/file/images/smoothio.png" />
 	</head>
 	<body id="smio_body" onload="onSmoothioPageLoad();" onblur="onSmoothioSleepy(true);" onfocus="onSmoothioSleepy(false);">
-		<div id="smio_log" style="background: #f0f0f0; display: none;">
-		</div>
-		<div id="smio_offline" class="smio-blocking-overlay" style="display: block">
-		</div>
+		<div id="smio_offline" class="smio-blocking-overlay"></div>
+		<noscript>
+			<br/><br/><br/><br/><hr/>Your web browser does not support JavaScript (or it has been disabled), and hence this application will not load.
+			<br/><br/>Verify that JavaScript is enabled in your web browser, then try a complete reload (press CTRL+R).
+			<hr/>Ihr Webbrowser unterst&uuml;tzt kein JavaScript (oder es wurde deaktiviert), und somit wird auch diese Anwendung nicht geladen.
+			<br/><br/>Stellen Sie sicher, da&szlig; Ihr Webbrowser JavaScript erlaubt, und versuchen Sie dann ein Komplett-Neuladen (STRG+R).<hr/>
+		</noscript>
 	</body>
 </html>
 

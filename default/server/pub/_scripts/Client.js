@@ -7,7 +7,7 @@
       this.socket = new smio.Socket(this, false);
       this.sleepy = false;
       $('#smio_offline').text(smio.resources.smoothio.offline);
-      cookie = $.cookie('smoothio');
+      cookie = $.cookie('smoo');
       try {
         this.smioCookie = JSON.parse(cookie);
       } catch (err) {

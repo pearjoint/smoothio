@@ -109,7 +109,7 @@ body {
   margin: 0px;
   background: #c0c0c0 url("/_/file/images/bg.png") repeat fixed center center;
   overflow: hidden;
-  font-family: FreeSans, Helvetica, Helvetica Neue, Arial, Sans-Serif;
+  font-family: FreeSans, Arial, Helvetica, Helvetica Neue, Sans-Serif;
 }
 .smio-main {
   height: 100%;

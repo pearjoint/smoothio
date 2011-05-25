@@ -46,6 +46,10 @@ class smio.Util
 				v = v + inc if inc? and inc > 0
 				if (v + '').length isnt 1 then v else '0' + v
 			"#{dt.getFullYear()}-#{pad dt.getMonth, 1}-#{pad dt.getDate}-#{pad dt.getHours}-#{dt.getMinutes()}-#{dt.getSeconds()}"
+		utcTicks: (dt) ->
+			if not dt
+				dt = new Date()
+			Date.UTC dt.getFullYear(), dt.getMonth(), dt.getDate(), dt.getHours(), dt.getMinutes(), dt.getSeconds(), dt.getMilliseconds()
 
 	@Number:
 		randomInt: (max) ->

@@ -1,28 +1,46 @@
 (function() {
-  var smio;
+  var smio, _;
+  _ = require('underscore');
   smio = global.smoothio;
-  smio.SocketSession = (function() {
-    SocketSession.all = {};
-    SocketSession.getBySessionID = function(server, sessionID) {
+  smio.Session = (function() {
+    Session.all = {};
+    Session.getBySessionID = function(server, sessionID) {
       var sess;
       sess = null;
       if (sessionID) {
         if (!(sess = this.all[sessionID])) {
-          this.all[sessionID] = sess = new smio.SocketSession(server, sessionID, server.socket);
+          this.all[sessionID] = sess = new smio.Session(server, sessionID, server.socket);
         }
       }
       return sess;
     };
-    SocketSession.getBySocketClient = function(server, client) {
-      return smio.SocketSession.getBySessionID(server, client.sessionId);
-    };
-    function SocketSession(server, sessionID, socket) {
+    function Session(server, sessionID, socket) {
       this.server = server;
       this.sessionID = sessionID;
       this.socket = socket;
+      this.inst = this.server.inst;
     }
-    SocketSession.prototype.onEnd = function() {};
-    SocketSession.prototype.onMessage = function(msg) {};
-    return SocketSession;
+    Session.prototype.handleFetch = function(rc, fr, finish) {
+      var fm, x;
+      fm = {
+        e: []
+      };
+      if (!fr) {
+        fr = rc.postData;
+      }
+      if (_.isString(fr)) {
+        try {
+          fr = JSON.parse(fr);
+        } catch (err) {
+          fm.e.push(this.inst.formatError(err));
+        }
+      }
+      if (fr && !_.isString(fr)) {
+        x = "";
+      }
+      return finish(fm);
+    };
+    Session.prototype.onEnd = function() {};
+    return Session;
   })();
 }).call(this);

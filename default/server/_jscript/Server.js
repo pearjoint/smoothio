@@ -77,6 +77,9 @@
         return this.onSocketMessage(msg, client);
       }, this));
     }
+    Server.prototype.getSocketSessionID = function(client) {
+      return (smio.RequestContext.parseSmioCookie(client.listener.request.headers.cookie)).sessid;
+    };
     Server.prototype.onBind = function() {
       this.status = 1;
       return smio.logit(this.inst.r('log_server_listening', this.serverName, this.hostName, this.port), 'servers.' + this.serverName);
@@ -114,36 +117,35 @@
       }
       uri.rawUrl = request.url;
       uri.url = url;
-      ctx = new smio.RequestContext(this, uri, request, response, this.inst.mongos['admin'], this.inst.mongos['smoothio_shared'], this.inst.mongos["smoothio__" + this.serverName]);
-      return ctx.handleRequest();
+      return ctx = new smio.RequestContext(this, uri, request, response, this.inst.mongos['admin'], this.inst.mongos['smoothio_shared'], this.inst.mongos["smoothio__" + this.serverName]);
     };
     Server.prototype.onSocketConnect = function(client) {
-      var sess;
-      if ((sess = smio.SocketSession.getBySocketClient(this, client))) {
-        client.send(sess.sessionID);
-        return sess.onInit();
+      var sess, sessid;
+      if ((sessid = this.getSocketSessionID(client)) && (sess = smio.Session.getBySessionID(this, sessid))) {
+        sess.onInit();
+        return client.send(client.sessionId);
       } else {
-        return client.send(JSON.stringify({
-          "errors": ["YO session could not be obtained or created."]
-        }));
+        return client.send("smoonocookie");
       }
     };
     Server.prototype.onSocketDisconnect = function(client) {
-      var sess;
-      if ((sess = smio.SocketSession.all[client.sessionId])) {
+      var sess, sessid;
+      if ((sessid = this.getSocketSessionID(client)) && (sess = smio.Session.all[sessid])) {
         sess.onEnd();
-        smio.SocketSession.all[client.sessionId] = null;
-        return delete smio.SocketSession.all[client.sessionId];
+        smio.Session.all[sessid] = null;
+        return delete smio.Session.all[sessid];
       }
     };
     Server.prototype.onSocketMessage = function(message, client) {
-      var sess;
-      if ((sess = smio.SocketSession.getBySocketClient(this, client))) {
-        return sess.onMessage(message);
-      } else {
-        return client.send(JSON.stringify({
-          "errors": ["Your session could not be obtained or created."]
-        }));
+      var sess, sessid;
+      if (message) {
+        if ((sessid = this.getSocketSessionID(client)) && (sess = smio.Session.getBySessionID(this, sessid))) {
+          return sess.handleFetch(null, message, function(data) {
+            return client.send(JSON.stringify(data));
+          });
+        } else {
+          return client.send("smoonocookie");
+        }
       }
     };
     Server.prototype.stop = function() {

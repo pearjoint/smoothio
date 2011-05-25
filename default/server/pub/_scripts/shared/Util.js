@@ -63,6 +63,12 @@
           }
         };
         return "" + (dt.getFullYear()) + "-" + (pad(dt.getMonth, 1)) + "-" + (pad(dt.getDate)) + "-" + (pad(dt.getHours)) + "-" + (dt.getMinutes()) + "-" + (dt.getSeconds());
+      },
+      utcTicks: function(dt) {
+        if (!dt) {
+          dt = new Date();
+        }
+        return Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate(), dt.getHours(), dt.getMinutes(), dt.getSeconds(), dt.getMilliseconds());
       }
     };
     Util.Number = {

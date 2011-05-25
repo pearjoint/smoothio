@@ -6,7 +6,7 @@ class smio.Client
 		@socket = new smio.Socket @, false
 		@sleepy = false
 		$('#smio_offline').text smio.resources.smoothio.offline
-		cookie = $.cookie 'smoothio'
+		cookie = $.cookie 'smoo'
 		try
 			@smioCookie = JSON.parse cookie
 		catch err

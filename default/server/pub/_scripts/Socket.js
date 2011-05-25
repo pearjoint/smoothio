@@ -63,8 +63,8 @@
             },
             sleepyFactor: 4
           },
-          lastResponseTime: 0,
-          lastSendTime: 0,
+          lastFetchTime: 0,
+          lastMessageTime: 0,
           send: __bind(function(heartbeat, force) {
             var data;
             if (force || !this.poll.busy) {
@@ -72,19 +72,28 @@
               if (heartbeat) {
                 data = null;
               } else {
-                this.poll.msg.last = data = this.poll.msg.next;
+                data = this.poll.msg.next;
                 this.poll.msg.next = {};
+                data['l'] = this.poll.lastFetchTime;
+                this.poll.msg.last = data;
               }
-              return ($.post("/_/poll/" + (heartbeat ? 'p' : 'f') + "/?t=" + (smio.Util.DateTime.ticks()), data, (__bind(function(m, t, x) {
+              ($.post("/_/poll/" + (heartbeat ? 'p' : 'f') + "/?t=" + (smio.Util.DateTime.ticks()), "" + (JSON.stringify(data)), (__bind(function(m, t, x) {
                 return this.onMessage(m, t, x);
-              }, this)), 'html')).error(__bind(function(x, t, e) {
+              }, this)), 'text')).error(__bind(function(x, t, e) {
                 return this.onError(x, t, e);
               }, this));
+              if (!heartbeat) {
+                return this.poll.lastFetchTime = smio.Util.DateTime.utcTicks();
+              }
             }
           }, this)
         };
       }
     }
+    Socket.prototype.clearTimers = function() {
+      this.setTimer('heartbeat');
+      return this.setTimer('fetch');
+    };
     Socket.prototype.connect = function() {
       if (this.socket) {
         return this.socket.connect();
@@ -123,7 +132,14 @@
     Socket.prototype.onMessage = function(msg, textStatus, xhr) {
       var data;
       data = null;
-      if (_.isString(msg)) {
+      if (msg === 'smoonocookie') {
+        this.socket.disconnect();
+        onSmoothioNoCookie();
+      }
+      if ((!msg) && textStatus && !_.isString(textStatus)) {
+        data = textStatus;
+      }
+      if (msg && (!data) && _.isString(msg)) {
         try {
           data = JSON.parse(msg);
         } catch (err) {
@@ -132,12 +148,17 @@
       }
       if (this.poll) {
         this.onOnline();
-        return this.poll.busy = false;
+        this.poll.busy = false;
+      }
+      if (data) {
+        if (this.poll) {
+          return this.poll.lastMessageTime = smio.Util.DateTime.utcTicks();
+        }
       }
     };
-    Socket.prototype.onSleepy = function(yeap) {
+    Socket.prototype.onSleepy = function(sleepy) {
       this.setTimers();
-      return $('#smio_sleepy')[yeap ? 'show' : 'hide']();
+      return $('#smio_sleepy')[sleepy ? 'show' : 'hide']();
     };
     Socket.prototype.onSocketClose = function() {};
     Socket.prototype.onSocketConnect = function() {
@@ -160,10 +181,6 @@
     };
     Socket.prototype.onSocketReconnecting = function(delay, attempts) {
       return this.onOffline();
-    };
-    Socket.prototype.clearTimers = function() {
-      this.setTimer('heartbeat');
-      return this.setTimer('fetch');
     };
     Socket.prototype.setTimer = function(name, fn) {
       var obj, val;

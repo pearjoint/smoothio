@@ -31,17 +31,25 @@ class smio.Socket
 						val: 20000
 						handle: null
 					sleepyFactor: 4
-				lastResponseTime: 0
-				lastSendTime: 0
+				lastFetchTime: 0
+				lastMessageTime: 0
 				send: (heartbeat, force) =>
 					if force or not @poll.busy
 						@poll.busy = true
 						if heartbeat
 							data = null
 						else
-							@poll.msg.last = data = @poll.msg.next
+							data = @poll.msg.next
 							@poll.msg.next = {}
-						($.post "/_/poll/#{if heartbeat then 'p' else 'f'}/?t=#{smio.Util.DateTime.ticks()}", data, ((m, t, x) => @onMessage m, t, x), 'html').error (x, t, e) => @onError x, t, e
+							data['l'] = @poll.lastFetchTime
+							@poll.msg.last = data
+						($.post "/_/poll/#{if heartbeat then 'p' else 'f'}/?t=#{smio.Util.DateTime.ticks()}", "#{JSON.stringify data}", ((m, t, x) => @onMessage m, t, x), 'text').error (x, t, e) => @onError x, t, e
+						if not heartbeat
+							@poll.lastFetchTime = smio.Util.DateTime.utcTicks()
+
+	clearTimers: () ->
+		@setTimer 'heartbeat'
+		@setTimer 'fetch'
 
 	connect: ->
 		if @socket
@@ -74,7 +82,12 @@ class smio.Socket
 
 	onMessage: (msg, textStatus, xhr) ->
 		data = null
-		if _.isString msg
+		if msg is 'smoonocookie'
+			@socket.disconnect()
+			onSmoothioNoCookie()
+		if (not msg) and textStatus and not _.isString textStatus
+			data = textStatus
+		if msg and (not data) and _.isString msg
 			try
 				data = JSON.parse msg
 			catch err
@@ -82,10 +95,13 @@ class smio.Socket
 		if @poll
 			@onOnline()
 			@poll.busy = false
+		if data
+			if @poll
+				@poll.lastMessageTime = smio.Util.DateTime.utcTicks()
 
-	onSleepy: (yeap) ->
+	onSleepy: (sleepy) ->
 		@setTimers()
-		$('#smio_sleepy')[if yeap then 'show' else 'hide']()
+		$('#smio_sleepy')[if sleepy then 'show' else 'hide']()
 
 	onSocketClose: ->
 
@@ -109,10 +125,6 @@ class smio.Socket
 
 	onSocketReconnecting: (delay,attempts) ->
 		@onOffline()
-
-	clearTimers: () ->
-		@setTimer 'heartbeat'
-		@setTimer 'fetch'
 
 	setTimer: (name, fn) ->
 		obj = @poll.intervals[name]
