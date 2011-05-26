@@ -11,6 +11,8 @@ socketio = require 'socket.io'
 smio = global.smoothio
 
 class smio.Server
+	@sockSessions: {}
+
 	constructor: (@inst, @serverName, @hostName, @port, @processes) ->
 		hostName = @hostName
 		localHostName = node_os.hostname()
@@ -41,7 +43,9 @@ class smio.Server
 		@socket.on 'clientMessage', (msg, client) => @onSocketMessage msg, client
 
 	getSocketSessionID: (client) ->
-		(smio.RequestContext.parseSmioCookie client.listener.request.headers.cookie).sessid
+		if not smio.Server.sockSessions[client.sessionId]
+			smio.Server.sockSessions[client.sessionId] = (smio.RequestContext.parseSmioCookie client['request']?['headers']?['cookie']).sessid
+		smio.Server.sockSessions[client.sessionId]
 
 	onBind: ->
 		@status = 1
@@ -78,6 +82,9 @@ class smio.Server
 			sess.onEnd()
 			smio.Session.all[sessid] = null
 			delete smio.Session.all[sessid]
+		if smio.Server.sockSessions[client.sessionId]
+			smio.Server.sockSessions[client.sessionId] = null
+			delete smio.Server.sockSessions[client.sessionId]
 
 	onSocketMessage: (message, client) ->
 		if message

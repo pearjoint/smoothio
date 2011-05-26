@@ -12,6 +12,7 @@
   socketio = require('socket.io');
   smio = global.smoothio;
   smio.Server = (function() {
+    Server.sockSessions = {};
     function Server(inst, serverName, hostName, port, processes) {
       var host, ip, localHostName, sockLogPath, sockLogger, _ref;
       this.inst = inst;
@@ -78,7 +79,11 @@
       }, this));
     }
     Server.prototype.getSocketSessionID = function(client) {
-      return (smio.RequestContext.parseSmioCookie(client.listener.request.headers.cookie)).sessid;
+      var _ref, _ref2;
+      if (!smio.Server.sockSessions[client.sessionId]) {
+        smio.Server.sockSessions[client.sessionId] = (smio.RequestContext.parseSmioCookie((_ref = client['request']) != null ? (_ref2 = _ref['headers']) != null ? _ref2['cookie'] : void 0 : void 0)).sessid;
+      }
+      return smio.Server.sockSessions[client.sessionId];
     };
     Server.prototype.onBind = function() {
       this.status = 1;
@@ -133,7 +138,11 @@
       if ((sessid = this.getSocketSessionID(client)) && (sess = smio.Session.all[sessid])) {
         sess.onEnd();
         smio.Session.all[sessid] = null;
-        return delete smio.Session.all[sessid];
+        delete smio.Session.all[sessid];
+      }
+      if (smio.Server.sockSessions[client.sessionId]) {
+        smio.Server.sockSessions[client.sessionId] = null;
+        return delete smio.Server.sockSessions[client.sessionId];
       }
     };
     Server.prototype.onSocketMessage = function(message, client) {

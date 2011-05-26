@@ -14,7 +14,7 @@
         cookies = smio.Util.Server.parseCookies(cookies);
       }
       parse = function() {
-        return JSON.parse(node_urlq.unescape(cookies['smoothio']));
+        return JSON.parse(node_urlq.unescape(cookies['smoo']));
       };
       if (fail) {
         smioCookie = parse();

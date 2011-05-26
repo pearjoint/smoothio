@@ -3,9 +3,9 @@ smio = global.smoothio
 class smio.Client
 
 	constructor: ->
-		@socket = new smio.Socket @, false
+		@socket = new smio.Socket @, true
 		@sleepy = false
-		$('#smio_offline').text smio.resources.smoothio.offline
+		$('#smio_offline').text smio.resources.smoothio.connect
 		cookie = $.cookie 'smoo'
 		try
 			@smioCookie = JSON.parse cookie

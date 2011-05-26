@@ -10,7 +10,7 @@ class smio.RequestContext
 	@parseSmioCookie: (cookies, fail) ->
 		if _.isString cookies
 			cookies = smio.Util.Server.parseCookies cookies
-		parse = -> JSON.parse node_urlq.unescape cookies['smoothio']
+		parse = -> JSON.parse node_urlq.unescape cookies['smoo']
 		if fail
 			smioCookie = parse()
 		else

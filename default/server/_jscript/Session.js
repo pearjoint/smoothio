@@ -22,6 +22,7 @@
     }
     Session.prototype.handleFetch = function(rc, fr, finish) {
       var fm, x;
+      smio.logit(JSON.stringify(fr));
       fm = {
         e: []
       };
@@ -41,6 +42,7 @@
       return finish(fm);
     };
     Session.prototype.onEnd = function() {};
+    Session.prototype.onInit = function() {};
     return Session;
   })();
 }).call(this);

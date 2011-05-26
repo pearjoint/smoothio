@@ -17,6 +17,7 @@ class smio.Session
 		@inst = @server.inst
 
 	handleFetch: (rc, fr, finish) ->
+		smio.logit JSON.stringify fr
 		fm =
 			e: []
 		if not fr
@@ -31,4 +32,6 @@ class smio.Session
 		finish fm
 
 	onEnd: ->
+
+	onInit: ->
 

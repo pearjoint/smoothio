@@ -12656,11 +12656,15 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     function Socket(client, isSocketIO, host, secure, port) {
       var opts;
       this.client = client;
-      this.offline = false;
+      this.offline = 1;
+      this.initialFullFetch = {
+        "f": {}
+      };
       if (isSocketIO) {
         opts = {
           resource: '/_/sockio/',
           rememberTransport: false,
+          reconnect: true,
           connectTimeout: 5000,
           secure: secure === true
         };
@@ -12700,15 +12704,15 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           busy: false,
           msg: {
             last: null,
-            next: {}
+            next: this.initialFullFetch
           },
           intervals: {
             heartbeat: {
-              val: 4500,
+              val: 0,
               handle: null
             },
             fetch: {
-              val: 20000,
+              val: 0,
               handle: null
             },
             sleepyFactor: 4
@@ -12748,12 +12752,13 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       if (this.socket) {
         return this.socket.connect();
       } else if (this.poll) {
-        this.setTimers();
         return this.poll.send(false, true);
       }
     };
     Socket.prototype.onError = function(xhr, textStatus, error, url) {
-      if (this.poll) {
+      if (!this.poll) {
+        return alert(JSON.stringify(xhr));
+      } else {
         if (xhr && (xhr.status === 0) && (xhr.readyState === 0)) {
           this.onOffline();
         } else {
@@ -12768,47 +12773,62 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
     };
     Socket.prototype.onOffline = function() {
-      if (!this.offline) {
-        this.offline = true;
+      this.offline++;
+      if (this.offline === 2) {
         return $('#smio_offline').show();
       }
     };
     Socket.prototype.onOnline = function() {
       if (this.offline) {
-        this.offline = false;
-        return $('#smio_offline').hide();
+        this.offline = 0;
+        $('#smio_offline').hide();
+        if (this.socket) {
+          return this.socket.send(JSON.stringify(this.initialFullFetch));
+        }
       }
     };
     Socket.prototype.onMessage = function(msg, textStatus, xhr) {
-      var data;
+      var data, err;
+      this.onOnline();
       data = null;
       if (msg === 'smoonocookie') {
         this.socket.disconnect();
         onSmoothioNoCookie();
+        return;
       }
       if ((!msg) && textStatus && !_.isString(textStatus)) {
         data = textStatus;
       }
       if (msg && (!data) && _.isString(msg)) {
-        try {
-          data = JSON.parse(msg);
-        } catch (err) {
-          this.onError(err);
+        if (_.isStartsWith(msg, '{')) {
+          try {
+            data = JSON.parse(msg);
+          } catch (err) {
+            if (_.isString(err)) {
+              err = {
+                message: err
+              };
+            }
+            err.faultyJson = msg;
+            this.onError(err);
+          }
+        } else {
+          data = {};
         }
-      }
-      if (this.poll) {
-        this.onOnline();
-        this.poll.busy = false;
       }
       if (data) {
         if (this.poll) {
-          return this.poll.lastMessageTime = smio.Util.DateTime.utcTicks();
+          this.poll.lastMessageTime = smio.Util.DateTime.utcTicks();
         }
+      }
+      if (this.poll) {
+        return this.poll.busy = false;
       }
     };
     Socket.prototype.onSleepy = function(sleepy) {
-      this.setTimers();
-      return $('#smio_sleepy')[sleepy ? 'show' : 'hide']();
+      if (this.poll) {
+        return this.setTimers();
+      }
     };
     Socket.prototype.onSocketClose = function() {};
     Socket.prototype.onSocketConnect = function() {
@@ -12823,13 +12843,13 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     Socket.prototype.onSocketDisconnect = function() {
       return this.onOffline();
     };
-    Socket.prototype.onSocketReconnect = function(type, attempts) {
+    Socket.prototype.onSocketReconnect = function() {
       return this.onOnline();
     };
     Socket.prototype.onSocketReconnectFailed = function() {
       return this.onOffline();
     };
-    Socket.prototype.onSocketReconnecting = function(delay, attempts) {
+    Socket.prototype.onSocketReconnecting = function() {
       return this.onOffline();
     };
     Socket.prototype.setTimer = function(name, fn) {
@@ -12839,7 +12859,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       if (obj['handle']) {
         clearInterval(obj.handle);
       }
-      if (fn) {
+      if (fn && val) {
         return obj.handle = setInterval(fn, val);
       }
     };
@@ -12862,9 +12882,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio.Client = (function() {
     function Client() {
       var cookie;
-      this.socket = new smio.Socket(this, false);
+      this.socket = new smio.Socket(this, true);
       this.sleepy = false;
-      $('#smio_offline').text(smio.resources.smoothio.offline);
+      $('#smio_offline').text(smio.resources.smoothio.connect);
       cookie = $.cookie('smoo');
       try {
         this.smioCookie = JSON.parse(cookie);

@@ -2,9 +2,10 @@ smio = global.smoothio
 
 class smio.Socket
 	constructor: (@client, isSocketIO, host, secure, port) ->
-		@offline = false
+		@offline = 1
+		@initialFullFetch = { "f": {} }
 		if isSocketIO
-			opts = resource: '/_/sockio/', rememberTransport: false, connectTimeout: 5000, secure: secure is true
+			opts = resource: '/_/sockio/', rememberTransport: false, reconnect: true, connectTimeout: 5000, secure: secure is true
 			if port
 				opts.port = port
 			@socket = new io.Socket host, opts
@@ -22,13 +23,13 @@ class smio.Socket
 				busy: false
 				msg:
 					last: null
-					next: {}
+					next: @initialFullFetch
 				intervals:
 					heartbeat:
-						val: 4500
+						val: 0
 						handle: null
 					fetch:
-						val: 20000
+						val: 0
 						handle: null
 					sleepyFactor: 4
 				lastFetchTime: 0
@@ -55,11 +56,12 @@ class smio.Socket
 		if @socket
 			@socket.connect()
 		else if @poll
-			@setTimers()
 			@poll.send false, true
 
 	onError: (xhr, textStatus, error, url) ->
-		if @poll
+		if not @poll
+			alert JSON.stringify xhr
+		else
 			if xhr and (xhr.status is 0) and (xhr.readyState is 0)
 				@onOffline()
 			else
@@ -71,37 +73,47 @@ class smio.Socket
 			@poll.busy = false
 
 	onOffline: ->
-		if not @offline
-			@offline = true
+		@offline++
+		if @offline is 2
 			$('#smio_offline').show()
 
 	onOnline: ->
 		if @offline
-			@offline = false
+			@offline = 0
 			$('#smio_offline').hide()
+			if @socket
+				@socket.send JSON.stringify @initialFullFetch
 
 	onMessage: (msg, textStatus, xhr) ->
+		@onOnline()
 		data = null
 		if msg is 'smoonocookie'
 			@socket.disconnect()
 			onSmoothioNoCookie()
+			return
 		if (not msg) and textStatus and not _.isString textStatus
 			data = textStatus
 		if msg and (not data) and _.isString msg
-			try
-				data = JSON.parse msg
-			catch err
-				@onError err
-		if @poll
-			@onOnline()
-			@poll.busy = false
+			if _.isStartsWith msg, '{'
+				try
+					data = JSON.parse msg
+				catch err
+					if _.isString err
+						err =
+							message: err
+					err.faultyJson = msg
+					@onError err
+			else
+				data = {}
 		if data
 			if @poll
 				@poll.lastMessageTime = smio.Util.DateTime.utcTicks()
+		if @poll
+			@poll.busy = false
 
 	onSleepy: (sleepy) ->
-		@setTimers()
-		$('#smio_sleepy')[if sleepy then 'show' else 'hide']()
+		if @poll
+			@setTimers()
 
 	onSocketClose: ->
 
@@ -117,13 +129,13 @@ class smio.Socket
 	onSocketDisconnect: ->
 		@onOffline()
 
-	onSocketReconnect: (type, attempts) ->
+	onSocketReconnect: ->
 		@onOnline()
 
 	onSocketReconnectFailed: ->
 		@onOffline()
 
-	onSocketReconnecting: (delay,attempts) ->
+	onSocketReconnecting: ->
 		@onOffline()
 
 	setTimer: (name, fn) ->
@@ -131,7 +143,7 @@ class smio.Socket
 		val = if @client.sleepy then (obj.val * @poll.intervals.sleepyFactor) else obj.val
 		if obj['handle']
 			clearInterval obj.handle
-		if fn
+		if fn and val
 			obj.handle = setInterval fn, val
 
 	setTimers: () ->
