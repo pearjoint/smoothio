@@ -13,6 +13,11 @@ class smio.FetchMessageBase
 			@msg[k] = null
 			delete @msg[k]
 
+	settings: (cfg) ->
+		if cfg
+			@msg.s = cfg
+		@msg.s
+
 	ticks: (ticks) ->
 		if ticks?
 			@msg.t = ticks

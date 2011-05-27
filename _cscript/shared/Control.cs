@@ -59,8 +59,8 @@ smio = smoothio = global.smoothio
 class smio.Packs_#{className} extends smio.Control
 #{decls}
 #{"#if client"}
-	constructor: (args) ->
-		super args, #{JSON.stringify baseName}, #{JSON.stringify className}
+	constructor: (client, args) ->
+		super client, args, #{JSON.stringify baseName}, #{JSON.stringify className}
 		@init()
 
 	renderHtml: ($el) ->
@@ -106,13 +106,13 @@ class smio.Packs_#{className} extends smio.Control
 			ctl.args[name]
 		"ctl": (ctl, className, args) ->
 			if (not ctl.controls[args.id]) and (ctor = smio['Packs_' + ctl.baseName + '_' + className])
-				ctl.controls[args.id] = new ctor args
+				ctl.client.allControls[args.id] = ctl.controls[args.id] = new ctor @client, args
 			if ctl.controls[args.id]
 				ctl.controls[args.id].renderHtml()
 			else
-				"CONTROL_NOT_FOUND:" + className
+				"!!CONTROL_NOT_FOUND::#{className}!!"
 
-	constructor: (args, baseName, className) ->
+	constructor: (@client, args, baseName, className) ->
 		@args = args
 		@ctlID = args.id
 		@baseName = baseName
@@ -129,10 +129,10 @@ class smio.Packs_#{className} extends smio.Control
 
 	init: ->
 
-	onLoad: ($root) ->
+	onLoad: () ->
 		@el = $('#' + @ctlID)
 		for id, ctl of @controls
-			ctl.onLoad $root
+			ctl.onLoad()
 
 	renderHtml: ($el) ->
 		if $el
@@ -144,6 +144,9 @@ class smio.Packs_#{className} extends smio.Control
 		if renderer
 			renderer(@, sarg, jarg)
 		else
-			"UNKNOWN_TAG:" + name
+			"!!UNKNOWN_TAG::#{name}!!"
+
+	syncUpdate: (ctlDesc) ->
+
 #endif
 

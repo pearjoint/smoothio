@@ -12,7 +12,7 @@ class smio.Packs_SmoothioCore_CommonControls_console extends smio.Control
 	init: ->
 
 	onLoad: ($el) ->
-		super $el
+		super()
 		if not @args['topDown']
 			$("##{@ctlID}_detail").insertBefore "##{@ctlID}_ever"
 			$("##{@ctlID}_hover").insertBefore "##{@ctlID}_ever"
@@ -21,8 +21,8 @@ class smio.Packs_SmoothioCore_CommonControls_console extends smio.Control
 
 
 #if client
-	constructor: (args) ->
-		super args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_console"
+	constructor: (client, args) ->
+		super client, args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_console"
 		@init()
 
 	renderHtml: ($el) ->

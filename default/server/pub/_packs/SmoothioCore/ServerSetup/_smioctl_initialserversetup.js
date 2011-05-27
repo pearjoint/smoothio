@@ -13,8 +13,8 @@
   smio = smoothio = global.smoothio;
   smio.Packs_SmoothioCore_ServerSetup_initialserversetup = (function() {
     __extends(Packs_SmoothioCore_ServerSetup_initialserversetup, smio.Control);
-    function Packs_SmoothioCore_ServerSetup_initialserversetup(args) {
-      Packs_SmoothioCore_ServerSetup_initialserversetup.__super__.constructor.call(this, args, "SmoothioCore_ServerSetup", "SmoothioCore_ServerSetup_initialserversetup");
+    function Packs_SmoothioCore_ServerSetup_initialserversetup(client, args) {
+      Packs_SmoothioCore_ServerSetup_initialserversetup.__super__.constructor.call(this, client, args, "SmoothioCore_ServerSetup", "SmoothioCore_ServerSetup_initialserversetup");
       this.init();
     }
     Packs_SmoothioCore_ServerSetup_initialserversetup.prototype.renderHtml = function($el) {

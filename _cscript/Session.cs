@@ -33,6 +33,8 @@ class smio.Session
 		if fr and not _.isString fr
 			freq = new smio.FetchRequestMessage fr
 			site = new smio.Site @, freq.url(), rc
+			if freq.settings()
+				fresp.settings interval_heartbeat: 4500, interval_fetch: 16000
 			fresp.controls site.getControlUpdates freq.ticks()
 			if not isSocket
 				fresp.ticks smio.Util.DateTime.utcTicks()

@@ -24,6 +24,12 @@
       }
       return _results;
     };
+    FetchMessageBase.prototype.settings = function(cfg) {
+      if (cfg) {
+        this.msg.s = cfg;
+      }
+      return this.msg.s;
+    };
     FetchMessageBase.prototype.ticks = function(ticks) {
       if (ticks != null) {
         this.msg.t = ticks;

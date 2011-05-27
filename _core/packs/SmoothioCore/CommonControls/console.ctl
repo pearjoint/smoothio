@@ -3,7 +3,7 @@
 	init: ->
 
 	onLoad: ($el) ->
-		super $el
+		super()
 		if not @args['topDown']
 			$("##{@ctlID}_detail").insertBefore "##{@ctlID}_ever"
 			$("##{@ctlID}_hover").insertBefore "##{@ctlID}_ever"

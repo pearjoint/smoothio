@@ -15,14 +15,14 @@
     __extends(Packs_SmoothioCore_CommonControls_console, smio.Control);
     Packs_SmoothioCore_CommonControls_console.prototype.init = function() {};
     Packs_SmoothioCore_CommonControls_console.prototype.onLoad = function($el) {
-      Packs_SmoothioCore_CommonControls_console.__super__.onLoad.call(this, $el);
+      Packs_SmoothioCore_CommonControls_console.__super__.onLoad.call(this);
       if (!this.args['topDown']) {
         $("#" + this.ctlID + "_detail").insertBefore("#" + this.ctlID + "_ever");
         return $("#" + this.ctlID + "_hover").insertBefore("#" + this.ctlID + "_ever");
       }
     };
-    function Packs_SmoothioCore_CommonControls_console(args) {
-      Packs_SmoothioCore_CommonControls_console.__super__.constructor.call(this, args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_console");
+    function Packs_SmoothioCore_CommonControls_console(client, args) {
+      Packs_SmoothioCore_CommonControls_console.__super__.constructor.call(this, client, args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_console");
       this.init();
     }
     Packs_SmoothioCore_CommonControls_console.prototype.renderHtml = function($el) {

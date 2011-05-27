@@ -16,7 +16,9 @@
     }
     Site.prototype.getControlUpdates = function(sinceTicks) {
       return {
-        "": "SmoothioCore_CommonControls_mainframe"
+        "": {
+          "_": "SmoothioCore_CommonControls_mainframe"
+        }
       };
     };
     return Site;

@@ -17,8 +17,8 @@
       var xy;
       return xy = "clientside";
     };
-    function Packs_SmoothioCore_CommonControls_mainframe(args) {
-      Packs_SmoothioCore_CommonControls_mainframe.__super__.constructor.call(this, args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_mainframe");
+    function Packs_SmoothioCore_CommonControls_mainframe(client, args) {
+      Packs_SmoothioCore_CommonControls_mainframe.__super__.constructor.call(this, client, args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_mainframe");
       this.init();
     }
     Packs_SmoothioCore_CommonControls_mainframe.prototype.renderHtml = function($el) {

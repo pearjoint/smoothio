@@ -19,6 +19,9 @@ class smio.Socket
 			@socket.on 'reconnect_failed', => @onSocketReconnectFailed()
 			@socket.on 'reconnecting', (delay, attempts) => @onSocketReconnecting delay, attempts
 		else
+			@client.pageBody.ajaxError (evt, xhr, cfg, err) ->
+				alert 'ajaxerr'
+				true
 			@poll =
 				busy: false
 				msg:
@@ -37,10 +40,12 @@ class smio.Socket
 					if force or not @poll.busy
 						@poll.busy = true
 						if heartbeat
-							data = null
+							freq = new smio.FetchRequestMessage()
 						else
 							freq = @poll.msg.next
 							@poll.msg.next = @newFetchRequest()
+							if not (@poll.intervals.heartbeat.val or @poll.intervals.fetch.val)
+								freq.settings ["interval_heartbeat", "interval_fetch"]
 							freq.ticks @poll.lastFetchTime
 							@poll.msg.last = freq
 						($.post "/_/poll/#{if heartbeat then 'p' else 'f'}/?t=#{smio.Util.DateTime.ticks()}", (JSON.stringify freq.msg), ((m, t, x) => @onMessage m, t, x), 'text').error (x, t, e) => @onError x, t, e
@@ -58,7 +63,7 @@ class smio.Socket
 	newFetchRequest: (msg, funcs) ->
 		new smio.FetchRequestMessage msg, smio.Util.Object.mergeDefaults funcs, url: ["/"]
 
-	onError: (xhr, textStatus, error, url) ->
+	oldErr: (xhr, textStatus, error, url) ->
 		if not @poll
 			alert JSON.stringify xhr
 		else
@@ -72,6 +77,10 @@ class smio.Socket
 					alert "#{textStatus}\n\n#{JSON.stringify error}\n\n#{JSON.stringify xhr}"
 			@poll.busy = false
 
+	onError: (xhr, textStatus, error, url) ->
+		alert 'moreerr'
+		true
+
 	onOffline: ->
 		@offline++
 		if @offline is 2
@@ -83,10 +92,10 @@ class smio.Socket
 			$('#smio_offline').hide()
 			if @socket
 				@socket.send JSON.stringify @newFetchRequest().msg
+		@socket = new smio.Socket @, false
 
 	onMessage: (msg, textStatus, xhr) ->
 		@onOnline()
-		alert msg
 		data = null
 		if msg is 'smoonocookie'
 			@socket.disconnect()
@@ -108,8 +117,15 @@ class smio.Socket
 				data = {}
 		if data
 			fresp = new smio.FetchResponseMessage data
+			if (ctls = fresp.controls())
+				@client.syncControls ctls
+			if (cfg = fresp.settings())
+				if @poll
+					@poll.intervals.heartbeat.val = cfg.interval_heartbeat
+					@poll.intervals.fetch.val = cfg.interval_fetch
+					@setTimers()
 			if @poll
-				@poll.lastFetchTime = data.t
+				@poll.lastFetchTime = fresp.ticks()
 		if @poll
 			@poll.busy = false
 

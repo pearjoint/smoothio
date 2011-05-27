@@ -8,8 +8,8 @@ smio = smoothio = global.smoothio
 class smio.Packs_SmoothioCore_ServerSetup_initialserversetup extends smio.Control
 
 #if client
-	constructor: (args) ->
-		super args, "SmoothioCore_ServerSetup", "SmoothioCore_ServerSetup_initialserversetup"
+	constructor: (client, args) ->
+		super client, args, "SmoothioCore_ServerSetup", "SmoothioCore_ServerSetup_initialserversetup"
 		@init()
 
 	renderHtml: ($el) ->

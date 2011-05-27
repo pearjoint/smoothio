@@ -79,7 +79,7 @@
           }
         }
       }
-      coffeeScript = "###\nAuto-generated from " + controlPath + "\n###\n" + "#if server" + "\nrequire '" + (smio.Util.String.times(oneUp, pathParts.length)) + "_jscript/Control'\n" + "#endif" + "\nsmio = smoothio = global.smoothio\nclass smio.Packs_" + className + " extends smio.Control\n" + decls + "\n" + "#if client" + "\n	constructor: (args) ->\n		super args, " + (JSON.stringify(baseName)) + ", " + (JSON.stringify(className)) + "\n		@init()\n\n	renderHtml: ($el) ->\n		if not @_html\n			parts = []";
+      coffeeScript = "###\nAuto-generated from " + controlPath + "\n###\n" + "#if server" + "\nrequire '" + (smio.Util.String.times(oneUp, pathParts.length)) + "_jscript/Control'\n" + "#endif" + "\nsmio = smoothio = global.smoothio\nclass smio.Packs_" + className + " extends smio.Control\n" + decls + "\n" + "#if client" + "\n	constructor: (client, args) ->\n		super client, args, " + (JSON.stringify(baseName)) + ", " + (JSON.stringify(className)) + "\n		@init()\n\n	renderHtml: ($el) ->\n		if not @_html\n			parts = []";
       _ref3 = [-1, 3, 3, smio.Util.String.times], ind = _ref3[0], indent = _ref3[1], rind = _ref3[2], stimes = _ref3[3];
       for (_k = 0, _len3 = renderParts.length; _k < _len3; _k++) {
         rp = renderParts[_k];

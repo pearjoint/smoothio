@@ -12,5 +12,5 @@ class smio.Site
 		@uri = node_url.parse @url
 
 	getControlUpdates: (sinceTicks) ->
-		{ "": "SmoothioCore_CommonControls_mainframe" }
+		{ "": { "_": "SmoothioCore_CommonControls_mainframe" } }
 

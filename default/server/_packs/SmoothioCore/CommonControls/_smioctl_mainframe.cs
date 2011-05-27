@@ -19,8 +19,8 @@ class smio.Packs_SmoothioCore_CommonControls_mainframe extends smio.Control
 
 
 #if client
-	constructor: (args) ->
-		super args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_mainframe"
+	constructor: (client, args) ->
+		super client, args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_mainframe"
 		@init()
 
 	renderHtml: ($el) ->

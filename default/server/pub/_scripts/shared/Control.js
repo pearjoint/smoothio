@@ -9,16 +9,17 @@
       "ctl": function(ctl, className, args) {
         var ctor;
         if ((!ctl.controls[args.id]) && (ctor = smio['Packs_' + ctl.baseName + '_' + className])) {
-          ctl.controls[args.id] = new ctor(args);
+          ctl.client.allControls[args.id] = ctl.controls[args.id] = new ctor(this.client, args);
         }
         if (ctl.controls[args.id]) {
           return ctl.controls[args.id].renderHtml();
         } else {
-          return "CONTROL_NOT_FOUND:" + className;
+          return "!!CONTROL_NOT_FOUND::" + className + "!!";
         }
       }
     };
-    function Control(args, baseName, className) {
+    function Control(client, args, baseName, className) {
+      this.client = client;
       this.args = args;
       this.ctlID = args.id;
       this.baseName = baseName;
@@ -35,14 +36,14 @@
       }
     };
     Control.prototype.init = function() {};
-    Control.prototype.onLoad = function($root) {
+    Control.prototype.onLoad = function() {
       var ctl, id, _ref, _results;
       this.el = $('#' + this.ctlID);
       _ref = this.controls;
       _results = [];
       for (id in _ref) {
         ctl = _ref[id];
-        _results.push(ctl.onLoad($root));
+        _results.push(ctl.onLoad());
       }
       return _results;
     };
@@ -58,9 +59,10 @@
       if (renderer) {
         return renderer(this, sarg, jarg);
       } else {
-        return "UNKNOWN_TAG:" + name;
+        return "!!UNKNOWN_TAG::" + name + "!!";
       }
     };
+    Control.prototype.syncUpdate = function(ctlDesc) {};
     return Control;
   })();
 }).call(this);
