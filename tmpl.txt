@@ -1,3 +1,14 @@
+REQUEST PROTOCOL
+t: long
+	last server ticks ONLY poll
+u: string
+	current target URL path ONLY socket
+
+RESPONSE PROTOCOL
+t:
+	current server ticks
+
+
 Chrome
 {"x":{"readyState":0,"responseText":"","status":0,"statusText":"error"},"t":"error","e":""}
 

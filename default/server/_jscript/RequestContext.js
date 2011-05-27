@@ -39,6 +39,7 @@
       this.postData = null;
       this.smioCookie = smio.RequestContext.parseSmioCookie(this.cookies = smio.Util.Server.parseCookies(this.httpRequest.headers['cookie']));
       if (this.httpRequest.method === 'POST') {
+        this.postData = '';
         this.httpRequest.on('end', __bind(function() {
           return this.handleRequest();
         }, this));

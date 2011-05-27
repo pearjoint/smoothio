@@ -1,5 +1,9 @@
 (function() {
   var smio, _;
+  require('./Site');
+  require('./shared/FetchRequestMessage');
+  require('./shared/FetchResponseMessage');
+  require('./shared/Util');
   _ = require('underscore');
   smio = global.smoothio;
   smio.Session = (function() {
@@ -21,11 +25,9 @@
       this.inst = this.server.inst;
     }
     Session.prototype.handleFetch = function(rc, fr, finish) {
-      var fm, x;
-      smio.logit(JSON.stringify(fr));
-      fm = {
-        e: []
-      };
+      var freq, fresp, isSocket, site;
+      isSocket = rc === null;
+      fresp = new smio.FetchResponseMessage();
       if (!fr) {
         fr = rc.postData;
       }
@@ -33,13 +35,18 @@
         try {
           fr = JSON.parse(fr);
         } catch (err) {
-          fm.e.push(this.inst.formatError(err));
+          fresp.errors(err);
         }
       }
       if (fr && !_.isString(fr)) {
-        x = "";
+        freq = new smio.FetchRequestMessage(fr);
+        site = new smio.Site(this, freq.url(), rc);
+        fresp.controls(site.getControlUpdates(freq.ticks()));
+        if (!isSocket) {
+          fresp.ticks(smio.Util.DateTime.utcTicks());
+        }
       }
-      return finish(fm);
+      return finish(fresp.msg);
     };
     Session.prototype.onEnd = function() {};
     Session.prototype.onInit = function() {};

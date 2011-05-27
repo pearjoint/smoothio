@@ -3,7 +3,7 @@ smio = global.smoothio
 class smio.Socket
 	constructor: (@client, isSocketIO, host, secure, port) ->
 		@offline = 1
-		@initialFullFetch = { "f": {} }
+		@initialFetchDone = false
 		if isSocketIO
 			opts = resource: '/_/sockio/', rememberTransport: false, reconnect: true, connectTimeout: 5000, secure: secure is true
 			if port
@@ -23,7 +23,7 @@ class smio.Socket
 				busy: false
 				msg:
 					last: null
-					next: @initialFullFetch
+					next: @newFetchRequest()
 				intervals:
 					heartbeat:
 						val: 0
@@ -33,20 +33,17 @@ class smio.Socket
 						handle: null
 					sleepyFactor: 4
 				lastFetchTime: 0
-				lastMessageTime: 0
 				send: (heartbeat, force) =>
 					if force or not @poll.busy
 						@poll.busy = true
 						if heartbeat
 							data = null
 						else
-							data = @poll.msg.next
-							@poll.msg.next = {}
-							data['l'] = @poll.lastFetchTime
-							@poll.msg.last = data
-						($.post "/_/poll/#{if heartbeat then 'p' else 'f'}/?t=#{smio.Util.DateTime.ticks()}", "#{JSON.stringify data}", ((m, t, x) => @onMessage m, t, x), 'text').error (x, t, e) => @onError x, t, e
-						if not heartbeat
-							@poll.lastFetchTime = smio.Util.DateTime.utcTicks()
+							freq = @poll.msg.next
+							@poll.msg.next = @newFetchRequest()
+							freq.ticks @poll.lastFetchTime
+							@poll.msg.last = freq
+						($.post "/_/poll/#{if heartbeat then 'p' else 'f'}/?t=#{smio.Util.DateTime.ticks()}", (JSON.stringify freq.msg), ((m, t, x) => @onMessage m, t, x), 'text').error (x, t, e) => @onError x, t, e
 
 	clearTimers: () ->
 		@setTimer 'heartbeat'
@@ -57,6 +54,9 @@ class smio.Socket
 			@socket.connect()
 		else if @poll
 			@poll.send false, true
+
+	newFetchRequest: (msg, funcs) ->
+		new smio.FetchRequestMessage msg, smio.Util.Object.mergeDefaults funcs, url: ["/"]
 
 	onError: (xhr, textStatus, error, url) ->
 		if not @poll
@@ -82,10 +82,11 @@ class smio.Socket
 			@offline = 0
 			$('#smio_offline').hide()
 			if @socket
-				@socket.send JSON.stringify @initialFullFetch
+				@socket.send JSON.stringify @newFetchRequest().msg
 
 	onMessage: (msg, textStatus, xhr) ->
 		@onOnline()
+		alert msg
 		data = null
 		if msg is 'smoonocookie'
 			@socket.disconnect()
@@ -106,8 +107,9 @@ class smio.Socket
 			else
 				data = {}
 		if data
+			fresp = new smio.FetchResponseMessage data
 			if @poll
-				@poll.lastMessageTime = smio.Util.DateTime.utcTicks()
+				@poll.lastFetchTime = data.t
 		if @poll
 			@poll.busy = false
 

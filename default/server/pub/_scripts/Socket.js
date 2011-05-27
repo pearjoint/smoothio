@@ -7,9 +7,7 @@
       var opts;
       this.client = client;
       this.offline = 1;
-      this.initialFullFetch = {
-        "f": {}
-      };
+      this.initialFetchDone = false;
       if (isSocketIO) {
         opts = {
           resource: '/_/sockio/',
@@ -54,7 +52,7 @@
           busy: false,
           msg: {
             last: null,
-            next: this.initialFullFetch
+            next: this.newFetchRequest()
           },
           intervals: {
             heartbeat: {
@@ -68,27 +66,23 @@
             sleepyFactor: 4
           },
           lastFetchTime: 0,
-          lastMessageTime: 0,
           send: __bind(function(heartbeat, force) {
-            var data;
+            var data, freq;
             if (force || !this.poll.busy) {
               this.poll.busy = true;
               if (heartbeat) {
                 data = null;
               } else {
-                data = this.poll.msg.next;
-                this.poll.msg.next = {};
-                data['l'] = this.poll.lastFetchTime;
-                this.poll.msg.last = data;
+                freq = this.poll.msg.next;
+                this.poll.msg.next = this.newFetchRequest();
+                freq.ticks(this.poll.lastFetchTime);
+                this.poll.msg.last = freq;
               }
-              ($.post("/_/poll/" + (heartbeat ? 'p' : 'f') + "/?t=" + (smio.Util.DateTime.ticks()), "" + (JSON.stringify(data)), (__bind(function(m, t, x) {
+              return ($.post("/_/poll/" + (heartbeat ? 'p' : 'f') + "/?t=" + (smio.Util.DateTime.ticks()), JSON.stringify(freq.msg), (__bind(function(m, t, x) {
                 return this.onMessage(m, t, x);
               }, this)), 'text')).error(__bind(function(x, t, e) {
                 return this.onError(x, t, e);
               }, this));
-              if (!heartbeat) {
-                return this.poll.lastFetchTime = smio.Util.DateTime.utcTicks();
-              }
             }
           }, this)
         };
@@ -104,6 +98,11 @@
       } else if (this.poll) {
         return this.poll.send(false, true);
       }
+    };
+    Socket.prototype.newFetchRequest = function(msg, funcs) {
+      return new smio.FetchRequestMessage(msg, smio.Util.Object.mergeDefaults(funcs, {
+        url: ["/"]
+      }));
     };
     Socket.prototype.onError = function(xhr, textStatus, error, url) {
       if (!this.poll) {
@@ -133,13 +132,14 @@
         this.offline = 0;
         $('#smio_offline').hide();
         if (this.socket) {
-          return this.socket.send(JSON.stringify(this.initialFullFetch));
+          return this.socket.send(JSON.stringify(this.newFetchRequest().msg));
         }
       }
     };
     Socket.prototype.onMessage = function(msg, textStatus, xhr) {
-      var data, err;
+      var data, err, fresp;
       this.onOnline();
+      alert(msg);
       data = null;
       if (msg === 'smoonocookie') {
         this.socket.disconnect();
@@ -167,8 +167,9 @@
         }
       }
       if (data) {
+        fresp = new smio.FetchResponseMessage(data);
         if (this.poll) {
-          this.poll.lastMessageTime = smio.Util.DateTime.utcTicks();
+          this.poll.lastFetchTime = data.t;
         }
       }
       if (this.poll) {

@@ -4,7 +4,7 @@
   smio.Client = (function() {
     function Client() {
       var cookie;
-      this.socket = new smio.Socket(this, true);
+      this.socket = new smio.Socket(this, false);
       this.sleepy = false;
       $('#smio_offline').text(smio.resources.smoothio.connect);
       cookie = $.cookie('smoo');

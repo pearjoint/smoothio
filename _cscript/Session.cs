@@ -1,4 +1,8 @@
 
+require './Site'
+require './shared/FetchRequestMessage'
+require './shared/FetchResponseMessage'
+require './shared/Util'
 _ = require 'underscore'
 
 smio = global.smoothio
@@ -17,19 +21,22 @@ class smio.Session
 		@inst = @server.inst
 
 	handleFetch: (rc, fr, finish) ->
-		smio.logit JSON.stringify fr
-		fm =
-			e: []
+		isSocket = rc is null
+		fresp = new smio.FetchResponseMessage()
 		if not fr
 			fr = rc.postData
 		if _.isString fr
 			try
 				fr = JSON.parse fr
 			catch err
-				fm.e.push @inst.formatError err
+				fresp.errors err
 		if fr and not _.isString fr
-			x = ""
-		finish fm
+			freq = new smio.FetchRequestMessage fr
+			site = new smio.Site @, freq.url(), rc
+			fresp.controls site.getControlUpdates freq.ticks()
+			if not isSocket
+				fresp.ticks smio.Util.DateTime.utcTicks()
+		finish fresp.msg
 
 	onEnd: ->
 

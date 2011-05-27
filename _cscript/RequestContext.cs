@@ -25,6 +25,7 @@ class smio.RequestContext
 		@postData = null
 		@smioCookie = smio.RequestContext.parseSmioCookie @cookies = smio.Util.Server.parseCookies @httpRequest.headers['cookie']
 		if @httpRequest.method is 'POST'
+			@postData = ''
 			@httpRequest.on 'end', () =>
 				@handleRequest()
 			@httpRequest.on 'data', (data) =>

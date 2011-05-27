@@ -3,7 +3,7 @@ smio = global.smoothio
 class smio.Client
 
 	constructor: ->
-		@socket = new smio.Socket @, true
+		@socket = new smio.Socket @, false
 		@sleepy = false
 		$('#smio_offline').text smio.resources.smoothio.connect
 		cookie = $.cookie 'smoo'

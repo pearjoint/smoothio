@@ -178,20 +178,30 @@ function compileStylusSheets(dirPath, outDirPath) {
 	}
 }
 
-function mergeFiles(ext, outFilePath, dirPaths, minify, first) {
-	var outc = '', tmp;
+function mergeFiles(ext, outFilePath, dirPaths, minify, sorted) {
+	var outc = '', allPaths = {}, fn = function(filePath) {
+		outc += ('/** ' + filePath + ' **/\n' + node_fs.readFileSync(filePath, 'utf-8') + '\n');
+	};
 	if (!dirPaths)
 		dirPaths = ['server/pub'];
-	for (var i = 0, l = dirPaths.length; i < l; i++)
+	for (var i = 0, l = dirPaths.length; i < l; i++) {
+		if (sorted)
+			allPaths[dirPaths[i]] = [];
 		smio.walkDir(dirPaths[i], null, function(filePath, fileName) {
-			if ((filePath != outFilePath) && (filePath.lastIndexOf(ext) == (filePath.length - ext.length))) {
-				tmp = ('/** ' + filePath + ' **/\n' + node_fs.readFileSync(filePath, 'utf-8') + '\n');
-				if (first && (fileName.toLowerCase() == first.toLowerCase()))
-					outc = tmp + outc;
+			var lastPos;
+			if ((filePath != outFilePath) && ((lastPos = filePath.lastIndexOf(ext)) == (filePath.length - ext.length)))
+				if (sorted)
+					allPaths[dirPaths[i]].push(filePath.substr(0, lastPos).substr(dirPaths[i].length + 1));
 				else
-					outc += tmp;
-			}
+					fn(filePath);
 		}, null, false, null, false, null, true);
+		if (sorted)
+			allPaths[dirPaths[i]] = allPaths[dirPaths[i]].sort();
+	}
+	if (sorted)
+		for (var dirPath in allPaths)
+			for (var i = 0, l = allPaths[dirPath].length; i < l; i++)
+				fn(node_path.join(dirPath, allPaths[dirPath][i] + ext));
 	if (outc) {
 		if (minify)
 			if (ext == '.css')
@@ -308,7 +318,7 @@ function startSmoothio() {
 		if ((smio.inst = new smio.Instance()) && ((returnCode = smio.inst.start()) < 0)) {
 			smio.logit('Merging client scripts and style sheets...');
 			mergeFiles('.css', 'server/pub/_merged/_smoothio.css', ['server/pub/_styles', 'server/pub/_packs'], smio.inst.config.smoothio.minify);
-			mergeFiles('.js', 'server/pub/_merged/_smoothio.js', ['../_core/scripts', 'server/pub/_scripts', 'server/pub/_packs'], smio.inst.config.smoothio.minify, 'jquery.js');
+			mergeFiles('.js', 'server/pub/_merged/_smoothio.js', ['../_core/scripts', 'server/pub/_scripts', 'server/pub/_packs'], smio.inst.config.smoothio.minify, true);
 			compileClientResources(['../_core/res/client', '../_core/packs'], 'server/pub/_scripts', smio.inst.config.smoothio.minify, smio.inst.autoRestart);
 			if (smio.inst.autoRestart) {
 				smio.walkDir('../_core/packs', null, watchSelective);
