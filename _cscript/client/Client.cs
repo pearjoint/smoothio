@@ -28,7 +28,7 @@ class smio.Client
 			else
 				@allControls[''] = ctl = new smio['Packs_' + ctlDesc._] @, smio.Util.Object.mergeDefaults ctlDesc, id: 'sm'
 				ctl.init()
-				ctl.renderHtml @pageBody
+				ctl.renderHtml $('#smio_main')
 				ctl.onLoad()
 		for id, ctlDesc of controlDescs
 			if id and (ctl = @allControls[id])

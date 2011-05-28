@@ -48,10 +48,6 @@
           return this.onSocketReconnecting(delay, attempts);
         }, this));
       } else {
-        this.client.pageBody.ajaxError(function(evt, xhr, cfg, err) {
-          alert('ajaxerr');
-          return true;
-        });
         this.poll = {
           busy: false,
           msg: {
@@ -111,7 +107,7 @@
         url: ["/"]
       }));
     };
-    Socket.prototype.oldErr = function(xhr, textStatus, error, url) {
+    Socket.prototype.onError = function(xhr, textStatus, error, url) {
       if (!this.poll) {
         return alert(JSON.stringify(xhr));
       } else {
@@ -128,10 +124,6 @@
         return this.poll.busy = false;
       }
     };
-    Socket.prototype.onError = function(xhr, textStatus, error, url) {
-      alert('moreerr');
-      return true;
-    };
     Socket.prototype.onOffline = function() {
       this.offline++;
       if (this.offline === 2) {
@@ -143,10 +135,9 @@
         this.offline = 0;
         $('#smio_offline').hide();
         if (this.socket) {
-          this.socket.send(JSON.stringify(this.newFetchRequest().msg));
+          return this.socket.send(JSON.stringify(this.newFetchRequest().msg));
         }
       }
-      return this.socket = new smio.Socket(this, false);
     };
     Socket.prototype.onMessage = function(msg, textStatus, xhr) {
       var cfg, ctls, data, err, fresp;

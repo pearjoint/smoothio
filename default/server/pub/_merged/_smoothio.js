@@ -12689,7 +12689,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
             id: 'sm'
           }));
           ctl.init();
-          ctl.renderHtml(this.pageBody);
+          ctl.renderHtml($('#smio_main'));
           ctl.onLoad();
         }
       }
@@ -12755,10 +12755,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           return this.onSocketReconnecting(delay, attempts);
         }, this));
       } else {
-        this.client.pageBody.ajaxError(function(evt, xhr, cfg, err) {
-          alert('ajaxerr');
-          return true;
-        });
         this.poll = {
           busy: false,
           msg: {
@@ -12818,7 +12814,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         url: ["/"]
       }));
     };
-    Socket.prototype.oldErr = function(xhr, textStatus, error, url) {
+    Socket.prototype.onError = function(xhr, textStatus, error, url) {
       if (!this.poll) {
         return alert(JSON.stringify(xhr));
       } else {
@@ -12835,10 +12831,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         return this.poll.busy = false;
       }
     };
-    Socket.prototype.onError = function(xhr, textStatus, error, url) {
-      alert('moreerr');
-      return true;
-    };
     Socket.prototype.onOffline = function() {
       this.offline++;
       if (this.offline === 2) {
@@ -12850,10 +12842,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         this.offline = 0;
         $('#smio_offline').hide();
         if (this.socket) {
-          this.socket.send(JSON.stringify(this.newFetchRequest().msg));
+          return this.socket.send(JSON.stringify(this.newFetchRequest().msg));
         }
       }
-      return this.socket = new smio.Socket(this, false);
     };
     Socket.prototype.onMessage = function(msg, textStatus, xhr) {
       var cfg, ctls, data, err, fresp;

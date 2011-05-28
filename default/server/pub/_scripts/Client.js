@@ -39,7 +39,7 @@
             id: 'sm'
           }));
           ctl.init();
-          ctl.renderHtml(this.pageBody);
+          ctl.renderHtml($('#smio_main'));
           ctl.onLoad();
         }
       }

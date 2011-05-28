@@ -19,9 +19,6 @@ class smio.Socket
 			@socket.on 'reconnect_failed', => @onSocketReconnectFailed()
 			@socket.on 'reconnecting', (delay, attempts) => @onSocketReconnecting delay, attempts
 		else
-			@client.pageBody.ajaxError (evt, xhr, cfg, err) ->
-				alert 'ajaxerr'
-				true
 			@poll =
 				busy: false
 				msg:
@@ -63,7 +60,7 @@ class smio.Socket
 	newFetchRequest: (msg, funcs) ->
 		new smio.FetchRequestMessage msg, smio.Util.Object.mergeDefaults funcs, url: ["/"]
 
-	oldErr: (xhr, textStatus, error, url) ->
+	onError: (xhr, textStatus, error, url) ->
 		if not @poll
 			alert JSON.stringify xhr
 		else
@@ -77,10 +74,6 @@ class smio.Socket
 					alert "#{textStatus}\n\n#{JSON.stringify error}\n\n#{JSON.stringify xhr}"
 			@poll.busy = false
 
-	onError: (xhr, textStatus, error, url) ->
-		alert 'moreerr'
-		true
-
 	onOffline: ->
 		@offline++
 		if @offline is 2
@@ -92,7 +85,6 @@ class smio.Socket
 			$('#smio_offline').hide()
 			if @socket
 				@socket.send JSON.stringify @newFetchRequest().msg
-		@socket = new smio.Socket @, false
 
 	onMessage: (msg, textStatus, xhr) ->
 		@onOnline()
