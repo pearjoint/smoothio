@@ -1,3 +1,42 @@
+
+
+
+CASE 1:
+
+sites:	1	/team/projects/one
+		2	/team/projects/two
+		3	/team/projects/two/subsite
+		4	/team/projects/three
+
+url:
+		0	/
+		0	/team/
+		0	/team/projects/
+		0	/team/projects/four
+		1	/team/projects/one/foo/bar.html
+		4	/team/projects/three/
+		3	/team/projects/two/subsite
+		2	/team/projects/two/bla
+
+CASE 2:
+
+sites:	1	/team/
+		2	/team/projects
+		3	/team/projects/one
+
+url:
+		0	/
+		0	/whatever/bla/foo
+		1	/team/
+		1	/team/blob/
+		2	/team/projects/
+		2	/team/projects/four
+		3	/team/projects/one/foo/bar.html
+		2	/team/projects/three/
+		2	/team/projects/two/subsite
+		2	/team/projects/two/bla
+
+
 REQUEST PROTOCOL
 t: long
 	last server ticks ONLY poll

@@ -65,9 +65,9 @@ smio.compileCoffeeScripts = function(dirOrFilePath, srvOutDirPath, cltOutDirPath
 					else if (!ignore)
 						fileContentClient += (lines[j] + '\n');
 			}
-			if (srvOutDirPath && (javaScript = coffee.compile(fileContentServer)))
+			if (srvOutDirPath && fileContentServer && (fileContentServer = _.trim(fileContentServer)) && (javaScript = coffee.compile(fileContentServer)))
 				node_fs.writeFileSync(node_path.join(srvOutDirPath, files[i].substr(0, files[i].lastIndexOf('.')) + '.js'), javaScript);
-			if (doClient && cltOutDirPath && (javaScript = coffee.compile(fileContentClient)))
+			if (doClient && cltOutDirPath && fileContentClient && (fileContentClient = _.trim(fileContentClient)) && (javaScript = coffee.compile(fileContentClient)))
 				node_fs.writeFileSync(node_path.join(cltOutDirPath, files[i].substr(0, files[i].lastIndexOf('.')) + '.js'), javaScript);
 		}
 	}

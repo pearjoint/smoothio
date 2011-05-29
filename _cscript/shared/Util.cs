@@ -11,6 +11,10 @@ smio = global.smoothio
 
 class smio.Util
 	@Array:
+		add: (arr, val) ->
+			copy = _.clone arr
+			copy.push val
+			copy
 		ensurePos: (arr, val, pos) ->
 			if pos <= arr.length and (index = arr.indexOf val) isnt pos
 				if index >= 0
@@ -50,6 +54,38 @@ class smio.Util
 			if not dt
 				dt = new Date()
 			Date.UTC dt.getFullYear(), dt.getMonth(), dt.getDate(), dt.getHours(), dt.getMinutes(), dt.getSeconds(), dt.getMilliseconds()
+
+	@Runtime:
+		parallel: (funs, finish) ->
+			len = funs.length
+			done = 0
+			checkDone = ->
+				if (++done) is len
+					finish()
+			for fn in funs
+				fn checkDone
+		promise: (obj) ->
+			if obj['__smioprom']
+				obj
+			else
+				p =
+					__smioprom:
+						ref: obj
+						chain: []
+				p.__smioprom.run = (cb) ->
+					prom = p.__smioprom
+					if prom.chain.length
+						chain[0] (err0, ret0) ->
+							chain[1] (err1, ret1) ->
+								chain[2] (err2, ret2) ->
+									cb err2, ret2
+						prom.chain[0] cb
+				for k, v of obj
+					if _.isFunction v
+						p[k] = ->
+							p.__smioprom.chain.push [k, _.toArray arguments]
+							p
+				p
 
 	@Number:
 		randomInt: (max) ->

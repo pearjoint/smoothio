@@ -13132,6 +13132,12 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio.Util = (function() {
     function Util() {}
     Util.Array = {
+      add: function(arr, val) {
+        var copy;
+        copy = _.clone(arr);
+        copy.push(val);
+        return copy;
+      },
       ensurePos: function(arr, val, pos) {
         var i, index, _ref, _ref2;
         if (pos <= arr.length && (index = arr.indexOf(val)) !== pos) {
@@ -13197,6 +13203,61 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           dt = new Date();
         }
         return Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate(), dt.getHours(), dt.getMinutes(), dt.getSeconds(), dt.getMilliseconds());
+      }
+    };
+    Util.Runtime = {
+      parallel: function(funs, finish) {
+        var checkDone, done, fn, len, _i, _len, _results;
+        len = funs.length;
+        done = 0;
+        checkDone = function() {
+          if ((++done) === len) {
+            return finish();
+          }
+        };
+        _results = [];
+        for (_i = 0, _len = funs.length; _i < _len; _i++) {
+          fn = funs[_i];
+          _results.push(fn(checkDone));
+        }
+        return _results;
+      },
+      promise: function(obj) {
+        var k, p, v;
+        if (obj['__smioprom']) {
+          return obj;
+        } else {
+          p = {
+            __smioprom: {
+              ref: obj,
+              chain: []
+            }
+          };
+          p.__smioprom.run = function(cb) {
+            var prom;
+            prom = p.__smioprom;
+            if (prom.chain.length) {
+              chain[0](function(err0, ret0) {
+                return chain[1](function(err1, ret1) {
+                  return chain[2](function(err2, ret2) {
+                    return cb(err2, ret2);
+                  });
+                });
+              });
+              return prom.chain[0](cb);
+            }
+          };
+          for (k in obj) {
+            v = obj[k];
+            if (_.isFunction(v)) {
+              p[k] = function() {
+                p.__smioprom.chain.push([k, _.toArray(arguments)]);
+                return p;
+              };
+            }
+          }
+          return p;
+        }
       }
     };
     Util.Number = {

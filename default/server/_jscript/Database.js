@@ -12,7 +12,7 @@
       this.title = title;
       this.server = server;
       this.db = new mongodb.Db(this.name, this.mongo, {
-        "strict": true,
+        "strict": false,
         "native_parser": false
       });
       if (this.server != null) {
@@ -35,6 +35,14 @@
         }, this));
       }
       return this.db;
+    };
+    Database.prototype.withCollection = function(name, cb) {
+      return this.connect(function(err, db) {
+        if (err) {
+          return cb(err);
+        }
+        return db.createCollection(name, cb);
+      });
     };
     return Database;
   })();

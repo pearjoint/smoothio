@@ -5,7 +5,7 @@ smio = global.smoothio
 
 class smio.Database
 	constructor: (@inst, @mongo, @name, @title, @server, interval) ->
-		@db = new mongodb.Db @name, @mongo, "strict": true, "native_parser": false
+		@db = new mongodb.Db @name, @mongo, "strict": false, "native_parser": false
 		if @server?
 			@server.db = @db
 		if interval
@@ -18,4 +18,9 @@ class smio.Database
 			@db.open (err, db) =>
 				func err, db
 		@db
+
+	withCollection: (name, cb) ->
+		@connect (err, db) ->
+			return cb err if err
+			db.createCollection name, cb
 

@@ -47,12 +47,19 @@
             interval_fetch: 16000
           });
         }
-        fresp.controls(site.getControlUpdates(freq.ticks()));
-        if (!isSocket) {
-          fresp.ticks(smio.Util.DateTime.utcTicks());
-        }
+        return site.getControlUpdates(freq.ticks(), function(err, ctl) {
+          if (err) {
+            fresp.errors(err);
+          }
+          if (ctl) {
+            fresp.controls(ctl);
+          }
+          if (!isSocket) {
+            fresp.ticks(smio.Util.DateTime.utcTicks());
+          }
+          return finish(fresp.msg);
+        });
       }
-      return finish(fresp.msg);
     };
     Session.prototype.onEnd = function() {};
     Session.prototype.onInit = function() {};

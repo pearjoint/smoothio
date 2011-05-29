@@ -35,10 +35,14 @@ class smio.Session
 			site = new smio.Site @, freq.url(), rc
 			if freq.settings()
 				fresp.settings interval_heartbeat: 4500, interval_fetch: 16000
-			fresp.controls site.getControlUpdates freq.ticks()
-			if not isSocket
-				fresp.ticks smio.Util.DateTime.utcTicks()
-		finish fresp.msg
+			site.getControlUpdates freq.ticks(), (err, ctl) ->
+				if err
+					fresp.errors err
+				if ctl
+					fresp.controls ctl
+				if not isSocket
+					fresp.ticks smio.Util.DateTime.utcTicks()
+				finish fresp.msg
 
 	onEnd: ->
 
