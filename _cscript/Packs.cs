@@ -42,7 +42,8 @@ class smio.Pack
 					outDirPathServer = node_path.join "server/_packs/#{@packName}", (relPath.substr 0, relPath.lastIndexOf '/')
 					if (_.isEndsWith fname, '.styl') and stylContent = smio.Util.FileSystem.readTextFile fpath
 						lastFilePath = fpath
-						stylus(stylContent).set('filename', fpath).render (err, css) =>
+						mixinPath = node_path.resolve '../_core/stylus/include/mixin'
+						stylus("@import '#{mixinPath}'\n#{stylContent}").set('filename', fpath).render (err, css) =>
 							if err
 								err['ml_error_filepath'] = fpath
 								smio.logit (@inst.r 'log_pack_error_compile', fpath, @inst.formatError err), 'packs.' + @packName

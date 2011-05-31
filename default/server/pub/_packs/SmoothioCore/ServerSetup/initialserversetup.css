@@ -1,0 +1,30 @@
+div.smio-setup {
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  right: 10%;
+  -moz-box-shadow: 0px 8px 48px #808080;
+  -webkit-box-shadow: 0px 8px 48px #808080;
+  box-shadow: 0px 8px 48px #808080;
+  line-height: 1.25;
+  overflow: hidden;
+}
+.smio-setup-outer {
+  padding: 1em;
+  background: rgba(255,255,255,0.85);
+}
+.smio-setup-inner {
+  padding: 1em;
+  background: rgba(255,255,255,0.95);
+  -moz-box-shadow: 0 0.062em 0.3em #808080 inset;
+  -webkit-box-shadow: 0 0.062em 0.3em #808080 inset;
+  box-shadow: 0 0.062em 0.3em #808080 inset;
+}
+.smio-setup-header {
+  font-size: 1.8em;
+  color: #303030;
+}
+.smio-setup-header-desc {
+  color: #808080;
+  font-size: 1.25em;
+}

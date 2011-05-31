@@ -12964,6 +12964,26 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         } else {
           return "!!CONTROL_NOT_FOUND::" + className + "!!";
         }
+      },
+      "r": function(ctl, name) {
+        var i, parts, resSet, resSets, ret, _ref;
+        ret = '';
+        if ((resSets = smio.resources)) {
+          parts = ctl.baseName.split('_');
+          for (i = _ref = parts.length - 1; _ref <= 0 ? i <= 0 : i >= 0; _ref <= 0 ? i++ : i--) {
+            if ((resSet = resSets[parts.slice(0, (i + 1) || 9e9).join('_')]) && (ret = resSet[name])) {
+              break;
+            }
+          }
+          if (!ret) {
+            ret = smio.resources.smoothio[name];
+          }
+        }
+        if (ret) {
+          return ret;
+        } else {
+          return name;
+        }
       }
     };
     function Control(client, args, baseName, className) {
@@ -12994,12 +13014,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         _results.push(ctl.onLoad());
       }
       return _results;
-    };
-    Control.prototype.renderHtml = function($el) {
-      if ($el) {
-        $el.html(this._html);
-      }
-      return this._html;
     };
     Control.prototype.renderTag = function(name, sarg, jarg) {
       var renderer;
@@ -13461,7 +13475,17 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         parts = [];
         parts.push("<div class=\"smio-setup\" id=\"");
         parts.push(this.id());
-        parts.push("\">\n\t<div class=\"smio-setup-header\">Set up a new smoothio server:</div>\n\t<div class=\"smio-setup-header-desc\">Let us explain...</div>\n\t<div class=\"smio-setup-usersetup\">\n\t\tset up admin user...\n\t</div>\n\t<div class=\"smio-setup-templates\">\n\t\tselect template...\n\t</div>\n\t<div class=\"smio-setup-buttonarea\">\n\t\t<a disabled=\"disabled\" class=\"smio-setup-button\">Setup</a>\n\t</div>\n</div>\n");
+        parts.push("\">\n\t<div class=\"smio-setup-outer\">\n\t\t<div class=\"smio-setup-header\">");
+        parts.push(this.renderTag("r", "title", null));
+        parts.push("</div>\n\t\t<div class=\"smio-setup-header-desc\">");
+        parts.push(this.renderTag("r", "desc", null));
+        parts.push("</div>\n\t</div>\n\t<div class=\"smio-setup-inner\">\n\t\t<div class=\"smio-setup-usersetup\">\n\t\t\t");
+        parts.push(this.renderTag("r", "usersetup", null));
+        parts.push("\n\t\t</div>\n\t\t<div class=\"smio-setup-templates\">\n\t\t\t");
+        parts.push(this.renderTag("r", "templateselection", null));
+        parts.push("\n\t\t</div>\n\t</div>\n\t<div class=\"smio-setup-outer\">\n\t\t<div class=\"smio-setup-buttonarea\">\n\t\t\t<a disabled=\"disabled\" class=\"smio-setup-button\">");
+        parts.push(this.renderTag("r", "button", null));
+        parts.push("</a>\n\t\t</div>\n\t</div>\n</div>\n\n");
         this._html = parts.join('');
       }
       if ($el) {

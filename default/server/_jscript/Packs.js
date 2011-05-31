@@ -58,12 +58,13 @@
             }
           }
           smio.walkDir(this.packPath, null, __bind(function(fpath, fname, relPath) {
-            var args, ccsContent, outDirPathClient, outDirPathServer, pattern, stylContent, tmplContent;
+            var args, ccsContent, mixinPath, outDirPathClient, outDirPathServer, pattern, stylContent, tmplContent;
             outDirPathClient = node_path.join("server/pub/_packs/" + this.packName, relPath.substr(0, relPath.lastIndexOf('/')));
             outDirPathServer = node_path.join("server/_packs/" + this.packName, relPath.substr(0, relPath.lastIndexOf('/')));
             if ((_.isEndsWith(fname, '.styl')) && (stylContent = smio.Util.FileSystem.readTextFile(fpath))) {
               lastFilePath = fpath;
-              return stylus(stylContent).set('filename', fpath).render(__bind(function(err, css) {
+              mixinPath = node_path.resolve('../_core/stylus/include/mixin');
+              return stylus("@import '" + mixinPath + "'\n" + stylContent).set('filename', fpath).render(__bind(function(err, css) {
                 if (err) {
                   err['ml_error_filepath'] = fpath;
                   return smio.logit(this.inst.r('log_pack_error_compile', fpath, this.inst.formatError(err)), 'packs.' + this.packName);

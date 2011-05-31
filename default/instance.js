@@ -319,7 +319,7 @@ function startSmoothio() {
 			smio.logit('Merging client scripts and style sheets...');
 			mergeFiles('.css', 'server/pub/_merged/_smoothio.css', ['server/pub/_styles', 'server/pub/_packs'], smio.inst.config.smoothio.minify);
 			mergeFiles('.js', 'server/pub/_merged/_smoothio.js', ['../_core/scripts', 'server/pub/_scripts', 'server/pub/_packs'], smio.inst.config.smoothio.minify, true);
-			compileClientResources(['../_core/res/client', '../_core/packs'], 'server/pub/_scripts', smio.inst.config.smoothio.minify, smio.inst.autoRestart);
+			compileClientResources(['../_core/res/client', '../_core/packs'], 'server/pub/_merged', smio.inst.config.smoothio.minify, smio.inst.autoRestart);
 			if (smio.inst.autoRestart) {
 				smio.walkDir('../_core/packs', null, watchSelective);
 				smio.walkDir('packs', null, watchSelective);

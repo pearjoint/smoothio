@@ -23,7 +23,17 @@
         parts = [];
         parts.push("<div class=\"smio-setup\" id=\"");
         parts.push(this.id());
-        parts.push("\">\n\t<div class=\"smio-setup-header\">Set up a new smoothio server:</div>\n\t<div class=\"smio-setup-header-desc\">Let us explain...</div>\n\t<div class=\"smio-setup-usersetup\">\n\t\tset up admin user...\n\t</div>\n\t<div class=\"smio-setup-templates\">\n\t\tselect template...\n\t</div>\n\t<div class=\"smio-setup-buttonarea\">\n\t\t<a disabled=\"disabled\" class=\"smio-setup-button\">Setup</a>\n\t</div>\n</div>\n");
+        parts.push("\">\n\t<div class=\"smio-setup-outer\">\n\t\t<div class=\"smio-setup-header\">");
+        parts.push(this.renderTag("r", "title", null));
+        parts.push("</div>\n\t\t<div class=\"smio-setup-header-desc\">");
+        parts.push(this.renderTag("r", "desc", null));
+        parts.push("</div>\n\t</div>\n\t<div class=\"smio-setup-inner\">\n\t\t<div class=\"smio-setup-usersetup\">\n\t\t\t");
+        parts.push(this.renderTag("r", "usersetup", null));
+        parts.push("\n\t\t</div>\n\t\t<div class=\"smio-setup-templates\">\n\t\t\t");
+        parts.push(this.renderTag("r", "templateselection", null));
+        parts.push("\n\t\t</div>\n\t</div>\n\t<div class=\"smio-setup-outer\">\n\t\t<div class=\"smio-setup-buttonarea\">\n\t\t\t<a disabled=\"disabled\" class=\"smio-setup-button\">");
+        parts.push(this.renderTag("r", "button", null));
+        parts.push("</a>\n\t\t</div>\n\t</div>\n</div>\n\n");
         this._html = parts.join('');
       }
       if ($el) {

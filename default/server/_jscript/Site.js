@@ -23,14 +23,14 @@
       this.url = this.url.toLowerCase();
       this.uri = node_url.parse(this.url);
     }
-    Site.prototype.checkExists = function(cb) {
+    Site.prototype.checkExists = function(cb_err_hasSites) {
       if (this.doc) {
-        return cb(null, true);
+        return cb_err_hasSites(null, true);
       } else {
         return this.dbServer.withCollection("_smio_sites", __bind(function(err, col) {
           var makeQuery;
           if (err) {
-            return cb(err);
+            return cb_err_hasSites(err);
           }
           makeQuery = function(url) {
             return function() {
@@ -41,16 +41,16 @@
             $where: makeQuery(this.url)
           })).toArray(__bind(function(err, results) {
             if (err) {
-              return cb(err);
+              return cb_err_hasSites(err);
             }
             if (results && results.length) {
               this.doc = (_.sortBy(results, function(doc) {
                 return -doc._smio_url.length;
               }))[0];
-              return cb(null, true);
+              return cb_err_hasSites(null, true);
             } else {
               return col.find().nextObject(__bind(function(err, doc) {
-                return cb(err, doc ? true : false);
+                return cb_err_hasSites(err, doc ? true : false);
               }, this));
             }
           }, this));

@@ -111,6 +111,16 @@ class smio.Packs_#{className} extends smio.Control
 				ctl.controls[args.id].renderHtml()
 			else
 				"!!CONTROL_NOT_FOUND::#{className}!!"
+		"r": (ctl, name) ->
+			ret = ''
+			if (resSets = smio.resources)
+				parts = ctl.baseName.split '_'
+				for i in [(parts.length - 1)..0]
+					if (resSet = resSets[parts[0..i].join '_']) and (ret = resSet[name])
+						break
+				if not ret
+					ret = smio.resources.smoothio[name]
+			if ret then ret else name
 
 	constructor: (@client, args, baseName, className) ->
 		@args = args
@@ -133,11 +143,6 @@ class smio.Packs_#{className} extends smio.Control
 		@el = $('#' + @ctlID)
 		for id, ctl of @controls
 			ctl.onLoad()
-
-	renderHtml: ($el) ->
-		if $el
-			$el.html @_html
-		@_html
 
 	renderTag: (name, sarg, jarg) ->
 		renderer = smio.Control.tagRenderers[name]

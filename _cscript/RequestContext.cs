@@ -57,7 +57,7 @@ class smio.RequestContext
 						if (cfgKey = @uri.query['config'])
 							if cfgKey is '_res.js'
 								respHeaders['Content-Type'] = 'text/javascript'
-								@serveFile '_scripts/_res.js', respHeaders
+								@serveFile '_merged/_res.js', respHeaders
 							else if (cfgVal = '' + smio.Util.Object.select @server.inst.config, cfgKey) and (fname = @uri.query[cfgVal])
 								if (ctype = @uri.query['type'])
 									respHeaders['Content-Type'] = ctype

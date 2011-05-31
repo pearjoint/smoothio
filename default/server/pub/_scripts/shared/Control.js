@@ -16,6 +16,26 @@
         } else {
           return "!!CONTROL_NOT_FOUND::" + className + "!!";
         }
+      },
+      "r": function(ctl, name) {
+        var i, parts, resSet, resSets, ret, _ref;
+        ret = '';
+        if ((resSets = smio.resources)) {
+          parts = ctl.baseName.split('_');
+          for (i = _ref = parts.length - 1; _ref <= 0 ? i <= 0 : i >= 0; _ref <= 0 ? i++ : i--) {
+            if ((resSet = resSets[parts.slice(0, (i + 1) || 9e9).join('_')]) && (ret = resSet[name])) {
+              break;
+            }
+          }
+          if (!ret) {
+            ret = smio.resources.smoothio[name];
+          }
+        }
+        if (ret) {
+          return ret;
+        } else {
+          return name;
+        }
       }
     };
     function Control(client, args, baseName, className) {
@@ -46,12 +66,6 @@
         _results.push(ctl.onLoad());
       }
       return _results;
-    };
-    Control.prototype.renderHtml = function($el) {
-      if ($el) {
-        $el.html(this._html);
-      }
-      return this._html;
     };
     Control.prototype.renderTag = function(name, sarg, jarg) {
       var renderer;

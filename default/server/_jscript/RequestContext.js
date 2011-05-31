@@ -78,7 +78,7 @@
               if ((cfgKey = this.uri.query['config'])) {
                 if (cfgKey === '_res.js') {
                   respHeaders['Content-Type'] = 'text/javascript';
-                  this.serveFile('_scripts/_res.js', respHeaders);
+                  this.serveFile('_merged/_res.js', respHeaders);
                 } else if ((cfgVal = '' + smio.Util.Object.select(this.server.inst.config, cfgKey)) && (fname = this.uri.query[cfgVal])) {
                   if ((ctype = this.uri.query['type'])) {
                     respHeaders['Content-Type'] = ctype;
