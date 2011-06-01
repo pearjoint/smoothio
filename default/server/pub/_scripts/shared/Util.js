@@ -93,43 +93,6 @@
           _results.push(fn(checkDone));
         }
         return _results;
-      },
-      promise: function(obj) {
-        var k, p, v;
-        if (obj['__smioprom']) {
-          return obj;
-        } else {
-          p = {
-            __smioprom: {
-              ref: obj,
-              chain: []
-            }
-          };
-          p.__smioprom.run = function(cb) {
-            var prom;
-            prom = p.__smioprom;
-            if (prom.chain.length) {
-              chain[0](function(err0, ret0) {
-                return chain[1](function(err1, ret1) {
-                  return chain[2](function(err2, ret2) {
-                    return cb(err2, ret2);
-                  });
-                });
-              });
-              return prom.chain[0](cb);
-            }
-          };
-          for (k in obj) {
-            v = obj[k];
-            if (_.isFunction(v)) {
-              p[k] = function() {
-                p.__smioprom.chain.push([k, _.toArray(arguments)]);
-                return p;
-              };
-            }
-          }
-          return p;
-        }
       }
     };
     Util.Number = {

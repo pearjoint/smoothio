@@ -4,10 +4,9 @@ node_util = require 'util'
 smio = global.smoothio
 
 class smio.Database
-	constructor: (@inst, @mongo, @name, @title, @server, interval) ->
+
+	constructor: (@inst, @mongo, @name, @title, interval) ->
 		@db = new mongodb.Db @name, @mongo, "strict": false, "native_parser": false
-		if @server?
-			@server.db = @db
 		if interval
 			setTimeout (=> @connect (err, db) => smio.logit (@inst.r (if err then 'log_mongo_error_dbnoconnect' else 'log_mongo_dbconnected'), @title, (if err then @inst.formatError err else '')), 'mongodb.' + @name), interval
 

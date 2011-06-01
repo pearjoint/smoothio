@@ -34,17 +34,23 @@ class smio.Instance
 
 	finalizeStart: () ->
 		lastInterval = 0
-		@mongo = new mongodb.Server @mongoConfig.host, @mongoConfig.port, "autoReconnect": true, "auto_reconnect": true
-		@mongos['admin'] = new smio.Database @, @mongo, 'admin', 'MongoDB Admin', null, lastInterval += 500
-		@mongos['smoothio_shared'] = new smio.Database @, @mongo, 'smoothio_shared', 'smoothio Shared', null, lastInterval += 500
+		@mongo = @getDbServer()
+		@mongos['admin'] = @getDb @mongo, 'admin', 'MongoDB Admin', lastInterval += 500
+		@mongos['smoothio_shared'] = @getDb @mongo, 'smoothio_shared', 'smoothio Shared', lastInterval += 500
 		for sname, scfg of @config.servers
 			if sname? and scfg? and scfg['host']? and scfg['port']? and (not (scfg['disabled'] is true))
 				server = new smio.Server @, sname, scfg.host, scfg.port, 1
 				@servers.push server
-				@mongos["smoothio__#{sname}"] = new smio.Database @, @mongo, "smoothio__#{sname}", "smoothio #{sname}", server, lastInterval += 500
+				@mongos["smoothio__#{sname}"] = @getDb @mongo, "smoothio__#{sname}", "smoothio #{sname}", lastInterval += 500
 
 	formatError: (err) ->
 		smio.Util.Server.formatError err, @config.smoothio.logging.details, @config.smoothio.logging.stack
+
+	getDb: (dbServer, name, title, interval) ->
+		new smio.Database @, dbServer, name, (if title then title else name), interval
+
+	getDbServer: () ->
+		new mongodb.Server @mongoConfig.host, @mongoConfig.port, "autoReconnect": true, "auto_reconnect": true
 
 	getUptime: () ->
 		((new Date).getTime() / 1000) - (@initTime.getTime() / 1000)

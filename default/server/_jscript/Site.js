@@ -14,9 +14,10 @@
       this.server = this.session.server;
       this.doc = null;
       this.inst = this.server.inst;
-      this.dbAdmin = this.inst.mongos['admin'];
-      this.dbServer = this.inst.mongos["smoothio__" + this.server.serverName];
-      this.dbShared = this.inst.mongos['smoothio_shared'];
+      this.mongo = this.inst.getDbServer();
+      this.dbAdmin = this.inst.getDb(this.mongo, 'admin');
+      this.dbServer = this.inst.getDb(this.mongo, "smoothio__" + this.server.serverName);
+      this.dbShared = this.inst.getDb(this.mongo, 'smoothio_shared');
       if (!this.url) {
         this.url = '/';
       }

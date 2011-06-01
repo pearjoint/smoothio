@@ -64,28 +64,6 @@ class smio.Util
 					finish()
 			for fn in funs
 				fn checkDone
-		promise: (obj) ->
-			if obj['__smioprom']
-				obj
-			else
-				p =
-					__smioprom:
-						ref: obj
-						chain: []
-				p.__smioprom.run = (cb) ->
-					prom = p.__smioprom
-					if prom.chain.length
-						chain[0] (err0, ret0) ->
-							chain[1] (err1, ret1) ->
-								chain[2] (err2, ret2) ->
-									cb err2, ret2
-						prom.chain[0] cb
-				for k, v of obj
-					if _.isFunction v
-						p[k] = ->
-							p.__smioprom.chain.push [k, _.toArray arguments]
-							p
-				p
 
 	@Number:
 		randomInt: (max) ->

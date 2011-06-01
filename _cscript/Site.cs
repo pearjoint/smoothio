@@ -11,9 +11,10 @@ class smio.Site
 		@server = @session.server
 		@doc = null
 		@inst = @server.inst
-		@dbAdmin = @inst.mongos['admin']
-		@dbServer = @inst.mongos["smoothio__#{@server.serverName}"]
-		@dbShared = @inst.mongos['smoothio_shared']
+		@mongo = @inst.getDbServer()
+		@dbAdmin = @inst.getDb @mongo, 'admin'
+		@dbServer = @inst.getDb @mongo, "smoothio__#{@server.serverName}"
+		@dbShared = @inst.getDb @mongo, 'smoothio_shared'
 		if not @url
 			@url = '/'
 		@url = @url.toLowerCase()

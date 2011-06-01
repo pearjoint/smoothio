@@ -39,22 +39,28 @@
     Instance.prototype.finalizeStart = function() {
       var lastInterval, scfg, server, sname, _ref, _results;
       lastInterval = 0;
-      this.mongo = new mongodb.Server(this.mongoConfig.host, this.mongoConfig.port, {
-        "autoReconnect": true,
-        "auto_reconnect": true
-      });
-      this.mongos['admin'] = new smio.Database(this, this.mongo, 'admin', 'MongoDB Admin', null, lastInterval += 500);
-      this.mongos['smoothio_shared'] = new smio.Database(this, this.mongo, 'smoothio_shared', 'smoothio Shared', null, lastInterval += 500);
+      this.mongo = this.getDbServer();
+      this.mongos['admin'] = this.getDb(this.mongo, 'admin', 'MongoDB Admin', lastInterval += 500);
+      this.mongos['smoothio_shared'] = this.getDb(this.mongo, 'smoothio_shared', 'smoothio Shared', lastInterval += 500);
       _ref = this.config.servers;
       _results = [];
       for (sname in _ref) {
         scfg = _ref[sname];
-        _results.push((sname != null) && (scfg != null) && (scfg['host'] != null) && (scfg['port'] != null) && (!(scfg['disabled'] === true)) ? (server = new smio.Server(this, sname, scfg.host, scfg.port, 1), this.servers.push(server), this.mongos["smoothio__" + sname] = new smio.Database(this, this.mongo, "smoothio__" + sname, "smoothio " + sname, server, lastInterval += 500)) : void 0);
+        _results.push((sname != null) && (scfg != null) && (scfg['host'] != null) && (scfg['port'] != null) && (!(scfg['disabled'] === true)) ? (server = new smio.Server(this, sname, scfg.host, scfg.port, 1), this.servers.push(server), this.mongos["smoothio__" + sname] = this.getDb(this.mongo, "smoothio__" + sname, "smoothio " + sname, lastInterval += 500)) : void 0);
       }
       return _results;
     };
     Instance.prototype.formatError = function(err) {
       return smio.Util.Server.formatError(err, this.config.smoothio.logging.details, this.config.smoothio.logging.stack);
+    };
+    Instance.prototype.getDb = function(dbServer, name, title, interval) {
+      return new smio.Database(this, dbServer, name, (title ? title : name), interval);
+    };
+    Instance.prototype.getDbServer = function() {
+      return new mongodb.Server(this.mongoConfig.host, this.mongoConfig.port, {
+        "autoReconnect": true,
+        "auto_reconnect": true
+      });
     };
     Instance.prototype.getUptime = function() {
       return ((new Date).getTime() / 1000) - (this.initTime.getTime() / 1000);
