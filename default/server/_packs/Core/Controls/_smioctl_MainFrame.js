@@ -1,6 +1,6 @@
 (function() {
   /*
-  Auto-generated from Core/ServerSetup/initialserversetup.ctl
+  Auto-generated from Core/Controls/MainFrame.ctl
   */  var smio, smoothio;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
@@ -12,11 +12,15 @@
   };
   require('../../../_jscript/Control');
   smio = smoothio = global.smoothio;
-  smio.Packs_Core_ServerSetup_initialserversetup = (function() {
-    __extends(Packs_Core_ServerSetup_initialserversetup, smio.Control);
-    function Packs_Core_ServerSetup_initialserversetup() {
-      Packs_Core_ServerSetup_initialserversetup.__super__.constructor.apply(this, arguments);
+  smio.Packs_Core_Controls_MainFrame = (function() {
+    __extends(Packs_Core_Controls_MainFrame, smio.Control);
+    function Packs_Core_Controls_MainFrame() {
+      Packs_Core_Controls_MainFrame.__super__.constructor.apply(this, arguments);
     }
-    return Packs_Core_ServerSetup_initialserversetup;
+    Packs_Core_Controls_MainFrame.prototype.test = function() {
+      var xy;
+      return xy = "serverside";
+    };
+    return Packs_Core_Controls_MainFrame;
   })();
 }).call(this);

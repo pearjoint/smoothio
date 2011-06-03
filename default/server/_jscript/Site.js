@@ -63,10 +63,10 @@
       if (sinceTicks) {
         return cb(null, {});
       } else {
-        ct = "Core_Controls_mainframe";
+        ct = "Core_Controls_MainFrame";
         return this.checkExists(function(err, serverHasSites) {
           if (!serverHasSites) {
-            ct = "Core_ServerSetup_initialserversetup";
+            ct = "Core_ServerSetup_InitialSiteSetup";
           }
           return cb(err, {
             "": {

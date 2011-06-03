@@ -1,0 +1,1 @@
+../../../node_modules/coffee-script/extras/coffee-script.js

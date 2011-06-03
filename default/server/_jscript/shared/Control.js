@@ -1,7 +1,8 @@
 (function() {
-  var node_util, smio, _;
+  var coffee, node_util, smio, _;
   _ = require('underscore');
   _.mixin(require('underscore.string'));
+  coffee = require('coffee-script');
   node_util = require('util');
   smio = global.smoothio;
   smio.Control = (function() {
@@ -79,15 +80,15 @@
           }
         }
       }
-      coffeeScript = "###\nAuto-generated from " + controlPath + "\n###\n" + "#if server" + "\nrequire '" + (smio.Util.String.times(oneUp, pathParts.length)) + "_jscript/Control'\n" + "#endif" + "\nsmio = smoothio = global.smoothio\nclass smio.Packs_" + className + " extends smio.Control\n" + decls + "\n" + "#if client" + "\n	constructor: (client, parent, args) ->\n		super client, parent, args, " + (JSON.stringify(baseName)) + ", " + (JSON.stringify(className)) + "\n		@init()\n\n	renderHtml: ($el) ->\n		if not @_html\n			parts = []";
+      coffeeScript = "###\nAuto-generated from " + controlPath + "\n###\n" + "#if server" + "\nrequire '" + (smio.Util.String.times(oneUp, pathParts.length)) + "_jscript/Control'\n" + "#endif" + "\nsmio = smoothio = global.smoothio\nclass smio.Packs_" + className + " extends smio.Control\n" + decls + "\n" + "#if client" + "\n	constructor: (client, parent, args) ->\n		super client, parent, args, " + (JSON.stringify(baseName)) + ", " + (JSON.stringify(className)) + "\n		@jsSelf = \"smio.client.allControls['\" + @id() + \"']\"\n		@init()\n\n	renderHtml: ($el) ->\n		if not @_html\n			__o = []";
       _ref3 = [-1, 3, 3, smio.Util.String.times], ind = _ref3[0], indent = _ref3[1], rind = _ref3[2], stimes = _ref3[3];
       for (_k = 0, _len3 = renderParts.length; _k < _len3; _k++) {
         rp = renderParts[_k];
         if (_.isString(rp)) {
-          coffeeScript += "\n" + (stimes('\t', rind)) + "parts.push " + (JSON.stringify(rp));
+          coffeeScript += "\n" + (stimes('\t', rind)) + "__o.push " + (JSON.stringify(rp));
         } else if ((_.isArray(rp)) && rp.length && rp.length > 1) {
           if (rp[0] === '=') {
-            coffeeScript += "\n" + (stimes('\t', rind)) + "parts.push " + rp[1];
+            coffeeScript += "\n" + (stimes('\t', rind)) + "__o.push " + rp[1];
           } else if (rp[0] === '_') {
             lines = rp[1].split('\n');
             rp[1] = '';
@@ -132,11 +133,11 @@
               jarg = sarg.substr(pos);
               sarg = _.trim(sarg.substr(0, pos));
             }
-            coffeeScript += "\n" + (stimes('\t', rind)) + "parts.push @renderTag " + (JSON.stringify(rp[0])) + ", " + (JSON.stringify(sarg)) + ", " + jarg;
+            coffeeScript += "\n" + (stimes('\t', rind)) + "__o.push @renderTag " + (JSON.stringify(rp[0])) + ", " + (JSON.stringify(sarg)) + ", " + jarg;
           }
         }
       }
-      coffeeScript += "\n" + (stimes('\t', indent)) + "@_html = parts.join ''\n" + (stimes('\t', indent - 1)) + "if $el\n" + (stimes('\t', indent)) + "$el.html @_html\n" + (stimes('\t', indent - 1)) + "@_html\n" + "#endif" + "\n";
+      coffeeScript += "\n" + (stimes('\t', indent)) + "@_html = __o.join ''\n" + (stimes('\t', indent - 1)) + "if $el\n" + (stimes('\t', indent)) + "$el.html @_html\n" + (stimes('\t', indent - 1)) + "@_html\n" + "#endif" + "\n";
       return coffeeScript;
     };
     Control.prototype.res = function(name) {

@@ -1,6 +1,6 @@
 (function() {
   /*
-  Auto-generated from Core/Controls/console.ctl
+  Auto-generated from Core/Controls/TabStrip.ctl
   */  var smio, smoothio;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
@@ -12,11 +12,11 @@
   };
   require('../../../_jscript/Control');
   smio = smoothio = global.smoothio;
-  smio.Packs_Core_Controls_console = (function() {
-    __extends(Packs_Core_Controls_console, smio.Control);
-    function Packs_Core_Controls_console() {
-      Packs_Core_Controls_console.__super__.constructor.apply(this, arguments);
+  smio.Packs_Core_Controls_TabStrip = (function() {
+    __extends(Packs_Core_Controls_TabStrip, smio.Control);
+    function Packs_Core_Controls_TabStrip() {
+      Packs_Core_Controls_TabStrip.__super__.constructor.apply(this, arguments);
     }
-    return Packs_Core_Controls_console;
+    return Packs_Core_Controls_TabStrip;
   })();
 }).call(this);

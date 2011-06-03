@@ -40,9 +40,9 @@ class smio.Site
 		if sinceTicks
 			cb null, {}
 		else
-			ct = "Core_Controls_mainframe"
+			ct = "Core_Controls_MainFrame"
 			@checkExists (err, serverHasSites) ->
 				if not serverHasSites
-					ct = "Core_ServerSetup_initialserversetup"
+					ct = "Core_ServerSetup_InitialSiteSetup"
 				cb err, { "": { "_": ct } }
 

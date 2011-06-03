@@ -2,6 +2,7 @@
 #if server
 _ = require 'underscore'
 _.mixin require 'underscore.string'
+coffee = require 'coffee-script'
 node_util = require 'util'
 #endif
 smio = global.smoothio
@@ -61,19 +62,20 @@ class smio.Packs_#{className} extends smio.Control
 #{"#if client"}
 	constructor: (client, parent, args) ->
 		super client, parent, args, #{JSON.stringify baseName}, #{JSON.stringify className}
+		@jsSelf = "smio.client.allControls['" + @id() + "']"
 		@init()
 
 	renderHtml: ($el) ->
 		if not @_html
-			parts = []
+			__o = []
 """
 		[ind, indent, rind, stimes] = [-1, 3, 3, smio.Util.String.times]
 		for rp in renderParts
 			if _.isString rp
-				coffeeScript += "\n#{stimes '\t', rind}parts.push #{JSON.stringify rp}"
+				coffeeScript += "\n#{stimes '\t', rind}__o.push #{JSON.stringify rp}"
 			else if (_.isArray rp) and rp.length and rp.length > 1
 				if rp[0] is '='
-					coffeeScript += "\n#{stimes '\t', rind}parts.push #{rp[1]}"
+					coffeeScript += "\n#{stimes '\t', rind}__o.push #{rp[1]}"
 				else if rp[0] is '_'
 					lines = rp[1].split '\n'
 					rp[1] = ''
@@ -106,8 +108,8 @@ class smio.Packs_#{className} extends smio.Control
 					if (pos = sarg.indexOf '{') > 0
 						jarg = sarg.substr pos
 						sarg = _.trim sarg.substr 0, pos
-					coffeeScript += "\n#{stimes '\t', rind}parts.push @renderTag #{JSON.stringify rp[0]}, #{JSON.stringify sarg}, #{jarg}"
-		coffeeScript += "\n#{stimes '\t', indent}@_html = parts.join ''\n#{stimes '\t', indent - 1}if $el\n#{stimes '\t', indent}$el.html @_html\n#{stimes '\t', indent - 1}@_html\n#{"#endif"}\n"
+					coffeeScript += "\n#{stimes '\t', rind}__o.push @renderTag #{JSON.stringify rp[0]}, #{JSON.stringify sarg}, #{jarg}"
+		coffeeScript += "\n#{stimes '\t', indent}@_html = __o.join ''\n#{stimes '\t', indent - 1}if $el\n#{stimes '\t', indent}$el.html @_html\n#{stimes '\t', indent - 1}@_html\n#{"#endif"}\n"
 		coffeeScript
 #endif
 #if client
@@ -123,6 +125,10 @@ class smio.Packs_#{className} extends smio.Control
 				"!!CONTROL_NOT_FOUND::#{className}!!"
 		"r": (ctl, name) ->
 			ctl.res.apply ctl, [name]
+		"tojs": (ctl, name, args) ->
+			for pn, pv of args
+				name = name.replace pn, pv
+			((CoffeeScript.compile name).split '\n').join ''
 
 	constructor: (@client, @parent, @args, @baseName, @className) ->
 		@ctlID = @args.id
@@ -139,9 +145,17 @@ class smio.Packs_#{className} extends smio.Control
 	init: ->
 
 	onLoad: () ->
+		prefix = "cscript:"
 		@el = $('#' + @ctlID)
 		for id, ctl of @controls
 			ctl.onLoad()
+		if not @parent
+			$("a[href^='#{prefix}']").each (i, a) ->
+				try
+					a.href = 'javascript:' + ((CoffeeScript.compile a.href.substr prefix.length).split '\n').join ''
+				catch err
+					alert "CODE:#{(unescape a.href).substr prefix.length}:CODE"
+					a.href = "javascript:smio.client.socket.onError(\"#{err}\");"
 
 	renderTag: (name, sarg, jarg) ->
 		renderer = smio.Control.tagRenderers[name]

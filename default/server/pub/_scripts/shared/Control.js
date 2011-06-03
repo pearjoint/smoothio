@@ -19,6 +19,14 @@
       },
       "r": function(ctl, name) {
         return ctl.res.apply(ctl, [name]);
+      },
+      "tojs": function(ctl, name, args) {
+        var pn, pv;
+        for (pn in args) {
+          pv = args[pn];
+          name = name.replace(pn, pv);
+        }
+        return ((CoffeeScript.compile(name)).split('\n')).join('');
       }
     };
     function Control(client, parent, args, baseName, className) {
@@ -41,15 +49,24 @@
     };
     Control.prototype.init = function() {};
     Control.prototype.onLoad = function() {
-      var ctl, id, _ref, _results;
+      var ctl, id, prefix, _ref;
+      prefix = "cscript:";
       this.el = $('#' + this.ctlID);
       _ref = this.controls;
-      _results = [];
       for (id in _ref) {
         ctl = _ref[id];
-        _results.push(ctl.onLoad());
+        ctl.onLoad();
       }
-      return _results;
+      if (!this.parent) {
+        return $("a[href^='" + prefix + "']").each(function(i, a) {
+          try {
+            return a.href = 'javascript:' + ((CoffeeScript.compile(a.href.substr(prefix.length))).split('\n')).join('');
+          } catch (err) {
+            alert("CODE:" + ((unescape(a.href)).substr(prefix.length)) + ":CODE");
+            return a.href = "javascript:smio.client.socket.onError(\"" + err + "\");";
+          }
+        });
+      }
     };
     Control.prototype.renderTag = function(name, sarg, jarg) {
       var renderer;
