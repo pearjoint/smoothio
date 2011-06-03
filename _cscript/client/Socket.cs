@@ -3,6 +3,7 @@ smio = global.smoothio
 class smio.Socket
 	constructor: (@client, isSocketIO, host, secure, port) ->
 		@offline = 1
+		@offlineBlinkIntervalHandle = null
 		@initialFetchDone = false
 		if isSocketIO
 			opts = resource: '/_/sockio/', rememberTransport: false, reconnect: true, connectTimeout: 5000, secure: secure is true
@@ -77,12 +78,19 @@ class smio.Socket
 	onOffline: ->
 		@offline++
 		if @offline is 2
+			if not @offlineBlinkIntervalHandle
+				@offlineBlinkIntervalHandle = setInterval (=> @toggleOfflineBlink()), 500
+			$('#smio_favicon').attr 'href': '/_/file/images/bg.png'
 			$('#smio_offline').show()
 
 	onOnline: ->
 		if @offline
 			@offline = 0
+			if @offlineBlinkIntervalHandle
+				clearInterval @offlineBlinkIntervalHandle
+				@offlineBlinkIntervalHandle = null
 			$('#smio_offline').hide()
+			$('#smio_favicon').attr 'href': '/_/file/images/smoothio.png'
 			if @socket
 				@socket.send JSON.stringify @newFetchRequest().msg
 
@@ -156,7 +164,12 @@ class smio.Socket
 		if fn and val
 			obj.handle = setInterval fn, val
 
-	setTimers: () ->
+	setTimers: ->
 		@setTimer 'heartbeat', () => @poll.send true
 		@setTimer 'fetch', () => @poll.send false
+
+	toggleOfflineBlink: ->
+		blink = $('#smio_offline_blink')
+		vis = blink.css 'visibility'
+		blink.css visibility: (if vis is 'hidden' then 'visible' else 'hidden')
 

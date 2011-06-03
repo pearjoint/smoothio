@@ -8,8 +8,8 @@
       },
       "ctl": function(ctl, className, args) {
         var ctor;
-        if ((!ctl.controls[args.id]) && (ctor = smio['Packs_' + ctl.baseName + '_' + className])) {
-          ctl.client.allControls[args.id] = ctl.controls[args.id] = new ctor(this.client, args);
+        if ((!ctl.controls[args.id]) && ((ctor = smio['Packs_' + ctl.baseName + '_' + className]) || (ctor = smio['Packs_' + ctl.baseName + '_Controls_' + className]) || (ctor = smio['Packs_Core_Controls_' + className]))) {
+          ctl.client.allControls[args.id] = ctl.controls[args.id] = new ctor(this.client, ctl, args);
         }
         if (ctl.controls[args.id]) {
           return ctl.controls[args.id].renderHtml();
@@ -18,32 +18,16 @@
         }
       },
       "r": function(ctl, name) {
-        var i, parts, resSet, resSets, ret, _ref;
-        ret = '';
-        if ((resSets = smio.resources)) {
-          parts = ctl.baseName.split('_');
-          for (i = _ref = parts.length - 1; _ref <= 0 ? i <= 0 : i >= 0; _ref <= 0 ? i++ : i--) {
-            if ((resSet = resSets[parts.slice(0, (i + 1) || 9e9).join('_')]) && (ret = resSet[name])) {
-              break;
-            }
-          }
-          if (!ret) {
-            ret = smio.resources.smoothio[name];
-          }
-        }
-        if (ret) {
-          return ret;
-        } else {
-          return name;
-        }
+        return ctl.res.apply(ctl, [name]);
       }
     };
-    function Control(client, args, baseName, className) {
+    function Control(client, parent, args, baseName, className) {
       this.client = client;
+      this.parent = parent;
       this.args = args;
-      this.ctlID = args.id;
       this.baseName = baseName;
       this.className = className;
+      this.ctlID = this.args.id;
       this.controls = {};
       this.el = null;
       this._html = '';
@@ -77,6 +61,30 @@
       }
     };
     Control.prototype.syncUpdate = function(ctlDesc) {};
+    Control.prototype.res = function(name) {
+      var i, parts, resSet, resSets, ret, _ref;
+      ret = '';
+      if ((resSets = smio.resources)) {
+        parts = this.baseName.split('_');
+        for (i = _ref = parts.length - 1; _ref <= 0 ? i <= 0 : i >= 0; _ref <= 0 ? i++ : i--) {
+          if ((resSet = resSets[parts.slice(0, (i + 1) || 9e9).join('_')]) && (ret = resSet[name])) {
+            break;
+          }
+        }
+        if (!ret) {
+          ret = smio.resources.smoothio[name];
+        }
+      }
+      if (ret) {
+        return ret;
+      } else {
+        if (this.parent) {
+          return this.parent.res(name);
+        } else {
+          return "!!RES::" + name + "!!";
+        }
+      }
+    };
     return Control;
   })();
 }).call(this);

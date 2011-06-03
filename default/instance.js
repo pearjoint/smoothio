@@ -91,11 +91,20 @@ smio.logit = function(line, cat) {
 }
 
 smio.walkDir = function(dirPath, files, fileFunc, errs, dontRecurse, rootDirPath, folderFuncFirst, folderFunc, allFilesFirst) {
-	var subFiles, subPath, isRoot = !rootDirPath, subDirs = [];
+	var subFiles, subPath, isRoot = !rootDirPath, subDirs = [], handleErr = function(err) {
+		if (errs && errs['push'])
+			errs.push(err);
+		else
+			throw err;
+	};
 	if (isRoot)
 		rootDirPath = dirPath;
 	if (folderFuncFirst && folderFunc && !isRoot)
-		folderFunc(dirPath, rootDirPath, dirPath.substr(rootDirPath.length + 1));
+		try {
+			folderFunc(dirPath, rootDirPath, dirPath.substr(rootDirPath.length + 1));
+		} catch(err) {
+			handleErr(err);
+		}
 	if (!files)
 		files = node_fs.readdirSync(dirPath);
 	for (var i = 0, l = files.length; i < l; i++) {
@@ -110,8 +119,7 @@ smio.walkDir = function(dirPath, files, fileFunc, errs, dontRecurse, rootDirPath
 				if (fileFunc)
 					fileFunc(subPath, files[i], subPath.substr(rootDirPath.length + 1));
 			} catch(err) {
-				if (errs && errs['push'])
-					errs.push(err);
+				handleErr(err);
 			}
 		else if (!dontRecurse)
 			if (allFilesFirst)
@@ -123,7 +131,11 @@ smio.walkDir = function(dirPath, files, fileFunc, errs, dontRecurse, rootDirPath
 		for (var i = 0, l = subDirs.length; i <  l; i++)
 			smio.walkDir(subDirs[i][0], subDirs[i][1], fileFunc, errs, false, rootDirPath, folderFuncFirst, folderFunc, allFilesFirst);
 	if (folderFunc && !(folderFuncFirst || isRoot))
-		folderFunc(dirPath, rootDirPath, dirPath.substr(rootDirPath.length + 1));
+		try {
+			folderFunc(dirPath, rootDirPath, dirPath.substr(rootDirPath.length + 1));
+		} catch(err) {
+			handleErr(err);
+		}
 }
 
 function clearDirectory(dirPath, removeDirs) {

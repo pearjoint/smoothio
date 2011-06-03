@@ -1,11 +1,11 @@
 ###
-Auto-generated from SmoothioCore/CommonControls/console.ctl
+Auto-generated from Core/Controls/console.ctl
 ###
 #if server
 require '../../../_jscript/Control'
 #endif
 smio = smoothio = global.smoothio
-class smio.Packs_SmoothioCore_CommonControls_console extends smio.Control
+class smio.Packs_Core_Controls_console extends smio.Control
 
 
 #if client
@@ -21,8 +21,8 @@ class smio.Packs_SmoothioCore_CommonControls_console extends smio.Control
 
 
 #if client
-	constructor: (client, args) ->
-		super client, args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_console"
+	constructor: (client, parent, args) ->
+		super client, parent, args, "Core_Controls", "Core_Controls_console"
 		@init()
 
 	renderHtml: ($el) ->

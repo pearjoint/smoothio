@@ -63,10 +63,10 @@
       if (sinceTicks) {
         return cb(null, {});
       } else {
-        ct = "SmoothioCore_CommonControls_mainframe";
+        ct = "Core_Controls_mainframe";
         return this.checkExists(function(err, serverHasSites) {
           if (!serverHasSites) {
-            ct = "SmoothioCore_ServerSetup_initialserversetup";
+            ct = "Core_ServerSetup_initialserversetup";
           }
           return cb(err, {
             "": {

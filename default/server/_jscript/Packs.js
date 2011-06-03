@@ -118,7 +118,7 @@
       smio.Util.FileSystem.ensureDirs('../_core/packs', 'server/_packs');
       smio.Util.FileSystem.ensureDirs('packs', 'server/pub/_packs');
       smio.Util.FileSystem.ensureDirs('packs', 'server/_packs');
-      _ref = smio.Util.Array.ensurePos(node_fs.readdirSync('../_core/packs', 'SmoothioCore', 0));
+      _ref = smio.Util.Array.ensurePos(node_fs.readdirSync('../_core/packs', 'Core', 0));
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         p = _ref[_i];
         if ((node_fs.statSync(pp = node_path.join('../_core/packs', p))).isDirectory()) {
@@ -132,7 +132,7 @@
           this.all[p] = new smio.Pack(this.inst, this, pp, p);
         }
       }
-      if (this.corePack = this.all['SmoothioCore']) {
+      if (this.corePack = this.all['Core']) {
         _ref3 = this.all;
         for (p in _ref3) {
           pack = _ref3[p];

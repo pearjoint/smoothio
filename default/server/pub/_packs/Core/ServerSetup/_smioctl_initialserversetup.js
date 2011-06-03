@@ -1,6 +1,6 @@
 (function() {
   /*
-  Auto-generated from SmoothioCore/ServerSetup/initialserversetup.ctl
+  Auto-generated from Core/ServerSetup/initialserversetup.ctl
   */  var smio, smoothio;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
@@ -11,13 +11,13 @@
     return child;
   };
   smio = smoothio = global.smoothio;
-  smio.Packs_SmoothioCore_ServerSetup_initialserversetup = (function() {
-    __extends(Packs_SmoothioCore_ServerSetup_initialserversetup, smio.Control);
-    function Packs_SmoothioCore_ServerSetup_initialserversetup(client, args) {
-      Packs_SmoothioCore_ServerSetup_initialserversetup.__super__.constructor.call(this, client, args, "SmoothioCore_ServerSetup", "SmoothioCore_ServerSetup_initialserversetup");
+  smio.Packs_Core_ServerSetup_initialserversetup = (function() {
+    __extends(Packs_Core_ServerSetup_initialserversetup, smio.Control);
+    function Packs_Core_ServerSetup_initialserversetup(client, parent, args) {
+      Packs_Core_ServerSetup_initialserversetup.__super__.constructor.call(this, client, parent, args, "Core_ServerSetup", "Core_ServerSetup_initialserversetup");
       this.init();
     }
-    Packs_SmoothioCore_ServerSetup_initialserversetup.prototype.renderHtml = function($el) {
+    Packs_Core_ServerSetup_initialserversetup.prototype.renderHtml = function($el) {
       var parts;
       if (!this._html) {
         parts = [];
@@ -31,9 +31,15 @@
         parts.push(this.renderTag("r", "usersetup", null));
         parts.push("\n\t\t</div>\n\t\t<div class=\"smio-setup-templates\">\n\t\t\t");
         parts.push(this.renderTag("r", "templateselection", null));
-        parts.push("\n\t\t</div>\n\t</div>\n\t<div class=\"smio-setup-outer\">\n\t\t<div class=\"smio-setup-buttonarea\">\n\t\t\t<a disabled=\"disabled\" class=\"smio-setup-button\">");
-        parts.push(this.renderTag("r", "button", null));
-        parts.push("</a>\n\t\t</div>\n\t</div>\n</div>\n\n");
+        parts.push("\n\t\t</div>\n\t</div>\n\t");
+        parts.push(this.renderTag("ctl", "tabstrip", {
+          id: this.id('steptabs'),
+          "class": 'smio-setup-outer smio-setup-steps',
+          tabClass: 'smio-setup-step',
+          tabs: ['owner', 'template', 'finish'],
+          resPrefix: 'steps_'
+        }));
+        parts.push("\n</div>\n\n");
         this._html = parts.join('');
       }
       if ($el) {
@@ -41,6 +47,6 @@
       }
       return this._html;
     };
-    return Packs_SmoothioCore_ServerSetup_initialserversetup;
+    return Packs_Core_ServerSetup_initialserversetup;
   })();
 }).call(this);

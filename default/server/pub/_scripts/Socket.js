@@ -7,6 +7,7 @@
       var opts;
       this.client = client;
       this.offline = 1;
+      this.offlineBlinkIntervalHandle = null;
       this.initialFetchDone = false;
       if (isSocketIO) {
         opts = {
@@ -127,13 +128,28 @@
     Socket.prototype.onOffline = function() {
       this.offline++;
       if (this.offline === 2) {
+        if (!this.offlineBlinkIntervalHandle) {
+          this.offlineBlinkIntervalHandle = setInterval((__bind(function() {
+            return this.toggleOfflineBlink();
+          }, this)), 500);
+        }
+        $('#smio_favicon').attr({
+          'href': '/_/file/images/bg.png'
+        });
         return $('#smio_offline').show();
       }
     };
     Socket.prototype.onOnline = function() {
       if (this.offline) {
         this.offline = 0;
+        if (this.offlineBlinkIntervalHandle) {
+          clearInterval(this.offlineBlinkIntervalHandle);
+          this.offlineBlinkIntervalHandle = null;
+        }
         $('#smio_offline').hide();
+        $('#smio_favicon').attr({
+          'href': '/_/file/images/smoothio.png'
+        });
         if (this.socket) {
           return this.socket.send(JSON.stringify(this.newFetchRequest().msg));
         }
@@ -233,6 +249,14 @@
       return this.setTimer('fetch', __bind(function() {
         return this.poll.send(false);
       }, this));
+    };
+    Socket.prototype.toggleOfflineBlink = function() {
+      var blink, vis;
+      blink = $('#smio_offline_blink');
+      vis = blink.css('visibility');
+      return blink.css({
+        visibility: (vis === 'hidden' ? 'visible' : 'hidden')
+      });
     };
     return Socket;
   })();

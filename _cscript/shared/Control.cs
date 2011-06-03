@@ -59,8 +59,8 @@ smio = smoothio = global.smoothio
 class smio.Packs_#{className} extends smio.Control
 #{decls}
 #{"#if client"}
-	constructor: (client, args) ->
-		super client, args, #{JSON.stringify baseName}, #{JSON.stringify className}
+	constructor: (client, parent, args) ->
+		super client, parent, args, #{JSON.stringify baseName}, #{JSON.stringify className}
 		@init()
 
 	renderHtml: ($el) ->
@@ -77,19 +77,29 @@ class smio.Packs_#{className} extends smio.Control
 				else if rp[0] is '_'
 					lines = rp[1].split '\n'
 					rp[1] = ''
-					for l in lines
-						if l and l.length
-							if ind < 0
-								ind = 0
-								for i in [0...l.length]
-									if (l.substr i, 1) is '\t'
-										ind++
-									else
-										break
-							rind = indent + ind
-							rp[1] += "\n#{stimes '\t', indent}#{l.substr ind}"
-					if rp[1] and (_.trim rp[1]) and (_.trim rp[1], ' ', '\t', '\r', '\n')
-						coffeeScript += "#{rp[1]}"
+					if lines and lines.length
+						for l in lines
+							if l and l.length and (_.trim l)
+								if ind < 0
+									ind = 0
+									for i in [0...l.length]
+										if (l.substr i, 1) is '\t'
+											ind++
+										else
+											break
+								rind = indent + ind
+								rp[1] += "\n#{stimes '\t', indent}#{l.substr ind}"
+						if lines.length > 1
+							l = _.last lines
+							lind = 0
+							for i in [0...l.length]
+								if (l.substr i, 1) is '\t'
+									lind++
+								else
+									break
+							rind = indent + (lind - ind)
+						if rp[1] and (_.trim rp[1]) and (_.trim rp[1], ' ', '\t', '\r', '\n')
+							coffeeScript += "#{rp[1]}"
 				else
 					sarg = rp[1]
 					jarg = null
@@ -105,28 +115,17 @@ class smio.Packs_#{className} extends smio.Control
 		"arg": (ctl, name) ->
 			ctl.args[name]
 		"ctl": (ctl, className, args) ->
-			if (not ctl.controls[args.id]) and (ctor = smio['Packs_' + ctl.baseName + '_' + className])
-				ctl.client.allControls[args.id] = ctl.controls[args.id] = new ctor @client, args
+			if (not ctl.controls[args.id]) and ((ctor = smio['Packs_' + ctl.baseName + '_' + className]) or (ctor = smio['Packs_' + ctl.baseName + '_Controls_' + className]) or (ctor = smio['Packs_Core_Controls_' + className] ))
+				ctl.client.allControls[args.id] = ctl.controls[args.id] = new ctor @client, ctl, args
 			if ctl.controls[args.id]
 				ctl.controls[args.id].renderHtml()
 			else
 				"!!CONTROL_NOT_FOUND::#{className}!!"
 		"r": (ctl, name) ->
-			ret = ''
-			if (resSets = smio.resources)
-				parts = ctl.baseName.split '_'
-				for i in [(parts.length - 1)..0]
-					if (resSet = resSets[parts[0..i].join '_']) and (ret = resSet[name])
-						break
-				if not ret
-					ret = smio.resources.smoothio[name]
-			if ret then ret else name
+			ctl.res.apply ctl, [name]
 
-	constructor: (@client, args, baseName, className) ->
-		@args = args
-		@ctlID = args.id
-		@baseName = baseName
-		@className = className
+	constructor: (@client, @parent, @args, @baseName, @className) ->
+		@ctlID = @args.id
 		@controls = {}
 		@el = null
 		@_html = ''
@@ -154,4 +153,15 @@ class smio.Packs_#{className} extends smio.Control
 	syncUpdate: (ctlDesc) ->
 
 #endif
+
+	res: (name) ->
+		ret = ''
+		if (resSets = smio.resources)
+			parts = @baseName.split '_'
+			for i in [(parts.length - 1)..0]
+				if (resSet = resSets[parts[0..i].join '_']) and (ret = resSet[name])
+					break
+			if not ret
+				ret = smio.resources.smoothio[name]
+		if ret then ret else (if @parent then (@parent.res name) else "!!RES::#{name}!!")
 

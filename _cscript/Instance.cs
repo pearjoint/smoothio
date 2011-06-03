@@ -143,7 +143,7 @@ class smio.Instance
 			return 0
 		@packs = new smio.Packs @
 		if (not @packs['corePack']?) or (not @packs.corePack.loaded)
-			smio.logit @r 'log_pack_nocorepack', 'SmoothioCore'
+			smio.logit @r 'log_pack_nocorepack', 'Core'
 			return 1
 		@mongoConfig = @config.mongodb
 		@autoRestart = if (@config.smoothio.autorestart.on_files_changed is true and @config.smoothio.processes is 1) then true else false

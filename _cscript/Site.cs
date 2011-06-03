@@ -40,9 +40,9 @@ class smio.Site
 		if sinceTicks
 			cb null, {}
 		else
-			ct = "SmoothioCore_CommonControls_mainframe"
+			ct = "Core_Controls_mainframe"
 			@checkExists (err, serverHasSites) ->
 				if not serverHasSites
-					ct = "SmoothioCore_ServerSetup_initialserversetup"
+					ct = "Core_ServerSetup_initialserversetup"
 				cb err, { "": { "_": ct } }
 

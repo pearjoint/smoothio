@@ -11,10 +11,6 @@
 			<%r:templateselection%>
 		</div>
 	</div>
-	<div class="smio-setup-outer">
-		<div class="smio-setup-buttonarea">
-			<a disabled="disabled" class="smio-setup-button"><%r:button%></a>
-		</div>
-	</div>
+	<%ctl:tabstrip { id: @id('steptabs'), class: 'smio-setup-outer smio-setup-steps', tabClass: 'smio-setup-step', tabs: ['owner', 'template', 'finish'], resPrefix: 'steps_' }%>
 </div>
 

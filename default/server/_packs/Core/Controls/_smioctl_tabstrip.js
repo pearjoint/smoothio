@@ -1,6 +1,6 @@
 (function() {
   /*
-  Auto-generated from SmoothioCore/ServerSetup/initialserversetup.ctl
+  Auto-generated from Core/Controls/tabstrip.ctl
   */  var smio, smoothio;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
@@ -12,11 +12,11 @@
   };
   require('../../../_jscript/Control');
   smio = smoothio = global.smoothio;
-  smio.Packs_SmoothioCore_ServerSetup_initialserversetup = (function() {
-    __extends(Packs_SmoothioCore_ServerSetup_initialserversetup, smio.Control);
-    function Packs_SmoothioCore_ServerSetup_initialserversetup() {
-      Packs_SmoothioCore_ServerSetup_initialserversetup.__super__.constructor.apply(this, arguments);
+  smio.Packs_Core_Controls_tabstrip = (function() {
+    __extends(Packs_Core_Controls_tabstrip, smio.Control);
+    function Packs_Core_Controls_tabstrip() {
+      Packs_Core_Controls_tabstrip.__super__.constructor.apply(this, arguments);
     }
-    return Packs_SmoothioCore_ServerSetup_initialserversetup;
+    return Packs_Core_Controls_tabstrip;
   })();
 }).call(this);

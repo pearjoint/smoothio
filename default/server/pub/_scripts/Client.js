@@ -8,7 +8,7 @@
       this.sleepy = false;
       this.allControls = {};
       this.pageBody = $('#smio_body');
-      $('#smio_offline').text(smio.resources.smoothio.connect);
+      $('#smio_offline').text(smio.resources.smoothio.connect).append('<span id="smio_offline_blink" style="visibility: hidden;">_</span>');
       cookie = $.cookie('smoo');
       try {
         this.smioCookie = JSON.parse(cookie);
@@ -35,7 +35,7 @@
         if ((ctl = this.allControls[''])) {
           ctl.syncUpdate(ctlDesc);
         } else {
-          this.allControls[''] = ctl = new smio['Packs_' + ctlDesc._](this, smio.Util.Object.mergeDefaults(ctlDesc, {
+          this.allControls[''] = ctl = new smio['Packs_' + ctlDesc._](this, null, smio.Util.Object.mergeDefaults(ctlDesc, {
             id: 'sm'
           }));
           ctl.init();

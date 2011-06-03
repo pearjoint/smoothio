@@ -1,6 +1,6 @@
 (function() {
   /*
-  Auto-generated from SmoothioCore/CommonControls/console.ctl
+  Auto-generated from Core/Controls/console.ctl
   */  var smio, smoothio;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
@@ -11,21 +11,21 @@
     return child;
   };
   smio = smoothio = global.smoothio;
-  smio.Packs_SmoothioCore_CommonControls_console = (function() {
-    __extends(Packs_SmoothioCore_CommonControls_console, smio.Control);
-    Packs_SmoothioCore_CommonControls_console.prototype.init = function() {};
-    Packs_SmoothioCore_CommonControls_console.prototype.onLoad = function($el) {
-      Packs_SmoothioCore_CommonControls_console.__super__.onLoad.call(this);
+  smio.Packs_Core_Controls_console = (function() {
+    __extends(Packs_Core_Controls_console, smio.Control);
+    Packs_Core_Controls_console.prototype.init = function() {};
+    Packs_Core_Controls_console.prototype.onLoad = function($el) {
+      Packs_Core_Controls_console.__super__.onLoad.call(this);
       if (!this.args['topDown']) {
         $("#" + this.ctlID + "_detail").insertBefore("#" + this.ctlID + "_ever");
         return $("#" + this.ctlID + "_hover").insertBefore("#" + this.ctlID + "_ever");
       }
     };
-    function Packs_SmoothioCore_CommonControls_console(client, args) {
-      Packs_SmoothioCore_CommonControls_console.__super__.constructor.call(this, client, args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_console");
+    function Packs_Core_Controls_console(client, parent, args) {
+      Packs_Core_Controls_console.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_console");
       this.init();
     }
-    Packs_SmoothioCore_CommonControls_console.prototype.renderHtml = function($el) {
+    Packs_Core_Controls_console.prototype.renderHtml = function($el) {
       var parts;
       if (!this._html) {
         parts = [];
@@ -47,6 +47,6 @@
       }
       return this._html;
     };
-    return Packs_SmoothioCore_CommonControls_console;
+    return Packs_Core_Controls_console;
   })();
 }).call(this);

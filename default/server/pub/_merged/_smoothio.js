@@ -12658,7 +12658,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.sleepy = false;
       this.allControls = {};
       this.pageBody = $('#smio_body');
-      $('#smio_offline').text(smio.resources.smoothio.connect);
+      $('#smio_offline').text(smio.resources.smoothio.connect).append('<span id="smio_offline_blink" style="visibility: hidden;">_</span>');
       cookie = $.cookie('smoo');
       try {
         this.smioCookie = JSON.parse(cookie);
@@ -12685,7 +12685,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         if ((ctl = this.allControls[''])) {
           ctl.syncUpdate(ctlDesc);
         } else {
-          this.allControls[''] = ctl = new smio['Packs_' + ctlDesc._](this, smio.Util.Object.mergeDefaults(ctlDesc, {
+          this.allControls[''] = ctl = new smio['Packs_' + ctlDesc._](this, null, smio.Util.Object.mergeDefaults(ctlDesc, {
             id: 'sm'
           }));
           ctl.init();
@@ -12714,6 +12714,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       var opts;
       this.client = client;
       this.offline = 1;
+      this.offlineBlinkIntervalHandle = null;
       this.initialFetchDone = false;
       if (isSocketIO) {
         opts = {
@@ -12834,13 +12835,28 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     Socket.prototype.onOffline = function() {
       this.offline++;
       if (this.offline === 2) {
+        if (!this.offlineBlinkIntervalHandle) {
+          this.offlineBlinkIntervalHandle = setInterval((__bind(function() {
+            return this.toggleOfflineBlink();
+          }, this)), 500);
+        }
+        $('#smio_favicon').attr({
+          'href': '/_/file/images/bg.png'
+        });
         return $('#smio_offline').show();
       }
     };
     Socket.prototype.onOnline = function() {
       if (this.offline) {
         this.offline = 0;
+        if (this.offlineBlinkIntervalHandle) {
+          clearInterval(this.offlineBlinkIntervalHandle);
+          this.offlineBlinkIntervalHandle = null;
+        }
         $('#smio_offline').hide();
+        $('#smio_favicon').attr({
+          'href': '/_/file/images/smoothio.png'
+        });
         if (this.socket) {
           return this.socket.send(JSON.stringify(this.newFetchRequest().msg));
         }
@@ -12941,6 +12957,14 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         return this.poll.send(false);
       }, this));
     };
+    Socket.prototype.toggleOfflineBlink = function() {
+      var blink, vis;
+      blink = $('#smio_offline_blink');
+      vis = blink.css('visibility');
+      return blink.css({
+        visibility: (vis === 'hidden' ? 'visible' : 'hidden')
+      });
+    };
     return Socket;
   })();
 }).call(this);
@@ -12956,8 +12980,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       },
       "ctl": function(ctl, className, args) {
         var ctor;
-        if ((!ctl.controls[args.id]) && (ctor = smio['Packs_' + ctl.baseName + '_' + className])) {
-          ctl.client.allControls[args.id] = ctl.controls[args.id] = new ctor(this.client, args);
+        if ((!ctl.controls[args.id]) && ((ctor = smio['Packs_' + ctl.baseName + '_' + className]) || (ctor = smio['Packs_' + ctl.baseName + '_Controls_' + className]) || (ctor = smio['Packs_Core_Controls_' + className]))) {
+          ctl.client.allControls[args.id] = ctl.controls[args.id] = new ctor(this.client, ctl, args);
         }
         if (ctl.controls[args.id]) {
           return ctl.controls[args.id].renderHtml();
@@ -12966,32 +12990,16 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         }
       },
       "r": function(ctl, name) {
-        var i, parts, resSet, resSets, ret, _ref;
-        ret = '';
-        if ((resSets = smio.resources)) {
-          parts = ctl.baseName.split('_');
-          for (i = _ref = parts.length - 1; _ref <= 0 ? i <= 0 : i >= 0; _ref <= 0 ? i++ : i--) {
-            if ((resSet = resSets[parts.slice(0, (i + 1) || 9e9).join('_')]) && (ret = resSet[name])) {
-              break;
-            }
-          }
-          if (!ret) {
-            ret = smio.resources.smoothio[name];
-          }
-        }
-        if (ret) {
-          return ret;
-        } else {
-          return name;
-        }
+        return ctl.res.apply(ctl, [name]);
       }
     };
-    function Control(client, args, baseName, className) {
+    function Control(client, parent, args, baseName, className) {
       this.client = client;
+      this.parent = parent;
       this.args = args;
-      this.ctlID = args.id;
       this.baseName = baseName;
       this.className = className;
+      this.ctlID = this.args.id;
       this.controls = {};
       this.el = null;
       this._html = '';
@@ -13025,6 +13033,30 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
     };
     Control.prototype.syncUpdate = function(ctlDesc) {};
+    Control.prototype.res = function(name) {
+      var i, parts, resSet, resSets, ret, _ref;
+      ret = '';
+      if ((resSets = smio.resources)) {
+        parts = this.baseName.split('_');
+        for (i = _ref = parts.length - 1; _ref <= 0 ? i <= 0 : i >= 0; _ref <= 0 ? i++ : i--) {
+          if ((resSet = resSets[parts.slice(0, (i + 1) || 9e9).join('_')]) && (ret = resSet[name])) {
+            break;
+          }
+        }
+        if (!ret) {
+          ret = smio.resources.smoothio[name];
+        }
+      }
+      if (ret) {
+        return ret;
+      } else {
+        if (this.parent) {
+          return this.parent.res(name);
+        } else {
+          return "!!RES::" + name + "!!";
+        }
+      }
+    };
     return Control;
   })();
 }).call(this);
@@ -13306,10 +13338,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   })();
 }).call(this);
 
-/** server/pub/_packs/SmoothioCore/CommonControls/_smioctl_console.js **/
+/** server/pub/_packs/Core/Controls/_smioctl_console.js **/
 (function() {
   /*
-  Auto-generated from SmoothioCore/CommonControls/console.ctl
+  Auto-generated from Core/Controls/console.ctl
   */  var smio, smoothio;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
@@ -13320,21 +13352,21 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     return child;
   };
   smio = smoothio = global.smoothio;
-  smio.Packs_SmoothioCore_CommonControls_console = (function() {
-    __extends(Packs_SmoothioCore_CommonControls_console, smio.Control);
-    Packs_SmoothioCore_CommonControls_console.prototype.init = function() {};
-    Packs_SmoothioCore_CommonControls_console.prototype.onLoad = function($el) {
-      Packs_SmoothioCore_CommonControls_console.__super__.onLoad.call(this);
+  smio.Packs_Core_Controls_console = (function() {
+    __extends(Packs_Core_Controls_console, smio.Control);
+    Packs_Core_Controls_console.prototype.init = function() {};
+    Packs_Core_Controls_console.prototype.onLoad = function($el) {
+      Packs_Core_Controls_console.__super__.onLoad.call(this);
       if (!this.args['topDown']) {
         $("#" + this.ctlID + "_detail").insertBefore("#" + this.ctlID + "_ever");
         return $("#" + this.ctlID + "_hover").insertBefore("#" + this.ctlID + "_ever");
       }
     };
-    function Packs_SmoothioCore_CommonControls_console(client, args) {
-      Packs_SmoothioCore_CommonControls_console.__super__.constructor.call(this, client, args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_console");
+    function Packs_Core_Controls_console(client, parent, args) {
+      Packs_Core_Controls_console.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_console");
       this.init();
     }
-    Packs_SmoothioCore_CommonControls_console.prototype.renderHtml = function($el) {
+    Packs_Core_Controls_console.prototype.renderHtml = function($el) {
       var parts;
       if (!this._html) {
         parts = [];
@@ -13356,14 +13388,14 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
       return this._html;
     };
-    return Packs_SmoothioCore_CommonControls_console;
+    return Packs_Core_Controls_console;
   })();
 }).call(this);
 
-/** server/pub/_packs/SmoothioCore/CommonControls/_smioctl_mainframe.js **/
+/** server/pub/_packs/Core/Controls/_smioctl_mainframe.js **/
 (function() {
   /*
-  Auto-generated from SmoothioCore/CommonControls/mainframe.ctl
+  Auto-generated from Core/Controls/mainframe.ctl
   */  var smio, smoothio;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
@@ -13374,17 +13406,17 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     return child;
   };
   smio = smoothio = global.smoothio;
-  smio.Packs_SmoothioCore_CommonControls_mainframe = (function() {
-    __extends(Packs_SmoothioCore_CommonControls_mainframe, smio.Control);
-    Packs_SmoothioCore_CommonControls_mainframe.prototype.test = function() {
+  smio.Packs_Core_Controls_mainframe = (function() {
+    __extends(Packs_Core_Controls_mainframe, smio.Control);
+    Packs_Core_Controls_mainframe.prototype.test = function() {
       var xy;
       return xy = "clientside";
     };
-    function Packs_SmoothioCore_CommonControls_mainframe(client, args) {
-      Packs_SmoothioCore_CommonControls_mainframe.__super__.constructor.call(this, client, args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_mainframe");
+    function Packs_Core_Controls_mainframe(client, parent, args) {
+      Packs_Core_Controls_mainframe.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_mainframe");
       this.init();
     }
-    Packs_SmoothioCore_CommonControls_mainframe.prototype.renderHtml = function($el) {
+    Packs_Core_Controls_mainframe.prototype.renderHtml = function($el) {
       var parts;
       if (!this._html) {
         parts = [];
@@ -13408,14 +13440,14 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
       return this._html;
     };
-    return Packs_SmoothioCore_CommonControls_mainframe;
+    return Packs_Core_Controls_mainframe;
   })();
 }).call(this);
 
-/** server/pub/_packs/SmoothioCore/ServerSetup/_smioctl_initialserversetup.js **/
+/** server/pub/_packs/Core/Controls/_smioctl_tabstrip.js **/
 (function() {
   /*
-  Auto-generated from SmoothioCore/ServerSetup/initialserversetup.ctl
+  Auto-generated from Core/Controls/tabstrip.ctl
   */  var smio, smoothio;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
@@ -13426,13 +13458,70 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     return child;
   };
   smio = smoothio = global.smoothio;
-  smio.Packs_SmoothioCore_ServerSetup_initialserversetup = (function() {
-    __extends(Packs_SmoothioCore_ServerSetup_initialserversetup, smio.Control);
-    function Packs_SmoothioCore_ServerSetup_initialserversetup(client, args) {
-      Packs_SmoothioCore_ServerSetup_initialserversetup.__super__.constructor.call(this, client, args, "SmoothioCore_ServerSetup", "SmoothioCore_ServerSetup_initialserversetup");
+  smio.Packs_Core_Controls_tabstrip = (function() {
+    __extends(Packs_Core_Controls_tabstrip, smio.Control);
+    function Packs_Core_Controls_tabstrip(client, parent, args) {
+      Packs_Core_Controls_tabstrip.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_tabstrip");
       this.init();
     }
-    Packs_SmoothioCore_ServerSetup_initialserversetup.prototype.renderHtml = function($el) {
+    Packs_Core_Controls_tabstrip.prototype.renderHtml = function($el) {
+      var firstDone, parts, tab, _i, _len, _ref;
+      if (!this._html) {
+        parts = [];
+        parts.push("<div id=\"");
+        parts.push(this.ctlID);
+        parts.push("\" class=\"");
+        parts.push(this.renderTag("arg", "class", null));
+        parts.push("\">\n");
+        firstDone = false;
+        _ref = this.args['tabs'];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          tab = _ref[_i];
+          parts.push("\n\t\t<a href=\"#\" id=\"");
+          parts.push(this.id(tab));
+          parts.push("\" class=\"");
+          parts.push(this.renderTag("arg", "tabClass", null));
+          parts.push(firstDone ? '' : ' ' + this.args['tabClass'] + '-active');
+          parts.push("\">");
+          parts.push(this.res(this.args['resPrefix'] + tab));
+          parts.push("</a>\n\t\t");
+          if (!firstDone) {
+            firstDone = true;
+          }
+        }
+        parts.push("\n</div>\n\n");
+        this._html = parts.join('');
+      }
+      if ($el) {
+        $el.html(this._html);
+      }
+      return this._html;
+    };
+    return Packs_Core_Controls_tabstrip;
+  })();
+}).call(this);
+
+/** server/pub/_packs/Core/ServerSetup/_smioctl_initialserversetup.js **/
+(function() {
+  /*
+  Auto-generated from Core/ServerSetup/initialserversetup.ctl
+  */  var smio, smoothio;
+  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
+  };
+  smio = smoothio = global.smoothio;
+  smio.Packs_Core_ServerSetup_initialserversetup = (function() {
+    __extends(Packs_Core_ServerSetup_initialserversetup, smio.Control);
+    function Packs_Core_ServerSetup_initialserversetup(client, parent, args) {
+      Packs_Core_ServerSetup_initialserversetup.__super__.constructor.call(this, client, parent, args, "Core_ServerSetup", "Core_ServerSetup_initialserversetup");
+      this.init();
+    }
+    Packs_Core_ServerSetup_initialserversetup.prototype.renderHtml = function($el) {
       var parts;
       if (!this._html) {
         parts = [];
@@ -13446,9 +13535,15 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         parts.push(this.renderTag("r", "usersetup", null));
         parts.push("\n\t\t</div>\n\t\t<div class=\"smio-setup-templates\">\n\t\t\t");
         parts.push(this.renderTag("r", "templateselection", null));
-        parts.push("\n\t\t</div>\n\t</div>\n\t<div class=\"smio-setup-outer\">\n\t\t<div class=\"smio-setup-buttonarea\">\n\t\t\t<a disabled=\"disabled\" class=\"smio-setup-button\">");
-        parts.push(this.renderTag("r", "button", null));
-        parts.push("</a>\n\t\t</div>\n\t</div>\n</div>\n\n");
+        parts.push("\n\t\t</div>\n\t</div>\n\t");
+        parts.push(this.renderTag("ctl", "tabstrip", {
+          id: this.id('steptabs'),
+          "class": 'smio-setup-outer smio-setup-steps',
+          tabClass: 'smio-setup-step',
+          tabs: ['owner', 'template', 'finish'],
+          resPrefix: 'steps_'
+        }));
+        parts.push("\n</div>\n\n");
         this._html = parts.join('');
       }
       if ($el) {
@@ -13456,7 +13551,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
       return this._html;
     };
-    return Packs_SmoothioCore_ServerSetup_initialserversetup;
+    return Packs_Core_ServerSetup_initialserversetup;
   })();
 }).call(this);
 

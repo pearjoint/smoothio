@@ -206,7 +206,7 @@
       }
       this.packs = new smio.Packs(this);
       if ((!(this.packs['corePack'] != null)) || (!this.packs.corePack.loaded)) {
-        smio.logit(this.r('log_pack_nocorepack', 'SmoothioCore'));
+        smio.logit(this.r('log_pack_nocorepack', 'Core'));
         return 1;
       }
       this.mongoConfig = this.config.mongodb;

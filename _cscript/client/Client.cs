@@ -6,7 +6,7 @@ class smio.Client
 		@sleepy = false
 		@allControls = {}
 		@pageBody = $('#smio_body')
-		$('#smio_offline').text smio.resources.smoothio.connect
+		$('#smio_offline').text(smio.resources.smoothio.connect).append('<span id="smio_offline_blink" style="visibility: hidden;">_</span>')
 		cookie = $.cookie 'smoo'
 		try
 			@smioCookie = JSON.parse cookie
@@ -26,7 +26,7 @@ class smio.Client
 			if (ctl = @allControls[''])
 				ctl.syncUpdate ctlDesc
 			else
-				@allControls[''] = ctl = new smio['Packs_' + ctlDesc._] @, smio.Util.Object.mergeDefaults ctlDesc, id: 'sm'
+				@allControls[''] = ctl = new smio['Packs_' + ctlDesc._] @, null, smio.Util.Object.mergeDefaults ctlDesc, id: 'sm'
 				ctl.init()
 				ctl.renderHtml $('#smio_main')
 				ctl.onLoad()

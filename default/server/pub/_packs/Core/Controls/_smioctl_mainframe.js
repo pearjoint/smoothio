@@ -1,6 +1,6 @@
 (function() {
   /*
-  Auto-generated from SmoothioCore/CommonControls/mainframe.ctl
+  Auto-generated from Core/Controls/mainframe.ctl
   */  var smio, smoothio;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
@@ -11,17 +11,17 @@
     return child;
   };
   smio = smoothio = global.smoothio;
-  smio.Packs_SmoothioCore_CommonControls_mainframe = (function() {
-    __extends(Packs_SmoothioCore_CommonControls_mainframe, smio.Control);
-    Packs_SmoothioCore_CommonControls_mainframe.prototype.test = function() {
+  smio.Packs_Core_Controls_mainframe = (function() {
+    __extends(Packs_Core_Controls_mainframe, smio.Control);
+    Packs_Core_Controls_mainframe.prototype.test = function() {
       var xy;
       return xy = "clientside";
     };
-    function Packs_SmoothioCore_CommonControls_mainframe(client, args) {
-      Packs_SmoothioCore_CommonControls_mainframe.__super__.constructor.call(this, client, args, "SmoothioCore_CommonControls", "SmoothioCore_CommonControls_mainframe");
+    function Packs_Core_Controls_mainframe(client, parent, args) {
+      Packs_Core_Controls_mainframe.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_mainframe");
       this.init();
     }
-    Packs_SmoothioCore_CommonControls_mainframe.prototype.renderHtml = function($el) {
+    Packs_Core_Controls_mainframe.prototype.renderHtml = function($el) {
       var parts;
       if (!this._html) {
         parts = [];
@@ -45,6 +45,6 @@
       }
       return this._html;
     };
-    return Packs_SmoothioCore_CommonControls_mainframe;
+    return Packs_Core_Controls_mainframe;
   })();
 }).call(this);

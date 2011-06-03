@@ -75,13 +75,13 @@ class smio.Packs
 		smio.Util.FileSystem.ensureDirs '../_core/packs', 'server/_packs'
 		smio.Util.FileSystem.ensureDirs 'packs', 'server/pub/_packs'
 		smio.Util.FileSystem.ensureDirs 'packs', 'server/_packs'
-		for p in smio.Util.Array.ensurePos node_fs.readdirSync '../_core/packs', 'SmoothioCore', 0
+		for p in smio.Util.Array.ensurePos node_fs.readdirSync '../_core/packs', 'Core', 0
 			if (node_fs.statSync pp = node_path.join '../_core/packs', p).isDirectory()
 				@all[p] = new smio.Pack @inst, @, pp, p
 		for p in node_fs.readdirSync 'packs'
 			if (node_fs.statSync pp = node_path.join 'packs', p).isDirectory()
 				@all[p] = new smio.Pack @inst, @, pp, p
-		if @corePack = @all['SmoothioCore']
+		if @corePack = @all['Core']
 			for p, pack of @all
 				pack.load()
 
