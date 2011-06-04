@@ -37,6 +37,7 @@
       this.className = className;
       this.ctlID = this.args.id;
       this.controls = {};
+      this.containers = {};
       this.el = null;
       this._html = '';
     }

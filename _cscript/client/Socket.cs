@@ -65,7 +65,7 @@ class smio.Socket
 		if not @poll
 			alert JSON.stringify xhr
 		else
-			if xhr and (xhr.status is 0) and (xhr.readyState is 0)
+			if xhr and ((xhr.status is 0) and (xhr.readyState is 0) or (xhr.status is 12029) and (xhr.readyState is 4))
 				@onOffline()
 			else
 				@onOnline()

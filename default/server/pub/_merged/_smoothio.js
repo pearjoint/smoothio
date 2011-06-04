@@ -12819,7 +12819,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       if (!this.poll) {
         return alert(JSON.stringify(xhr));
       } else {
-        if (xhr && (xhr.status === 0) && (xhr.readyState === 0)) {
+        if (xhr && ((xhr.status === 0) && (xhr.readyState === 0) || (xhr.status === 12029) && (xhr.readyState === 4))) {
           this.onOffline();
         } else {
           this.onOnline();
@@ -13009,6 +13009,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.className = className;
       this.ctlID = this.args.id;
       this.controls = {};
+      this.containers = {};
       this.el = null;
       this._html = '';
     }
@@ -13463,6 +13464,47 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   })();
 }).call(this);
 
+/** server/pub/_packs/Core/Controls/_smioctl_SwipeBehavior.js **/
+(function() {
+  /*
+  Auto-generated from Core/Controls/SwipeBehavior.ctl
+  */  var smio, smoothio;
+  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
+  };
+  smio = smoothio = global.smoothio;
+  smio.Packs_Core_Controls_SwipeBehavior = (function() {
+    __extends(Packs_Core_Controls_SwipeBehavior, smio.Control);
+    Packs_Core_Controls_SwipeBehavior.prototype.onLoad = function() {
+      Packs_Core_Controls_SwipeBehavior.__super__.onLoad.call(this);
+      return this.el.addClass('smio-swipebehavior');
+    };
+    function Packs_Core_Controls_SwipeBehavior(client, parent, args) {
+      Packs_Core_Controls_SwipeBehavior.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_SwipeBehavior");
+      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
+      this.init();
+    }
+    Packs_Core_Controls_SwipeBehavior.prototype.renderHtml = function($el) {
+      var __o;
+      if (!this._html) {
+        __o = [];
+        __o.push("\n\n");
+        this._html = __o.join('');
+      }
+      if ($el) {
+        $el.html(this._html);
+      }
+      return this._html;
+    };
+    return Packs_Core_Controls_SwipeBehavior;
+  })();
+}).call(this);
+
 /** server/pub/_packs/Core/Controls/_smioctl_TabStrip.js **/
 (function() {
   /*
@@ -13579,15 +13621,21 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         __o = [];
         __o.push("<div class=\"smio-setup\" id=\"");
         __o.push(this.id());
-        __o.push("\">\n\t<div class=\"smio-setup-outer\">\n\t\t<div class=\"smio-setup-header\">");
+        __o.push("\">\n\t<div class=\"smio-setup-outer smio-setup-outer-top\">\n\t\t<div class=\"smio-setup-header\">");
         __o.push(this.renderTag("r", "title", null));
         __o.push("</div>\n\t\t<div class=\"smio-setup-header-desc\">");
         __o.push(this.renderTag("r", "desc", null));
-        __o.push("</div>\n\t</div>\n\t<div class=\"smio-setup-inner\">\n\t\t<div class=\"smio-setup-usersetup\">\n\t\t\t");
+        __o.push("</div>\n\t</div>\n\t<div class=\"smio-setup-inner\">\n\t\t<ul id=\"");
+        __o.push(this.id('stepswipe'));
+        __o.push("\">\n\t\t\t<li class=\"smio-setup-stepbox\">\n\t\t\t\t");
         __o.push(this.renderTag("r", "usersetup", null));
-        __o.push("\n\t\t</div>\n\t\t<div class=\"smio-setup-templates\">\n\t\t\t");
+        __o.push("\n\t\t\t</li>\n\t\t\t<li class=\"smio-setup-stepbox\">\n\t\t\t\t");
         __o.push(this.renderTag("r", "templateselection", null));
-        __o.push("\n\t\t</div>\n\t</div>\n\t");
+        __o.push("\n\t\t\t</li>\n\t\t\t<li class=\"smio-setup-stepbox\">\n\t\t\t\tthe finish line!!\n\t\t\t\t<br/>\n\t\t\t\tthis is where we ROLL...\n\t\t\t\t<br/><br/>\n\t\t\t\tcrazy innit?!\n\t\t\t</li>\n\t\t</ul>\n\t\t");
+        __o.push(this.renderTag("ctl", "SwipeBehavior", {
+          id: this.id('stepswipe')
+        }));
+        __o.push("\n\t</div>\n\t");
         __o.push(this.renderTag("ctl", "TabStrip", {
           id: this.id('steptabs'),
           "class": 'smio-setup-outer smio-setup-steps',

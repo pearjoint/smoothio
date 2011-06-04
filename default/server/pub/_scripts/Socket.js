@@ -112,7 +112,7 @@
       if (!this.poll) {
         return alert(JSON.stringify(xhr));
       } else {
-        if (xhr && (xhr.status === 0) && (xhr.readyState === 0)) {
+        if (xhr && ((xhr.status === 0) && (xhr.readyState === 0) || (xhr.status === 12029) && (xhr.readyState === 4))) {
           this.onOffline();
         } else {
           this.onOnline();

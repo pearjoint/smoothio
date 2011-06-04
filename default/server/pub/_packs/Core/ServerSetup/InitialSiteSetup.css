@@ -1,24 +1,29 @@
 div.smio-setup {
   position: absolute;
-  top: 10%;
+  top: 12%;
   left: 20%;
   right: 20%;
-  -moz-box-shadow: 0em 0.6em 4.8em #909090;
-  -webkit-box-shadow: 0em 0.6em 4.8em #909090;
-  box-shadow: 0em 0.6em 4.8em #909090;
+  -moz-box-shadow: 0em 0.4em 4.8em #909090;
+  -webkit-box-shadow: 0em 0.4em 4.8em #909090;
+  box-shadow: 0em 0.4em 4.8em #909090;
   line-height: 1.25;
   overflow: hidden;
 }
 .smio-setup-outer {
   padding: 1em;
-  background: rgba(255,255,255,0.88);
+}
+.smio-setup-outer-top {
+  background: rgba(255,255,255,0.66);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255,255,255,0.66)), to(rgba(255,255,255,0.88)));
+  background: -moz-linear-gradient(rgba(255,255,255,0.66), rgba(255,255,255,0.88));
+  background: -webkit-linear-gradient(rgba(255,255,255,0.66), rgba(255,255,255,0.88));
+  background: -o-linear-gradient(rgba(255,255,255,0.66), rgba(255,255,255,0.88));
 }
 .smio-setup-inner {
-  padding: 1em;
   background: rgba(255,255,255,0.95);
-  -moz-box-shadow: 0 0.062em 0.3em #909090 inset;
-  -webkit-box-shadow: 0 0.062em 0.3em #909090 inset;
-  box-shadow: 0 0.062em 0.3em #909090 inset;
+  -moz-box-shadow: 0 0.062em 0.35em #c0c0c0 inset;
+  -webkit-box-shadow: 0 0.062em 0.35em #c0c0c0 inset;
+  box-shadow: 0 0.062em 0.35em #c0c0c0 inset;
 }
 .smio-setup-header {
   font-size: 2em;
@@ -28,7 +33,15 @@ div.smio-setup {
   color: #808080;
   font-size: 1.25em;
 }
+.smio-setup-stepbox {
+  padding: 1em;
+}
 .smio-setup-steps {
+  background: rgba(255,255,255,0.95);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255,255,255,0.95)), to(rgba(255,255,255,0.65)));
+  background: -moz-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.65));
+  background: -webkit-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.65));
+  background: -o-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.65));
   text-align: center;
   white-space: nowrap;
 }
@@ -36,7 +49,7 @@ div.smio-setup {
   font-size: 0.95em;
   padding: 0.2em 1em 0.2em 1em;
   display: inline-block;
-  color: #808080;
+  color: #707070;
   text-shadow: 0px 0.098em #fff;
 }
 .smio-setup-step-inactive:hover {

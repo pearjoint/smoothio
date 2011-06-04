@@ -133,6 +133,7 @@ class smio.Packs_#{className} extends smio.Control
 	constructor: (@client, @parent, @args, @baseName, @className) ->
 		@ctlID = @args.id
 		@controls = {}
+		@containers = {}
 		@el = null
 		@_html = ''
 
