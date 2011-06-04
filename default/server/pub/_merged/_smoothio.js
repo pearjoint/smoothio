@@ -12985,9 +12985,26 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         }
         if (ctl.controls[args.id]) {
           return ctl.controls[args.id].renderHtml();
+        } else if (ctl.ctlRenderers[className]) {
+          return ctl.ctlRenderers[className](className, args);
         } else {
           return "!!CONTROL_NOT_FOUND::" + className + "!!";
         }
+      },
+      "inner": function(ctl, name, args) {
+        var a, i, o, tmp, _ref;
+        o = [];
+        a = args ? args : ctl.args;
+        if (a['__o'] && a.__o['length']) {
+          for (i = 0, _ref = a.__o.length; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
+            if (_.isString((tmp = a.__o[i]))) {
+              o.push(tmp);
+            } else {
+              o.push(ctl.renderTag(tmp.t, tmp.s, tmp.a));
+            }
+          }
+        }
+        return o.join('');
       },
       "r": function(ctl, name) {
         return ctl.res.apply(ctl, [name]);
@@ -13010,6 +13027,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.ctlID = this.args.id;
       this.controls = {};
       this.containers = {};
+      this.ctlRenderers = {};
       this.el = null;
       this._html = '';
     }
@@ -13356,6 +13374,67 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   })();
 }).call(this);
 
+/** server/pub/_packs/Core/Controls/_smioctl_Carousel.js **/
+(function() {
+  /*
+  Auto-generated from Core/Controls/Carousel.ctl
+  */  var smio, smoothio;
+  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
+  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  smio = smoothio = global.smoothio;
+  smio.Packs_Core_Controls_Carousel = (function() {
+    __extends(Packs_Core_Controls_Carousel, smio.Control);
+    Packs_Core_Controls_Carousel.prototype.init = function() {
+      Packs_Core_Controls_Carousel.__super__.init.call(this);
+      return this.ctlRenderers['item'] = __bind(function(className, args) {
+        var content, itemID;
+        itemID = this.id(args.id);
+        content = this.renderTag("inner", null, args);
+        return "<li id=\"" + itemID + "\">" + content + "</li>";
+      }, this);
+    };
+    Packs_Core_Controls_Carousel.prototype.onLoad = function() {
+      Packs_Core_Controls_Carousel.__super__.onLoad.call(this);
+      return this.el[0].scrollLeft = 200;
+    };
+    function Packs_Core_Controls_Carousel(client, parent, args) {
+      Packs_Core_Controls_Carousel.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_Carousel");
+      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
+      this.init();
+    }
+    Packs_Core_Controls_Carousel.prototype.renderHtml = function($el) {
+      var __r;
+      if (!this._html) {
+        __r = {
+          ctls: [],
+          m: [],
+          o: null
+        };
+        __r.o = __r.m;
+        __r.o.push("\n<div id=\"");
+        __r.o.push(this.id());
+        __r.o.push("\" class=\"smio-carousel\">\n\t<ul id=\"");
+        __r.o.push(this.id('ul'));
+        __r.o.push("\" class=\"smio-carousel\">\n\t\t");
+        __r.o.push(this.renderTag("inner", "", null));
+        __r.o.push("\n\t</ul>\n</div>\n\n");
+        this._html = __r.o.join('');
+      }
+      if ($el) {
+        $el.html(this._html);
+      }
+      return this._html;
+    };
+    return Packs_Core_Controls_Carousel;
+  })();
+}).call(this);
+
 /** server/pub/_packs/Core/Controls/_smioctl_Console.js **/
 (function() {
   /*
@@ -13386,21 +13465,26 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.init();
     }
     Packs_Core_Controls_Console.prototype.renderHtml = function($el) {
-      var __o;
+      var __r;
       if (!this._html) {
-        __o = [];
-        __o.push("\n<div id=\"");
-        __o.push(this.ctlID);
-        __o.push("\" class=\"smio-console smio-console-");
-        __o.push(this.args['topDown'] ? 'top' : 'bottom');
-        __o.push("\">\n\t<div id=\"");
-        __o.push(this.ctlID);
-        __o.push("_ever\" class=\"smio-console-ever\">header</div>\n\t<div id=\"");
-        __o.push(this.ctlID);
-        __o.push("_hover\" class=\"smio-console-hover\" style=\"display: none;\">hover</div>\n\t<div id=\"");
-        __o.push(this.ctlID);
-        __o.push("_detail\" class=\"smio-console-detail\" style=\"display: none;\">details</div>\n</div>\n\n");
-        this._html = __o.join('');
+        __r = {
+          ctls: [],
+          m: [],
+          o: null
+        };
+        __r.o = __r.m;
+        __r.o.push("\n<div id=\"");
+        __r.o.push(this.ctlID);
+        __r.o.push("\" class=\"smio-console smio-console-");
+        __r.o.push(this.args['topDown'] ? 'top' : 'bottom');
+        __r.o.push("\">\n\t<div id=\"");
+        __r.o.push(this.ctlID);
+        __r.o.push("_ever\" class=\"smio-console-ever\">header</div>\n\t<div id=\"");
+        __r.o.push(this.ctlID);
+        __r.o.push("_hover\" class=\"smio-console-hover\" style=\"display: none;\">hover</div>\n\t<div id=\"");
+        __r.o.push(this.ctlID);
+        __r.o.push("_detail\" class=\"smio-console-detail\" style=\"display: none;\">details</div>\n</div>\n\n");
+        this._html = __r.o.join('');
       }
       if ($el) {
         $el.html(this._html);
@@ -13437,23 +13521,28 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.init();
     }
     Packs_Core_Controls_MainFrame.prototype.renderHtml = function($el) {
-      var __o;
+      var __r;
       if (!this._html) {
-        __o = [];
-        __o.push("\n<div class=\"smio-main\" id=\"");
-        __o.push(this.id());
-        __o.push("\">\n\t");
-        __o.push(this.renderTag("ctl", "Console", {
+        __r = {
+          ctls: [],
+          m: [],
+          o: null
+        };
+        __r.o = __r.m;
+        __r.o.push("\n<div class=\"smio-main\" id=\"");
+        __r.o.push(this.id());
+        __r.o.push("\">\n\t");
+        __r.o.push(this.renderTag("ctl", "Console", {
           id: this.id('ctop'),
           topDown: true
         }));
-        __o.push("\n\t<div class=\"smio-console smio-console-main\"></div>\n\t");
-        __o.push(this.renderTag("ctl", "Console", {
+        __r.o.push("\n\t<div class=\"smio-console smio-console-main\"></div>\n\t");
+        __r.o.push(this.renderTag("ctl", "Console", {
           id: this.id('cbottom'),
           topDown: false
         }));
-        __o.push("\n</div>\n\n");
-        this._html = __o.join('');
+        __r.o.push("\n</div>\n\n");
+        this._html = __r.o.join('');
       }
       if ($el) {
         $el.html(this._html);
@@ -13461,47 +13550,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       return this._html;
     };
     return Packs_Core_Controls_MainFrame;
-  })();
-}).call(this);
-
-/** server/pub/_packs/Core/Controls/_smioctl_SwipeBehavior.js **/
-(function() {
-  /*
-  Auto-generated from Core/Controls/SwipeBehavior.ctl
-  */  var smio, smoothio;
-  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
-    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
-    function ctor() { this.constructor = child; }
-    ctor.prototype = parent.prototype;
-    child.prototype = new ctor;
-    child.__super__ = parent.prototype;
-    return child;
-  };
-  smio = smoothio = global.smoothio;
-  smio.Packs_Core_Controls_SwipeBehavior = (function() {
-    __extends(Packs_Core_Controls_SwipeBehavior, smio.Control);
-    Packs_Core_Controls_SwipeBehavior.prototype.onLoad = function() {
-      Packs_Core_Controls_SwipeBehavior.__super__.onLoad.call(this);
-      return this.el.addClass('smio-swipebehavior');
-    };
-    function Packs_Core_Controls_SwipeBehavior(client, parent, args) {
-      Packs_Core_Controls_SwipeBehavior.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_SwipeBehavior");
-      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
-      this.init();
-    }
-    Packs_Core_Controls_SwipeBehavior.prototype.renderHtml = function($el) {
-      var __o;
-      if (!this._html) {
-        __o = [];
-        __o.push("\n\n");
-        this._html = __o.join('');
-      }
-      if ($el) {
-        $el.html(this._html);
-      }
-      return this._html;
-    };
-    return Packs_Core_Controls_SwipeBehavior;
   })();
 }).call(this);
 
@@ -13557,33 +13605,38 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.init();
     }
     Packs_Core_Controls_TabStrip.prototype.renderHtml = function($el) {
-      var firstDone, tab, __o, _i, _len, _ref;
+      var firstDone, tab, __r, _i, _len, _ref;
       if (!this._html) {
-        __o = [];
-        __o.push("\n<div id=\"");
-        __o.push(this.ctlID);
-        __o.push("\" class=\"");
-        __o.push(this.renderTag("arg", "class", null));
-        __o.push("\">\n");
+        __r = {
+          ctls: [],
+          m: [],
+          o: null
+        };
+        __r.o = __r.m;
+        __r.o.push("\n<div id=\"");
+        __r.o.push(this.ctlID);
+        __r.o.push("\" class=\"");
+        __r.o.push(this.renderTag("arg", "class", null));
+        __r.o.push("\">\n");
         firstDone = false;
         _ref = this.args.tabs;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           tab = _ref[_i];
-          __o.push("\n\t\t<a href=\"javascript:void(0);\" id=\"");
-          __o.push(this.id(tab));
-          __o.push("\" class=\"");
-          __o.push(this.renderTag("arg", "tabClass", null));
-          __o.push(" ");
-          __o.push(this.args.tabClass + (firstDone ? '-inactive' : '-active'));
-          __o.push("\">");
-          __o.push(this.res(this.args.resPrefix + tab));
-          __o.push("</a>\n\t\t");
+          __r.o.push("\n\t\t<a href=\"javascript:void(0);\" id=\"");
+          __r.o.push(this.id(tab));
+          __r.o.push("\" class=\"");
+          __r.o.push(this.renderTag("arg", "tabClass", null));
+          __r.o.push(" ");
+          __r.o.push(this.args.tabClass + (firstDone ? '-inactive' : '-active'));
+          __r.o.push("\">");
+          __r.o.push(this.res(this.args.resPrefix + tab));
+          __r.o.push("</a>\n\t\t");
           if (!firstDone) {
             firstDone = true;
           }
         }
-        __o.push("\n</div>\n\n");
-        this._html = __o.join('');
+        __r.o.push("\n</div>\n\n");
+        this._html = __r.o.join('');
       }
       if ($el) {
         $el.html(this._html);
@@ -13616,35 +13669,118 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.init();
     }
     Packs_Core_ServerSetup_InitialSiteSetup.prototype.renderHtml = function($el) {
-      var __o;
+      var tmp, __r;
       if (!this._html) {
-        __o = [];
-        __o.push("<div class=\"smio-setup\" id=\"");
-        __o.push(this.id());
-        __o.push("\">\n\t<div class=\"smio-setup-outer smio-setup-outer-top\">\n\t\t<div class=\"smio-setup-header\">");
-        __o.push(this.renderTag("r", "title", null));
-        __o.push("</div>\n\t\t<div class=\"smio-setup-header-desc\">");
-        __o.push(this.renderTag("r", "desc", null));
-        __o.push("</div>\n\t</div>\n\t<div class=\"smio-setup-inner\">\n\t\t<ul id=\"");
-        __o.push(this.id('stepswipe'));
-        __o.push("\">\n\t\t\t<li class=\"smio-setup-stepbox\">\n\t\t\t\t");
-        __o.push(this.renderTag("r", "usersetup", null));
-        __o.push("\n\t\t\t</li>\n\t\t\t<li class=\"smio-setup-stepbox\">\n\t\t\t\t");
-        __o.push(this.renderTag("r", "templateselection", null));
-        __o.push("\n\t\t\t</li>\n\t\t\t<li class=\"smio-setup-stepbox\">\n\t\t\t\tthe finish line!!\n\t\t\t\t<br/>\n\t\t\t\tthis is where we ROLL...\n\t\t\t\t<br/><br/>\n\t\t\t\tcrazy innit?!\n\t\t\t</li>\n\t\t</ul>\n\t\t");
-        __o.push(this.renderTag("ctl", "SwipeBehavior", {
-          id: this.id('stepswipe')
-        }));
-        __o.push("\n\t</div>\n\t");
-        __o.push(this.renderTag("ctl", "TabStrip", {
+        __r = {
+          ctls: [],
+          m: [],
+          o: null
+        };
+        __r.o = __r.m;
+        __r.o.push("<div class=\"smio-setup\" id=\"");
+        __r.o.push(this.id());
+        __r.o.push("\">\n\t<div class=\"smio-setup-outer smio-setup-outer-top\">\n\t\t<div class=\"smio-setup-header\">");
+        __r.o.push(this.renderTag("r", "title", null));
+        __r.o.push("</div>\n\t\t<div class=\"smio-setup-header-desc\">");
+        __r.o.push(this.renderTag("r", "desc", null));
+        __r.o.push("</div>\n\t</div>\n\t<div class=\"smio-setup-inner\">\n\t\t");
+        tmp = [];
+        __r.ctls.push({
+          o: tmp,
+          c: "Carousel",
+          args: {
+            id: this.id('carousel')
+          }
+        });
+        __r.o = tmp;
+        __r.o.push("\n\t\t\t");
+        tmp = [];
+        __r.ctls.push({
+          o: tmp,
+          c: "item",
+          args: {
+            id: 'owner'
+          }
+        });
+        __r.o = tmp;
+        __r.o.push("\n\t\t\t\t");
+        __r.o.push({
+          t: "r",
+          s: "usersetup",
+          a: null
+        });
+        __r.o.push("\n\t\t\t");
+        tmp = __r.ctls.pop();
+        __r.o = __r.ctls[0].o;
+        __r.o.push({
+          t: 'ctl',
+          s: tmp.c,
+          a: smio.Util.Object.mergeDefaults(tmp.args, {
+            __o: tmp.o
+          })
+        });
+        __r.o.push("\n\t\t\t");
+        tmp = [];
+        __r.ctls.push({
+          o: tmp,
+          c: "item",
+          args: {
+            id: 'template'
+          }
+        });
+        __r.o = tmp;
+        __r.o.push("\n\t\t\t\t");
+        __r.o.push({
+          t: "r",
+          s: "templateselection",
+          a: null
+        });
+        __r.o.push("\n\t\t\t");
+        tmp = __r.ctls.pop();
+        __r.o = __r.ctls[0].o;
+        __r.o.push({
+          t: 'ctl',
+          s: tmp.c,
+          a: smio.Util.Object.mergeDefaults(tmp.args, {
+            __o: tmp.o
+          })
+        });
+        __r.o.push("\n\t\t\t");
+        tmp = [];
+        __r.ctls.push({
+          o: tmp,
+          c: "item",
+          args: {
+            id: 'finish'
+          }
+        });
+        __r.o = tmp;
+        __r.o.push("\n\t\t\t\tthe finish line!!\n\t\t\t\t<br/>\n\t\t\t\tthis is where we ROLL...\n\t\t\t\t<br/><br/>\n\t\t\t\tcrazy innit?!\n\t\t\t");
+        tmp = __r.ctls.pop();
+        __r.o = __r.ctls[0].o;
+        __r.o.push({
+          t: 'ctl',
+          s: tmp.c,
+          a: smio.Util.Object.mergeDefaults(tmp.args, {
+            __o: tmp.o
+          })
+        });
+        __r.o.push("\n\t\t");
+        tmp = __r.ctls.pop();
+        __r.o = __r.m;
+        __r.o.push(this.renderTag('ctl', tmp.c, smio.Util.Object.mergeDefaults(tmp.args, {
+          __o: tmp.o
+        })));
+        __r.o.push("\n\t</div>\n\t");
+        __r.o.push(this.renderTag("ctl", "TabStrip", {
           id: this.id('steptabs'),
           "class": 'smio-setup-outer smio-setup-steps',
           tabClass: 'smio-setup-step',
           tabs: ['owner', 'template', 'finish'],
           resPrefix: 'steps_'
         }));
-        __o.push("\n</div>\n\n");
-        this._html = __o.join('');
+        __r.o.push("\n</div>\n\n");
+        this._html = __r.o.join('');
       }
       if ($el) {
         $el.html(this._html);

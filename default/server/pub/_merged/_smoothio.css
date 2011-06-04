@@ -176,13 +176,14 @@ body {
 }
 
 /** server/pub/_packs/Core/Controls/Controls.css **/
-.smio-swipebehavior {
-  list-style-type: none;
-  overflow: scroll;
+div.smio-carousel {
+  overflow: auto;
   white-space: nowrap;
-  vertical-align: top;
 }
-.smio-swipebehavior > li {
+ul.smio-carousel {
+  list-style-type: none;
+}
+ul.smio-carousel > li {
   display: inline-block;
   vertical-align: top;
   width: 100%;

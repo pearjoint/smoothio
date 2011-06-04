@@ -13,9 +13,26 @@
         }
         if (ctl.controls[args.id]) {
           return ctl.controls[args.id].renderHtml();
+        } else if (ctl.ctlRenderers[className]) {
+          return ctl.ctlRenderers[className](className, args);
         } else {
           return "!!CONTROL_NOT_FOUND::" + className + "!!";
         }
+      },
+      "inner": function(ctl, name, args) {
+        var a, i, o, tmp, _ref;
+        o = [];
+        a = args ? args : ctl.args;
+        if (a['__o'] && a.__o['length']) {
+          for (i = 0, _ref = a.__o.length; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
+            if (_.isString((tmp = a.__o[i]))) {
+              o.push(tmp);
+            } else {
+              o.push(ctl.renderTag(tmp.t, tmp.s, tmp.a));
+            }
+          }
+        }
+        return o.join('');
       },
       "r": function(ctl, name) {
         return ctl.res.apply(ctl, [name]);
@@ -38,6 +55,7 @@
       this.ctlID = this.args.id;
       this.controls = {};
       this.containers = {};
+      this.ctlRenderers = {};
       this.el = null;
       this._html = '';
     }

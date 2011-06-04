@@ -35,27 +35,31 @@ class smio.Packs_Core_Controls_TabStrip extends smio.Control
 
 	renderHtml: ($el) ->
 		if not @_html
-			__o = []
-			__o.push "\n<div id=\""
-			__o.push @ctlID
-			__o.push "\" class=\""
-			__o.push @renderTag "arg", "class", null
-			__o.push "\">\n"
+			__r =
+				ctls: []
+				m: []
+				o: null
+			__r.o = __r.m
+			__r.o.push "\n<div id=\""
+			__r.o.push @ctlID
+			__r.o.push "\" class=\""
+			__r.o.push @renderTag "arg", "class", null
+			__r.o.push "\">\n"
 			firstDone = false
 			for tab in @args.tabs
-				__o.push "\n\t\t<a href=\"javascript:void(0);\" id=\""
-				__o.push @id(tab)
-				__o.push "\" class=\""
-				__o.push @renderTag "arg", "tabClass", null
-				__o.push " "
-				__o.push @args.tabClass + (if firstDone then '-inactive' else '-active')
-				__o.push "\">"
-				__o.push @res @args.resPrefix + tab
-				__o.push "</a>\n\t\t"
+				__r.o.push "\n\t\t<a href=\"javascript:void(0);\" id=\""
+				__r.o.push @id(tab)
+				__r.o.push "\" class=\""
+				__r.o.push @renderTag "arg", "tabClass", null
+				__r.o.push " "
+				__r.o.push @args.tabClass + (if firstDone then '-inactive' else '-active')
+				__r.o.push "\">"
+				__r.o.push @res @args.resPrefix + tab
+				__r.o.push "</a>\n\t\t"
 				if not firstDone
 					firstDone = true
-			__o.push "\n</div>\n\n"
-			@_html = __o.join ''
+			__r.o.push "\n</div>\n\n"
+			@_html = __r.o.join ''
 		if $el
 			$el.html @_html
 		@_html

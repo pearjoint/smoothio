@@ -26,15 +26,19 @@ class smio.Packs_Core_Controls_MainFrame extends smio.Control
 
 	renderHtml: ($el) ->
 		if not @_html
-			__o = []
-			__o.push "\n<div class=\"smio-main\" id=\""
-			__o.push @id()
-			__o.push "\">\n\t"
-			__o.push @renderTag "ctl", "Console", { id: (@id 'ctop'), topDown: true }
-			__o.push "\n\t<div class=\"smio-console smio-console-main\"></div>\n\t"
-			__o.push @renderTag "ctl", "Console", { id: (@id 'cbottom'), topDown: false }
-			__o.push "\n</div>\n\n"
-			@_html = __o.join ''
+			__r =
+				ctls: []
+				m: []
+				o: null
+			__r.o = __r.m
+			__r.o.push "\n<div class=\"smio-main\" id=\""
+			__r.o.push @id()
+			__r.o.push "\">\n\t"
+			__r.o.push @renderTag "ctl", "Console", { id: (@id 'ctop'), topDown: true }
+			__r.o.push "\n\t<div class=\"smio-console smio-console-main\"></div>\n\t"
+			__r.o.push @renderTag "ctl", "Console", { id: (@id 'cbottom'), topDown: false }
+			__r.o.push "\n</div>\n\n"
+			@_html = __r.o.join ''
 		if $el
 			$el.html @_html
 		@_html

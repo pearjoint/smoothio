@@ -23,23 +23,28 @@
       this.init();
     }
     Packs_Core_Controls_MainFrame.prototype.renderHtml = function($el) {
-      var __o;
+      var __r;
       if (!this._html) {
-        __o = [];
-        __o.push("\n<div class=\"smio-main\" id=\"");
-        __o.push(this.id());
-        __o.push("\">\n\t");
-        __o.push(this.renderTag("ctl", "Console", {
+        __r = {
+          ctls: [],
+          m: [],
+          o: null
+        };
+        __r.o = __r.m;
+        __r.o.push("\n<div class=\"smio-main\" id=\"");
+        __r.o.push(this.id());
+        __r.o.push("\">\n\t");
+        __r.o.push(this.renderTag("ctl", "Console", {
           id: this.id('ctop'),
           topDown: true
         }));
-        __o.push("\n\t<div class=\"smio-console smio-console-main\"></div>\n\t");
-        __o.push(this.renderTag("ctl", "Console", {
+        __r.o.push("\n\t<div class=\"smio-console smio-console-main\"></div>\n\t");
+        __r.o.push(this.renderTag("ctl", "Console", {
           id: this.id('cbottom'),
           topDown: false
         }));
-        __o.push("\n</div>\n\n");
-        this._html = __o.join('');
+        __r.o.push("\n</div>\n\n");
+        this._html = __r.o.join('');
       }
       if ($el) {
         $el.html(this._html);

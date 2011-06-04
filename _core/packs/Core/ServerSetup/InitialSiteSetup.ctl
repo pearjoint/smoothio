@@ -4,22 +4,21 @@
 		<div class="smio-setup-header-desc"><%r:desc%></div>
 	</div>
 	<div class="smio-setup-inner">
-		<ul id="<%=@id('stepswipe')%>">
-			<li class="smio-setup-stepbox">
+		<%begin:Carousel { id: @id('carousel') } %>
+			<%begin:item { id: 'owner' } %>
 				<%r:usersetup%>
-			</li>
-			<li class="smio-setup-stepbox">
+			<%end:%>
+			<%begin:item { id: 'template' } %>
 				<%r:templateselection%>
-			</li>
-			<li class="smio-setup-stepbox">
+			<%end:%>
+			<%begin:item { id: 'finish' } %>
 				the finish line!!
 				<br/>
 				this is where we ROLL...
 				<br/><br/>
 				crazy innit?!
-			</li>
-		</ul>
-		<%ctl:SwipeBehavior { id: @id('stepswipe') }%>
+			<%end:%>
+		<%end:%>
 	</div>
 	<%ctl:TabStrip { id: @id('steptabs'), class: 'smio-setup-outer smio-setup-steps', tabClass: 'smio-setup-step', tabs: ['owner', 'template', 'finish'], resPrefix: 'steps_' }%>
 </div>

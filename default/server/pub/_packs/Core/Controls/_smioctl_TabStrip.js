@@ -49,33 +49,38 @@
       this.init();
     }
     Packs_Core_Controls_TabStrip.prototype.renderHtml = function($el) {
-      var firstDone, tab, __o, _i, _len, _ref;
+      var firstDone, tab, __r, _i, _len, _ref;
       if (!this._html) {
-        __o = [];
-        __o.push("\n<div id=\"");
-        __o.push(this.ctlID);
-        __o.push("\" class=\"");
-        __o.push(this.renderTag("arg", "class", null));
-        __o.push("\">\n");
+        __r = {
+          ctls: [],
+          m: [],
+          o: null
+        };
+        __r.o = __r.m;
+        __r.o.push("\n<div id=\"");
+        __r.o.push(this.ctlID);
+        __r.o.push("\" class=\"");
+        __r.o.push(this.renderTag("arg", "class", null));
+        __r.o.push("\">\n");
         firstDone = false;
         _ref = this.args.tabs;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           tab = _ref[_i];
-          __o.push("\n\t\t<a href=\"javascript:void(0);\" id=\"");
-          __o.push(this.id(tab));
-          __o.push("\" class=\"");
-          __o.push(this.renderTag("arg", "tabClass", null));
-          __o.push(" ");
-          __o.push(this.args.tabClass + (firstDone ? '-inactive' : '-active'));
-          __o.push("\">");
-          __o.push(this.res(this.args.resPrefix + tab));
-          __o.push("</a>\n\t\t");
+          __r.o.push("\n\t\t<a href=\"javascript:void(0);\" id=\"");
+          __r.o.push(this.id(tab));
+          __r.o.push("\" class=\"");
+          __r.o.push(this.renderTag("arg", "tabClass", null));
+          __r.o.push(" ");
+          __r.o.push(this.args.tabClass + (firstDone ? '-inactive' : '-active'));
+          __r.o.push("\">");
+          __r.o.push(this.res(this.args.resPrefix + tab));
+          __r.o.push("</a>\n\t\t");
           if (!firstDone) {
             firstDone = true;
           }
         }
-        __o.push("\n</div>\n\n");
-        this._html = __o.join('');
+        __r.o.push("\n</div>\n\n");
+        this._html = __r.o.join('');
       }
       if ($el) {
         $el.html(this._html);

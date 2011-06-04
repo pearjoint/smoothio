@@ -8,7 +8,7 @@
   smio.Control = (function() {
     function Control() {}
     Control.compile = function(inst, ctlContent, controlPath) {
-      var baseName, c, className, coffeeScript, contentParts, decls, dyn, dynCmd, i, inDyn, ind, indent, isCmd, jarg, l, lastChar, lastContent, lind, lines, obj, oneUp, part, pathParts, pos, posC, posS, renderParts, rind, rp, sarg, stimes, tmpPos, tmpPos2, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref, _ref2, _ref3, _ref4, _ref5;
+      var baseName, br, c, className, coffeeScript, contentParts, decls, dyn, dynCmd, i, inDyn, ind, indent, isCmd, jarg, l, lastChar, lastContent, lind, lines, obj, oneUp, part, pathParts, pos, posC, posS, renderParts, rind, rp, sarg, stimes, subs, tmpPos, tmpPos2, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref, _ref2, _ref3, _ref4, _ref5;
       this.inst = inst;
       _ref = [false, '../', [], '', [], '', '', {}], inDyn = _ref[0], oneUp = _ref[1], contentParts = _ref[2], decls = _ref[3], renderParts = _ref[4], lastChar = _ref[5], lastContent = _ref[6], obj = _ref[7];
       pathParts = (controlPath.substr(0, controlPath.lastIndexOf('.'))).split('/');
@@ -80,15 +80,17 @@
           }
         }
       }
-      coffeeScript = "###\nAuto-generated from " + controlPath + "\n###\n" + "#if server" + "\nrequire '" + (smio.Util.String.times(oneUp, pathParts.length)) + "_jscript/Control'\n" + "#endif" + "\nsmio = smoothio = global.smoothio\nclass smio.Packs_" + className + " extends smio.Control\n" + decls + "\n" + "#if client" + "\n	constructor: (client, parent, args) ->\n		super client, parent, args, " + (JSON.stringify(baseName)) + ", " + (JSON.stringify(className)) + "\n		@jsSelf = \"smio.client.allControls['\" + @id() + \"']\"\n		@init()\n\n	renderHtml: ($el) ->\n		if not @_html\n			__o = []";
+      coffeeScript = "###\nAuto-generated from " + controlPath + "\n###\n" + "#if server" + "\nrequire '" + (smio.Util.String.times(oneUp, pathParts.length)) + "_jscript/Control'\n" + "#endif" + "\nsmio = smoothio = global.smoothio\nclass smio.Packs_" + className + " extends smio.Control\n" + decls + "\n" + "#if client" + "\n	constructor: (client, parent, args) ->\n		super client, parent, args, " + (JSON.stringify(baseName)) + ", " + (JSON.stringify(className)) + "\n		@jsSelf = \"smio.client.allControls['\" + @id() + \"']\"\n		@init()\n\n	renderHtml: ($el) ->\n		if not @_html\n			__r =\n				ctls: []\n				m: []\n				o: null\n			__r.o = __r.m";
       _ref3 = [-1, 3, 3, smio.Util.String.times], ind = _ref3[0], indent = _ref3[1], rind = _ref3[2], stimes = _ref3[3];
+      subs = 0;
       for (_k = 0, _len3 = renderParts.length; _k < _len3; _k++) {
         rp = renderParts[_k];
+        br = "\n" + (stimes('\t', rind));
         if (_.isString(rp)) {
-          coffeeScript += "\n" + (stimes('\t', rind)) + "__o.push " + (JSON.stringify(rp));
+          coffeeScript += "" + br + "__r.o.push " + (JSON.stringify(rp));
         } else if ((_.isArray(rp)) && rp.length && rp.length > 1) {
           if (rp[0] === '=') {
-            coffeeScript += "\n" + (stimes('\t', rind)) + "__o.push " + rp[1];
+            coffeeScript += "" + br + "__r.o.push " + rp[1];
           } else if (rp[0] === '_') {
             lines = rp[1].split('\n');
             rp[1] = '';
@@ -133,11 +135,26 @@
               jarg = sarg.substr(pos);
               sarg = _.trim(sarg.substr(0, pos));
             }
-            coffeeScript += "\n" + (stimes('\t', rind)) + "__o.push @renderTag " + (JSON.stringify(rp[0])) + ", " + (JSON.stringify(sarg)) + ", " + jarg;
+            if (rp[0] === 'begin') {
+              subs = subs + 1;
+              coffeeScript += "" + br + "tmp = []" + br + "__r.ctls.push o: tmp, c: " + (JSON.stringify(sarg)) + ", args: " + jarg + br + "__r.o = tmp";
+            } else if (rp[0] === 'end') {
+              subs = subs - 1;
+              coffeeScript += ("" + br + "tmp = __r.ctls.pop()" + br + "__r.o = ") + (subs ? "__r.ctls[" + (subs - 1) + "].o" : '__r.m');
+              if (subs) {
+                coffeeScript += "" + br + "__r.o.push t: 'ctl', s: tmp.c, a: (smio.Util.Object.mergeDefaults tmp.args, __o: tmp.o)";
+              } else {
+                coffeeScript += "" + br + "__r.o.push @renderTag 'ctl', tmp.c, smio.Util.Object.mergeDefaults tmp.args, __o: tmp.o";
+              }
+            } else if (subs) {
+              coffeeScript += "" + br + "__r.o.push t: " + (JSON.stringify(rp[0])) + ", s: " + (JSON.stringify(sarg)) + ", a: " + jarg;
+            } else {
+              coffeeScript += "" + br + "__r.o.push @renderTag " + (JSON.stringify(rp[0])) + ", " + (JSON.stringify(sarg)) + ", " + jarg;
+            }
           }
         }
       }
-      coffeeScript += "\n" + (stimes('\t', indent)) + "@_html = __o.join ''\n" + (stimes('\t', indent - 1)) + "if $el\n" + (stimes('\t', indent)) + "$el.html @_html\n" + (stimes('\t', indent - 1)) + "@_html\n" + "#endif" + "\n";
+      coffeeScript += "\n" + (stimes('\t', indent)) + "@_html = __r.o.join ''\n" + (stimes('\t', indent - 1)) + "if $el\n" + (stimes('\t', indent)) + "$el.html @_html\n" + (stimes('\t', indent - 1)) + "@_html\n" + "#endif" + "\n";
       return coffeeScript;
     };
     Control.prototype.res = function(name) {
