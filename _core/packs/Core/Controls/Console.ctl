@@ -5,14 +5,14 @@
 	onLoad: ($el) ->
 		super()
 		if not @args['topDown']
-			$("##{@ctlID}_detail").insertBefore "##{@ctlID}_ever"
-			$("##{@ctlID}_hover").insertBefore "##{@ctlID}_ever"
+			$("##{@id()}_detail").insertBefore "##{@id()}_ever"
+			$("##{@id()}_hover").insertBefore "##{@id()}_ever"
 
 #endif
 %>
-<div id="<%=@ctlID%>" class="smio-console smio-console-<%= if @args['topDown'] then 'top' else 'bottom'%>">
-	<div id="<%=@ctlID%>_ever" class="smio-console-ever">header</div>
-	<div id="<%=@ctlID%>_hover" class="smio-console-hover" style="display: none;">hover</div>
-	<div id="<%=@ctlID%>_detail" class="smio-console-detail" style="display: none;">details</div>
+<div id="<%=@id()%>" class="smio-console smio-console-<%= if @args['topDown'] then 'top' else 'bottom'%>">
+	<div id="<%=@id()%>_ever" class="smio-console-ever">header</div>
+	<div id="<%=@id()%>_hover" class="smio-console-hover" style="display: none;">hover</div>
+	<div id="<%=@id()%>_detail" class="smio-console-detail" style="display: none;">details</div>
 </div>
 

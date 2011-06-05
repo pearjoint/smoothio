@@ -7,6 +7,7 @@
       var cookie;
       this.sleepy = false;
       this.allControls = {};
+      this.pageWindow = $(window);
       this.pageBody = $('#smio_body');
       $('#smio_offline').text(smio.resources.smoothio.connect).append('<span id="smio_offline_blink" style="visibility: hidden;">_</span>');
       cookie = $.cookie('smoo');
@@ -20,6 +21,9 @@
       }
       this.sessionID = this.smioCookie['sessid'];
       this.socket = new smio.Socket(this, false);
+      this.pageWindow.resize(_.debounce((__bind(function() {
+        return this.onWindowResize();
+      }, this)), 300));
     }
     Client.prototype.init = function() {
       this.socket.connect();
@@ -28,6 +32,17 @@
           "background-image": "url('/_/file/images/bg" + (smio.Util.Number.randomInt(4)) + ".jpg')"
         });
       }, this)), 5000);
+    };
+    Client.prototype.onWindowResize = function() {
+      var ctl, h, id, w, _ref, _ref2, _results;
+      _ref = [this.pageWindow.width(), this.pageWindow.height()], w = _ref[0], h = _ref[1];
+      _ref2 = this.allControls;
+      _results = [];
+      for (id in _ref2) {
+        ctl = _ref2[id];
+        _results.push(ctl.onWindowResize(w, h));
+      }
+      return _results;
     };
     Client.prototype.syncControls = function(controlDescs) {
       var ctl, ctlDesc, id, _results;

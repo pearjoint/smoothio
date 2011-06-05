@@ -17,8 +17,8 @@
     Packs_Core_Controls_Console.prototype.onLoad = function($el) {
       Packs_Core_Controls_Console.__super__.onLoad.call(this);
       if (!this.args['topDown']) {
-        $("#" + this.ctlID + "_detail").insertBefore("#" + this.ctlID + "_ever");
-        return $("#" + this.ctlID + "_hover").insertBefore("#" + this.ctlID + "_ever");
+        $("#" + (this.id()) + "_detail").insertBefore("#" + (this.id()) + "_ever");
+        return $("#" + (this.id()) + "_hover").insertBefore("#" + (this.id()) + "_ever");
       }
     };
     function Packs_Core_Controls_Console(client, parent, args) {
@@ -31,20 +31,19 @@
       if (!this._html) {
         __r = {
           ctls: [],
-          m: [],
-          o: null
+          m: []
         };
         __r.o = __r.m;
         __r.o.push("\n<div id=\"");
-        __r.o.push(this.ctlID);
+        __r.o.push(this.id());
         __r.o.push("\" class=\"smio-console smio-console-");
         __r.o.push(this.args['topDown'] ? 'top' : 'bottom');
         __r.o.push("\">\n\t<div id=\"");
-        __r.o.push(this.ctlID);
+        __r.o.push(this.id());
         __r.o.push("_ever\" class=\"smio-console-ever\">header</div>\n\t<div id=\"");
-        __r.o.push(this.ctlID);
+        __r.o.push(this.id());
         __r.o.push("_hover\" class=\"smio-console-hover\" style=\"display: none;\">hover</div>\n\t<div id=\"");
-        __r.o.push(this.ctlID);
+        __r.o.push(this.id());
         __r.o.push("_detail\" class=\"smio-console-detail\" style=\"display: none;\">details</div>\n</div>\n\n");
         this._html = __r.o.join('');
       }

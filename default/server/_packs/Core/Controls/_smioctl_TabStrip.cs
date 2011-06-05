@@ -14,16 +14,18 @@ class smio.Packs_Core_Controls_TabStrip extends smio.Control
 		for t in @args.tabs
 			makeHandler = (tabID) =>
 				() => @selectTab tabID
-			$("##{@ctlID}_#{t}").click makeHandler t
+			$("##{@id t}").click makeHandler t
 
 	selectTab: (tabID) ->
-		a = $("##{@ctlID}_#{tabID}")
+		a = $("##{@id tabID}")
 		cls = "#{@args.tabClass}-active"
 		incls = "#{@args.tabClass}-inactive"
 		if not a.hasClass cls
 			for t in @args.tabs
-				$("##{@ctlID}_#{t}").removeClass(cls).addClass incls
+				$("##{@id t}").removeClass(cls).addClass incls
 			a.removeClass(incls).addClass cls
+			if @args.onTabSelect
+				@args.onTabSelect tabID
 #endif
 
 
@@ -38,17 +40,16 @@ class smio.Packs_Core_Controls_TabStrip extends smio.Control
 			__r =
 				ctls: []
 				m: []
-				o: null
 			__r.o = __r.m
 			__r.o.push "\n<div id=\""
-			__r.o.push @ctlID
+			__r.o.push @id()
 			__r.o.push "\" class=\""
 			__r.o.push @renderTag "arg", "class", null
 			__r.o.push "\">\n"
 			firstDone = false
 			for tab in @args.tabs
 				__r.o.push "\n\t\t<a href=\"javascript:void(0);\" id=\""
-				__r.o.push @id(tab)
+				__r.o.push @id tab
 				__r.o.push "\" class=\""
 				__r.o.push @renderTag "arg", "tabClass", null
 				__r.o.push " "

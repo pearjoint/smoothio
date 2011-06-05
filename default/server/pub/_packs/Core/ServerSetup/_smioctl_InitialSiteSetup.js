@@ -9,10 +9,13 @@
     child.prototype = new ctor;
     child.__super__ = parent.prototype;
     return child;
-  };
+  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   smio = smoothio = global.smoothio;
   smio.Packs_Core_ServerSetup_InitialSiteSetup = (function() {
     __extends(Packs_Core_ServerSetup_InitialSiteSetup, smio.Control);
+    Packs_Core_ServerSetup_InitialSiteSetup.prototype.onTabSelect = function(tabID) {
+      return this.controls.stepslide.scrollTo(tabID);
+    };
     function Packs_Core_ServerSetup_InitialSiteSetup(client, parent, args) {
       Packs_Core_ServerSetup_InitialSiteSetup.__super__.constructor.call(this, client, parent, args, "Core_ServerSetup", "Core_ServerSetup_InitialSiteSetup");
       this.jsSelf = "smio.client.allControls['" + this.id() + "']";
@@ -23,11 +26,10 @@
       if (!this._html) {
         __r = {
           ctls: [],
-          m: [],
-          o: null
+          m: []
         };
         __r.o = __r.m;
-        __r.o.push("<div class=\"smio-setup\" id=\"");
+        __r.o.push("\n<div class=\"smio-setup\" id=\"");
         __r.o.push(this.id());
         __r.o.push("\">\n\t<div class=\"smio-setup-outer smio-setup-outer-top\">\n\t\t<div class=\"smio-setup-header\">");
         __r.o.push(this.renderTag("r", "title", null));
@@ -37,9 +39,11 @@
         tmp = [];
         __r.ctls.push({
           o: tmp,
-          c: "Carousel",
+          c: "SlidePanel",
           args: {
-            id: this.id('carousel')
+            id: 'stepslide',
+            "class": 'smio-setup-stepslide',
+            itemClass: 'smio-setup-stepbox'
           }
         });
         __r.o = tmp;
@@ -123,11 +127,14 @@
         })));
         __r.o.push("\n\t</div>\n\t");
         __r.o.push(this.renderTag("ctl", "TabStrip", {
-          id: this.id('steptabs'),
-          "class": 'smio-setup-outer smio-setup-steps',
-          tabClass: 'smio-setup-step',
+          id: 'steptabs',
+          "class": 'smio-setup-outer smio-setup-steptabs',
+          tabClass: 'smio-setup-steptab',
           tabs: ['owner', 'template', 'finish'],
-          resPrefix: 'steps_'
+          resPrefix: 'steps_',
+          onTabSelect: __bind(function(tabID) {
+            return this.onTabSelect(tabID);
+          }, this)
         }));
         __r.o.push("\n</div>\n\n");
         this._html = __r.o.join('');

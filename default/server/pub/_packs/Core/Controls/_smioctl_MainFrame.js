@@ -27,20 +27,19 @@
       if (!this._html) {
         __r = {
           ctls: [],
-          m: [],
-          o: null
+          m: []
         };
         __r.o = __r.m;
         __r.o.push("\n<div class=\"smio-main\" id=\"");
         __r.o.push(this.id());
         __r.o.push("\">\n\t");
         __r.o.push(this.renderTag("ctl", "Console", {
-          id: this.id('ctop'),
+          id: 'ctop',
           topDown: true
         }));
         __r.o.push("\n\t<div class=\"smio-console smio-console-main\"></div>\n\t");
         __r.o.push(this.renderTag("ctl", "Console", {
-          id: this.id('cbottom'),
+          id: 'cbottom',
           topDown: false
         }));
         __r.o.push("\n</div>\n\n");

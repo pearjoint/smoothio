@@ -7,6 +7,11 @@ require '../../../_jscript/Control'
 smio = smoothio = global.smoothio
 class smio.Packs_Core_ServerSetup_InitialSiteSetup extends smio.Control
 
+
+	onTabSelect: (tabID) ->
+		@controls.stepslide.scrollTo tabID
+
+
 #if client
 	constructor: (client, parent, args) ->
 		super client, parent, args, "Core_ServerSetup", "Core_ServerSetup_InitialSiteSetup"
@@ -18,9 +23,8 @@ class smio.Packs_Core_ServerSetup_InitialSiteSetup extends smio.Control
 			__r =
 				ctls: []
 				m: []
-				o: null
 			__r.o = __r.m
-			__r.o.push "<div class=\"smio-setup\" id=\""
+			__r.o.push "\n<div class=\"smio-setup\" id=\""
 			__r.o.push @id()
 			__r.o.push "\">\n\t<div class=\"smio-setup-outer smio-setup-outer-top\">\n\t\t<div class=\"smio-setup-header\">"
 			__r.o.push @renderTag "r", "title", null
@@ -28,7 +32,7 @@ class smio.Packs_Core_ServerSetup_InitialSiteSetup extends smio.Control
 			__r.o.push @renderTag "r", "desc", null
 			__r.o.push "</div>\n\t</div>\n\t<div class=\"smio-setup-inner\">\n\t\t"
 			tmp = []
-			__r.ctls.push o: tmp, c: "Carousel", args: { id: @id('carousel') } 
+			__r.ctls.push o: tmp, c: "SlidePanel", args: { id: 'stepslide', class: 'smio-setup-stepslide', itemClass: 'smio-setup-stepbox' } 
 			__r.o = tmp
 			__r.o.push "\n\t\t\t"
 			tmp = []
@@ -63,7 +67,7 @@ class smio.Packs_Core_ServerSetup_InitialSiteSetup extends smio.Control
 			__r.o = __r.m
 			__r.o.push @renderTag 'ctl', tmp.c, smio.Util.Object.mergeDefaults tmp.args, __o: tmp.o
 			__r.o.push "\n\t</div>\n\t"
-			__r.o.push @renderTag "ctl", "TabStrip", { id: @id('steptabs'), class: 'smio-setup-outer smio-setup-steps', tabClass: 'smio-setup-step', tabs: ['owner', 'template', 'finish'], resPrefix: 'steps_' }
+			__r.o.push @renderTag "ctl", "TabStrip", { id: 'steptabs', class: 'smio-setup-outer smio-setup-steptabs', tabClass: 'smio-setup-steptab', tabs: ['owner', 'template', 'finish'], resPrefix: 'steps_', onTabSelect: (tabID) => @onTabSelect tabID }
 			__r.o.push "\n</div>\n\n"
 			@_html = __r.o.join ''
 		if $el

@@ -6,7 +6,7 @@ class smio.Socket
 		@offlineBlinkIntervalHandle = null
 		@initialFetchDone = false
 		if isSocketIO
-			opts = resource: '/_/sockio/', rememberTransport: false, reconnect: true, connectTimeout: 5000, secure: secure is true
+			opts = resource: '/_/sockio/', transports: ['websocket'], rememberTransport: false, reconnect: true, connectTimeout: 5000, secure: secure is true
 			if port
 				opts.port = port
 			@socket = new io.Socket host, opts
@@ -65,7 +65,7 @@ class smio.Socket
 		if not @poll
 			alert JSON.stringify xhr
 		else
-			if xhr and ((xhr.status is 0) and (xhr.readyState is 0) or (xhr.status is 12029) and (xhr.readyState is 4))
+			if xhr and ((xhr.status is 0) and (xhr.readyState is 0)) or ((xhr.readyState is 4) and (xhr.status >= 12001) and (xhr.status <= 12156))
 				@onOffline()
 			else
 				@onOnline()

@@ -25,22 +25,25 @@
             return this.selectTab(tabID);
           }, this);
         }, this);
-        _results.push($("#" + this.ctlID + "_" + t).click(makeHandler(t)));
+        _results.push($("#" + (this.id(t))).click(makeHandler(t)));
       }
       return _results;
     };
     Packs_Core_Controls_TabStrip.prototype.selectTab = function(tabID) {
       var a, cls, incls, t, _i, _len, _ref;
-      a = $("#" + this.ctlID + "_" + tabID);
+      a = $("#" + (this.id(tabID)));
       cls = "" + this.args.tabClass + "-active";
       incls = "" + this.args.tabClass + "-inactive";
       if (!a.hasClass(cls)) {
         _ref = this.args.tabs;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           t = _ref[_i];
-          $("#" + this.ctlID + "_" + t).removeClass(cls).addClass(incls);
+          $("#" + (this.id(t))).removeClass(cls).addClass(incls);
         }
-        return a.removeClass(incls).addClass(cls);
+        a.removeClass(incls).addClass(cls);
+        if (this.args.onTabSelect) {
+          return this.args.onTabSelect(tabID);
+        }
       }
     };
     function Packs_Core_Controls_TabStrip(client, parent, args) {
@@ -53,12 +56,11 @@
       if (!this._html) {
         __r = {
           ctls: [],
-          m: [],
-          o: null
+          m: []
         };
         __r.o = __r.m;
         __r.o.push("\n<div id=\"");
-        __r.o.push(this.ctlID);
+        __r.o.push(this.id());
         __r.o.push("\" class=\"");
         __r.o.push(this.renderTag("arg", "class", null));
         __r.o.push("\">\n");

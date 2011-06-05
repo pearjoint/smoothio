@@ -5,6 +5,7 @@ class smio.Client
 	constructor: ->
 		@sleepy = false
 		@allControls = {}
+		@pageWindow = $(window)
 		@pageBody = $('#smio_body')
 		$('#smio_offline').text(smio.resources.smoothio.connect).append('<span id="smio_offline_blink" style="visibility: hidden;">_</span>')
 		cookie = $.cookie 'smoo'
@@ -16,10 +17,16 @@ class smio.Client
 			@smioCookie = {}
 		@sessionID = @smioCookie['sessid']
 		@socket = new smio.Socket @, false
+		@pageWindow.resize _.debounce (=> @onWindowResize()), 300
 
 	init: ->
 		@socket.connect()
 		setInterval (=> @pageBody.css "background-image": "url('/_/file/images/bg#{smio.Util.Number.randomInt(4)}.jpg')"), 5000
+
+	onWindowResize: () ->
+		[w, h] = [@pageWindow.width(), @pageWindow.height()]
+		for id, ctl of @allControls
+			ctl.onWindowResize w, h
 
 	syncControls: (controlDescs) ->
 		if (ctlDesc = controlDescs[''])

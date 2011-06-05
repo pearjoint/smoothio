@@ -1,9 +1,16 @@
-smio-background-gradient(col1, col2)
+smio-background-vgradient(col1, col2)
 	background col1
-	background -webkit-gradient(linear, 0% 0%, 0% 100%, from(col1), to(col2))
+	background -ms-linear-gradient(col1, col2)
 	background -moz-linear-gradient(col1, col2)
 	background -webkit-linear-gradient(col1, col2)
 	background -o-linear-gradient(col1, col2)
+
+smio-background-hgradient(col1, col2)
+	background col1
+	background -ms-linear-gradient(left, col1, col2)
+	background -moz-linear-gradient(left, col1, col2)
+	background -webkit-linear-gradient(left, col1, col2)
+	background -o-linear-gradient(left, col1, col2)
 
 smio-border-radius()
 	-webkit-border-radius arguments

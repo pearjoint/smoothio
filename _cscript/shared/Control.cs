@@ -70,7 +70,6 @@ class smio.Packs_#{className} extends smio.Control
 			__r =
 				ctls: []
 				m: []
-				o: null
 			__r.o = __r.m
 """
 		[ind, indent, rind, stimes] = [-1, 3, 3, smio.Util.String.times]
@@ -169,17 +168,22 @@ class smio.Packs_#{className} extends smio.Control
 		@el = null
 		@_html = ''
 
+	ctl: (ctlID) ->
+		c = @client.allControls ctlID
+		if c then c else @client.allControls @id(ctlID)
+
 	id: (subID) ->
+		myID = if @parent then "#{@parent.id()}_#{@ctlID}" else @ctlID
 		if (subID)
-			@ctlID + '_' + subID
+			myID + '_' + subID
 		else
-			@ctlID
+			myID
 
 	init: ->
 
 	onLoad: () ->
 		prefix = "cscript:"
-		@el = $('#' + @ctlID)
+		@el = $('#' + @id())
 		for id, ctl of @controls
 			ctl.onLoad()
 		if not @parent
@@ -189,6 +193,8 @@ class smio.Packs_#{className} extends smio.Control
 				catch err
 					alert "CODE:#{(unescape a.href).substr prefix.length}:CODE"
 					a.href = "javascript:smio.client.socket.onError(\"#{err}\");"
+
+	onWindowResize: (width, height) ->
 
 	renderTag: (name, sarg, jarg) ->
 		renderer = smio.Control.tagRenderers[name]

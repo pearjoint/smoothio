@@ -11,7 +11,9 @@ div.smio-setup
 	padding 1em
 
 .smio-setup-outer-top
-	smio-background-gradient rgba(255, 255, 255, 0.66) rgba(255, 255, 255, 0.88)
+	white-space nowrap
+	overflow hidden
+	smio-background-vgradient rgba(255, 255, 255, 0.66) rgba(255, 255, 255, 0.88)
 
 .smio-setup-inner
 	background rgba(255, 255, 255, 0.95)
@@ -20,30 +22,36 @@ div.smio-setup
 .smio-setup-header
 	font-size 2em
 	color #aa4400
+	text-shadow 0px 0px 0.6em #ffffff
 
 .smio-setup-header-desc
-	color #808080
+	color #707070
 	font-size 1.25em
+	text-shadow 0px 0.074em #ffffff
 
-.smio-setup-stepbox
-	padding 1em
+.smio-setup-stepslide > .smio-setup-stepbox
+	padding 1em 0em 1em 0em
+	width: 80%
 
-.smio-setup-steps
-	smio-background-gradient rgba(255, 255, 255, 0.95) rgba(255, 255, 255, 0.65)
+.smio-setup-stepslide .smio-slidepanel-edge
+	width: 10%
+
+.smio-setup-steptabs
+	smio-background-vgradient rgba(255, 255, 255, 0.95) rgba(255, 255, 255, 0.65)
 	text-align center
 	white-space nowrap
 
-.smio-setup-step
+.smio-setup-steptab
 	font-size 0.95em
 	padding 0.2em 1em 0.2em 1em
 	display inline-block
-	color #707070
+	color #606060
 	text-shadow 0px 0.098em #ffffff
 
-.smio-setup-step-inactive:hover
+.smio-setup-steptab-inactive:hover
 	text-decoration underline
 
-.smio-setup-step-active
+.smio-setup-steptab-active
 	cursor default
 	smio-border-radius 1em
 	smio-box-shadow 0 0.066em 0.3em #606060 inset

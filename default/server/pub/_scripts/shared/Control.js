@@ -59,18 +59,29 @@
       this.el = null;
       this._html = '';
     }
-    Control.prototype.id = function(subID) {
-      if (subID) {
-        return this.ctlID + '_' + subID;
+    Control.prototype.ctl = function(ctlID) {
+      var c;
+      c = this.client.allControls(ctlID);
+      if (c) {
+        return c;
       } else {
-        return this.ctlID;
+        return this.client.allControls(this.id(ctlID));
+      }
+    };
+    Control.prototype.id = function(subID) {
+      var myID;
+      myID = this.parent ? "" + (this.parent.id()) + "_" + this.ctlID : this.ctlID;
+      if (subID) {
+        return myID + '_' + subID;
+      } else {
+        return myID;
       }
     };
     Control.prototype.init = function() {};
     Control.prototype.onLoad = function() {
       var ctl, id, prefix, _ref;
       prefix = "cscript:";
-      this.el = $('#' + this.ctlID);
+      this.el = $('#' + this.id());
       _ref = this.controls;
       for (id in _ref) {
         ctl = _ref[id];
@@ -87,6 +98,7 @@
         });
       }
     };
+    Control.prototype.onWindowResize = function(width, height) {};
     Control.prototype.renderTag = function(name, sarg, jarg) {
       var renderer;
       renderer = smio.Control.tagRenderers[name];

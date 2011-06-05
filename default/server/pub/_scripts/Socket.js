@@ -12,6 +12,7 @@
       if (isSocketIO) {
         opts = {
           resource: '/_/sockio/',
+          transports: ['websocket'],
           rememberTransport: false,
           reconnect: true,
           connectTimeout: 5000,
@@ -112,7 +113,7 @@
       if (!this.poll) {
         return alert(JSON.stringify(xhr));
       } else {
-        if (xhr && ((xhr.status === 0) && (xhr.readyState === 0) || (xhr.status === 12029) && (xhr.readyState === 4))) {
+        if (xhr && ((xhr.status === 0) && (xhr.readyState === 0)) || ((xhr.readyState === 4) && (xhr.status >= 12001) && (xhr.status <= 12156))) {
           this.onOffline();
         } else {
           this.onOnline();

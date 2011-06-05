@@ -9356,6 +9356,313 @@ if (!JSON) {
     }
 }());
 
+/** ../_core/scripts/morpheus.js **/
+/*!
+  * Morpheus - A Brilliant Animator
+  * https://github.com/ded/morpheus - (c) Dustin Diaz 2011
+  * License MIT
+  */
+!function (context, doc, win) {
+
+  var html = doc.documentElement,
+      rgbOhex = /^rgb\(|#/,
+      relVal = /^([+\-])=([\d\.]+)/,
+      numUnit = /^(?:[\+\-]=)?\d+(?:\.\d+)?(%|in|cm|mm|em|ex|pt|pc|px)$/,
+      // does this browser support the opacity property?
+      opasity = function () {
+        return typeof doc.createElement('a').style.opacity !== 'undefined';
+      }(),
+      // these elements do not require 'px'
+      unitless = { lineHeight: 1, zoom: 1, zIndex: 1, opacity: 1 },
+
+      // initial style is determined by the elements themselves
+      getStyle = doc.defaultView && doc.defaultView.getComputedStyle ?
+        function (el, property) {
+          var value = null;
+          var computed = doc.defaultView.getComputedStyle(el, '');
+          computed && (value = computed[camelize(property)]);
+          return el.style[property] || value;
+        } : html.currentStyle ?
+
+        function (el, property) {
+          property = camelize(property);
+
+          if (property == 'opacity') {
+            var val = 100;
+            try {
+              val = el.filters['DXImageTransform.Microsoft.Alpha'].opacity;
+            } catch (e1) {
+              try {
+                val = el.filters('alpha').opacity;
+              } catch (e2) {}
+            }
+            return val / 100;
+          }
+          var value = el.currentStyle ? el.currentStyle[property] : null;
+          return el.style[property] || value;
+        } :
+
+        function (el, property) {
+          return el.style[camelize(property)];
+        },
+
+      rgb = function (r, g, b) {
+        return '#' + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
+      },
+
+      // convert rgb and short hex to long hex
+      toHex = function (c) {
+        var m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(c);
+        return (m ? rgb(m[1], m[2], m[3]) : c)
+        .replace(/#(\w)(\w)(\w)$/, '#$1$1$2$2$3$3'); // short to long
+      },
+
+      // change font-size => fontSize etc.
+      camelize = function (s) {
+        return s.replace(/-(.)/g, function (m, m1) {
+          return m1.toUpperCase();
+        });
+      },
+
+      fun = function (f) {
+        return typeof f == 'function';
+      },
+
+      frame = function () {
+        // native animation frames
+        // http://webstuff.nfshost.com/anim-timing/Overview.html
+        // http://dev.chromium.org/developers/design-documents/requestanimationframe-implementation
+        return win.requestAnimationFrame  ||
+          win.webkitRequestAnimationFrame ||
+          win.mozRequestAnimationFrame    ||
+          win.oRequestAnimationFrame      ||
+          win.msRequestAnimationFrame     ||
+          function (callback) {
+            win.setTimeout(function () {
+              callback(+new Date());
+            }, 10);
+          };
+      }();
+
+  /**
+    * Core tween method that requests each frame
+    * @param duration: time in milliseconds. defaults to 1000
+    * @param fn: tween frame callback function receiving 'position'
+    * @param done {optional}: complete callback function
+    * @param ease {optional}: easing method. defaults to easeOut
+    * @param from {optional}: integer to start from
+    * @param to {optional}: integer to end at
+    * @returns method to stop the animation
+    */
+  function tween(duration, fn, done, ease, from, to) {
+    ease = ease || function (t) {
+      // default to a pleasant-to-the-eye easeOut (like native animations)
+      return Math.sin(t * Math.PI / 2)
+    };
+    var time = duration || 1000,
+        diff = to - from,
+        start = +new Date(),
+        stop = 0,
+        end = 0;
+    frame(run);
+
+    function run(t) {
+      var delta = t - start;
+      if (delta > time || stop) {
+        to = isFinite(to) ? to : 1;
+        stop ? end && fn(to) : fn(to);
+        done && done();
+        return;
+      }
+      // if you don't specify a 'to' you can use tween as a generic delta tweener
+      // cool, eh?
+      isFinite(to) ?
+        fn((diff * ease(delta / time)) + from) :
+        fn(ease(delta / time));
+      frame(run);
+    }
+    return {
+      stop: function (jump) {
+        stop = 1;
+        end = jump; // jump to end of animation?
+      }
+    }
+  }
+
+  /**
+    * generic bezier method for animating x|y coordinates
+    * minimum of 2 points required (start and end).
+    * first point start, last point end
+    * additional control points are optional (but why else would you use this anyway ;)
+    * @param points: array containing control points
+       [[0, 0], [100, 200], [200, 100]]
+    * @param pos: current be(tween) position represented as float  0 - 1
+    * @return [x, y]
+    */
+  function bezier(points, pos) {
+    var n = points.length, r = [], i, j;
+    for (i = 0; i < n; ++i) {
+      r[i] = [points[i][0], points[i][1]];
+    }
+    for (j = 1; j < n; ++j) {
+      for (i = 0; i < n - j; ++i) {
+        r[i][0] = (1 - pos) * r[i][0] + pos * r[parseInt(i + 1, 10)][0];
+        r[i][1] = (1 - pos) * r[i][1] + pos * r[parseInt(i + 1, 10)][1];
+      }
+    }
+    return [r[0][0], r[0][1]];
+  }
+
+  // this gets you the next hex in line according to a 'position'
+  function nextColor(pos, start, finish) {
+    var r = [], i, e;
+    for (i = 0; i < 6; i++) {
+      from = Math.min(15, parseInt(start.charAt(i),  16));
+      to   = Math.min(15, parseInt(finish.charAt(i), 16));
+      e = Math.floor((to - from) * pos + from);
+      e = e > 15 ? 15 : e < 0 ? 0 : e;
+      r[i] = e.toString(16);
+    }
+    return '#' + r.join('');
+  }
+
+  // this retreives the frame value within a sequence
+  function getTweenVal(pos, units, begin, end, k, i, v) {
+    if (typeof begin[i][k] == 'string') {
+      return nextColor(pos, begin[i][k], end[i][k]);
+    } else {
+      // round so we don't get crazy long floats
+      v = Math.round(((end[i][k] - begin[i][k]) * pos + begin[i][k]) * 1000) / 1000;
+      // some css properties don't require a unit (like zIndex, lineHeight, opacity)
+      !(k in unitless) && (v += units[i][k] || 'px');
+      return v;
+    }
+  }
+
+  // support for relative movement via '+=n' or '-=n'
+  function by(val, start, m, r, i) {
+    return (m = relVal.exec(val)) ?
+      (i = parseFloat(m[2])) && (r = (start + i)) && m[1] == '+' ?
+      r : start - i :
+      parseFloat(val);
+  }
+
+  /**
+    * morpheus:
+    * @param element(s): HTMLElement(s)
+    * @param options: mixed bag between CSS Style properties & animation options
+    *  - {n} CSS properties|values
+    *     - value can be strings, integers,
+    *     - or callback function that receives element to be animated. method must return value to be tweened
+    *     - relative animations start with += or -= followed by integer
+    *  - duration: time in ms - defaults to 1000(ms)
+    *  - easing: a transition method - defaults to an 'easeOut' algorithm
+    *  - complete: a callback method for when all elements have finished
+    *  - bezier: array of arrays containing x|y coordinates that define the bezier points. defaults to none
+    *     - this may also be a function that receives element to be animated. it must return a value
+    */
+  function morpheus(elements, options) {
+    var els = elements ? (els = isFinite(elements.length) ? elements : [elements]) : [], i,
+        complete = options.complete,
+        duration = options.duration,
+        ease = options.easing,
+        points = options.bezier,
+        begin = [],
+        end = [],
+        units = [],
+        bez = [],
+        originalLeft,
+        originalTop;
+
+    delete options.complete;
+    delete options.duration;
+    delete options.easing;
+    delete options.bezier;
+
+    if (points) {
+      // remember the original values for top|left
+      originalLeft = options.left;
+      originalTop = options.top;
+      delete options.right;
+      delete options.bottom;
+      delete options.left;
+      delete options.top;
+    }
+
+    for (i = els.length; i--;) {
+
+      // record beginning and end states to calculate positions
+      begin[i] = {};
+      end[i] = {};
+      units[i] = {};
+
+      // are we 'moving'?
+      if (points) {
+
+        var left = getStyle(els[i], 'left'),
+            top = getStyle(els[i], 'top'),
+            xy = [by(fun(originalLeft) ? originalLeft(els[i]) : originalLeft || 0, parseFloat(left)),
+                  by(fun(originalTop) ? originalTop(els[i]) : originalTop || 0, parseFloat(top))];
+
+        bez[i] = fun(points) ? points(els[i], xy) : points;
+        bez[i].push(xy);
+        bez[i].unshift([
+          parseInt(left, 10),
+          parseInt(top, 10)
+        ]);
+      }
+
+      for (var k in options) {
+        var v = getStyle(els[i], k), unit,
+            tmp = fun(options[k]) ? options[k](els[i]) : options[k]
+        if (typeof tmp == 'string' &&
+            rgbOhex.test(tmp) &&
+            !rgbOhex.test(v)) {
+          delete options[k]; // remove key :(
+          continue; // cannot animate colors like 'orange' or 'transparent'
+                    // only #xxx, #xxxxxx, rgb(n,n,n)
+        }
+
+        begin[i][k] = typeof tmp == 'string' && rgbOhex.test(tmp) ?
+          toHex(v).slice(1) :
+          parseFloat(v);
+        end[i][k] = typeof tmp == 'string' && tmp.charAt(0) == '#' ?
+          toHex(tmp).slice(1) :
+          by(tmp, parseFloat(v));
+        // record original unit
+        typeof tmp == 'string' && (unit = tmp.match(numUnit)) && (units[i][k] = unit[1]);
+      }
+    }
+    // ONE TWEEN TO RULE THEM ALL
+    return tween(duration, function (pos, v, xy) {
+      // normally not a fan of optimizing for() loops, but we want something
+      // fast for animating
+      for (i = els.length; i--;) {
+        if (points) {
+          xy = bezier(bez[i], pos);
+          els[i].style.left = xy[0] + 'px';
+          els[i].style.top = xy[1] + 'px';
+        }
+        for (var k in options) {
+          v = getTweenVal(pos, units, begin, end, k, i);
+          k == 'opacity' && !opasity ?
+            (els[i].style.filter = 'alpha(opacity=' + (v * 100) + ')') :
+            (els[i].style[camelize(k)] = v);
+        }
+      }
+    }, complete, ease);
+  }
+
+  // expose useful methods
+  morpheus.tween = tween;
+  morpheus.getStyle = getStyle;
+  morpheus.bezier = bezier;
+
+  typeof module !== 'undefined' && module.exports &&
+    (module.exports = morpheus);
+  context['morpheus'] = morpheus;
+
+}(this, document, window);
 /** ../_core/scripts/socket.io.js **/
 /** Socket.IO 0.6.3 - Built with build.js */
 /**
@@ -12657,6 +12964,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       var cookie;
       this.sleepy = false;
       this.allControls = {};
+      this.pageWindow = $(window);
       this.pageBody = $('#smio_body');
       $('#smio_offline').text(smio.resources.smoothio.connect).append('<span id="smio_offline_blink" style="visibility: hidden;">_</span>');
       cookie = $.cookie('smoo');
@@ -12670,6 +12978,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
       this.sessionID = this.smioCookie['sessid'];
       this.socket = new smio.Socket(this, false);
+      this.pageWindow.resize(_.debounce((__bind(function() {
+        return this.onWindowResize();
+      }, this)), 300));
     }
     Client.prototype.init = function() {
       this.socket.connect();
@@ -12678,6 +12989,17 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           "background-image": "url('/_/file/images/bg" + (smio.Util.Number.randomInt(4)) + ".jpg')"
         });
       }, this)), 5000);
+    };
+    Client.prototype.onWindowResize = function() {
+      var ctl, h, id, w, _ref, _ref2, _results;
+      _ref = [this.pageWindow.width(), this.pageWindow.height()], w = _ref[0], h = _ref[1];
+      _ref2 = this.allControls;
+      _results = [];
+      for (id in _ref2) {
+        ctl = _ref2[id];
+        _results.push(ctl.onWindowResize(w, h));
+      }
+      return _results;
     };
     Client.prototype.syncControls = function(controlDescs) {
       var ctl, ctlDesc, id, _results;
@@ -12719,6 +13041,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       if (isSocketIO) {
         opts = {
           resource: '/_/sockio/',
+          transports: ['websocket'],
           rememberTransport: false,
           reconnect: true,
           connectTimeout: 5000,
@@ -12819,7 +13142,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       if (!this.poll) {
         return alert(JSON.stringify(xhr));
       } else {
-        if (xhr && ((xhr.status === 0) && (xhr.readyState === 0) || (xhr.status === 12029) && (xhr.readyState === 4))) {
+        if (xhr && ((xhr.status === 0) && (xhr.readyState === 0)) || ((xhr.readyState === 4) && (xhr.status >= 12001) && (xhr.status <= 12156))) {
           this.onOffline();
         } else {
           this.onOnline();
@@ -13031,18 +13354,29 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.el = null;
       this._html = '';
     }
-    Control.prototype.id = function(subID) {
-      if (subID) {
-        return this.ctlID + '_' + subID;
+    Control.prototype.ctl = function(ctlID) {
+      var c;
+      c = this.client.allControls(ctlID);
+      if (c) {
+        return c;
       } else {
-        return this.ctlID;
+        return this.client.allControls(this.id(ctlID));
+      }
+    };
+    Control.prototype.id = function(subID) {
+      var myID;
+      myID = this.parent ? "" + (this.parent.id()) + "_" + this.ctlID : this.ctlID;
+      if (subID) {
+        return myID + '_' + subID;
+      } else {
+        return myID;
       }
     };
     Control.prototype.init = function() {};
     Control.prototype.onLoad = function() {
       var ctl, id, prefix, _ref;
       prefix = "cscript:";
-      this.el = $('#' + this.ctlID);
+      this.el = $('#' + this.id());
       _ref = this.controls;
       for (id in _ref) {
         ctl = _ref[id];
@@ -13059,6 +13393,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         });
       }
     };
+    Control.prototype.onWindowResize = function(width, height) {};
     Control.prototype.renderTag = function(name, sarg, jarg) {
       var renderer;
       renderer = smio.Control.tagRenderers[name];
@@ -13374,67 +13709,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   })();
 }).call(this);
 
-/** server/pub/_packs/Core/Controls/_smioctl_Carousel.js **/
-(function() {
-  /*
-  Auto-generated from Core/Controls/Carousel.ctl
-  */  var smio, smoothio;
-  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
-    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
-    function ctor() { this.constructor = child; }
-    ctor.prototype = parent.prototype;
-    child.prototype = new ctor;
-    child.__super__ = parent.prototype;
-    return child;
-  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-  smio = smoothio = global.smoothio;
-  smio.Packs_Core_Controls_Carousel = (function() {
-    __extends(Packs_Core_Controls_Carousel, smio.Control);
-    Packs_Core_Controls_Carousel.prototype.init = function() {
-      Packs_Core_Controls_Carousel.__super__.init.call(this);
-      return this.ctlRenderers['item'] = __bind(function(className, args) {
-        var content, itemID;
-        itemID = this.id(args.id);
-        content = this.renderTag("inner", null, args);
-        return "<li id=\"" + itemID + "\">" + content + "</li>";
-      }, this);
-    };
-    Packs_Core_Controls_Carousel.prototype.onLoad = function() {
-      Packs_Core_Controls_Carousel.__super__.onLoad.call(this);
-      return this.el[0].scrollLeft = 200;
-    };
-    function Packs_Core_Controls_Carousel(client, parent, args) {
-      Packs_Core_Controls_Carousel.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_Carousel");
-      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
-      this.init();
-    }
-    Packs_Core_Controls_Carousel.prototype.renderHtml = function($el) {
-      var __r;
-      if (!this._html) {
-        __r = {
-          ctls: [],
-          m: [],
-          o: null
-        };
-        __r.o = __r.m;
-        __r.o.push("\n<div id=\"");
-        __r.o.push(this.id());
-        __r.o.push("\" class=\"smio-carousel\">\n\t<ul id=\"");
-        __r.o.push(this.id('ul'));
-        __r.o.push("\" class=\"smio-carousel\">\n\t\t");
-        __r.o.push(this.renderTag("inner", "", null));
-        __r.o.push("\n\t</ul>\n</div>\n\n");
-        this._html = __r.o.join('');
-      }
-      if ($el) {
-        $el.html(this._html);
-      }
-      return this._html;
-    };
-    return Packs_Core_Controls_Carousel;
-  })();
-}).call(this);
-
 /** server/pub/_packs/Core/Controls/_smioctl_Console.js **/
 (function() {
   /*
@@ -13455,8 +13729,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     Packs_Core_Controls_Console.prototype.onLoad = function($el) {
       Packs_Core_Controls_Console.__super__.onLoad.call(this);
       if (!this.args['topDown']) {
-        $("#" + this.ctlID + "_detail").insertBefore("#" + this.ctlID + "_ever");
-        return $("#" + this.ctlID + "_hover").insertBefore("#" + this.ctlID + "_ever");
+        $("#" + (this.id()) + "_detail").insertBefore("#" + (this.id()) + "_ever");
+        return $("#" + (this.id()) + "_hover").insertBefore("#" + (this.id()) + "_ever");
       }
     };
     function Packs_Core_Controls_Console(client, parent, args) {
@@ -13469,20 +13743,19 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       if (!this._html) {
         __r = {
           ctls: [],
-          m: [],
-          o: null
+          m: []
         };
         __r.o = __r.m;
         __r.o.push("\n<div id=\"");
-        __r.o.push(this.ctlID);
+        __r.o.push(this.id());
         __r.o.push("\" class=\"smio-console smio-console-");
         __r.o.push(this.args['topDown'] ? 'top' : 'bottom');
         __r.o.push("\">\n\t<div id=\"");
-        __r.o.push(this.ctlID);
+        __r.o.push(this.id());
         __r.o.push("_ever\" class=\"smio-console-ever\">header</div>\n\t<div id=\"");
-        __r.o.push(this.ctlID);
+        __r.o.push(this.id());
         __r.o.push("_hover\" class=\"smio-console-hover\" style=\"display: none;\">hover</div>\n\t<div id=\"");
-        __r.o.push(this.ctlID);
+        __r.o.push(this.id());
         __r.o.push("_detail\" class=\"smio-console-detail\" style=\"display: none;\">details</div>\n</div>\n\n");
         this._html = __r.o.join('');
       }
@@ -13525,20 +13798,19 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       if (!this._html) {
         __r = {
           ctls: [],
-          m: [],
-          o: null
+          m: []
         };
         __r.o = __r.m;
         __r.o.push("\n<div class=\"smio-main\" id=\"");
         __r.o.push(this.id());
         __r.o.push("\">\n\t");
         __r.o.push(this.renderTag("ctl", "Console", {
-          id: this.id('ctop'),
+          id: 'ctop',
           topDown: true
         }));
         __r.o.push("\n\t<div class=\"smio-console smio-console-main\"></div>\n\t");
         __r.o.push(this.renderTag("ctl", "Console", {
-          id: this.id('cbottom'),
+          id: 'cbottom',
           topDown: false
         }));
         __r.o.push("\n</div>\n\n");
@@ -13550,6 +13822,93 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       return this._html;
     };
     return Packs_Core_Controls_MainFrame;
+  })();
+}).call(this);
+
+/** server/pub/_packs/Core/Controls/_smioctl_SlidePanel.js **/
+(function() {
+  /*
+  Auto-generated from Core/Controls/SlidePanel.ctl
+  */  var smio, smoothio;
+  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
+  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  smio = smoothio = global.smoothio;
+  smio.Packs_Core_Controls_SlidePanel = (function() {
+    __extends(Packs_Core_Controls_SlidePanel, smio.Control);
+    Packs_Core_Controls_SlidePanel.prototype.init = function() {
+      this.curItem = 0;
+      this.items = [];
+      Packs_Core_Controls_SlidePanel.__super__.init.call(this);
+      return this.ctlRenderers['item'] = __bind(function(className, args) {
+        this.items.push(args.id);
+        return "<li class=\"" + this.args.itemClass + " " + args["class"] + "\" id=\"" + (this.id('items_' + args.id)) + "\">" + (this.renderTag("inner", null, args)) + "</li>";
+      }, this);
+    };
+    Packs_Core_Controls_SlidePanel.prototype.onLoad = function() {
+      return this.scrollTo(0, true);
+    };
+    Packs_Core_Controls_SlidePanel.prototype.onWindowResize = function(w, h) {
+      return this.scrollTo(this.curItem, true);
+    };
+    Packs_Core_Controls_SlidePanel.prototype.scrollTo = function(item, force) {
+      var el, el2, w;
+      if (_.isString(item)) {
+        item = this.items.indexOf(item);
+      }
+      if (item >= 0 && (force || item !== this.curItem)) {
+        this.curItem = item;
+        w = $("#" + (this.id('scrollprev'))).width();
+        el = $("#" + (this.id('scrollbox')));
+        el2 = $("#" + (this.id('before')));
+        return morpheus.tween(250, (__bind(function(pos) {
+          return el.scrollLeft(pos);
+        }, this)), (function() {}), null, el.scrollLeft(), el.scrollLeft() + $("#" + (this.id('items_' + this.items[item]))).position().left - w);
+      }
+    };
+    function Packs_Core_Controls_SlidePanel(client, parent, args) {
+      Packs_Core_Controls_SlidePanel.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_SlidePanel");
+      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
+      this.init();
+    }
+    Packs_Core_Controls_SlidePanel.prototype.renderHtml = function($el) {
+      var __r;
+      if (!this._html) {
+        __r = {
+          ctls: [],
+          m: []
+        };
+        __r.o = __r.m;
+        __r.o.push("\n<div id=\"");
+        __r.o.push(this.id());
+        __r.o.push("\" class=\"smio-slidepanel ");
+        __r.o.push(this.args["class"]);
+        __r.o.push("\">\n\t<div id=\"");
+        __r.o.push(this.id('scrollprev'));
+        __r.o.push("\" class=\"smio-slidepanel-edge smio-slidepanel-edge-left\"></div>\n\t<div id=\"");
+        __r.o.push(this.id('scrollnext'));
+        __r.o.push("\" class=\"smio-slidepanel-edge smio-slidepanel-edge-right\"></div>\n\t<div id=\"");
+        __r.o.push(this.id('scrollbox'));
+        __r.o.push("\" class=\"smio-slidepanel-scrollbox\">\n\t<ul id=\"");
+        __r.o.push(this.id('items'));
+        __r.o.push("\" class=\"smio-slidepanel ");
+        __r.o.push(this.args["class"]);
+        __r.o.push("\">\n\t\t<li class=\"" + this.args.itemClass + "\" id=\"" + (this.id('before')) + "\">&nbsp;</li>\n\t\t");
+        __r.o.push(this.renderTag("inner", "", null));
+        __r.o.push("\n\t\t<li class=\"" + this.args.itemClass + "\" id=\"" + (this.id('after')) + "\">&nbsp;</li>\n\t</ul>\n\t</div>\n</div>\n\n");
+        this._html = __r.o.join('');
+      }
+      if ($el) {
+        $el.html(this._html);
+      }
+      return this._html;
+    };
+    return Packs_Core_Controls_SlidePanel;
   })();
 }).call(this);
 
@@ -13581,22 +13940,25 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
             return this.selectTab(tabID);
           }, this);
         }, this);
-        _results.push($("#" + this.ctlID + "_" + t).click(makeHandler(t)));
+        _results.push($("#" + (this.id(t))).click(makeHandler(t)));
       }
       return _results;
     };
     Packs_Core_Controls_TabStrip.prototype.selectTab = function(tabID) {
       var a, cls, incls, t, _i, _len, _ref;
-      a = $("#" + this.ctlID + "_" + tabID);
+      a = $("#" + (this.id(tabID)));
       cls = "" + this.args.tabClass + "-active";
       incls = "" + this.args.tabClass + "-inactive";
       if (!a.hasClass(cls)) {
         _ref = this.args.tabs;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           t = _ref[_i];
-          $("#" + this.ctlID + "_" + t).removeClass(cls).addClass(incls);
+          $("#" + (this.id(t))).removeClass(cls).addClass(incls);
         }
-        return a.removeClass(incls).addClass(cls);
+        a.removeClass(incls).addClass(cls);
+        if (this.args.onTabSelect) {
+          return this.args.onTabSelect(tabID);
+        }
       }
     };
     function Packs_Core_Controls_TabStrip(client, parent, args) {
@@ -13609,12 +13971,11 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       if (!this._html) {
         __r = {
           ctls: [],
-          m: [],
-          o: null
+          m: []
         };
         __r.o = __r.m;
         __r.o.push("\n<div id=\"");
-        __r.o.push(this.ctlID);
+        __r.o.push(this.id());
         __r.o.push("\" class=\"");
         __r.o.push(this.renderTag("arg", "class", null));
         __r.o.push("\">\n");
@@ -13659,10 +14020,13 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     child.prototype = new ctor;
     child.__super__ = parent.prototype;
     return child;
-  };
+  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   smio = smoothio = global.smoothio;
   smio.Packs_Core_ServerSetup_InitialSiteSetup = (function() {
     __extends(Packs_Core_ServerSetup_InitialSiteSetup, smio.Control);
+    Packs_Core_ServerSetup_InitialSiteSetup.prototype.onTabSelect = function(tabID) {
+      return this.controls.stepslide.scrollTo(tabID);
+    };
     function Packs_Core_ServerSetup_InitialSiteSetup(client, parent, args) {
       Packs_Core_ServerSetup_InitialSiteSetup.__super__.constructor.call(this, client, parent, args, "Core_ServerSetup", "Core_ServerSetup_InitialSiteSetup");
       this.jsSelf = "smio.client.allControls['" + this.id() + "']";
@@ -13673,11 +14037,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       if (!this._html) {
         __r = {
           ctls: [],
-          m: [],
-          o: null
+          m: []
         };
         __r.o = __r.m;
-        __r.o.push("<div class=\"smio-setup\" id=\"");
+        __r.o.push("\n<div class=\"smio-setup\" id=\"");
         __r.o.push(this.id());
         __r.o.push("\">\n\t<div class=\"smio-setup-outer smio-setup-outer-top\">\n\t\t<div class=\"smio-setup-header\">");
         __r.o.push(this.renderTag("r", "title", null));
@@ -13687,9 +14050,11 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         tmp = [];
         __r.ctls.push({
           o: tmp,
-          c: "Carousel",
+          c: "SlidePanel",
           args: {
-            id: this.id('carousel')
+            id: 'stepslide',
+            "class": 'smio-setup-stepslide',
+            itemClass: 'smio-setup-stepbox'
           }
         });
         __r.o = tmp;
@@ -13773,11 +14138,14 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         })));
         __r.o.push("\n\t</div>\n\t");
         __r.o.push(this.renderTag("ctl", "TabStrip", {
-          id: this.id('steptabs'),
-          "class": 'smio-setup-outer smio-setup-steps',
-          tabClass: 'smio-setup-step',
+          id: 'steptabs',
+          "class": 'smio-setup-outer smio-setup-steptabs',
+          tabClass: 'smio-setup-steptab',
           tabs: ['owner', 'template', 'finish'],
-          resPrefix: 'steps_'
+          resPrefix: 'steps_',
+          onTabSelect: __bind(function(tabID) {
+            return this.onTabSelect(tabID);
+          }, this)
         }));
         __r.o.push("\n</div>\n\n");
         this._html = __r.o.join('');
