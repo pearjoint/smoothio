@@ -149,6 +149,7 @@ body {
   font-size: 1.7em;
   color: #f0f0f0;
   text-shadow: 0 0 0.6em #000;
+  letter-spacing: -0.062em;
 }
 .smio-console {
   text-align: center;
