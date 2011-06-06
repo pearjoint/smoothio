@@ -3,9 +3,9 @@ div.smio-setup {
   top: 12%;
   left: 20%;
   right: 20%;
-  -moz-box-shadow: 0em 0.4em 4.8em #909090;
-  -webkit-box-shadow: 0em 0.4em 4.8em #909090;
-  box-shadow: 0em 0.4em 4.8em #909090;
+  -moz-box-shadow: 0 0.4em 4.8em #909090;
+  -webkit-box-shadow: 0 0.4em 4.8em #909090;
+  box-shadow: 0 0.4em 4.8em #909090;
   line-height: 1.25;
   overflow: hidden;
 }
@@ -15,38 +15,46 @@ div.smio-setup {
 .smio-setup-outer-top {
   white-space: nowrap;
   overflow: hidden;
-  background: rgba(255,255,255,0.66);
   background: -ms-linear-gradient(rgba(255,255,255,0.66), rgba(255,255,255,0.88));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255,255,255,0.66)), to(rgba(255,255,255,0.88)));
   background: -moz-linear-gradient(rgba(255,255,255,0.66), rgba(255,255,255,0.88));
   background: -webkit-linear-gradient(rgba(255,255,255,0.66), rgba(255,255,255,0.88));
   background: -o-linear-gradient(rgba(255,255,255,0.66), rgba(255,255,255,0.88));
 }
 .smio-setup-inner {
   background: rgba(255,255,255,0.95);
-  -moz-box-shadow: 0 0.062em 0.35em #c0c0c0 inset;
-  -webkit-box-shadow: 0 0.062em 0.35em #c0c0c0 inset;
-  box-shadow: 0 0.062em 0.35em #c0c0c0 inset;
+  -moz-box-shadow: 0 0.062em 0.35em #b0b0b0 inset;
+  -webkit-box-shadow: 0 0.062em 0.35em #b0b0b0 inset;
+  box-shadow: 0 0.062em 0.35em #b0b0b0 inset;
 }
 .smio-setup-header {
   font-size: 2em;
   color: #a40;
-  text-shadow: 0px 0px 0.6em #fff;
+  text-shadow: 0 0 0.6em #fff;
 }
 .smio-setup-header-desc {
   color: #707070;
   font-size: 1.25em;
-  text-shadow: 0px 0.074em #fff;
+  text-shadow: 0 0.074em #fff;
 }
 .smio-setup-stepslide > .smio-setup-stepbox {
-  padding: 1em 0em 1em 0em;
-  width: 80%;
+  padding: 1em 0 1em 0;
+  width: 70%;
 }
 .smio-setup-stepslide .smio-slidepanel-edge {
-  width: 10%;
+  width: 15%;
+}
+.smio-setup-stepbox-title {
+  font-size: 1.55em;
+  text-shadow: 0.04em 0.04em #c0d0c0;
+  color: #90b090;
+}
+.smio-setup-stepbox-form {
+  padding: 1em 0 0 3.25em;
 }
 .smio-setup-steptabs {
-  background: rgba(255,255,255,0.95);
   background: -ms-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.65));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255,255,255,0.95)), to(rgba(255,255,255,0.65)));
   background: -moz-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.65));
   background: -webkit-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.65));
   background: -o-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.65));
@@ -58,7 +66,7 @@ div.smio-setup {
   padding: 0.2em 1em 0.2em 1em;
   display: inline-block;
   color: #606060;
-  text-shadow: 0px 0.098em #fff;
+  text-shadow: 0 0.098em #fff;
 }
 .smio-setup-steptab-inactive:hover {
   text-decoration: underline;

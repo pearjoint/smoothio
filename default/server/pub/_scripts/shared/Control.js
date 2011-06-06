@@ -56,6 +56,7 @@
       this.controls = {};
       this.containers = {};
       this.ctlRenderers = {};
+      this.eventHandlers = {};
       this.el = null;
       this._html = '';
     }
@@ -78,6 +79,27 @@
       }
     };
     Control.prototype.init = function() {};
+    Control.prototype.on = function(eventName, handler) {
+      var eh, _i, _len, _ref, _results;
+      if (eventName) {
+        if (_.isFunction(handler)) {
+          if (!this.eventHandlers[eventName]) {
+            this.eventHandlers[eventName] = [];
+          }
+          if (0 > _.indexOf(this.eventHandlers[eventName], handler)) {
+            return this.eventHandlers[eventName].push(handler);
+          }
+        } else if (this.eventHandlers[eventName]) {
+          _ref = this.eventHandlers[eventName];
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            eh = _ref[_i];
+            _results.push(eh.apply(this, handler));
+          }
+          return _results;
+        }
+      }
+    };
     Control.prototype.onLoad = function() {
       var ctl, id, prefix, _ref;
       prefix = "cscript:";
@@ -109,6 +131,11 @@
       }
     };
     Control.prototype.syncUpdate = function(ctlDesc) {};
+    Control.prototype.un = function(eventName, handler) {
+      if (eventName && this.eventHandlers[eventName] && _.isFunction(handler)) {
+        return this.eventHandlers[eventName] = _.without(this.eventHandlers[eventName], handler);
+      }
+    };
     Control.prototype.res = function(name) {
       var i, parts, resSet, resSets, ret, _ref;
       ret = '';

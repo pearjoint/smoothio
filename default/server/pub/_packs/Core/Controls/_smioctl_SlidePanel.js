@@ -17,30 +17,45 @@
       this.curItem = 0;
       this.items = [];
       Packs_Core_Controls_SlidePanel.__super__.init.call(this);
-      return this.ctlRenderers['item'] = __bind(function(className, args) {
+      this.ctlRenderers['item'] = __bind(function(className, args) {
         this.items.push(args.id);
         return "<li class=\"" + this.args.itemClass + " " + args["class"] + "\" id=\"" + (this.id('items_' + args.id)) + "\">" + (this.renderTag("inner", null, args)) + "</li>";
       }, this);
+      if (this.args.onItemSelect && _.isFunction(this.args.onItemSelect)) {
+        return this.on('itemSelect', this.args.onItemSelect);
+      }
     };
     Packs_Core_Controls_SlidePanel.prototype.onLoad = function() {
+      (this.edgePrev = $("#" + (this.id('edgeprev')))).click(__bind(function() {
+        return this.scrollTo(this.curItem - 1);
+      }, this));
+      (this.edgeNext = $("#" + (this.id('edgenext')))).click(__bind(function() {
+        return this.scrollTo(this.curItem + 1);
+      }, this));
+      this.scrollBox = $("#" + (this.id('scrollbox')));
       return this.scrollTo(0, true);
     };
     Packs_Core_Controls_SlidePanel.prototype.onWindowResize = function(w, h) {
       return this.scrollTo(this.curItem, true);
     };
     Packs_Core_Controls_SlidePanel.prototype.scrollTo = function(item, force) {
-      var el, el2, w;
       if (_.isString(item)) {
         item = this.items.indexOf(item);
       }
-      if (item >= 0 && (force || item !== this.curItem)) {
-        this.curItem = item;
-        w = $("#" + (this.id('scrollprev'))).width();
-        el = $("#" + (this.id('scrollbox')));
-        el2 = $("#" + (this.id('before')));
+      if (((item < 0) || (item >= this.items.length)) && force) {
+        item = 0;
+      }
+      if ((force || item !== this.curItem) && (item >= 0) && (item < this.items.length)) {
+        this.edgePrev.css({
+          display: item === 0 ? 'none' : 'block'
+        });
+        this.edgeNext.css({
+          display: item === (this.items.length - 1) ? 'none' : 'block'
+        });
+        this.on('itemSelect', [this.curItem = item, this.items[item]]);
         return morpheus.tween(250, (__bind(function(pos) {
-          return el.scrollLeft(pos);
-        }, this)), (function() {}), null, el.scrollLeft(), el.scrollLeft() + $("#" + (this.id('items_' + this.items[item]))).position().left - w);
+          return this.scrollBox.scrollLeft(pos);
+        }, this)), (function() {}), null, this.scrollBox.scrollLeft(), this.scrollBox.scrollLeft() + $("#" + (this.id('items_' + this.items[item]))).position().left - this.edgePrev.width());
       }
     };
     function Packs_Core_Controls_SlidePanel(client, parent, args) {
@@ -61,18 +76,18 @@
         __r.o.push("\" class=\"smio-slidepanel ");
         __r.o.push(this.args["class"]);
         __r.o.push("\">\n\t<div id=\"");
-        __r.o.push(this.id('scrollprev'));
-        __r.o.push("\" class=\"smio-slidepanel-edge smio-slidepanel-edge-left\"></div>\n\t<div id=\"");
-        __r.o.push(this.id('scrollnext'));
-        __r.o.push("\" class=\"smio-slidepanel-edge smio-slidepanel-edge-right\"></div>\n\t<div id=\"");
+        __r.o.push(this.id('edgeprev'));
+        __r.o.push("\" class=\"smio-slidepanel-edge smio-slidepanel-edge-left\"><div class=\"smio-slidepanel-edge-arr\" x=\"#9668\">&laquo;&nbsp;&nbsp;back</div></div>\n\t<div id=\"");
+        __r.o.push(this.id('edgenext'));
+        __r.o.push("\" class=\"smio-slidepanel-edge smio-slidepanel-edge-right\"><div class=\"smio-slidepanel-edge-arr\" x=\"#9658\">next&nbsp;&nbsp;&raquo;</div></div>\n\t<div id=\"");
         __r.o.push(this.id('scrollbox'));
         __r.o.push("\" class=\"smio-slidepanel-scrollbox\">\n\t<ul id=\"");
         __r.o.push(this.id('items'));
         __r.o.push("\" class=\"smio-slidepanel ");
         __r.o.push(this.args["class"]);
-        __r.o.push("\">\n\t\t<li class=\"" + this.args.itemClass + "\" id=\"" + (this.id('before')) + "\">&nbsp;</li>\n\t\t");
+        __r.o.push("\">\n\t\t<li class=\"" + this.args.edgeItemClass + "\" id=\"" + (this.id('libefore')) + "\">&nbsp;</li>\n\t\t");
         __r.o.push(this.renderTag("inner", "", null));
-        __r.o.push("\n\t\t<li class=\"" + this.args.itemClass + "\" id=\"" + (this.id('after')) + "\">&nbsp;</li>\n\t</ul>\n\t</div>\n</div>\n\n");
+        __r.o.push("\n\t\t<li class=\"" + this.args.edgeItemClass + "\" id=\"" + (this.id('liafter')) + "\">&nbsp;</li>\n\t</ul>\n\t</div>\n</div>\n\n");
         this._html = __r.o.join('');
       }
       if ($el) {

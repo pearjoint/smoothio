@@ -13,6 +13,9 @@
   smio = smoothio = global.smoothio;
   smio.Packs_Core_ServerSetup_InitialSiteSetup = (function() {
     __extends(Packs_Core_ServerSetup_InitialSiteSetup, smio.Control);
+    Packs_Core_ServerSetup_InitialSiteSetup.prototype.onSlide = function(index, itemID) {
+      return this.controls.steptabs.selectTab(itemID);
+    };
     Packs_Core_ServerSetup_InitialSiteSetup.prototype.onTabSelect = function(tabID) {
       return this.controls.stepslide.scrollTo(tabID);
     };
@@ -43,7 +46,10 @@
           args: {
             id: 'stepslide',
             "class": 'smio-setup-stepslide',
-            itemClass: 'smio-setup-stepbox'
+            itemClass: 'smio-setup-stepbox',
+            onItemSelect: __bind(function(i, id) {
+              return this.onSlide(i, id);
+            }, this)
           }
         });
         __r.o = tmp;
@@ -57,13 +63,13 @@
           }
         });
         __r.o = tmp;
-        __r.o.push("\n\t\t\t\t");
+        __r.o.push("\n\t\t\t\t<div class=\"smio-setup-stepbox-title\">");
         __r.o.push({
           t: "r",
-          s: "usersetup",
+          s: "steptitle_owner",
           a: null
         });
-        __r.o.push("\n\t\t\t");
+        __r.o.push("</div>\n\t\t\t\t<div class=\"smio-setup-stepbox-form\">\n\t\t\t\t\tblaa\n\t\t\t\t\t<br/><br/>\n\t\t\t\t\tfoo\n\t\t\t\t\t<br/><br/>\n\t\t\t\t\tyeah right\n\t\t\t\t</div>\n\t\t\t");
         tmp = __r.ctls.pop();
         __r.o = __r.ctls[0].o;
         __r.o.push({
@@ -83,13 +89,13 @@
           }
         });
         __r.o = tmp;
-        __r.o.push("\n\t\t\t\t");
+        __r.o.push("\n\t\t\t\t<div class=\"smio-setup-stepbox-title\">");
         __r.o.push({
           t: "r",
-          s: "templateselection",
+          s: "steptitle_template",
           a: null
         });
-        __r.o.push("\n\t\t\t");
+        __r.o.push("</div>\n\t\t\t\t<div class=\"smio-setup-stepbox-form\">\n\t\t\t\t\tblaa\n\t\t\t\t\t<br/><br/>\n\t\t\t\t\tfoo\n\t\t\t\t\t<br/><br/>\n\t\t\t\t\tyeah right\n\t\t\t\t</div>\n\t\t\t");
         tmp = __r.ctls.pop();
         __r.o = __r.ctls[0].o;
         __r.o.push({
@@ -109,7 +115,13 @@
           }
         });
         __r.o = tmp;
-        __r.o.push("\n\t\t\t\tthe finish line!!\n\t\t\t\t<br/>\n\t\t\t\tthis is where we ROLL...\n\t\t\t\t<br/><br/>\n\t\t\t\tcrazy innit?!\n\t\t\t");
+        __r.o.push("\n\t\t\t\t<div class=\"smio-setup-stepbox-title\">");
+        __r.o.push({
+          t: "r",
+          s: "steptitle_finish",
+          a: null
+        });
+        __r.o.push("</div>\n\t\t\t\t<div class=\"smio-setup-stepbox-form\">\n\t\t\t\t\tthe finish line!!\n\t\t\t\t\t<br/>\n\t\t\t\t\tthis is where we ROLL...\n\t\t\t\t\t<br/><br/>\n\t\t\t\t\tcrazy innit?!\n\t\t\t\t</div>\n\t\t\t");
         tmp = __r.ctls.pop();
         __r.o = __r.ctls[0].o;
         __r.o.push({

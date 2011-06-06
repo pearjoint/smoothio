@@ -76,6 +76,16 @@ time,
 mark,
 audio,
 video {
+  -o-user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -o-user-drag: none;
+  -moz-user-drag: none;
+  -webkit-user-drag: none;
+  -ms-user-drag: none;
+  user-drag: none;
+  user-select: none;
   margin: 0;
   padding: 0;
   border: 0;
@@ -113,8 +123,10 @@ img {
   -ms-interpolation-mode: bicubic;
 }
 body {
+  cursor: default;
+  user-select: none;
   color: #303030;
-  margin: 0px;
+  margin: 0;
   background: #c0c0c0 url("/_/file/images/bg.png") repeat fixed center center;
   overflow: hidden;
   font-family: FreeSans, Arial, Helvetica, Helvetica Neue, Sans-Serif;
@@ -126,17 +138,17 @@ body {
 .smio-blocking-overlay {
   background: rgba(0,0,0,0.6);
   position: fixed;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 2147483640;
   text-align: center;
   padding: 18% 8% 8% 8%;
   line-height: 1.3em;
   font-size: 1.7em;
   color: #f0f0f0;
-  text-shadow: 0px 0px 0.6em #000;
+  text-shadow: 0 0 0.6em #000;
 }
 .smio-console {
   text-align: center;
@@ -144,12 +156,12 @@ body {
 }
 .smio-console-top {
   background: rgba(255,255,255,0.6);
-  -moz-box-shadow: 0px 0px 12px #000;
-  -webkit-box-shadow: 0px 0px 12px #000;
-  box-shadow: 0px 0px 12px #000;
+  -moz-box-shadow: 0 0 12px #000;
+  -webkit-box-shadow: 0 0 12px #000;
+  box-shadow: 0 0 12px #000;
   position: fixed;
   width: 100%;
-  top: 0px;
+  top: 0;
 }
 .smio-console-ever {
   height: 32px;
@@ -158,8 +170,8 @@ body {
   background: rgba(128,128,128,0.4);
   position: absolute;
   top: 32px;
-  left: 0px;
-  right: 0px;
+  left: 0;
+  right: 0;
   bottom: 32px;
 }
 .smio-console-bottom {
@@ -167,9 +179,9 @@ body {
   color: #fff;
   position: fixed;
   width: 100%;
-  bottom: 0px;
+  bottom: 0;
   border-top: 1px solid #303030;
-  -moz-box-shadow: 0px 0px 16px #303030;
-  -webkit-box-shadow: 0px 0px 16px #303030;
-  box-shadow: 0px 0px 16px #303030;
+  -moz-box-shadow: 0 0 16px #303030;
+  -webkit-box-shadow: 0 0 16px #303030;
+  box-shadow: 0 0 16px #303030;
 }

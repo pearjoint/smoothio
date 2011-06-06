@@ -13351,6 +13351,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.controls = {};
       this.containers = {};
       this.ctlRenderers = {};
+      this.eventHandlers = {};
       this.el = null;
       this._html = '';
     }
@@ -13373,6 +13374,27 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
     };
     Control.prototype.init = function() {};
+    Control.prototype.on = function(eventName, handler) {
+      var eh, _i, _len, _ref, _results;
+      if (eventName) {
+        if (_.isFunction(handler)) {
+          if (!this.eventHandlers[eventName]) {
+            this.eventHandlers[eventName] = [];
+          }
+          if (0 > _.indexOf(this.eventHandlers[eventName], handler)) {
+            return this.eventHandlers[eventName].push(handler);
+          }
+        } else if (this.eventHandlers[eventName]) {
+          _ref = this.eventHandlers[eventName];
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            eh = _ref[_i];
+            _results.push(eh.apply(this, handler));
+          }
+          return _results;
+        }
+      }
+    };
     Control.prototype.onLoad = function() {
       var ctl, id, prefix, _ref;
       prefix = "cscript:";
@@ -13404,6 +13426,11 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
     };
     Control.prototype.syncUpdate = function(ctlDesc) {};
+    Control.prototype.un = function(eventName, handler) {
+      if (eventName && this.eventHandlers[eventName] && _.isFunction(handler)) {
+        return this.eventHandlers[eventName] = _.without(this.eventHandlers[eventName], handler);
+      }
+    };
     Control.prototype.res = function(name) {
       var i, parts, resSet, resSets, ret, _ref;
       ret = '';
@@ -13845,30 +13872,45 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.curItem = 0;
       this.items = [];
       Packs_Core_Controls_SlidePanel.__super__.init.call(this);
-      return this.ctlRenderers['item'] = __bind(function(className, args) {
+      this.ctlRenderers['item'] = __bind(function(className, args) {
         this.items.push(args.id);
         return "<li class=\"" + this.args.itemClass + " " + args["class"] + "\" id=\"" + (this.id('items_' + args.id)) + "\">" + (this.renderTag("inner", null, args)) + "</li>";
       }, this);
+      if (this.args.onItemSelect && _.isFunction(this.args.onItemSelect)) {
+        return this.on('itemSelect', this.args.onItemSelect);
+      }
     };
     Packs_Core_Controls_SlidePanel.prototype.onLoad = function() {
+      (this.edgePrev = $("#" + (this.id('edgeprev')))).click(__bind(function() {
+        return this.scrollTo(this.curItem - 1);
+      }, this));
+      (this.edgeNext = $("#" + (this.id('edgenext')))).click(__bind(function() {
+        return this.scrollTo(this.curItem + 1);
+      }, this));
+      this.scrollBox = $("#" + (this.id('scrollbox')));
       return this.scrollTo(0, true);
     };
     Packs_Core_Controls_SlidePanel.prototype.onWindowResize = function(w, h) {
       return this.scrollTo(this.curItem, true);
     };
     Packs_Core_Controls_SlidePanel.prototype.scrollTo = function(item, force) {
-      var el, el2, w;
       if (_.isString(item)) {
         item = this.items.indexOf(item);
       }
-      if (item >= 0 && (force || item !== this.curItem)) {
-        this.curItem = item;
-        w = $("#" + (this.id('scrollprev'))).width();
-        el = $("#" + (this.id('scrollbox')));
-        el2 = $("#" + (this.id('before')));
+      if (((item < 0) || (item >= this.items.length)) && force) {
+        item = 0;
+      }
+      if ((force || item !== this.curItem) && (item >= 0) && (item < this.items.length)) {
+        this.edgePrev.css({
+          display: item === 0 ? 'none' : 'block'
+        });
+        this.edgeNext.css({
+          display: item === (this.items.length - 1) ? 'none' : 'block'
+        });
+        this.on('itemSelect', [this.curItem = item, this.items[item]]);
         return morpheus.tween(250, (__bind(function(pos) {
-          return el.scrollLeft(pos);
-        }, this)), (function() {}), null, el.scrollLeft(), el.scrollLeft() + $("#" + (this.id('items_' + this.items[item]))).position().left - w);
+          return this.scrollBox.scrollLeft(pos);
+        }, this)), (function() {}), null, this.scrollBox.scrollLeft(), this.scrollBox.scrollLeft() + $("#" + (this.id('items_' + this.items[item]))).position().left - this.edgePrev.width());
       }
     };
     function Packs_Core_Controls_SlidePanel(client, parent, args) {
@@ -13889,18 +13931,18 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         __r.o.push("\" class=\"smio-slidepanel ");
         __r.o.push(this.args["class"]);
         __r.o.push("\">\n\t<div id=\"");
-        __r.o.push(this.id('scrollprev'));
-        __r.o.push("\" class=\"smio-slidepanel-edge smio-slidepanel-edge-left\"></div>\n\t<div id=\"");
-        __r.o.push(this.id('scrollnext'));
-        __r.o.push("\" class=\"smio-slidepanel-edge smio-slidepanel-edge-right\"></div>\n\t<div id=\"");
+        __r.o.push(this.id('edgeprev'));
+        __r.o.push("\" class=\"smio-slidepanel-edge smio-slidepanel-edge-left\"><div class=\"smio-slidepanel-edge-arr\" x=\"#9668\">&laquo;&nbsp;&nbsp;back</div></div>\n\t<div id=\"");
+        __r.o.push(this.id('edgenext'));
+        __r.o.push("\" class=\"smio-slidepanel-edge smio-slidepanel-edge-right\"><div class=\"smio-slidepanel-edge-arr\" x=\"#9658\">next&nbsp;&nbsp;&raquo;</div></div>\n\t<div id=\"");
         __r.o.push(this.id('scrollbox'));
         __r.o.push("\" class=\"smio-slidepanel-scrollbox\">\n\t<ul id=\"");
         __r.o.push(this.id('items'));
         __r.o.push("\" class=\"smio-slidepanel ");
         __r.o.push(this.args["class"]);
-        __r.o.push("\">\n\t\t<li class=\"" + this.args.itemClass + "\" id=\"" + (this.id('before')) + "\">&nbsp;</li>\n\t\t");
+        __r.o.push("\">\n\t\t<li class=\"" + this.args.edgeItemClass + "\" id=\"" + (this.id('libefore')) + "\">&nbsp;</li>\n\t\t");
         __r.o.push(this.renderTag("inner", "", null));
-        __r.o.push("\n\t\t<li class=\"" + this.args.itemClass + "\" id=\"" + (this.id('after')) + "\">&nbsp;</li>\n\t</ul>\n\t</div>\n</div>\n\n");
+        __r.o.push("\n\t\t<li class=\"" + this.args.edgeItemClass + "\" id=\"" + (this.id('liafter')) + "\">&nbsp;</li>\n\t</ul>\n\t</div>\n</div>\n\n");
         this._html = __r.o.join('');
       }
       if ($el) {
@@ -14024,6 +14066,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio = smoothio = global.smoothio;
   smio.Packs_Core_ServerSetup_InitialSiteSetup = (function() {
     __extends(Packs_Core_ServerSetup_InitialSiteSetup, smio.Control);
+    Packs_Core_ServerSetup_InitialSiteSetup.prototype.onSlide = function(index, itemID) {
+      return this.controls.steptabs.selectTab(itemID);
+    };
     Packs_Core_ServerSetup_InitialSiteSetup.prototype.onTabSelect = function(tabID) {
       return this.controls.stepslide.scrollTo(tabID);
     };
@@ -14054,7 +14099,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           args: {
             id: 'stepslide',
             "class": 'smio-setup-stepslide',
-            itemClass: 'smio-setup-stepbox'
+            itemClass: 'smio-setup-stepbox',
+            onItemSelect: __bind(function(i, id) {
+              return this.onSlide(i, id);
+            }, this)
           }
         });
         __r.o = tmp;
@@ -14068,13 +14116,13 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           }
         });
         __r.o = tmp;
-        __r.o.push("\n\t\t\t\t");
+        __r.o.push("\n\t\t\t\t<div class=\"smio-setup-stepbox-title\">");
         __r.o.push({
           t: "r",
-          s: "usersetup",
+          s: "steptitle_owner",
           a: null
         });
-        __r.o.push("\n\t\t\t");
+        __r.o.push("</div>\n\t\t\t\t<div class=\"smio-setup-stepbox-form\">\n\t\t\t\t\tblaa\n\t\t\t\t\t<br/><br/>\n\t\t\t\t\tfoo\n\t\t\t\t\t<br/><br/>\n\t\t\t\t\tyeah right\n\t\t\t\t</div>\n\t\t\t");
         tmp = __r.ctls.pop();
         __r.o = __r.ctls[0].o;
         __r.o.push({
@@ -14094,13 +14142,13 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           }
         });
         __r.o = tmp;
-        __r.o.push("\n\t\t\t\t");
+        __r.o.push("\n\t\t\t\t<div class=\"smio-setup-stepbox-title\">");
         __r.o.push({
           t: "r",
-          s: "templateselection",
+          s: "steptitle_template",
           a: null
         });
-        __r.o.push("\n\t\t\t");
+        __r.o.push("</div>\n\t\t\t\t<div class=\"smio-setup-stepbox-form\">\n\t\t\t\t\tblaa\n\t\t\t\t\t<br/><br/>\n\t\t\t\t\tfoo\n\t\t\t\t\t<br/><br/>\n\t\t\t\t\tyeah right\n\t\t\t\t</div>\n\t\t\t");
         tmp = __r.ctls.pop();
         __r.o = __r.ctls[0].o;
         __r.o.push({
@@ -14120,7 +14168,13 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           }
         });
         __r.o = tmp;
-        __r.o.push("\n\t\t\t\tthe finish line!!\n\t\t\t\t<br/>\n\t\t\t\tthis is where we ROLL...\n\t\t\t\t<br/><br/>\n\t\t\t\tcrazy innit?!\n\t\t\t");
+        __r.o.push("\n\t\t\t\t<div class=\"smio-setup-stepbox-title\">");
+        __r.o.push({
+          t: "r",
+          s: "steptitle_finish",
+          a: null
+        });
+        __r.o.push("</div>\n\t\t\t\t<div class=\"smio-setup-stepbox-form\">\n\t\t\t\t\tthe finish line!!\n\t\t\t\t\t<br/>\n\t\t\t\t\tthis is where we ROLL...\n\t\t\t\t\t<br/><br/>\n\t\t\t\t\tcrazy innit?!\n\t\t\t\t</div>\n\t\t\t");
         tmp = __r.ctls.pop();
         __r.o = __r.ctls[0].o;
         __r.o.push({

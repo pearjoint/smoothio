@@ -165,6 +165,7 @@ class smio.Packs_#{className} extends smio.Control
 		@controls = {}
 		@containers = {}
 		@ctlRenderers = {}
+		@eventHandlers = {}
 		@el = null
 		@_html = ''
 
@@ -180,6 +181,17 @@ class smio.Packs_#{className} extends smio.Control
 			myID
 
 	init: ->
+
+	on: (eventName, handler) ->
+		if eventName
+			if _.isFunction handler
+				if not @eventHandlers[eventName]
+					@eventHandlers[eventName] = []
+				if 0 > _.indexOf @eventHandlers[eventName], handler
+					@eventHandlers[eventName].push handler
+			else if @eventHandlers[eventName]
+				for eh in @eventHandlers[eventName]
+					eh.apply @, handler
 
 	onLoad: () ->
 		prefix = "cscript:"
@@ -204,6 +216,10 @@ class smio.Packs_#{className} extends smio.Control
 			"!!UNKNOWN_TAG::#{name}!!"
 
 	syncUpdate: (ctlDesc) ->
+
+	un: (eventName, handler) ->
+		if eventName and @eventHandlers[eventName] and _.isFunction handler
+			@eventHandlers[eventName] = _.without @eventHandlers[eventName], handler
 
 #endif
 

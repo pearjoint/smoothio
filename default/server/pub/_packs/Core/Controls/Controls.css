@@ -6,23 +6,53 @@ div.smio-slidepanel-scrollbox {
   white-space: nowrap;
 }
 div.smio-slidepanel-edge {
+  cursor: pointer;
   position: absolute;
-  top: 0.2em;
-  bottom: 0.1em;
+  top: 0.25em;
+  bottom: 0.15em;
   width: 3em;
+  overflow: hidden;
+  text-align: center;
+}
+.smio-slidepanel-edge-arr {
+  white-space: nowrap;
+  margin: 9.5em 1em 1em 1em;
+  padding: 0.1em;
+  text-align: center;
+  -webkit-border-radius: 0.4em;
+  -moz-border-radius: 0.4em;
+  border-radius: 0.4em;
+  -moz-box-shadow: 0em 0.08em 0.25em #909090;
+  -webkit-box-shadow: 0em 0.08em 0.25em #909090;
+  box-shadow: 0em 0.08em 0.25em #909090;
+  border: 0.1em #a0a0a0 outset;
+  background: -ms-linear-gradient(rgba(56,56,56,0.65), rgba(56,56,56,0.85));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(56,56,56,0.65)), to(rgba(56,56,56,0.85)));
+  background: -moz-linear-gradient(rgba(56,56,56,0.65), rgba(56,56,56,0.85));
+  background: -webkit-linear-gradient(rgba(56,56,56,0.65), rgba(56,56,56,0.85));
+  background: -o-linear-gradient(rgba(56,56,56,0.65), rgba(56,56,56,0.85));
+  font-size: 0.9em;
+  text-shadow: 0 -0.092em #404040;
+  overflow: hidden;
+  white-space: nowrap;
+  color: #f0f0f0;
+  visibility: hidden;
+}
+div.smio-slidepanel:hover .smio-slidepanel-edge-arr {
+  visibility: visible;
 }
 div.smio-slidepanel-edge-left {
   left: 0em;
-  background: rgba(250,250,250,0.9);
   background: -ms-linear-gradient(left, rgba(250,250,250,0.9), rgba(250,250,250,0.3));
+  background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(250,250,250,0.9)), to(rgba(250,250,250,0.3)));
   background: -moz-linear-gradient(left, rgba(250,250,250,0.9), rgba(250,250,250,0.3));
   background: -webkit-linear-gradient(left, rgba(250,250,250,0.9), rgba(250,250,250,0.3));
   background: -o-linear-gradient(left, rgba(250,250,250,0.9), rgba(250,250,250,0.3));
 }
 div.smio-slidepanel-edge-right {
   right: 0em;
-  background: rgba(250,250,250,0.3);
   background: -ms-linear-gradient(left, rgba(250,250,250,0.3), rgba(250,250,250,0.9));
+  background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(250,250,250,0.3)), to(rgba(250,250,250,0.9)));
   background: -moz-linear-gradient(left, rgba(250,250,250,0.3), rgba(250,250,250,0.9));
   background: -webkit-linear-gradient(left, rgba(250,250,250,0.3), rgba(250,250,250,0.9));
   background: -o-linear-gradient(left, rgba(250,250,250,0.3), rgba(250,250,250,0.9));

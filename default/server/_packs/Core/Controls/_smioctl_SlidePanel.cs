@@ -15,8 +15,13 @@ class smio.Packs_Core_Controls_SlidePanel extends smio.Control
 		@ctlRenderers['item'] = (className, args) =>
 			@items.push args.id
 			"<li class=\"#{@args.itemClass} #{args.class}\" id=\"#{@id('items_' + args.id)}\">#{@renderTag "inner", null, args}</li>"
+		if @args.onItemSelect and _.isFunction @args.onItemSelect
+			@on 'itemSelect', @args.onItemSelect
 
 	onLoad: ->
+		(@edgePrev = $("##{@id 'edgeprev'}")).click => @scrollTo @curItem - 1
+		(@edgeNext = $("##{@id 'edgenext'}")).click => @scrollTo @curItem + 1
+		@scrollBox = $("##{@id 'scrollbox'}")
 		@scrollTo 0, true
 
 	onWindowResize: (w, h) ->
@@ -25,12 +30,13 @@ class smio.Packs_Core_Controls_SlidePanel extends smio.Control
 	scrollTo: (item, force) ->
 		if _.isString item
 			item = @items.indexOf item
-		if item >= 0 and (force or item isnt @curItem)
-			@curItem = item
-			w = $("##{@id 'scrollprev'}").width()
-			el = $("##{@id 'scrollbox'}")
-			el2 = $("##{@id 'before'}")
-			morpheus.tween 250, ((pos) => el.scrollLeft pos), (->), null, el.scrollLeft(), el.scrollLeft() + $("##{@id 'items_' + @items[item]}").position().left - w
+		if ((item < 0) or (item >= @items.length)) and force
+			item = 0
+		if (force or item isnt @curItem) and (item >= 0) and (item < @items.length)
+			@edgePrev.css display: if (item is 0) then 'none' else 'block'
+			@edgeNext.css display: if (item is (@items.length - 1)) then 'none' else 'block'
+			@on 'itemSelect', [@curItem = item, @items[item]]
+			morpheus.tween 250, ((pos) => @scrollBox.scrollLeft pos), (->), null, @scrollBox.scrollLeft(), @scrollBox.scrollLeft() + $("##{@id 'items_' + @items[item]}").position().left - @edgePrev.width()
 
 
 #if client
@@ -50,18 +56,18 @@ class smio.Packs_Core_Controls_SlidePanel extends smio.Control
 			__r.o.push "\" class=\"smio-slidepanel "
 			__r.o.push  @args.class
 			__r.o.push "\">\n\t<div id=\""
-			__r.o.push  @id('scrollprev') 
-			__r.o.push "\" class=\"smio-slidepanel-edge smio-slidepanel-edge-left\"></div>\n\t<div id=\""
-			__r.o.push  @id('scrollnext') 
-			__r.o.push "\" class=\"smio-slidepanel-edge smio-slidepanel-edge-right\"></div>\n\t<div id=\""
+			__r.o.push  @id('edgeprev') 
+			__r.o.push "\" class=\"smio-slidepanel-edge smio-slidepanel-edge-left\"><div class=\"smio-slidepanel-edge-arr\" x=\"#9668\">&laquo;&nbsp;&nbsp;back</div></div>\n\t<div id=\""
+			__r.o.push  @id('edgenext') 
+			__r.o.push "\" class=\"smio-slidepanel-edge smio-slidepanel-edge-right\"><div class=\"smio-slidepanel-edge-arr\" x=\"#9658\">next&nbsp;&nbsp;&raquo;</div></div>\n\t<div id=\""
 			__r.o.push  @id('scrollbox') 
 			__r.o.push "\" class=\"smio-slidepanel-scrollbox\">\n\t<ul id=\""
 			__r.o.push  @id('items') 
 			__r.o.push "\" class=\"smio-slidepanel "
 			__r.o.push  @args.class
-			__r.o.push "\">\n\t\t<li class=\"#{@args.itemClass}\" id=\"#{@id('before')}\">&nbsp;</li>\n\t\t"
+			__r.o.push "\">\n\t\t<li class=\"#{@args.edgeItemClass}\" id=\"#{@id('libefore')}\">&nbsp;</li>\n\t\t"
 			__r.o.push @renderTag "inner", "", null
-			__r.o.push "\n\t\t<li class=\"#{@args.itemClass}\" id=\"#{@id('after')}\">&nbsp;</li>\n\t</ul>\n\t</div>\n</div>\n\n"
+			__r.o.push "\n\t\t<li class=\"#{@args.edgeItemClass}\" id=\"#{@id('liafter')}\">&nbsp;</li>\n\t</ul>\n\t</div>\n</div>\n\n"
 			@_html = __r.o.join ''
 		if $el
 			$el.html @_html
