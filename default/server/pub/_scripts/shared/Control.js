@@ -6,7 +6,7 @@
       "arg": function(ctl, name) {
         return ctl.args[name];
       },
-      "ctl": function(ctl, className, args) {
+      "ctl": function(ctl, className, args, emptyIfMissing) {
         var ctor;
         if ((!ctl.controls[args.id]) && ((ctor = smio['Packs_' + ctl.baseName + '_' + className]) || (ctor = smio['Packs_' + ctl.baseName + '_Controls_' + className]) || (ctor = smio['Packs_Core_Controls_' + className]))) {
           ctl.client.allControls[args.id] = ctl.controls[args.id] = new ctor(this.client, ctl, args);
@@ -16,7 +16,11 @@
         } else if (ctl.ctlRenderers[className]) {
           return ctl.ctlRenderers[className](className, args);
         } else {
-          return "!!CONTROL_NOT_FOUND::" + className + "!!";
+          if (emptyIfMissing) {
+            return '';
+          } else {
+            return "!!CONTROL_NOT_FOUND::" + className + "!!";
+          }
         }
       },
       "inner": function(ctl, name, args) {
@@ -121,6 +125,89 @@
       }
     };
     Control.prototype.onWindowResize = function(width, height) {};
+    Control.prototype.renderJsonTemplate = function(json, buf) {
+      var an, atts, attstr, av, hasc, haso, is1, k, kc, kt, name, pos, result, toAtt, v, val;
+      toAtt = function(an, av) {
+        return " " + an + "=\"" + av + "\"";
+      };
+      is1 = false;
+      if (!buf) {
+        is1 = true;
+        buf = [];
+      }
+      for (k in json) {
+        v = json[k];
+        if ((kt = _.trim(k))) {
+          atts = {};
+          attstr = '';
+          kc = [];
+          while ((pos = kt.lastIndexOf('.')) > 0) {
+            kc.push(_.trim(kt.substr(pos + 1)));
+            kt = _.trim(kt.substr(0, pos));
+          }
+          if (kc.length) {
+            atts['class'] = kc.join(' ');
+          }
+          if ((pos = kt.lastIndexOf('#')) > 0) {
+            atts.id = _.trim(kt.substr(pos + 1));
+            kt = _.trim(kt.substr(0, pos));
+          }
+          for (an in atts) {
+            av = atts[an];
+            attstr += toAtt(an, av);
+          }
+          if (!v) {
+            buf.push("<" + kt + attstr + "/>");
+          } else if (typeof v === 'object') {
+            if ((result = smio.Control.tagRenderers.ctl(this, kt, smio.Util.Object.mergeDefaults(v, atts), true))) {
+              buf.push(result);
+            } else {
+              buf.push("<" + kt + attstr);
+              hasc = false;
+              haso = false;
+              for (name in v) {
+                val = v[name];
+                if (val) {
+                  if (typeof val === 'object') {
+                    haso = true;
+                  } else {
+                    buf.push(toAtt(name, val));
+                  }
+                }
+              }
+              if (haso) {
+                for (name in v) {
+                  val = v[name];
+                  if (val && (typeof val === 'object')) {
+                    if (!hasc) {
+                      hasc = true;
+                      buf.push(">");
+                    }
+                    this.renderJsonTemplate(val, buf);
+                  }
+                }
+              }
+              buf.push(hasc ? "</" + kt + ">" : "/>");
+            }
+          } else {
+            buf.push("<" + kt + attstr + ">" + v + "</" + kt + ">");
+          }
+        }
+      }
+      if (is1) {
+        alert(buf.join(''));
+      }
+      return buf.join('');
+    };
+    Control.prototype.renderHtml = function($el) {
+      if ((!this._html) && this['renderTemplate'] && _.isFunction(this.renderTemplate)) {
+        this._html = this.renderJsonTemplate(this.renderTemplate());
+      }
+      if ($el) {
+        $el.html(this._html);
+      }
+      return this._html;
+    };
     Control.prototype.renderTag = function(name, sarg, jarg) {
       var renderer;
       renderer = smio.Control.tagRenderers[name];
@@ -135,6 +222,9 @@
       if (eventName && this.eventHandlers[eventName] && _.isFunction(handler)) {
         return this.eventHandlers[eventName] = _.without(this.eventHandlers[eventName], handler);
       }
+    };
+    Control.prototype.r = function(name) {
+      return this.res(name);
     };
     Control.prototype.res = function(name) {
       var i, parts, resSet, resSets, ret, _ref;

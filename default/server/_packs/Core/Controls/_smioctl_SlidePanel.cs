@@ -44,22 +44,20 @@ class smio.Packs_Core_Controls_SlidePanel extends smio.Control
 		super client, parent, args, "Core_Controls", "Core_Controls_SlidePanel"
 		@jsSelf = "smio.client.allControls['" + @id() + "']"
 		@init()
-
 	renderHtml: ($el) ->
 		if not @_html
-			__r =
-				ctls: []
-				m: []
+			__r = ctls: [], m: []
 			__r.o = __r.m
+
 			__r.o.push "\n<div id=\""
 			__r.o.push  @id() 
 			__r.o.push "\" class=\"smio-slidepanel "
 			__r.o.push  @args.class
 			__r.o.push "\">\n\t<div id=\""
 			__r.o.push  @id('edgeprev') 
-			__r.o.push "\" class=\"smio-slidepanel-edge smio-slidepanel-edge-left\"><div class=\"smio-slidepanel-edge-arr\" x=\"#9668\">&laquo;&nbsp;&nbsp;back</div></div>\n\t<div id=\""
+			__r.o.push "\" class=\"smio-slidepanel-edge smio-slidepanel-edge-left\"><div class=\"smio-slidepanel-edge-arr\" x=\"#9668\">&laquo;&nbsp;&nbsp;Back</div></div>\n\t<div id=\""
 			__r.o.push  @id('edgenext') 
-			__r.o.push "\" class=\"smio-slidepanel-edge smio-slidepanel-edge-right\"><div class=\"smio-slidepanel-edge-arr\" x=\"#9658\">next&nbsp;&nbsp;&raquo;</div></div>\n\t<div id=\""
+			__r.o.push "\" class=\"smio-slidepanel-edge smio-slidepanel-edge-right\"><div class=\"smio-slidepanel-edge-arr\" x=\"#9658\">Next&nbsp;&nbsp;&raquo;</div></div>\n\t<div id=\""
 			__r.o.push  @id('scrollbox') 
 			__r.o.push "\" class=\"smio-slidepanel-scrollbox\">\n\t<ul id=\""
 			__r.o.push  @id('items') 

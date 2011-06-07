@@ -14,6 +14,11 @@ class smio.Control
 		pathParts = ((controlPath.substr 0, controlPath.lastIndexOf '.').split '/')
 		baseName = pathParts[0...(pathParts.length - 1)].join '_'
 		className = pathParts.join '_'
+		if ctlContent and '<' isnt ctlContent.substr 0, 1
+			lines = []
+			for l in ctlContent.split '\n'
+				lines.push (if ('#' isnt l.substr 0, 1) then '\t' else '') + l
+			ctlContent = "<%script:\n#{lines.join '\n'}\n%>"
 		for c in ctlContent
 			if ((lastChar + c) is '<%') and not inDyn
 				inDyn = true
@@ -64,77 +69,72 @@ class smio.Packs_#{className} extends smio.Control
 		super client, parent, args, #{JSON.stringify baseName}, #{JSON.stringify className}
 		@jsSelf = "smio.client.allControls['" + @id() + "']"
 		@init()
-
-	renderHtml: ($el) ->
-		if not @_html
-			__r =
-				ctls: []
-				m: []
-			__r.o = __r.m
 """
-		[ind, indent, rind, stimes] = [-1, 3, 3, smio.Util.String.times]
-		subs = 0
-		for rp in renderParts
-			br = "\n#{stimes '\t', rind}"
-			if _.isString rp
-				coffeeScript += "#{br}__r.o.push #{JSON.stringify rp}"
-			else if (_.isArray rp) and rp.length and rp.length > 1
-				if rp[0] is '='
-					coffeeScript += "#{br}__r.o.push #{rp[1]}"
-				else if rp[0] is '_'
-					lines = rp[1].split '\n'
-					rp[1] = ''
-					if lines and lines.length
-						for l in lines
-							if l and l.length and (_.trim l)
-								if ind < 0
-									ind = 0
-									for i in [0...l.length]
-										if (l.substr i, 1) is '\t'
-											ind++
-										else
-											break
-								rind = indent + ind
-								rp[1] += "\n#{stimes '\t', indent}#{l.substr ind}"
-						if lines.length > 1
-							l = _.last lines
-							lind = 0
-							for i in [0...l.length]
-								if (l.substr i, 1) is '\t'
-									lind++
-								else
-									break
-							rind = indent + (lind - ind)
-						if rp[1] and (_.trim rp[1]) and (_.trim rp[1], ' ', '\t', '\r', '\n')
-							coffeeScript += "#{rp[1]}"
-				else
-					sarg = rp[1]
-					jarg = null
-					if (pos = sarg.indexOf '{') > 0
-						jarg = sarg.substr pos
-						sarg = _.trim sarg.substr 0, pos
-					if rp[0] is 'begin'
-						subs = subs + 1
-						coffeeScript += "#{br}tmp = []#{br}__r.ctls.push o: tmp, c: #{JSON.stringify sarg}, args: #{jarg}#{br}__r.o = tmp"
-					else if rp[0] is 'end'
-						subs = subs - 1
-						coffeeScript += "#{br}tmp = __r.ctls.pop()#{br}__r.o = " + (if subs then "__r.ctls[#{subs - 1}].o" else '__r.m')
-						if subs
-							coffeeScript += "#{br}__r.o.push t: 'ctl', s: tmp.c, a: (smio.Util.Object.mergeDefaults tmp.args, __o: tmp.o)"
-						else
-							coffeeScript += "#{br}__r.o.push @renderTag 'ctl', tmp.c, smio.Util.Object.mergeDefaults tmp.args, __o: tmp.o"
-					else if subs
-						coffeeScript += "#{br}__r.o.push t: #{JSON.stringify rp[0]}, s: #{JSON.stringify sarg}, a: #{jarg}"
+		if renderParts and renderParts.length
+			[ind, indent, rind, stimes] = [-1, 3, 3, smio.Util.String.times]
+			subs = 0
+			coffeeScript += "\n\trenderHtml: ($el) ->\n\t\tif not @_html\n\t\t\t__r = ctls: [], m: []\n\t\t\t__r.o = __r.m\n"
+			for rp in renderParts
+				br = "\n#{stimes '\t', rind}"
+				if _.isString rp
+					coffeeScript += "#{br}__r.o.push #{JSON.stringify rp}"
+				else if (_.isArray rp) and rp.length and rp.length > 1
+					if rp[0] is '='
+						coffeeScript += "#{br}__r.o.push #{rp[1]}"
+					else if rp[0] is '_'
+						lines = rp[1].split '\n'
+						rp[1] = ''
+						if lines and lines.length
+							for l in lines
+								if l and l.length and (_.trim l)
+									if ind < 0
+										ind = 0
+										for i in [0...l.length]
+											if (l.substr i, 1) is '\t'
+												ind++
+											else
+												break
+									rind = indent + ind
+									rp[1] += "\n#{stimes '\t', indent}#{l.substr ind}"
+							if lines.length > 1
+								l = _.last lines
+								lind = 0
+								for i in [0...l.length]
+									if (l.substr i, 1) is '\t'
+										lind++
+									else
+										break
+								rind = indent + (lind - ind)
+							if rp[1] and (_.trim rp[1]) and (_.trim rp[1], ' ', '\t', '\r', '\n')
+								coffeeScript += "#{rp[1]}"
 					else
-						coffeeScript += "#{br}__r.o.push @renderTag #{JSON.stringify rp[0]}, #{JSON.stringify sarg}, #{jarg}"
-		coffeeScript += "\n#{stimes '\t', indent}@_html = __r.o.join ''\n#{stimes '\t', indent - 1}if $el\n#{stimes '\t', indent}$el.html @_html\n#{stimes '\t', indent - 1}@_html\n#{"#endif"}\n"
+						sarg = rp[1]
+						jarg = null
+						if (pos = sarg.indexOf '{') > 0
+							jarg = sarg.substr pos
+							sarg = _.trim sarg.substr 0, pos
+						if rp[0] is 'begin'
+							subs = subs + 1
+							coffeeScript += "#{br}tmp = []#{br}__r.ctls.push o: tmp, c: #{JSON.stringify sarg}, args: #{jarg}#{br}__r.o = tmp"
+						else if rp[0] is 'end'
+							subs = subs - 1
+							coffeeScript += "#{br}tmp = __r.ctls.pop()#{br}__r.o = " + (if subs then "__r.ctls[#{subs - 1}].o" else '__r.m')
+							if subs
+								coffeeScript += "#{br}__r.o.push t: 'ctl', s: tmp.c, a: (smio.Util.Object.mergeDefaults tmp.args, __o: tmp.o)"
+							else
+								coffeeScript += "#{br}__r.o.push @renderTag 'ctl', tmp.c, smio.Util.Object.mergeDefaults tmp.args, __o: tmp.o"
+						else if subs
+							coffeeScript += "#{br}__r.o.push t: #{JSON.stringify rp[0]}, s: #{JSON.stringify sarg}, a: #{jarg}"
+						else
+							coffeeScript += "#{br}__r.o.push @renderTag #{JSON.stringify rp[0]}, #{JSON.stringify sarg}, #{jarg}"
+			coffeeScript += "\n#{stimes '\t', indent}@_html = __r.o.join ''\n#{stimes '\t', indent - 1}if $el\n#{stimes '\t', indent}$el.html @_html\n#{stimes '\t', indent - 1}@_html\n#{"#endif"}\n"
 		coffeeScript
 #endif
 #if client
 	@tagRenderers:
 		"arg": (ctl, name) ->
 			ctl.args[name]
-		"ctl": (ctl, className, args) ->
+		"ctl": (ctl, className, args, emptyIfMissing) ->
 			if (not ctl.controls[args.id]) and ((ctor = smio['Packs_' + ctl.baseName + '_' + className]) or (ctor = smio['Packs_' + ctl.baseName + '_Controls_' + className]) or (ctor = smio['Packs_Core_Controls_' + className] ))
 				ctl.client.allControls[args.id] = ctl.controls[args.id] = new ctor @client, ctl, args
 			if ctl.controls[args.id]
@@ -142,7 +142,7 @@ class smio.Packs_#{className} extends smio.Control
 			else if ctl.ctlRenderers[className]
 				ctl.ctlRenderers[className] className, args
 			else
-				"!!CONTROL_NOT_FOUND::#{className}!!"
+				if emptyIfMissing then '' else "!!CONTROL_NOT_FOUND::#{className}!!"
 		"inner": (ctl, name, args) ->
 			o = []
 			a = if args then args else ctl.args
@@ -208,6 +208,64 @@ class smio.Packs_#{className} extends smio.Control
 
 	onWindowResize: (width, height) ->
 
+	renderJsonTemplate: (json, buf) ->
+		toAtt = (an, av) ->
+			" #{an}=\"#{av}\""
+		is1 = false
+		if not buf
+			is1 = true
+			buf = []
+		for k, v of json
+			if (kt = _.trim k)
+				atts = {}
+				attstr = ''
+				kc = []
+				while (pos = kt.lastIndexOf '.') > 0
+					kc.push _.trim kt.substr pos + 1
+					kt = _.trim kt.substr 0, pos
+				if kc.length
+					atts['class'] = kc.join ' '
+				if (pos = kt.lastIndexOf '#') > 0
+					atts.id = _.trim kt.substr pos + 1
+					kt = _.trim kt.substr 0, pos
+				for an, av of atts
+					attstr += toAtt an, av
+				if not v
+					buf.push "<#{kt}#{attstr}/>"
+				else if typeof(v) is 'object'
+					if (result = smio.Control.tagRenderers.ctl @, kt, (smio.Util.Object.mergeDefaults v, atts), true)
+						buf.push result
+					else
+						buf.push "<#{kt}#{attstr}"
+						hasc = false
+						haso = false
+						for name, val of v
+							if val
+								if (typeof(val) is 'object')
+									haso = true
+								else
+									buf.push toAtt name, val
+						if haso
+							for name, val of v
+								if val and (typeof(val) is 'object')
+									if not hasc
+										hasc = true
+										buf.push ">"
+									@renderJsonTemplate val, buf
+						buf.push if hasc then "</#{kt}>" else "/>"
+				else
+					buf.push "<#{kt}#{attstr}>#{v}</#{kt}>"
+		if is1
+			alert buf.join ''
+		buf.join ''
+
+	renderHtml: ($el) ->
+		if (not @_html) and @['renderTemplate'] and _.isFunction @renderTemplate
+			@_html = @renderJsonTemplate @renderTemplate()
+		if $el
+			$el.html @_html
+		@_html
+
 	renderTag: (name, sarg, jarg) ->
 		renderer = smio.Control.tagRenderers[name]
 		if renderer
@@ -222,6 +280,9 @@ class smio.Packs_#{className} extends smio.Control
 			@eventHandlers[eventName] = _.without @eventHandlers[eventName], handler
 
 #endif
+
+	r: (name) ->
+		@res name
 
 	res: (name) ->
 		ret = ''

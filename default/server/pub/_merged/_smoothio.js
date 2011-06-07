@@ -13301,7 +13301,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       "arg": function(ctl, name) {
         return ctl.args[name];
       },
-      "ctl": function(ctl, className, args) {
+      "ctl": function(ctl, className, args, emptyIfMissing) {
         var ctor;
         if ((!ctl.controls[args.id]) && ((ctor = smio['Packs_' + ctl.baseName + '_' + className]) || (ctor = smio['Packs_' + ctl.baseName + '_Controls_' + className]) || (ctor = smio['Packs_Core_Controls_' + className]))) {
           ctl.client.allControls[args.id] = ctl.controls[args.id] = new ctor(this.client, ctl, args);
@@ -13311,7 +13311,11 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         } else if (ctl.ctlRenderers[className]) {
           return ctl.ctlRenderers[className](className, args);
         } else {
-          return "!!CONTROL_NOT_FOUND::" + className + "!!";
+          if (emptyIfMissing) {
+            return '';
+          } else {
+            return "!!CONTROL_NOT_FOUND::" + className + "!!";
+          }
         }
       },
       "inner": function(ctl, name, args) {
@@ -13416,6 +13420,89 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
     };
     Control.prototype.onWindowResize = function(width, height) {};
+    Control.prototype.renderJsonTemplate = function(json, buf) {
+      var an, atts, attstr, av, hasc, haso, is1, k, kc, kt, name, pos, result, toAtt, v, val;
+      toAtt = function(an, av) {
+        return " " + an + "=\"" + av + "\"";
+      };
+      is1 = false;
+      if (!buf) {
+        is1 = true;
+        buf = [];
+      }
+      for (k in json) {
+        v = json[k];
+        if ((kt = _.trim(k))) {
+          atts = {};
+          attstr = '';
+          kc = [];
+          while ((pos = kt.lastIndexOf('.')) > 0) {
+            kc.push(_.trim(kt.substr(pos + 1)));
+            kt = _.trim(kt.substr(0, pos));
+          }
+          if (kc.length) {
+            atts['class'] = kc.join(' ');
+          }
+          if ((pos = kt.lastIndexOf('#')) > 0) {
+            atts.id = _.trim(kt.substr(pos + 1));
+            kt = _.trim(kt.substr(0, pos));
+          }
+          for (an in atts) {
+            av = atts[an];
+            attstr += toAtt(an, av);
+          }
+          if (!v) {
+            buf.push("<" + kt + attstr + "/>");
+          } else if (typeof v === 'object') {
+            if ((result = smio.Control.tagRenderers.ctl(this, kt, smio.Util.Object.mergeDefaults(v, atts), true))) {
+              buf.push(result);
+            } else {
+              buf.push("<" + kt + attstr);
+              hasc = false;
+              haso = false;
+              for (name in v) {
+                val = v[name];
+                if (val) {
+                  if (typeof val === 'object') {
+                    haso = true;
+                  } else {
+                    buf.push(toAtt(name, val));
+                  }
+                }
+              }
+              if (haso) {
+                for (name in v) {
+                  val = v[name];
+                  if (val && (typeof val === 'object')) {
+                    if (!hasc) {
+                      hasc = true;
+                      buf.push(">");
+                    }
+                    this.renderJsonTemplate(val, buf);
+                  }
+                }
+              }
+              buf.push(hasc ? "</" + kt + ">" : "/>");
+            }
+          } else {
+            buf.push("<" + kt + attstr + ">" + v + "</" + kt + ">");
+          }
+        }
+      }
+      if (is1) {
+        alert(buf.join(''));
+      }
+      return buf.join('');
+    };
+    Control.prototype.renderHtml = function($el) {
+      if ((!this._html) && this['renderTemplate'] && _.isFunction(this.renderTemplate)) {
+        this._html = this.renderJsonTemplate(this.renderTemplate());
+      }
+      if ($el) {
+        $el.html(this._html);
+      }
+      return this._html;
+    };
     Control.prototype.renderTag = function(name, sarg, jarg) {
       var renderer;
       renderer = smio.Control.tagRenderers[name];
@@ -13430,6 +13517,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       if (eventName && this.eventHandlers[eventName] && _.isFunction(handler)) {
         return this.eventHandlers[eventName] = _.without(this.eventHandlers[eventName], handler);
       }
+    };
+    Control.prototype.r = function(name) {
+      return this.res(name);
     };
     Control.prototype.res = function(name) {
       var i, parts, resSet, resSets, ret, _ref;
@@ -13932,9 +14022,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         __r.o.push(this.args["class"]);
         __r.o.push("\">\n\t<div id=\"");
         __r.o.push(this.id('edgeprev'));
-        __r.o.push("\" class=\"smio-slidepanel-edge smio-slidepanel-edge-left\"><div class=\"smio-slidepanel-edge-arr\" x=\"#9668\">&laquo;&nbsp;&nbsp;back</div></div>\n\t<div id=\"");
+        __r.o.push("\" class=\"smio-slidepanel-edge smio-slidepanel-edge-left\"><div class=\"smio-slidepanel-edge-arr\" x=\"#9668\">&laquo;&nbsp;&nbsp;Back</div></div>\n\t<div id=\"");
         __r.o.push(this.id('edgenext'));
-        __r.o.push("\" class=\"smio-slidepanel-edge smio-slidepanel-edge-right\"><div class=\"smio-slidepanel-edge-arr\" x=\"#9658\">next&nbsp;&nbsp;&raquo;</div></div>\n\t<div id=\"");
+        __r.o.push("\" class=\"smio-slidepanel-edge smio-slidepanel-edge-right\"><div class=\"smio-slidepanel-edge-arr\" x=\"#9658\">Next&nbsp;&nbsp;&raquo;</div></div>\n\t<div id=\"");
         __r.o.push(this.id('scrollbox'));
         __r.o.push("\" class=\"smio-slidepanel-scrollbox\">\n\t<ul id=\"");
         __r.o.push(this.id('items'));
@@ -14072,12 +14162,86 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     Packs_Core_ServerSetup_InitialSiteSetup.prototype.onTabSelect = function(tabID) {
       return this.controls.stepslide.scrollTo(tabID);
     };
+    Packs_Core_ServerSetup_InitialSiteSetup.prototype.renderTemplate = function() {
+      return {
+        "div .smio-setup": {
+          "id": this.id(),
+          "div .smio-setup-outer .smio-setup-outer-top": {
+            "div.smio-setup-header": this.r('title'),
+            "div.smio-setup-header-desc": this.r('desc')
+          },
+          "div .smio-setup-inner": {
+            "SlidePanel #stepslide .smio-setup-stepslide": {
+              itemClass: 'smio-setup-stepbox',
+              onItemSelect: __bind(function(i, id) {
+                return this.onSlide(i, id);
+              }, this),
+              items: [
+                {
+                  "item #owner": {
+                    'div .smio-setup-stepbox-title': this.r('steptitle_owner'),
+                    'div .smio-setup-stepbox-form': 'ding blaa<br/><br/>foo<br/><br/>yeah right'
+                  },
+                  "item #template": {
+                    "div .smio-setup-stepbox-title": this.r('steptitle_template'),
+                    "div .smio-setup-stepbox-form": 'boar<br/>blaa<br/><br/>foo<br/><br/>yeah right'
+                  },
+                  "item #finish": {
+                    "div .smio-setup-stepbox-title": this.r('steptitle_finish'),
+                    "div .smio-setup-stepbox-form": 'mooboar<br/><br/>blaa<br/><br/>foo<br/><br/>yeah right'
+                  }
+                }
+              ]
+            }
+          },
+          "TabStrip #steptabs .smio-setup-outer .smio-setup-steptabs": {
+            "tabClass": 'smio-setup-steptab',
+            "tabs": ['owner', 'template', 'finish'],
+            "resPrefix": 'steps_',
+            "onTabSelect": __bind(function(tabID) {
+              return this.onTabSelect(tabID);
+            }, this)
+          }
+        }
+      };
+    };
     function Packs_Core_ServerSetup_InitialSiteSetup(client, parent, args) {
       Packs_Core_ServerSetup_InitialSiteSetup.__super__.constructor.call(this, client, parent, args, "Core_ServerSetup", "Core_ServerSetup_InitialSiteSetup");
       this.jsSelf = "smio.client.allControls['" + this.id() + "']";
       this.init();
     }
-    Packs_Core_ServerSetup_InitialSiteSetup.prototype.renderHtml = function($el) {
+    return Packs_Core_ServerSetup_InitialSiteSetup;
+  })();
+}).call(this);
+
+/** server/pub/_packs/Core/ServerSetup/_smioctl_OldInitialSiteSetup.js **/
+(function() {
+  /*
+  Auto-generated from Core/ServerSetup/OldInitialSiteSetup.ctl
+  */  var smio, smoothio;
+  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
+  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  smio = smoothio = global.smoothio;
+  smio.Packs_Core_ServerSetup_OldInitialSiteSetup = (function() {
+    __extends(Packs_Core_ServerSetup_OldInitialSiteSetup, smio.Control);
+    Packs_Core_ServerSetup_OldInitialSiteSetup.prototype.onSlide = function(index, itemID) {
+      return this.controls.steptabs.selectTab(itemID);
+    };
+    Packs_Core_ServerSetup_OldInitialSiteSetup.prototype.onTabSelect = function(tabID) {
+      return this.controls.stepslide.scrollTo(tabID);
+    };
+    function Packs_Core_ServerSetup_OldInitialSiteSetup(client, parent, args) {
+      Packs_Core_ServerSetup_OldInitialSiteSetup.__super__.constructor.call(this, client, parent, args, "Core_ServerSetup", "Core_ServerSetup_OldInitialSiteSetup");
+      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
+      this.init();
+    }
+    Packs_Core_ServerSetup_OldInitialSiteSetup.prototype.renderHtml = function($el) {
       var tmp, __r;
       if (!this._html) {
         __r = {
@@ -14209,7 +14373,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
       return this._html;
     };
-    return Packs_Core_ServerSetup_InitialSiteSetup;
+    return Packs_Core_ServerSetup_OldInitialSiteSetup;
   })();
 }).call(this);
 

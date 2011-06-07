@@ -30,8 +30,8 @@
 			morpheus.tween 250, ((pos) => @scrollBox.scrollLeft pos), (->), null, @scrollBox.scrollLeft(), @scrollBox.scrollLeft() + $("##{@id 'items_' + @items[item]}").position().left - @edgePrev.width()
 %>
 <div id="<%= @id() %>" class="smio-slidepanel <%= @args.class%>">
-	<div id="<%= @id('edgeprev') %>" class="smio-slidepanel-edge smio-slidepanel-edge-left"><div class="smio-slidepanel-edge-arr" x="#9668">&laquo;&nbsp;&nbsp;back</div></div>
-	<div id="<%= @id('edgenext') %>" class="smio-slidepanel-edge smio-slidepanel-edge-right"><div class="smio-slidepanel-edge-arr" x="#9658">next&nbsp;&nbsp;&raquo;</div></div>
+	<div id="<%= @id('edgeprev') %>" class="smio-slidepanel-edge smio-slidepanel-edge-left"><div class="smio-slidepanel-edge-arr" x="#9668">&laquo;&nbsp;&nbsp;Back</div></div>
+	<div id="<%= @id('edgenext') %>" class="smio-slidepanel-edge smio-slidepanel-edge-right"><div class="smio-slidepanel-edge-arr" x="#9658">Next&nbsp;&nbsp;&raquo;</div></div>
 	<div id="<%= @id('scrollbox') %>" class="smio-slidepanel-scrollbox">
 	<ul id="<%= @id('items') %>" class="smio-slidepanel <%= @args.class%>">
 		<li class="#{@args.edgeItemClass}" id="#{@id('libefore')}">&nbsp;</li>

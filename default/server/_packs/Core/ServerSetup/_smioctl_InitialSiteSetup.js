@@ -17,12 +17,6 @@
     function Packs_Core_ServerSetup_InitialSiteSetup() {
       Packs_Core_ServerSetup_InitialSiteSetup.__super__.constructor.apply(this, arguments);
     }
-    Packs_Core_ServerSetup_InitialSiteSetup.prototype.onSlide = function(index, itemID) {
-      return this.controls.steptabs.selectTab(itemID);
-    };
-    Packs_Core_ServerSetup_InitialSiteSetup.prototype.onTabSelect = function(tabID) {
-      return this.controls.stepslide.scrollTo(tabID);
-    };
     return Packs_Core_ServerSetup_InitialSiteSetup;
   })();
 }).call(this);

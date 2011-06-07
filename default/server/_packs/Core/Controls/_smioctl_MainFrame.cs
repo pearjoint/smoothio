@@ -23,13 +23,11 @@ class smio.Packs_Core_Controls_MainFrame extends smio.Control
 		super client, parent, args, "Core_Controls", "Core_Controls_MainFrame"
 		@jsSelf = "smio.client.allControls['" + @id() + "']"
 		@init()
-
 	renderHtml: ($el) ->
 		if not @_html
-			__r =
-				ctls: []
-				m: []
+			__r = ctls: [], m: []
 			__r.o = __r.m
+
 			__r.o.push "\n<div class=\"smio-main\" id=\""
 			__r.o.push @id()
 			__r.o.push "\">\n\t"

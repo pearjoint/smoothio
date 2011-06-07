@@ -227,10 +227,11 @@ div.smio-slidepanel-edge {
   overflow: hidden;
   white-space: nowrap;
   color: #f0f0f0;
-  visibility: hidden;
+  opacity: 0;
+  text-transform: lowercase;
 }
 div.smio-slidepanel:hover .smio-slidepanel-edge-arr {
-  visibility: visible;
+  opacity: 1;
 }
 div.smio-slidepanel-edge-left {
   left: 0em;
@@ -310,8 +311,9 @@ div.smio-setup {
   font-size: 1.6em;
   text-shadow: 0.05em 0.05em 0.15em #000;
   color: #f6f6f6;
-  letter-spacing: -0.062em;
   font-weight: 900;
+  letter-spacing: -0.062em;
+  text-transform: lowercase;
 }
 .smio-setup-stepbox-form {
   padding: 1em 0 0 3.25em;
@@ -331,6 +333,7 @@ div.smio-setup {
   display: inline-block;
   color: #606060;
   text-shadow: 0 0.098em #fff;
+  text-transform: lowercase;
 }
 .smio-setup-steptab-inactive:hover {
   text-decoration: underline;
