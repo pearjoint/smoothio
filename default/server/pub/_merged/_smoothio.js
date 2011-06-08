@@ -13932,6 +13932,12 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         }
       };
     };
+    Packs_Core_Controls_LinkButton.prototype.onLoad = function() {
+      Packs_Core_Controls_LinkButton.__super__.onLoad.call(this);
+      if (this.args.onClick) {
+        return this.el.click(this.args.onClick);
+      }
+    };
     function Packs_Core_Controls_LinkButton(client, parent, args) {
       Packs_Core_Controls_LinkButton.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_LinkButton");
       this.jsSelf = "smio.client.allControls['" + this.id() + "']";
@@ -14116,7 +14122,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio.Packs_Core_Controls_TabStrip = (function() {
     __extends(Packs_Core_Controls_TabStrip, smio.Control);
     Packs_Core_Controls_TabStrip.prototype.renderTemplate = function() {
-      var is1st, ret, tab, _i, _len, _ref;
+      var is1st, makeOnClick, ret, tab, _i, _len, _ref;
       ret = {
         div: {
           id: '',
@@ -14124,31 +14130,21 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         }
       };
       is1st = true;
+      makeOnClick = __bind(function(tabID) {
+        return __bind(function() {
+          return this.selectTab(tabID);
+        }, this);
+      }, this);
       _ref = this.args.tabs;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         tab = _ref[_i];
         ret.div["LinkButton #" + tab + " ." + this.args.tabClass + " ." + (this.args.tabClass + (is1st ? '-active' : '-inactive'))] = {
-          label: [this.r(this.args.resPrefix + tab)]
+          label: [this.r(this.args.resPrefix + tab)],
+          onClick: makeOnClick(tab)
         };
         is1st = false;
       }
       return ret;
-    };
-    Packs_Core_Controls_TabStrip.prototype.onLoad = function() {
-      var makeHandler, t, _i, _len, _ref, _results;
-      Packs_Core_Controls_TabStrip.__super__.onLoad.call(this);
-      _ref = this.args.tabs;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        t = _ref[_i];
-        makeHandler = __bind(function(tabID) {
-          return __bind(function() {
-            return this.selectTab(tabID);
-          }, this);
-        }, this);
-        _results.push($("#" + (this.id(t))).click(makeHandler(t)));
-      }
-      return _results;
     };
     Packs_Core_Controls_TabStrip.prototype.selectTab = function(tabID) {
       var a, cls, incls, t, _i, _len, _ref;

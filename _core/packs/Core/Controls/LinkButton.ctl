@@ -7,5 +7,10 @@ renderTemplate: ->
 		href: @args.href or 'javascript:void(0);'
 		_: [@args.label]
 
+onLoad: ->
+	super()
+	if @args.onClick
+		@el.click @args.onClick
+
 #endif
 

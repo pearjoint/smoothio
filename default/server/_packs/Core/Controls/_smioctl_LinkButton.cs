@@ -17,6 +17,11 @@ class smio.Packs_Core_Controls_LinkButton extends smio.Control
 			href: @args.href or 'javascript:void(0);'
 			_: [@args.label]
 	
+	onLoad: ->
+		super()
+		if @args.onClick
+			@el.click @args.onClick
+	
 #endif
 	
 	

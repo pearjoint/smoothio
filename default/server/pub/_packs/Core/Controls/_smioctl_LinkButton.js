@@ -23,6 +23,12 @@
         }
       };
     };
+    Packs_Core_Controls_LinkButton.prototype.onLoad = function() {
+      Packs_Core_Controls_LinkButton.__super__.onLoad.call(this);
+      if (this.args.onClick) {
+        return this.el.click(this.args.onClick);
+      }
+    };
     function Packs_Core_Controls_LinkButton(client, parent, args) {
       Packs_Core_Controls_LinkButton.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_LinkButton");
       this.jsSelf = "smio.client.allControls['" + this.id() + "']";

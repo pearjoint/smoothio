@@ -6,17 +6,13 @@ renderTemplate: ->
 			id: ''
 			class: @args.class or ''
 	is1st = true
+	makeOnClick = (tabID) => => @selectTab tabID
 	for tab in @args.tabs
-		ret.div["LinkButton ##{tab} .#{@args.tabClass} .#{@args.tabClass + (if is1st then '-active' else '-inactive')}"] = label: [@r @args.resPrefix + tab]
+		ret.div["LinkButton ##{tab} .#{@args.tabClass} .#{@args.tabClass + (if is1st then '-active' else '-inactive')}"] =
+			label: [@r @args.resPrefix + tab]
+			onClick: makeOnClick tab
 		is1st = false
 	ret
-
-onLoad: ->
-	super()
-	for t in @args.tabs
-		makeHandler = (tabID) =>
-			() => @selectTab tabID
-		$("##{@id t}").click makeHandler t
 
 selectTab: (tabID) ->
 	a = $("##{@id tabID}")
