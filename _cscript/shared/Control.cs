@@ -136,7 +136,7 @@ class smio.Packs_#{className} extends smio.Control
 			ctl.args[name]
 		"ctl": (ctl, className, args, emptyIfMissing) ->
 			if (not ctl.controls[args.id]) and ((ctor = smio['Packs_' + ctl.baseName + '_' + className]) or (ctor = smio['Packs_' + ctl.baseName + '_Controls_' + className]) or (ctor = smio['Packs_Core_Controls_' + className] ))
-				ctl.client.allControls[args.id] = ctl.controls[args.id] = new ctor @client, ctl, args
+				ctl.client.allControls[args.id] = ctl.controls[args.id] = new ctor ctl.client, ctl, args
 			if ctl.controls[args.id]
 				ctl.controls[args.id].renderHtml()
 			else if ctl.ctlRenderers[className]
@@ -208,60 +208,65 @@ class smio.Packs_#{className} extends smio.Control
 
 	onWindowResize: (width, height) ->
 
-	renderJsonTemplate: (json, buf) ->
-		toAtt = (an, av) ->
-			" #{an}=\"#{av}\""
-		is1 = false
-		if not buf
-			is1 = true
-			buf = []
-		for k, v of json
-			if (kt = _.trim k)
-				atts = {}
-				attstr = ''
-				kc = []
-				while (pos = kt.lastIndexOf '.') > 0
-					kc.push _.trim kt.substr pos + 1
-					kt = _.trim kt.substr 0, pos
-				if kc.length
-					atts['class'] = kc.join ' '
-				if (pos = kt.lastIndexOf '#') > 0
-					atts.id = _.trim kt.substr pos + 1
-					kt = _.trim kt.substr 0, pos
-				for an, av of atts
-					attstr += toAtt an, av
-				if not v
-					buf.push "<#{kt}#{attstr}/>"
-				else if typeof(v) is 'object'
-					if (result = smio.Control.tagRenderers.ctl @, kt, (smio.Util.Object.mergeDefaults v, atts), true)
-						buf.push result
-					else
-						buf.push "<#{kt}#{attstr}"
-						hasc = false
-						haso = false
-						for name, val of v
+	renderJsonTemplate: (tagKey, objTree, level) ->
+		buf = ''
+		toHtml = smio.Util.String.htmlEncode
+		toAtt = (an, av) =>
+			" #{an}=\"#{toHtml if (an is 'id') then (@id av) else av}\""
+		if not level
+			level = 0
+		if (kt = _.trim tagKey)
+			atts = {}
+			attstr = ''
+			kc = []
+			while (pos = kt.lastIndexOf '.') > 0
+				kc.push _.trim kt.substr pos + 1
+				kt = _.trim kt.substr 0, pos
+			if kc.length
+				atts['class'] = kc.join ' '
+			if (pos = kt.lastIndexOf '#') > 0
+				atts.id = _.trim kt.substr pos + 1
+				kt = _.trim kt.substr 0, pos
+			for an, av of atts
+				attstr += toAtt an, av
+			if not objTree
+				buf += "<#{kt}#{attstr}/>"
+			else if typeof(objTree) is 'object'
+				if (result = smio.Control.tagRenderers.ctl @, kt, (smio.Util.Object.mergeDefaults (_.clone objTree), atts), true)
+					buf += result
+				else
+					buf += "<#{kt}#{attstr}"
+					hasc = false
+					haso = false
+					for name, val of objTree
+						if val?
+							if (_.isArray val) or (typeof(val) is 'object')
+								haso = true
+							else
+								buf += toAtt name, val
+					if haso
+						for name, val of objTree
 							if val
-								if (typeof(val) is 'object')
-									haso = true
-								else
-									buf.push toAtt name, val
-						if haso
-							for name, val of v
-								if val and (typeof(val) is 'object')
+								if _.isArray val
 									if not hasc
 										hasc = true
-										buf.push ">"
-									@renderJsonTemplate val, buf
-						buf.push if hasc then "</#{kt}>" else "/>"
-				else
-					buf.push "<#{kt}#{attstr}>#{v}</#{kt}>"
-		if is1
-			alert buf.join ''
-		buf.join ''
+										buf += ">"
+									buf += (if (name is '_') then (toHtml val.join '') else if (name is 'html') then (val.join '') else @renderJsonTemplate name, (toHtml val.join ''), level + 1)
+								else if (typeof(val) is 'object')
+									if not hasc
+										hasc = true
+										buf += ">"
+									buf += @renderJsonTemplate name, val, level + 1
+					buf += (if hasc then "</#{kt}>" else "/>")
+			else
+				buf += "<#{kt}#{attstr}>#{if (_.isArray objTree) then (if (kt is 'html') then (objTree.join '') else (toHtml objTree.join '')) else objTree}</#{kt}>"
+		buf
 
 	renderHtml: ($el) ->
-		if (not @_html) and @['renderTemplate'] and _.isFunction @renderTemplate
-			@_html = @renderJsonTemplate @renderTemplate()
+		if (not @_html) and @['renderTemplate'] and (_.isFunction @renderTemplate) and (objTree = @renderTemplate())
+			@_html = ''
+			for tagKey, subTree of objTree
+				@_html += @renderJsonTemplate tagKey, subTree
 		if $el
 			$el.html @_html
 		@_html

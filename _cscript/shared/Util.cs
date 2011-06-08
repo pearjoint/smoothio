@@ -92,6 +92,15 @@ class smio.Util
 			last
 
 	@String:
+		htmlEncode: (str) ->
+			[ret, tmp] = ['', _.escapeHTML str]
+			len = tmp.length
+			for i in [0...len]
+				if (cc = tmp.charCodeAt i) > 127
+					ret += "&##{cc};"
+				else
+					ret += tmp.substr i, 1
+			ret
 		replace: (str, replace) ->
 			for val, repl of replace
 				while (pos = str.indexOf val) >= 0

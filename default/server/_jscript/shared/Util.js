@@ -147,6 +147,19 @@
       }
     };
     Util.String = {
+      htmlEncode: function(str) {
+        var cc, i, len, ret, tmp, _ref;
+        _ref = ['', _.escapeHTML(str)], ret = _ref[0], tmp = _ref[1];
+        len = tmp.length;
+        for (i = 0; 0 <= len ? i < len : i > len; 0 <= len ? i++ : i--) {
+          if ((cc = tmp.charCodeAt(i)) > 127) {
+            ret += "&#" + cc + ";";
+          } else {
+            ret += tmp.substr(i, 1);
+          }
+        }
+        return ret;
+      },
       replace: function(str, replace) {
         var pos, repl, val;
         for (val in replace) {

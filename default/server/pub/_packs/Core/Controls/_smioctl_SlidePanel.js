@@ -13,14 +13,45 @@
   smio = smoothio = global.smoothio;
   smio.Packs_Core_Controls_SlidePanel = (function() {
     __extends(Packs_Core_Controls_SlidePanel, smio.Control);
+    Packs_Core_Controls_SlidePanel.prototype.renderTemplate = function() {
+      var item, itemID, ul, _ref;
+      ul = {
+        "class": "smio-slidepanel " + (this.args["class"] || ''),
+        'li #libefore': {
+          html: ['&nbsp;']
+        }
+      };
+      if (this.args.items) {
+        _ref = this.args.items;
+        for (itemID in _ref) {
+          item = _ref[itemID];
+          this.items.push(itemID);
+          ul["li #items_" + itemID + " ." + (this.args.itemClass || '')] = item;
+        }
+      }
+      ul['li #liafter'] = {
+        html: ['&nbsp;']
+      };
+      return {
+        div: {
+          id: '',
+          "class": "smio-slidepanel " + this.args["class"],
+          'div #edgeprev .smio-slidepanel-edge .smio-slidepanel-edge-left': {
+            'div .smio-slidepanel-edge-arr .x9668': [this.r('slidepanel_prev')]
+          },
+          'div #edgenext .smio-slidepanel-edge .smio-slidepanel-edge-right': {
+            'div .smio-slidepanel-edge-arr .x9658': [this.r('slidepanel_next')]
+          },
+          'div #scrollbox .smio-slidepanel-scrollbox': {
+            'ul #items': ul
+          }
+        }
+      };
+    };
     Packs_Core_Controls_SlidePanel.prototype.init = function() {
       this.curItem = 0;
       this.items = [];
       Packs_Core_Controls_SlidePanel.__super__.init.call(this);
-      this.ctlRenderers['item'] = __bind(function(className, args) {
-        this.items.push(args.id);
-        return "<li class=\"" + this.args.itemClass + " " + args["class"] + "\" id=\"" + (this.id('items_' + args.id)) + "\">" + (this.renderTag("inner", null, args)) + "</li>";
-      }, this);
       if (this.args.onItemSelect && _.isFunction(this.args.onItemSelect)) {
         return this.on('itemSelect', this.args.onItemSelect);
       }
@@ -63,38 +94,6 @@
       this.jsSelf = "smio.client.allControls['" + this.id() + "']";
       this.init();
     }
-    Packs_Core_Controls_SlidePanel.prototype.renderHtml = function($el) {
-      var __r;
-      if (!this._html) {
-        __r = {
-          ctls: [],
-          m: []
-        };
-        __r.o = __r.m;
-        __r.o.push("\n<div id=\"");
-        __r.o.push(this.id());
-        __r.o.push("\" class=\"smio-slidepanel ");
-        __r.o.push(this.args["class"]);
-        __r.o.push("\">\n\t<div id=\"");
-        __r.o.push(this.id('edgeprev'));
-        __r.o.push("\" class=\"smio-slidepanel-edge smio-slidepanel-edge-left\"><div class=\"smio-slidepanel-edge-arr\" x=\"#9668\">&laquo;&nbsp;&nbsp;Back</div></div>\n\t<div id=\"");
-        __r.o.push(this.id('edgenext'));
-        __r.o.push("\" class=\"smio-slidepanel-edge smio-slidepanel-edge-right\"><div class=\"smio-slidepanel-edge-arr\" x=\"#9658\">Next&nbsp;&nbsp;&raquo;</div></div>\n\t<div id=\"");
-        __r.o.push(this.id('scrollbox'));
-        __r.o.push("\" class=\"smio-slidepanel-scrollbox\">\n\t<ul id=\"");
-        __r.o.push(this.id('items'));
-        __r.o.push("\" class=\"smio-slidepanel ");
-        __r.o.push(this.args["class"]);
-        __r.o.push("\">\n\t\t<li class=\"" + this.args.edgeItemClass + "\" id=\"" + (this.id('libefore')) + "\">&nbsp;</li>\n\t\t");
-        __r.o.push(this.renderTag("inner", "", null));
-        __r.o.push("\n\t\t<li class=\"" + this.args.edgeItemClass + "\" id=\"" + (this.id('liafter')) + "\">&nbsp;</li>\n\t</ul>\n\t</div>\n</div>\n\n");
-        this._html = __r.o.join('');
-      }
-      if ($el) {
-        $el.html(this._html);
-      }
-      return this._html;
-    };
     return Packs_Core_Controls_SlidePanel;
   })();
 }).call(this);

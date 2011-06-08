@@ -1,5 +1,6 @@
 (function() {
   var smio;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   smio = global.smoothio;
   smio.Control = (function() {
     Control.tagRenderers = {
@@ -9,7 +10,7 @@
       "ctl": function(ctl, className, args, emptyIfMissing) {
         var ctor;
         if ((!ctl.controls[args.id]) && ((ctor = smio['Packs_' + ctl.baseName + '_' + className]) || (ctor = smio['Packs_' + ctl.baseName + '_Controls_' + className]) || (ctor = smio['Packs_Core_Controls_' + className]))) {
-          ctl.client.allControls[args.id] = ctl.controls[args.id] = new ctor(this.client, ctl, args);
+          ctl.client.allControls[args.id] = ctl.controls[args.id] = new ctor(ctl.client, ctl, args);
         }
         if (ctl.controls[args.id]) {
           return ctl.controls[args.id].renderHtml();
@@ -125,83 +126,90 @@
       }
     };
     Control.prototype.onWindowResize = function(width, height) {};
-    Control.prototype.renderJsonTemplate = function(json, buf) {
-      var an, atts, attstr, av, hasc, haso, is1, k, kc, kt, name, pos, result, toAtt, v, val;
-      toAtt = function(an, av) {
-        return " " + an + "=\"" + av + "\"";
-      };
-      is1 = false;
-      if (!buf) {
-        is1 = true;
-        buf = [];
+    Control.prototype.renderJsonTemplate = function(tagKey, objTree, level) {
+      var an, atts, attstr, av, buf, hasc, haso, kc, kt, name, pos, result, toAtt, toHtml, val;
+      buf = '';
+      toHtml = smio.Util.String.htmlEncode;
+      toAtt = __bind(function(an, av) {
+        return " " + an + "=\"" + (toHtml(an === 'id' ? this.id(av) : av)) + "\"";
+      }, this);
+      if (!level) {
+        level = 0;
       }
-      for (k in json) {
-        v = json[k];
-        if ((kt = _.trim(k))) {
-          atts = {};
-          attstr = '';
-          kc = [];
-          while ((pos = kt.lastIndexOf('.')) > 0) {
-            kc.push(_.trim(kt.substr(pos + 1)));
-            kt = _.trim(kt.substr(0, pos));
-          }
-          if (kc.length) {
-            atts['class'] = kc.join(' ');
-          }
-          if ((pos = kt.lastIndexOf('#')) > 0) {
-            atts.id = _.trim(kt.substr(pos + 1));
-            kt = _.trim(kt.substr(0, pos));
-          }
-          for (an in atts) {
-            av = atts[an];
-            attstr += toAtt(an, av);
-          }
-          if (!v) {
-            buf.push("<" + kt + attstr + "/>");
-          } else if (typeof v === 'object') {
-            if ((result = smio.Control.tagRenderers.ctl(this, kt, smio.Util.Object.mergeDefaults(v, atts), true))) {
-              buf.push(result);
-            } else {
-              buf.push("<" + kt + attstr);
-              hasc = false;
-              haso = false;
-              for (name in v) {
-                val = v[name];
-                if (val) {
-                  if (typeof val === 'object') {
-                    haso = true;
-                  } else {
-                    buf.push(toAtt(name, val));
-                  }
+      if ((kt = _.trim(tagKey))) {
+        atts = {};
+        attstr = '';
+        kc = [];
+        while ((pos = kt.lastIndexOf('.')) > 0) {
+          kc.push(_.trim(kt.substr(pos + 1)));
+          kt = _.trim(kt.substr(0, pos));
+        }
+        if (kc.length) {
+          atts['class'] = kc.join(' ');
+        }
+        if ((pos = kt.lastIndexOf('#')) > 0) {
+          atts.id = _.trim(kt.substr(pos + 1));
+          kt = _.trim(kt.substr(0, pos));
+        }
+        for (an in atts) {
+          av = atts[an];
+          attstr += toAtt(an, av);
+        }
+        if (!objTree) {
+          buf += "<" + kt + attstr + "/>";
+        } else if (typeof objTree === 'object') {
+          if ((result = smio.Control.tagRenderers.ctl(this, kt, smio.Util.Object.mergeDefaults(_.clone(objTree), atts), true))) {
+            buf += result;
+          } else {
+            buf += "<" + kt + attstr;
+            hasc = false;
+            haso = false;
+            for (name in objTree) {
+              val = objTree[name];
+              if (val != null) {
+                if ((_.isArray(val)) || (typeof val === 'object')) {
+                  haso = true;
+                } else {
+                  buf += toAtt(name, val);
                 }
               }
-              if (haso) {
-                for (name in v) {
-                  val = v[name];
-                  if (val && (typeof val === 'object')) {
+            }
+            if (haso) {
+              for (name in objTree) {
+                val = objTree[name];
+                if (val) {
+                  if (_.isArray(val)) {
                     if (!hasc) {
                       hasc = true;
-                      buf.push(">");
+                      buf += ">";
                     }
-                    this.renderJsonTemplate(val, buf);
+                    buf += (name === '_' ? toHtml(val.join('')) : name === 'html' ? val.join('') : this.renderJsonTemplate(name, toHtml(val.join('')), level + 1));
+                  } else if (typeof val === 'object') {
+                    if (!hasc) {
+                      hasc = true;
+                      buf += ">";
+                    }
+                    buf += this.renderJsonTemplate(name, val, level + 1);
                   }
                 }
               }
-              buf.push(hasc ? "</" + kt + ">" : "/>");
             }
-          } else {
-            buf.push("<" + kt + attstr + ">" + v + "</" + kt + ">");
+            buf += (hasc ? "</" + kt + ">" : "/>");
           }
+        } else {
+          buf += "<" + kt + attstr + ">" + (_.isArray(objTree) ? (kt === 'html' ? objTree.join('') : toHtml(objTree.join(''))) : objTree) + "</" + kt + ">";
         }
       }
-      if (is1) {
-        alert(buf.join(''));
-      }
-      return buf.join('');
+      return buf;
     };
     Control.prototype.renderHtml = function($el) {
-      if ((!this._html) && this['renderTemplate'] && _.isFunction(this.renderTemplate)) {
-        this._html = this.renderJsonTemplate(this.renderTemplate());
+      var objTree, subTree, tagKey;
+      if ((!this._html) && this['renderTemplate'] && (_.isFunction(this.renderTemplate)) && (objTree = this.renderTemplate())) {
+        this._html = '';
+        for (tagKey in objTree) {
+          subTree = objTree[tagKey];
+          this._html += this.renderJsonTemplate(tagKey, subTree);
+        }
       }
       if ($el) {
         $el.html(this._html);

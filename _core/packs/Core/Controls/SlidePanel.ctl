@@ -1,43 +1,52 @@
-<%script:
-	init: ->
-		@curItem = 0
-		@items = []
-		super()
-		@ctlRenderers['item'] = (className, args) =>
-			@items.push args.id
-			"<li class=\"#{@args.itemClass} #{args.class}\" id=\"#{@id('items_' + args.id)}\">#{@renderTag "inner", null, args}</li>"
-		if @args.onItemSelect and _.isFunction @args.onItemSelect
-			@on 'itemSelect', @args.onItemSelect
+#if client
 
-	onLoad: ->
-		(@edgePrev = $("##{@id 'edgeprev'}")).click => @scrollTo @curItem - 1
-		(@edgeNext = $("##{@id 'edgenext'}")).click => @scrollTo @curItem + 1
-		@scrollBox = $("##{@id 'scrollbox'}")
-		@scrollTo 0, true
+renderTemplate: ->
+	ul =
+		class: "smio-slidepanel #{@args.class or ''}"
+		'li #libefore':
+			html: ['&nbsp;']
+	if @args.items
+		for itemID, item of @args.items
+			@items.push itemID
+			ul["li #items_#{itemID} .#{@args.itemClass or ''}"] = item
+	ul['li #liafter'] =
+		html: ['&nbsp;']
+	div:
+		id: ''
+		class: "smio-slidepanel #{@args.class}"
+		'div #edgeprev .smio-slidepanel-edge .smio-slidepanel-edge-left':
+			'div .smio-slidepanel-edge-arr .x9668': [@r 'slidepanel_prev']
+		'div #edgenext .smio-slidepanel-edge .smio-slidepanel-edge-right':
+			'div .smio-slidepanel-edge-arr .x9658': [@r 'slidepanel_next']
+		'div #scrollbox .smio-slidepanel-scrollbox':
+			'ul #items': ul
 
-	onWindowResize: (w, h) ->
-		@scrollTo @curItem, true
+init: ->
+	@curItem = 0
+	@items = []
+	super()
+	if @args.onItemSelect and _.isFunction @args.onItemSelect
+		@on 'itemSelect', @args.onItemSelect
 
-	scrollTo: (item, force) ->
-		if _.isString item
-			item = @items.indexOf item
-		if ((item < 0) or (item >= @items.length)) and force
-			item = 0
-		if (force or item isnt @curItem) and (item >= 0) and (item < @items.length)
-			@edgePrev.css display: if (item is 0) then 'none' else 'block'
-			@edgeNext.css display: if (item is (@items.length - 1)) then 'none' else 'block'
-			@on 'itemSelect', [@curItem = item, @items[item]]
-			morpheus.tween 250, ((pos) => @scrollBox.scrollLeft pos), (->), null, @scrollBox.scrollLeft(), @scrollBox.scrollLeft() + $("##{@id 'items_' + @items[item]}").position().left - @edgePrev.width()
-%>
-<div id="<%= @id() %>" class="smio-slidepanel <%= @args.class%>">
-	<div id="<%= @id('edgeprev') %>" class="smio-slidepanel-edge smio-slidepanel-edge-left"><div class="smio-slidepanel-edge-arr" x="#9668">&laquo;&nbsp;&nbsp;Back</div></div>
-	<div id="<%= @id('edgenext') %>" class="smio-slidepanel-edge smio-slidepanel-edge-right"><div class="smio-slidepanel-edge-arr" x="#9658">Next&nbsp;&nbsp;&raquo;</div></div>
-	<div id="<%= @id('scrollbox') %>" class="smio-slidepanel-scrollbox">
-	<ul id="<%= @id('items') %>" class="smio-slidepanel <%= @args.class%>">
-		<li class="#{@args.edgeItemClass}" id="#{@id('libefore')}">&nbsp;</li>
-		<%inner:%>
-		<li class="#{@args.edgeItemClass}" id="#{@id('liafter')}">&nbsp;</li>
-	</ul>
-	</div>
-</div>
+onLoad: ->
+	(@edgePrev = $("##{@id 'edgeprev'}")).click => @scrollTo @curItem - 1
+	(@edgeNext = $("##{@id 'edgenext'}")).click => @scrollTo @curItem + 1
+	@scrollBox = $("##{@id 'scrollbox'}")
+	@scrollTo 0, true
+
+onWindowResize: (w, h) ->
+	@scrollTo @curItem, true
+
+scrollTo: (item, force) ->
+	if _.isString item
+		item = @items.indexOf item
+	if ((item < 0) or (item >= @items.length)) and force
+		item = 0
+	if (force or item isnt @curItem) and (item >= 0) and (item < @items.length)
+		@edgePrev.css display: if (item is 0) then 'none' else 'block'
+		@edgeNext.css display: if (item is (@items.length - 1)) then 'none' else 'block'
+		@on 'itemSelect', [@curItem = item, @items[item]]
+		morpheus.tween 250, ((pos) => @scrollBox.scrollLeft pos), (->), null, @scrollBox.scrollLeft(), @scrollBox.scrollLeft() + $("##{@id 'items_' + @items[item]}").position().left - @edgePrev.width()
+
+#endif
 

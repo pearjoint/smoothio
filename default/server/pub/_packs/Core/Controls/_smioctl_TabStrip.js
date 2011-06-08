@@ -13,6 +13,25 @@
   smio = smoothio = global.smoothio;
   smio.Packs_Core_Controls_TabStrip = (function() {
     __extends(Packs_Core_Controls_TabStrip, smio.Control);
+    Packs_Core_Controls_TabStrip.prototype.renderTemplate = function() {
+      var is1st, ret, tab, _i, _len, _ref;
+      ret = {
+        div: {
+          id: '',
+          "class": this.args["class"] || ''
+        }
+      };
+      is1st = true;
+      _ref = this.args.tabs;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        tab = _ref[_i];
+        ret.div["LinkButton #" + tab + " ." + this.args.tabClass + " ." + (this.args.tabClass + (is1st ? '-active' : '-inactive'))] = {
+          label: [this.r(this.args.resPrefix + tab)]
+        };
+        is1st = false;
+      }
+      return ret;
+    };
     Packs_Core_Controls_TabStrip.prototype.onLoad = function() {
       var makeHandler, t, _i, _len, _ref, _results;
       Packs_Core_Controls_TabStrip.__super__.onLoad.call(this);
@@ -51,44 +70,6 @@
       this.jsSelf = "smio.client.allControls['" + this.id() + "']";
       this.init();
     }
-    Packs_Core_Controls_TabStrip.prototype.renderHtml = function($el) {
-      var firstDone, tab, __r, _i, _len, _ref;
-      if (!this._html) {
-        __r = {
-          ctls: [],
-          m: []
-        };
-        __r.o = __r.m;
-        __r.o.push("\n<div id=\"");
-        __r.o.push(this.id());
-        __r.o.push("\" class=\"");
-        __r.o.push(this.renderTag("arg", "class", null));
-        __r.o.push("\">\n");
-        firstDone = false;
-        _ref = this.args.tabs;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          tab = _ref[_i];
-          __r.o.push("\n\t\t<a href=\"javascript:void(0);\" id=\"");
-          __r.o.push(this.id(tab));
-          __r.o.push("\" class=\"");
-          __r.o.push(this.renderTag("arg", "tabClass", null));
-          __r.o.push(" ");
-          __r.o.push(this.args.tabClass + (firstDone ? '-inactive' : '-active'));
-          __r.o.push("\">");
-          __r.o.push(this.res(this.args.resPrefix + tab));
-          __r.o.push("</a>\n\t\t");
-          if (!firstDone) {
-            firstDone = true;
-          }
-        }
-        __r.o.push("\n</div>\n\n");
-        this._html = __r.o.join('');
-      }
-      if ($el) {
-        $el.html(this._html);
-      }
-      return this._html;
-    };
     return Packs_Core_Controls_TabStrip;
   })();
 }).call(this);

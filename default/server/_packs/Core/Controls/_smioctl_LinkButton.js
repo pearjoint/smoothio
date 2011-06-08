@@ -1,6 +1,6 @@
 (function() {
   /*
-  Auto-generated from Core/Controls/SlidePanel.ctl
+  Auto-generated from Core/Controls/LinkButton.ctl
   */  var smio, smoothio;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
@@ -12,11 +12,11 @@
   };
   require('../../../_jscript/Control');
   smio = smoothio = global.smoothio;
-  smio.Packs_Core_Controls_SlidePanel = (function() {
-    __extends(Packs_Core_Controls_SlidePanel, smio.Control);
-    function Packs_Core_Controls_SlidePanel() {
-      Packs_Core_Controls_SlidePanel.__super__.constructor.apply(this, arguments);
+  smio.Packs_Core_Controls_LinkButton = (function() {
+    __extends(Packs_Core_Controls_LinkButton, smio.Control);
+    function Packs_Core_Controls_LinkButton() {
+      Packs_Core_Controls_LinkButton.__super__.constructor.apply(this, arguments);
     }
-    return Packs_Core_Controls_SlidePanel;
+    return Packs_Core_Controls_LinkButton;
   })();
 }).call(this);

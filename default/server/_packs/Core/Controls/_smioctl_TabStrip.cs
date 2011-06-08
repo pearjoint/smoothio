@@ -9,13 +9,25 @@ class smio.Packs_Core_Controls_TabStrip extends smio.Control
 
 
 #if client
+	
+	renderTemplate: ->
+		ret =
+			div:
+				id: ''
+				class: @args.class or ''
+		is1st = true
+		for tab in @args.tabs
+			ret.div["LinkButton ##{tab} .#{@args.tabClass} .#{@args.tabClass + (if is1st then '-active' else '-inactive')}"] = label: [@r @args.resPrefix + tab]
+			is1st = false
+		ret
+	
 	onLoad: ->
 		super()
 		for t in @args.tabs
 			makeHandler = (tabID) =>
 				() => @selectTab tabID
 			$("##{@id t}").click makeHandler t
-
+	
 	selectTab: (tabID) ->
 		a = $("##{@id tabID}")
 		cls = "#{@args.tabClass}-active"
@@ -26,7 +38,10 @@ class smio.Packs_Core_Controls_TabStrip extends smio.Control
 			a.removeClass(incls).addClass cls
 			if @args.onTabSelect
 				@args.onTabSelect tabID
+	
 #endif
+	
+	
 
 
 #if client
@@ -34,32 +49,3 @@ class smio.Packs_Core_Controls_TabStrip extends smio.Control
 		super client, parent, args, "Core_Controls", "Core_Controls_TabStrip"
 		@jsSelf = "smio.client.allControls['" + @id() + "']"
 		@init()
-	renderHtml: ($el) ->
-		if not @_html
-			__r = ctls: [], m: []
-			__r.o = __r.m
-
-			__r.o.push "\n<div id=\""
-			__r.o.push @id()
-			__r.o.push "\" class=\""
-			__r.o.push @renderTag "arg", "class", null
-			__r.o.push "\">\n"
-			firstDone = false
-			for tab in @args.tabs
-				__r.o.push "\n\t\t<a href=\"javascript:void(0);\" id=\""
-				__r.o.push @id tab
-				__r.o.push "\" class=\""
-				__r.o.push @renderTag "arg", "tabClass", null
-				__r.o.push " "
-				__r.o.push @args.tabClass + (if firstDone then '-inactive' else '-active')
-				__r.o.push "\">"
-				__r.o.push @res @args.resPrefix + tab
-				__r.o.push "</a>\n\t\t"
-				if not firstDone
-					firstDone = true
-			__r.o.push "\n</div>\n\n"
-			@_html = __r.o.join ''
-		if $el
-			$el.html @_html
-		@_html
-#endif
