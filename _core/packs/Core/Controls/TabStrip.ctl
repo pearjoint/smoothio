@@ -5,8 +5,8 @@ renderTemplate: ->
 		div:
 			id: ''
 			class: @args.class or ''
-	is1st = true
 	makeOnClick = (tabID) => => @selectTab tabID
+	is1st = true
 	for tab in @args.tabs
 		ret.div["LinkButton ##{tab} .#{@args.tabClass} .#{@args.tabClass + (if is1st then '-active' else '-inactive')}"] =
 			label: [@r @args.resPrefix + tab]

@@ -1,8 +1,37 @@
+
+smio-posabs-rbl(r, b = r, l = b)
+	position absolute
+	left l
+	right r
+	bottom b
+
+smio-posabs-trl(t, r = t, l = r)
+	position absolute
+	top t
+	right r
+	left l
+
+smio-posabs-tbw(t, b, w)
+	position absolute
+	top t
+	bottom b
+	width w
+
+smio-nooverflow-nowrap()
+	overflow hidden
+	white-space nowrap
+
 smio-narrow()
-	letter-spacing -0.062em
+	letter-spacing -0.05em
 
 smio-lcase()
 	text-transform lowercase
+
+smio-transition()
+	-moz-transition arguments
+	-webkit-transition arguments
+	-o-transition arguments
+	transition arguments
 
 smio-background-vgradient(col1, col2)
 	background -ms-linear-gradient(col1, col2)

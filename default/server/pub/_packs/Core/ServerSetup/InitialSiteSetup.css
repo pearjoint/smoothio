@@ -1,43 +1,47 @@
 div.smio-setup {
-  position: absolute;
-  top: 12%;
-  left: 20%;
-  right: 20%;
   -moz-box-shadow: 0 0.4em 4.8em #909090;
   -webkit-box-shadow: 0 0.4em 4.8em #909090;
   box-shadow: 0 0.4em 4.8em #909090;
   line-height: 1.25;
+  position: absolute;
+  top: 12%;
+  right: 20%;
+  left: 20%;
   overflow: hidden;
+  white-space: nowrap;
 }
 .smio-setup-outer {
   padding: 1em;
 }
 .smio-setup-outer-top {
-  white-space: nowrap;
-  overflow: hidden;
   background: -ms-linear-gradient(rgba(255,255,255,0.66), rgba(255,255,255,0.88));
   background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255,255,255,0.66)), to(rgba(255,255,255,0.88)));
   background: -moz-linear-gradient(rgba(255,255,255,0.66), rgba(255,255,255,0.88));
   background: -webkit-linear-gradient(rgba(255,255,255,0.66), rgba(255,255,255,0.88));
   background: -o-linear-gradient(rgba(255,255,255,0.66), rgba(255,255,255,0.88));
+  overflow: hidden;
+  white-space: nowrap;
 }
 .smio-setup-inner {
   background: rgba(255,255,255,0.95);
   -moz-box-shadow: 0 0.062em 0.35em #b0b0b0 inset;
   -webkit-box-shadow: 0 0.062em 0.35em #b0b0b0 inset;
   box-shadow: 0 0.062em 0.35em #b0b0b0 inset;
+  padding: 0 0.2em 0 0;
+  overflow: hidden;
+  white-space: nowrap;
 }
 .smio-setup-header {
   font-size: 2em;
   color: #a40;
   text-shadow: 0 0 0.6em #fff;
-  letter-spacing: -0.062em;
+  letter-spacing: -0.05em;
 }
 .smio-setup-header-desc {
   color: #707070;
   font-size: 1.25em;
   text-shadow: 0 0.074em #fff;
-  letter-spacing: -0.062em;
+  letter-spacing: -0.05em;
 }
 .smio-setup-stepslide > .smio-setup-stepbox {
   padding: 1em 0 1em 0;
@@ -51,18 +55,18 @@ div.smio-setup {
   text-shadow: 0.05em 0.05em 0.15em #000;
   color: #f6f6f6;
   font-weight: 900;
-  letter-spacing: -0.062em;
+  letter-spacing: -0.05em;
   text-transform: lowercase;
 }
 .smio-setup-stepbox-form {
   padding: 1em 0 0 3.25em;
 }
 .smio-setup-steptabs {
-  background: -ms-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.65));
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255,255,255,0.95)), to(rgba(255,255,255,0.65)));
-  background: -moz-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.65));
-  background: -webkit-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.65));
-  background: -o-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.65));
+  background: -ms-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.66));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255,255,255,0.95)), to(rgba(255,255,255,0.66)));
+  background: -moz-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.66));
+  background: -webkit-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.66));
+  background: -o-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.66));
   text-align: center;
   white-space: nowrap;
 }

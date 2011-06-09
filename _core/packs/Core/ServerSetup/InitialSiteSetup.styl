@@ -1,23 +1,26 @@
+$setup-grad-base = rgb(255, 255, 255)
+$setup-grad-dark = 0.66
+$setup-grad-tlite = 0.88
+$setup-grad-blite = 0.95
+
 div.smio-setup
-	position absolute
-	top 12%
-	left 20%
-	right 20%
 	smio-box-shadow 0 0.4em 4.8em #909090
 	line-height 1.25
-	overflow hidden
+	smio-posabs-trl 12% 20%
+	smio-nooverflow-nowrap()
 
 .smio-setup-outer
 	padding 1em
 
 .smio-setup-outer-top
-	white-space nowrap
-	overflow hidden
-	smio-background-vgradient rgba(255, 255, 255, 0.66) rgba(255, 255, 255, 0.88)
+	smio-background-vgradient rgba($setup-grad-base, $setup-grad-dark) rgba($setup-grad-base, $setup-grad-tlite)
+	smio-nooverflow-nowrap()
 
 .smio-setup-inner
-	background rgba(255, 255, 255, 0.95)
+	background rgba($setup-grad-base, $setup-grad-blite)
 	smio-box-shadow 0 0.062em 0.35em #b0b0b0 inset
+	padding 0 0.2em 0 0
+	smio-nooverflow-nowrap()
 
 .smio-setup-header
 	font-size 2em
@@ -50,7 +53,7 @@ div.smio-setup
 	padding 1em 0 0 3.25em
 
 .smio-setup-steptabs
-	smio-background-vgradient rgba(255, 255, 255, 0.95) rgba(255, 255, 255, 0.65)
+	smio-background-vgradient rgba($setup-grad-base, $setup-grad-blite) rgba($setup-grad-base, $setup-grad-dark)
 	text-align center
 	white-space nowrap
 

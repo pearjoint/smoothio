@@ -16,6 +16,8 @@ renderTemplate: ->
 							[@r 'steptitle_owner']
 						'div .smio-setup-stepbox-form':
 							html: ['ding blaa<br/><br/>foo<br/><br/>yeah right']
+							TextInput:
+								id: 'input'
 					"template":
 						"div .smio-setup-stepbox-title":
 							[@r 'steptitle_template']

@@ -130,7 +130,7 @@ body {
   margin: 0;
   background: #c0c0c0 url("/_/file/images/bg.png") repeat fixed center center;
   overflow: hidden;
-  font-family: FreeSans, Arial, Helvetica, Helvetica Neue, Sans-Serif;
+  font-family: Arial, Helvetica, Helvetica Neue, Sans-Serif;
 }
 .smio-main {
   height: 100%;
@@ -150,8 +150,10 @@ body {
   font-size: 1.7em;
   color: #f0f0f0;
   text-shadow: 0 0 0.6em #000;
-  letter-spacing: -0.062em;
+  letter-spacing: -0.05em;
 }
+
+/** server/pub/_packs/Core/Controls/Console.css **/
 .smio-console {
   text-align: center;
   overflow: hidden;
@@ -188,7 +190,7 @@ body {
   box-shadow: 0 0 16px #303030;
 }
 
-/** server/pub/_packs/Core/Controls/Controls.css **/
+/** server/pub/_packs/Core/Controls/SlidePanel.css **/
 div.smio-slidepanel {
   position: relative;
 }
@@ -197,44 +199,61 @@ div.smio-slidepanel-scrollbox {
   white-space: nowrap;
 }
 div.smio-slidepanel-edge {
+  overflow: hidden;
+  white-space: nowrap;
   cursor: pointer;
+  text-align: center;
   position: absolute;
   top: 0.25em;
   bottom: 0.15em;
   width: 3em;
-  overflow: hidden;
-  text-align: center;
 }
 .smio-slidepanel-edge-arr {
-  white-space: nowrap;
-  margin: 12em 1em 1em 1em;
   padding: 0.1em;
+  position: absolute;
+  left: 1em;
+  right: 1em;
+  bottom: 1em;
   text-align: center;
-  -webkit-border-radius: 0.4em;
-  -moz-border-radius: 0.4em;
-  border-radius: 0.4em;
+  -webkit-border-radius: 0.33em;
+  -moz-border-radius: 0.33em;
+  border-radius: 0.33em;
   -moz-box-shadow: 0em 0.08em 0.25em #909090;
   -webkit-box-shadow: 0em 0.08em 0.25em #909090;
   box-shadow: 0em 0.08em 0.25em #909090;
-  border: 0.1em #a0a0a0 outset;
-  background: -ms-linear-gradient(rgba(56,56,56,0.65), rgba(56,56,56,0.85));
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(56,56,56,0.65)), to(rgba(56,56,56,0.85)));
-  background: -moz-linear-gradient(rgba(56,56,56,0.65), rgba(56,56,56,0.85));
-  background: -webkit-linear-gradient(rgba(56,56,56,0.65), rgba(56,56,56,0.85));
-  background: -o-linear-gradient(rgba(56,56,56,0.65), rgba(56,56,56,0.85));
+  border: 0.092em #a0a0a0 outset;
+  background: -ms-linear-gradient(rgba(48,48,48,0.65), rgba(48,48,48,0.85));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(48,48,48,0.65)), to(rgba(48,48,48,0.85)));
+  background: -moz-linear-gradient(rgba(48,48,48,0.65), rgba(48,48,48,0.85));
+  background: -webkit-linear-gradient(rgba(48,48,48,0.65), rgba(48,48,48,0.85));
+  background: -o-linear-gradient(rgba(48,48,48,0.65), rgba(48,48,48,0.85));
   font-size: 0.9em;
   text-shadow: 0 -0.092em #404040;
-  overflow: hidden;
-  white-space: nowrap;
   color: #f0f0f0;
   opacity: 0;
+  -moz-transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+  overflow: hidden;
+  white-space: nowrap;
   text-transform: lowercase;
 }
 div.smio-slidepanel:hover .smio-slidepanel-edge-arr {
+  opacity: 0.7;
+}
+div.smio-slidepanel-edge:hover .smio-slidepanel-edge-arr {
   opacity: 1;
 }
+div.smio-slidepanel-edge:active .smio-slidepanel-edge-arr {
+  background: -ms-linear-gradient(rgba(48,48,48,0.85), rgba(48,48,48,0.65));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(48,48,48,0.85)), to(rgba(48,48,48,0.65)));
+  background: -moz-linear-gradient(rgba(48,48,48,0.85), rgba(48,48,48,0.65));
+  background: -webkit-linear-gradient(rgba(48,48,48,0.85), rgba(48,48,48,0.65));
+  background: -o-linear-gradient(rgba(48,48,48,0.85), rgba(48,48,48,0.65));
+}
 div.smio-slidepanel-edge-left {
-  left: 0em;
+  left: 0;
   background: -ms-linear-gradient(left, rgba(250,250,250,0.9), rgba(250,250,250,0.3));
   background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(250,250,250,0.9)), to(rgba(250,250,250,0.3)));
   background: -moz-linear-gradient(left, rgba(250,250,250,0.9), rgba(250,250,250,0.3));
@@ -242,7 +261,7 @@ div.smio-slidepanel-edge-left {
   background: -o-linear-gradient(left, rgba(250,250,250,0.9), rgba(250,250,250,0.3));
 }
 div.smio-slidepanel-edge-right {
-  right: 0em;
+  right: 0;
   background: -ms-linear-gradient(left, rgba(250,250,250,0.3), rgba(250,250,250,0.9));
   background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(250,250,250,0.3)), to(rgba(250,250,250,0.9)));
   background: -moz-linear-gradient(left, rgba(250,250,250,0.3), rgba(250,250,250,0.9));
@@ -260,45 +279,49 @@ ul.smio-slidepanel > li {
 
 /** server/pub/_packs/Core/ServerSetup/InitialSiteSetup.css **/
 div.smio-setup {
-  position: absolute;
-  top: 12%;
-  left: 20%;
-  right: 20%;
   -moz-box-shadow: 0 0.4em 4.8em #909090;
   -webkit-box-shadow: 0 0.4em 4.8em #909090;
   box-shadow: 0 0.4em 4.8em #909090;
   line-height: 1.25;
+  position: absolute;
+  top: 12%;
+  right: 20%;
+  left: 20%;
   overflow: hidden;
+  white-space: nowrap;
 }
 .smio-setup-outer {
   padding: 1em;
 }
 .smio-setup-outer-top {
-  white-space: nowrap;
-  overflow: hidden;
   background: -ms-linear-gradient(rgba(255,255,255,0.66), rgba(255,255,255,0.88));
   background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255,255,255,0.66)), to(rgba(255,255,255,0.88)));
   background: -moz-linear-gradient(rgba(255,255,255,0.66), rgba(255,255,255,0.88));
   background: -webkit-linear-gradient(rgba(255,255,255,0.66), rgba(255,255,255,0.88));
   background: -o-linear-gradient(rgba(255,255,255,0.66), rgba(255,255,255,0.88));
+  overflow: hidden;
+  white-space: nowrap;
 }
 .smio-setup-inner {
   background: rgba(255,255,255,0.95);
   -moz-box-shadow: 0 0.062em 0.35em #b0b0b0 inset;
   -webkit-box-shadow: 0 0.062em 0.35em #b0b0b0 inset;
   box-shadow: 0 0.062em 0.35em #b0b0b0 inset;
+  padding: 0 0.2em 0 0;
+  overflow: hidden;
+  white-space: nowrap;
 }
 .smio-setup-header {
   font-size: 2em;
   color: #a40;
   text-shadow: 0 0 0.6em #fff;
-  letter-spacing: -0.062em;
+  letter-spacing: -0.05em;
 }
 .smio-setup-header-desc {
   color: #707070;
   font-size: 1.25em;
   text-shadow: 0 0.074em #fff;
-  letter-spacing: -0.062em;
+  letter-spacing: -0.05em;
 }
 .smio-setup-stepslide > .smio-setup-stepbox {
   padding: 1em 0 1em 0;
@@ -312,18 +335,18 @@ div.smio-setup {
   text-shadow: 0.05em 0.05em 0.15em #000;
   color: #f6f6f6;
   font-weight: 900;
-  letter-spacing: -0.062em;
+  letter-spacing: -0.05em;
   text-transform: lowercase;
 }
 .smio-setup-stepbox-form {
   padding: 1em 0 0 3.25em;
 }
 .smio-setup-steptabs {
-  background: -ms-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.65));
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255,255,255,0.95)), to(rgba(255,255,255,0.65)));
-  background: -moz-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.65));
-  background: -webkit-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.65));
-  background: -o-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.65));
+  background: -ms-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.66));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255,255,255,0.95)), to(rgba(255,255,255,0.66)));
+  background: -moz-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.66));
+  background: -webkit-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.66));
+  background: -o-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.66));
   text-align: center;
   white-space: nowrap;
 }

@@ -31,7 +31,10 @@
                 "owner": {
                   'div .smio-setup-stepbox-title': [this.r('steptitle_owner')],
                   'div .smio-setup-stepbox-form': {
-                    html: ['ding blaa<br/><br/>foo<br/><br/>yeah right']
+                    html: ['ding blaa<br/><br/>foo<br/><br/>yeah right'],
+                    TextInput: {
+                      id: 'input'
+                    }
                   }
                 },
                 "template": {

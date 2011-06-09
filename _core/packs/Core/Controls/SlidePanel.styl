@@ -1,0 +1,60 @@
+$slide-grad-base = rgb(250, 250, 250)
+$slide-grad-lite = 0.9
+$slide-grad-dark = 0.3
+$slide-edge-base = rgb(48, 48, 48)
+$slide-edge-lite = 0.85
+$slide-edge-dark = 0.65
+
+div.smio-slidepanel
+	position relative
+
+div.smio-slidepanel-scrollbox
+	smio-nooverflow-nowrap()
+
+div.smio-slidepanel-edge
+	smio-nooverflow-nowrap()
+	cursor pointer
+	text-align center
+	smio-posabs-tbw 0.25em 0.15em 3em
+
+.smio-slidepanel-edge-arr
+	padding 0.1em
+	smio-posabs-rbl 1em
+	text-align center
+	smio-border-radius 0.33em
+	smio-box-shadow 0em 0.08em 0.25em #909090
+	border 0.092em #a0a0a0 outset
+	smio-background-vgradient rgba($slide-edge-base, $slide-edge-dark) rgba($slide-edge-base, $slide-edge-lite)
+	font-size 0.9em
+	text-shadow 0 -0.092em #404040
+	color #f0f0f0
+	opacity 0
+	smio-transition all 0.5s
+	smio-nooverflow-nowrap()
+	smio-lcase()
+
+div.smio-slidepanel:hover .smio-slidepanel-edge-arr
+	opacity 0.7
+
+div.smio-slidepanel-edge:hover .smio-slidepanel-edge-arr
+	opacity 1
+
+div.smio-slidepanel-edge:active .smio-slidepanel-edge-arr
+	smio-background-vgradient rgba($slide-edge-base, $slide-edge-lite) rgba($slide-edge-base, $slide-edge-dark)
+
+div.smio-slidepanel-edge-left
+	left 0
+	smio-background-hgradient rgba($slide-grad-base, $slide-grad-lite) rgba($slide-grad-base, $slide-grad-dark)
+
+div.smio-slidepanel-edge-right
+	right 0
+	smio-background-hgradient rgba($slide-grad-base, $slide-grad-dark) rgba($slide-grad-base, $slide-grad-lite)
+
+ul.smio-slidepanel
+	list-style-type none
+
+ul.smio-slidepanel > li
+	display inline-block
+	vertical-align top
+	width 100%
+

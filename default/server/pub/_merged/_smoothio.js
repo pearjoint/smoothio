@@ -14129,12 +14129,12 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           "class": this.args["class"] || ''
         }
       };
-      is1st = true;
       makeOnClick = __bind(function(tabID) {
         return __bind(function() {
           return this.selectTab(tabID);
         }, this);
       }, this);
+      is1st = true;
       _ref = this.args.tabs;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         tab = _ref[_i];
@@ -14172,6 +14172,43 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   })();
 }).call(this);
 
+/** server/pub/_packs/Core/Controls/_smioctl_TextInput.js **/
+(function() {
+  /*
+  Auto-generated from Core/Controls/TextInput.ctl
+  */  var smio, smoothio;
+  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
+  };
+  smio = smoothio = global.smoothio;
+  smio.Packs_Core_Controls_TextInput = (function() {
+    __extends(Packs_Core_Controls_TextInput, smio.Control);
+    Packs_Core_Controls_TextInput.prototype.renderTemplate = function() {
+      var ret;
+      ret = {
+        span: {
+          id: '',
+          input: {
+            type: 'text'
+          }
+        }
+      };
+      return ret;
+    };
+    function Packs_Core_Controls_TextInput(client, parent, args) {
+      Packs_Core_Controls_TextInput.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_TextInput");
+      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
+      this.init();
+    }
+    return Packs_Core_Controls_TextInput;
+  })();
+}).call(this);
+
 /** server/pub/_packs/Core/ServerSetup/_smioctl_InitialSiteSetup.js **/
 (function() {
   /*
@@ -14206,7 +14243,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                 "owner": {
                   'div .smio-setup-stepbox-title': [this.r('steptitle_owner')],
                   'div .smio-setup-stepbox-form': {
-                    html: ['ding blaa<br/><br/>foo<br/><br/>yeah right']
+                    html: ['ding blaa<br/><br/>foo<br/><br/>yeah right'],
+                    TextInput: {
+                      id: 'input'
+                    }
                   }
                 },
                 "template": {

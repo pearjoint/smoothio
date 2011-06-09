@@ -21,12 +21,12 @@
           "class": this.args["class"] || ''
         }
       };
-      is1st = true;
       makeOnClick = __bind(function(tabID) {
         return __bind(function() {
           return this.selectTab(tabID);
         }, this);
       }, this);
+      is1st = true;
       _ref = this.args.tabs;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         tab = _ref[_i];
