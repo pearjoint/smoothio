@@ -37,10 +37,14 @@
           id: '',
           "class": "smio-slidepanel " + this.args["class"],
           'div #edgeprev .smio-slidepanel-edge .smio-slidepanel-edge-left': {
-            'div .smio-slidepanel-edge-arr .x9668': [this.r('slidepanel_prev')]
+            'div .smio-slidepanel-edge-arr .x9668': {
+              text: [this.r('slidepanel_prev')]
+            }
           },
           'div #edgenext .smio-slidepanel-edge .smio-slidepanel-edge-right': {
-            'div .smio-slidepanel-edge-arr .x9658': [this.r('slidepanel_next')]
+            'div .smio-slidepanel-edge-arr .x9658': {
+              text: [this.r('slidepanel_next')]
+            }
           },
           'div #scrollbox .smio-slidepanel-scrollbox': {
             'ul #items': ul
@@ -57,6 +61,7 @@
       }
     };
     Packs_Core_Controls_SlidePanel.prototype.onLoad = function() {
+      Packs_Core_Controls_SlidePanel.__super__.onLoad.call(this);
       (this.edgePrev = $("#" + (this.id('edgeprev')))).click(__bind(function() {
         return this.scrollTo(this.curItem - 1);
       }, this));

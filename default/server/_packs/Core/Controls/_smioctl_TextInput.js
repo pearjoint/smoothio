@@ -14,6 +14,28 @@
   smio = smoothio = global.smoothio;
   smio.Packs_Core_Controls_TextInput = (function() {
     __extends(Packs_Core_Controls_TextInput, smio.Control);
+    Packs_Core_Controls_TextInput.prototype.renderTemplate = function() {
+      var ret;
+      ret = {
+        span: {
+          "class": 'smio-textinput',
+          id: ''
+        }
+      };
+      if (this.args.labelText) {
+        ret.span.label = {
+          id: 'label',
+          "for": this.id('input'),
+          html: [this.args.labelText]
+        };
+      }
+      ret.span.input = {
+        id: 'input',
+        "class": 'smio-textinput',
+        type: this.args.type === 'password' ? 'password' : 'text'
+      };
+      return ret;
+    };
     function Packs_Core_Controls_TextInput(client, parent, args) {
       Packs_Core_Controls_TextInput.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_TextInput");
       this.jsSelf = "smio.client.allControls['" + this.id() + "']";

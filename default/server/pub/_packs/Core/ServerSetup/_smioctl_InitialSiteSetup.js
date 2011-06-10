@@ -31,9 +31,20 @@
                 "owner": {
                   'div .smio-setup-stepbox-title': [this.r('steptitle_owner')],
                   'div .smio-setup-stepbox-form': {
-                    html: ['ding blaa<br/><br/>foo<br/><br/>yeah right'],
-                    TextInput: {
-                      id: 'input'
+                    "TextInput #owner_name": {
+                      labelText: this.r('owner_name')
+                    },
+                    "TextInput #owner_pass": {
+                      labelText: this.r('owner_pass'),
+                      type: 'password'
+                    },
+                    "Toggle #owner_login": {
+                      labelText: this.r('owner_login'),
+                      toggleName: 'owner_toggle'
+                    },
+                    "Toggle #owner_create": {
+                      labelText: this.r('owner_create'),
+                      toggleName: 'owner_toggle'
                     }
                   }
                 },

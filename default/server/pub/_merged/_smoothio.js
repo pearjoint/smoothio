@@ -13407,6 +13407,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.ctlRenderers = {};
       this.eventHandlers = {};
       this.el = null;
+      this.idStack = [];
       this._html = '';
     }
     Control.prototype.ctl = function(ctlID) {
@@ -13422,7 +13423,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       var myID;
       myID = this.parent ? "" + (this.parent.id()) + "_" + this.ctlID : this.ctlID;
       if (subID) {
-        return myID + '_' + subID;
+        return myID + '_' + (this.idStack.length ? (this.idStack.join('_')) + '_' : '') + subID;
       } else {
         return myID;
       }
@@ -14048,10 +14049,14 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           id: '',
           "class": "smio-slidepanel " + this.args["class"],
           'div #edgeprev .smio-slidepanel-edge .smio-slidepanel-edge-left': {
-            'div .smio-slidepanel-edge-arr .x9668': [this.r('slidepanel_prev')]
+            'div .smio-slidepanel-edge-arr .x9668': {
+              text: [this.r('slidepanel_prev')]
+            }
           },
           'div #edgenext .smio-slidepanel-edge .smio-slidepanel-edge-right': {
-            'div .smio-slidepanel-edge-arr .x9658': [this.r('slidepanel_next')]
+            'div .smio-slidepanel-edge-arr .x9658': {
+              text: [this.r('slidepanel_next')]
+            }
           },
           'div #scrollbox .smio-slidepanel-scrollbox': {
             'ul #items': ul
@@ -14068,6 +14073,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
     };
     Packs_Core_Controls_SlidePanel.prototype.onLoad = function() {
+      Packs_Core_Controls_SlidePanel.__super__.onLoad.call(this);
       (this.edgePrev = $("#" + (this.id('edgeprev')))).click(__bind(function() {
         return this.scrollTo(this.curItem - 1);
       }, this));
@@ -14196,11 +14202,21 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       var ret;
       ret = {
         span: {
-          id: '',
-          input: {
-            type: 'text'
-          }
+          "class": 'smio-textinput',
+          id: ''
         }
+      };
+      if (this.args.labelText) {
+        ret.span.label = {
+          id: 'label',
+          "for": this.id('input'),
+          html: [this.args.labelText]
+        };
+      }
+      ret.span.input = {
+        id: 'input',
+        "class": 'smio-textinput',
+        type: this.args.type === 'password' ? 'password' : 'text'
       };
       return ret;
     };
@@ -14230,19 +14246,28 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio.Packs_Core_Controls_Toggle = (function() {
     __extends(Packs_Core_Controls_Toggle, smio.Control);
     Packs_Core_Controls_Toggle.prototype.renderTemplate = function() {
-      return {
+      var ret;
+      ret = {
         span: {
-          id: '',
-          input: {
-            id: 'input'
-          },
-          label: {
-            id: 'label',
-            "for": this.id('input'),
-            text: [this.args.label || '']
-          }
+          "class": 'smio-toggleinput',
+          id: ''
         }
       };
+      ret.span.input = {
+        id: 'input',
+        name: this.args.toggleName,
+        "class": 'smio-toggleinput',
+        disabled: 'disabled',
+        type: this.args.type === 'checkbox' ? 'checkbox' : 'radio'
+      };
+      if (this.args.labelText) {
+        ret.span.label = {
+          id: 'label',
+          "for": this.id('input'),
+          html: [this.args.labelText]
+        };
+      }
+      return ret;
     };
     function Packs_Core_Controls_Toggle(client, parent, args) {
       Packs_Core_Controls_Toggle.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_Toggle");
@@ -14287,9 +14312,20 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                 "owner": {
                   'div .smio-setup-stepbox-title': [this.r('steptitle_owner')],
                   'div .smio-setup-stepbox-form': {
-                    html: ['ding blaa<br/><br/>foo<br/><br/>yeah right'],
-                    TextInput: {
-                      id: 'input'
+                    "TextInput #owner_name": {
+                      labelText: this.r('owner_name')
+                    },
+                    "TextInput #owner_pass": {
+                      labelText: this.r('owner_pass'),
+                      type: 'password'
+                    },
+                    "Toggle #owner_login": {
+                      labelText: this.r('owner_login'),
+                      toggleName: 'owner_toggle'
+                    },
+                    "Toggle #owner_create": {
+                      labelText: this.r('owner_create'),
+                      toggleName: 'owner_toggle'
                     }
                   }
                 },

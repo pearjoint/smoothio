@@ -14,19 +14,28 @@
   smio.Packs_Core_Controls_Toggle = (function() {
     __extends(Packs_Core_Controls_Toggle, smio.Control);
     Packs_Core_Controls_Toggle.prototype.renderTemplate = function() {
-      return {
+      var ret;
+      ret = {
         span: {
-          id: '',
-          input: {
-            id: 'input'
-          },
-          label: {
-            id: 'label',
-            "for": this.id('input'),
-            text: [this.args.label || '']
-          }
+          "class": 'smio-toggleinput',
+          id: ''
         }
       };
+      ret.span.input = {
+        id: 'input',
+        name: this.args.toggleName,
+        "class": 'smio-toggleinput',
+        disabled: 'disabled',
+        type: this.args.type === 'checkbox' ? 'checkbox' : 'radio'
+      };
+      if (this.args.labelText) {
+        ret.span.label = {
+          id: 'label',
+          "for": this.id('input'),
+          html: [this.args.labelText]
+        };
+      }
+      return ret;
     };
     function Packs_Core_Controls_Toggle(client, parent, args) {
       Packs_Core_Controls_Toggle.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_Toggle");

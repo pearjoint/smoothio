@@ -238,6 +238,7 @@
       this.ctlRenderers = {};
       this.eventHandlers = {};
       this.el = null;
+      this.idStack = [];
       this._html = '';
     }
     Control.prototype.ctl = function(ctlID) {
@@ -253,7 +254,7 @@
       var myID;
       myID = this.parent ? "" + (this.parent.id()) + "_" + this.ctlID : this.ctlID;
       if (subID) {
-        return myID + '_' + subID;
+        return myID + '_' + (this.idStack.length ? (this.idStack.join('_')) + '_' : '') + subID;
       } else {
         return myID;
       }

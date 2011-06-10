@@ -81,7 +81,8 @@ class smio.Instance
 					@resourceSets[resBaseName][resLang] = {}
 				try
 					for name, val of resSet = JSON.parse smio.Util.FileSystem.readTextFile fpath
-						@resourceSets[resBaseName][if resLang then resLang else 'en'][name] = val
+						if (name isnt 'x') and (name isnt '___resource_file_intro')
+							@resourceSets[resBaseName][if resLang then resLang else 'en'][name] = val
 				catch err
 					err['ml_error_filepath'] = fpath
 					errs.push err

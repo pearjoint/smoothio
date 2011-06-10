@@ -26,9 +26,17 @@ renderTemplate: ->
 						'div .smio-setup-stepbox-title':
 							[@r 'steptitle_owner']
 						'div .smio-setup-stepbox-form':
-							html: ['ding blaa<br/><br/>foo<br/><br/>yeah right']
-							TextInput:
-								id: 'input'
+							"TextInput #owner_name":
+								labelText: @r 'owner_name'
+							"TextInput #owner_pass":
+								labelText: @r 'owner_pass'
+								type: 'password'
+							"Toggle #owner_login":
+								labelText: @r 'owner_login'
+								toggleName: 'owner_toggle'
+							"Toggle #owner_create":
+								labelText: @r 'owner_create'
+								toggleName: 'owner_toggle'
 					"template":
 						"div .smio-setup-stepbox-title":
 							[@r 'steptitle_template']

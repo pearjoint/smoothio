@@ -22,9 +22,6 @@ div.smio-slidepanel-edge {
   right: 1em;
   bottom: 1em;
   text-align: center;
-  -webkit-border-radius: 0.33em;
-  -moz-border-radius: 0.33em;
-  border-radius: 0.33em;
   -moz-box-shadow: 0em 0.08em 0.25em #909090;
   -webkit-box-shadow: 0em 0.08em 0.25em #909090;
   box-shadow: 0em 0.08em 0.25em #909090;
@@ -38,10 +35,10 @@ div.smio-slidepanel-edge {
   text-shadow: 0 -0.092em #404040;
   color: #f0f0f0;
   opacity: 0;
-  -moz-transition: all 0.5s;
-  -webkit-transition: all 0.5s;
-  -o-transition: all 0.5s;
-  transition: all 0.5s;
+  -moz-transition: opacity 0.5s;
+  -webkit-transition: opacity 0.5s;
+  -o-transition: opacity 0.5s;
+  transition: opacity 0.5s;
   overflow: hidden;
   white-space: nowrap;
   text-transform: lowercase;
@@ -66,6 +63,16 @@ div.smio-slidepanel-edge-left {
   background: -moz-linear-gradient(left, rgba(250,250,250,0.9), rgba(250,250,250,0.3));
   background: -webkit-linear-gradient(left, rgba(250,250,250,0.9), rgba(250,250,250,0.3));
   background: -o-linear-gradient(left, rgba(250,250,250,0.9), rgba(250,250,250,0.3));
+}
+div.smio-slidepanel-edge-left .smio-slidepanel-edge-arr {
+  -webkit-border-radius: 1em 0.33em 0.33em 1em;
+  -moz-border-radius: 1em 0.33em 0.33em 1em;
+  border-radius: 1em 0.33em 0.33em 1em;
+}
+div.smio-slidepanel-edge-right .smio-slidepanel-edge-arr {
+  -webkit-border-radius: 0.33em 1em 1em 0.33em;
+  -moz-border-radius: 0.33em 1em 1em 0.33em;
+  border-radius: 0.33em 1em 1em 0.33em;
 }
 div.smio-slidepanel-edge-right {
   right: 0;

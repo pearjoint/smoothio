@@ -17,11 +17,21 @@
       var ret;
       ret = {
         span: {
-          id: '',
-          input: {
-            type: 'text'
-          }
+          "class": 'smio-textinput',
+          id: ''
         }
+      };
+      if (this.args.labelText) {
+        ret.span.label = {
+          id: 'label',
+          "for": this.id('input'),
+          html: [this.args.labelText]
+        };
+      }
+      ret.span.input = {
+        id: 'input',
+        "class": 'smio-textinput',
+        type: this.args.type === 'password' ? 'password' : 'text'
       };
       return ret;
     };

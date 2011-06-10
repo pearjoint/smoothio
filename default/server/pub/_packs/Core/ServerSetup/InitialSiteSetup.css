@@ -59,7 +59,23 @@ div.smio-setup {
   text-transform: lowercase;
 }
 .smio-setup-stepbox-form {
-  padding: 1em 0 0 3.25em;
+  padding: 1em 0 0 1.8em;
+}
+.smio-setup-stepbox-form span.smio-textinput {
+  display: table-row;
+  padding: 0.5em 0 0.5em 0;
+}
+.smio-setup-stepbox-form span.smio-toggleinput {
+  display: block;
+  padding: 0.5em 0 0.5em 0;
+}
+.smio-setup-stepbox-form span.smio-textinput input.smio-textinput {
+  width: 100%;
+}
+.smio-setup-stepbox-form span.smio-textinput label {
+  display: table-cell;
+  vertical-align: center;
+  padding: 1em 1em 1em 0;
 }
 .smio-setup-steptabs {
   background: -ms-linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.66));

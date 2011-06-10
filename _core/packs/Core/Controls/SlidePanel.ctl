@@ -15,9 +15,9 @@ renderTemplate: ->
 		id: ''
 		class: "smio-slidepanel #{@args.class}"
 		'div #edgeprev .smio-slidepanel-edge .smio-slidepanel-edge-left':
-			'div .smio-slidepanel-edge-arr .x9668': [@r 'slidepanel_prev']
+			'div .smio-slidepanel-edge-arr .x9668': text: [@r 'slidepanel_prev']
 		'div #edgenext .smio-slidepanel-edge .smio-slidepanel-edge-right':
-			'div .smio-slidepanel-edge-arr .x9658': [@r 'slidepanel_next']
+			'div .smio-slidepanel-edge-arr .x9658': text: [@r 'slidepanel_next']
 		'div #scrollbox .smio-slidepanel-scrollbox':
 			'ul #items': ul
 
@@ -29,6 +29,7 @@ init: ->
 		@on 'itemSelect', @args.onItemSelect
 
 onLoad: ->
+	super()
 	(@edgePrev = $("##{@id 'edgeprev'}")).click => @scrollTo @curItem - 1
 	(@edgeNext = $("##{@id 'edgenext'}")).click => @scrollTo @curItem + 1
 	@scrollBox = $("##{@id 'scrollbox'}")

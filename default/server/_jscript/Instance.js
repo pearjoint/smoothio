@@ -113,7 +113,7 @@
             _results = [];
             for (name in _ref) {
               val = _ref[name];
-              _results.push(this.resourceSets[resBaseName][resLang ? resLang : 'en'][name] = val);
+              _results.push((name !== 'x') && (name !== '___resource_file_intro') ? this.resourceSets[resBaseName][resLang ? resLang : 'en'][name] = val : void 0);
             }
             return _results;
           } catch (err) {

@@ -21,7 +21,6 @@ div.smio-slidepanel-edge
 	padding 0.1em
 	smio-posabs-rbl 1em
 	text-align center
-	smio-border-radius 0.33em
 	smio-box-shadow 0em 0.08em 0.25em #909090
 	border 0.092em #a0a0a0 outset
 	smio-background-vgradient rgba($slide-edge-base, $slide-edge-dark) rgba($slide-edge-base, $slide-edge-lite)
@@ -29,7 +28,7 @@ div.smio-slidepanel-edge
 	text-shadow 0 -0.092em #404040
 	color #f0f0f0
 	opacity 0
-	smio-transition all 0.5s
+	smio-transition opacity 0.5s
 	smio-nooverflow-nowrap()
 	smio-lcase()
 
@@ -45,6 +44,12 @@ div.smio-slidepanel-edge:active .smio-slidepanel-edge-arr
 div.smio-slidepanel-edge-left
 	left 0
 	smio-background-hgradient rgba($slide-grad-base, $slide-grad-lite) rgba($slide-grad-base, $slide-grad-dark)
+
+div.smio-slidepanel-edge-left .smio-slidepanel-edge-arr
+	smio-border-radius 1em 0.33em 0.33em 1em
+
+div.smio-slidepanel-edge-right .smio-slidepanel-edge-arr
+	smio-border-radius 0.33em 1em 1em 0.33em
 
 div.smio-slidepanel-edge-right
 	right 0

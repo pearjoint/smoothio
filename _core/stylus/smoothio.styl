@@ -1,5 +1,16 @@
-@import 'include/reset'
 @import 'include/mixin'
+@import 'include/reset'
+
+smio-selection()
+	background-color rgba(48, 48, 48, 0.48)
+	color #f0f0f0
+	text-shadow none
+
+::selection
+	smio-selection()
+
+::-moz-selection
+	smio-selection()
 
 a
 	text-decoration none

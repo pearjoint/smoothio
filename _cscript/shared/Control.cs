@@ -209,6 +209,7 @@ class smio.Packs_#{className} extends smio.Control
 		@ctlRenderers = {}
 		@eventHandlers = {}
 		@el = null
+		@idStack = []
 		@_html = ''
 
 	ctl: (ctlID) ->
@@ -218,7 +219,7 @@ class smio.Packs_#{className} extends smio.Control
 	id: (subID) ->
 		myID = if @parent then "#{@parent.id()}_#{@ctlID}" else @ctlID
 		if (subID)
-			myID + '_' + subID
+			myID + '_' + (if @idStack.length then ((@idStack.join '_') + '_') else '') + subID
 		else
 			myID
 

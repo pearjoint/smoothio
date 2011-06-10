@@ -75,17 +75,19 @@ summary,
 time,
 mark,
 audio,
-video {
+video,
+input,
+textarea {
   -o-user-select: none;
   -ms-user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
+  user-select: none;
   -o-user-drag: none;
   -moz-user-drag: none;
   -webkit-user-drag: none;
   -ms-user-drag: none;
   user-drag: none;
-  user-select: none;
   margin: 0;
   padding: 0;
   border: 0;
@@ -113,6 +115,16 @@ body {
 table {
   border-collapse: collapse;
   border-spacing: 0;
+}
+::selection {
+  background-color: rgba(48,48,48,0.48);
+  color: #f0f0f0;
+  text-shadow: none;
+}
+::-moz-selection {
+  background-color: rgba(48,48,48,0.48);
+  color: #f0f0f0;
+  text-shadow: none;
 }
 a {
   text-decoration: none;
