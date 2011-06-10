@@ -3,6 +3,8 @@
 ,	"x"								:	"y"
 ,	"title"							:	"Setting up your first Site"
 ,	"desc"							:	"This server does not contain any Sites yet. Create one below:"
+,	"nojs_title"					:	"NOJS Setting up your first Site"
+,	"nojs_desc"						:	"NOJS This server does not contain any Sites yet. Create one below:"
 ,	"steps_owner"					:	"1. Specify owner"
 ,	"steps_template"				:	"2. Select template"
 ,	"steps_finish"					:	"3. Finish setup"

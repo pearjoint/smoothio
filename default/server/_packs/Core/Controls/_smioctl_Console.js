@@ -10,13 +10,41 @@
     child.__super__ = parent.prototype;
     return child;
   };
-  require('../../../_jscript/Control');
+  require('../../../_jscript/shared/Control');
   smio = smoothio = global.smoothio;
   smio.Packs_Core_Controls_Console = (function() {
     __extends(Packs_Core_Controls_Console, smio.Control);
-    function Packs_Core_Controls_Console() {
-      Packs_Core_Controls_Console.__super__.constructor.apply(this, arguments);
+    function Packs_Core_Controls_Console(client, parent, args) {
+      Packs_Core_Controls_Console.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_Console");
+      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
+      this.init();
     }
+    Packs_Core_Controls_Console.prototype.renderHtml = function($el) {
+      var __r;
+      if (!this._html) {
+        __r = {
+          ctls: [],
+          m: []
+        };
+        __r.o = __r.m;
+        __r.o.push("\n<div id=\"");
+        __r.o.push(this.id());
+        __r.o.push("\" class=\"smio-console smio-console-");
+        __r.o.push(this.args['topDown'] ? 'top' : 'bottom');
+        __r.o.push("\">\n\t<div id=\"");
+        __r.o.push(this.id());
+        __r.o.push("_ever\" class=\"smio-console-ever\">header</div>\n\t<div id=\"");
+        __r.o.push(this.id());
+        __r.o.push("_hover\" class=\"smio-console-hover\" style=\"display: none;\">hover</div>\n\t<div id=\"");
+        __r.o.push(this.id());
+        __r.o.push("_detail\" class=\"smio-console-detail\" style=\"display: none;\">details</div>\n</div>\n\n");
+        this._html = __r.o.join('');
+      }
+      if ($el) {
+        $el.html(this._html);
+      }
+      return this._html;
+    };
     return Packs_Core_Controls_Console;
   })();
 }).call(this);

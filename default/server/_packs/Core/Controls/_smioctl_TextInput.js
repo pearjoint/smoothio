@@ -10,12 +10,14 @@
     child.__super__ = parent.prototype;
     return child;
   };
-  require('../../../_jscript/Control');
+  require('../../../_jscript/shared/Control');
   smio = smoothio = global.smoothio;
   smio.Packs_Core_Controls_TextInput = (function() {
     __extends(Packs_Core_Controls_TextInput, smio.Control);
-    function Packs_Core_Controls_TextInput() {
-      Packs_Core_Controls_TextInput.__super__.constructor.apply(this, arguments);
+    function Packs_Core_Controls_TextInput(client, parent, args) {
+      Packs_Core_Controls_TextInput.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_TextInput");
+      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
+      this.init();
     }
     return Packs_Core_Controls_TextInput;
   })();

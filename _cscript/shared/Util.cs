@@ -26,6 +26,8 @@ class smio.Util
 					arr[i] = arr[i - 1]
 				arr[pos] = val
 			arr
+		removeLast: (arr) ->
+			arr[0...(arr.length - 1)]
 		toObject: (arr, keyGen) ->
 			obj = {}
 			for v, i in arr

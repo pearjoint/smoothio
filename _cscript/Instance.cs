@@ -61,11 +61,14 @@ class smio.Instance
 				false
 		if @mongoIsLocal and @mongos['admin'] then @mongoHasShutDown else true
 
-	loadResourceSets: (dirPath, recurse) ->
+	loadResourceSets: (dirPath, recurse, getBaseName) ->
 		errs = []
-		smio.walkDir dirPath, null, (fpath, fname) =>
+		if not _.isFunction getBaseName
+			getBaseName = (fpath, fname, relpath) ->
+				fname
+		smio.walkDir dirPath, null, (fpath, fname, relpath) =>
 			if _.isEndsWith fname, '.res'
-				resBaseName = fname.substr 0, pos = fname.indexOf '.'
+				resBaseName = getBaseName fpath, (fname.substr 0, pos = fname.indexOf '.'), relpath
 				if 'en' is (resLang = if pos is (lpos = fname.lastIndexOf '.') then '' else fname.substr pos + 1, lpos - pos - 1)
 					resLang = ''
 				if not @resourceSets[resBaseName]?

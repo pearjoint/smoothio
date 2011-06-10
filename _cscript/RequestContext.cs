@@ -1,4 +1,5 @@
 
+require './shared/Control'
 require './Session'
 _ = require 'underscore'
 node_path = require 'path'
@@ -71,7 +72,7 @@ class smio.RequestContext
 					else
 						hasHandler = false
 			if not hasHandler
-				@serveFile 'smoothio.html', respHeaders
+				@servePage respHeaders
 		catch err
 			respHeaders['Content-Type'] = 'text/plain'
 			@httpResponse.writeHead 500, respHeaders
@@ -87,4 +88,21 @@ class smio.RequestContext
 			respHeaders['Content-Type'] = 'text/plain'
 			@httpResponse.writeHead 404, respHeaders
 			@httpResponse.end "404 File Not Found: #{node_path.join @server.fileServer.root, filePath}"
+
+	servePage: (respHeaders) ->
+		placeholder = "___smiopagecontent___"
+		respHeaders['Content-Type'] = 'text/html'
+		@httpResponse.writeHead 200, respHeaders
+		if not smio.RequestContext.htmlContent
+			smio.RequestContext.htmlContent = smio.Util.FileSystem.readTextFile "server/pub/smoothio.html"
+		fileContent = smio.RequestContext.htmlContent
+		pos = fileContent.indexOf placeholder
+		if pos <= 0
+			@httpResponse.write fileContent
+		else
+			@httpResponse.write fileContent.substr 0, pos
+			(session = smio.Session.getBySessionID @server, @smioCookie['sessid']).handleFetch @, {}, (data) =>
+				ctl = smio.Control.load data['c']['']['_'], null, id: 'sm'
+				@httpResponse.write ctl.renderHtml()
+				@httpResponse.end fileContent.substr pos + placeholder.length
 

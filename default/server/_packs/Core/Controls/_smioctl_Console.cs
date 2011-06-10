@@ -2,7 +2,7 @@
 Auto-generated from Core/Controls/Console.ctl
 ###
 #if server
-require '../../../_jscript/Control'
+require '../../../_jscript/shared/Control'
 #endif
 smio = smoothio = global.smoothio
 class smio.Packs_Core_Controls_Console extends smio.Control
@@ -20,7 +20,6 @@ class smio.Packs_Core_Controls_Console extends smio.Control
 #endif
 
 
-#if client
 	constructor: (client, parent, args) ->
 		super client, parent, args, "Core_Controls", "Core_Controls_Console"
 		@jsSelf = "smio.client.allControls['" + @id() + "']"
@@ -45,4 +44,3 @@ class smio.Packs_Core_Controls_Console extends smio.Control
 		if $el
 			$el.html @_html
 		@_html
-#endif

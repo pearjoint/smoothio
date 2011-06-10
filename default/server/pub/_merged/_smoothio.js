@@ -13298,6 +13298,54 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   smio = global.smoothio;
   smio.Control = (function() {
+    Control.prototype.on = function(eventName, handler) {
+      var eh, _i, _len, _ref, _results;
+      if (eventName) {
+        if (_.isFunction(handler)) {
+          if (!this.eventHandlers[eventName]) {
+            this.eventHandlers[eventName] = [];
+          }
+          if (0 > _.indexOf(this.eventHandlers[eventName], handler)) {
+            return this.eventHandlers[eventName].push(handler);
+          }
+        } else if (this.eventHandlers[eventName]) {
+          _ref = this.eventHandlers[eventName];
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            eh = _ref[_i];
+            _results.push(eh.apply(this, handler));
+          }
+          return _results;
+        }
+      }
+    };
+    Control.prototype.onLoad = function() {
+      var ctl, id, prefix, _ref;
+      prefix = "cscript:";
+      this.el = $('#' + this.id());
+      _ref = this.controls;
+      for (id in _ref) {
+        ctl = _ref[id];
+        ctl.onLoad();
+      }
+      if (!this.parent) {
+        return $("a[href^='" + prefix + "']").each(function(i, a) {
+          try {
+            return a.href = 'javascript:' + ((CoffeeScript.compile(a.href.substr(prefix.length))).split('\n')).join('');
+          } catch (err) {
+            alert("CODE:" + ((unescape(a.href)).substr(prefix.length)) + ":CODE");
+            return a.href = "javascript:smio.client.socket.onError(\"" + err + "\");";
+          }
+        });
+      }
+    };
+    Control.prototype.onWindowResize = function(width, height) {};
+    Control.prototype.syncUpdate = function(ctlDesc) {};
+    Control.prototype.un = function(eventName, handler) {
+      if (eventName && this.eventHandlers[eventName] && _.isFunction(handler)) {
+        return this.eventHandlers[eventName] = _.without(this.eventHandlers[eventName], handler);
+      }
+    };
     Control.tagRenderers = {
       "arg": function(ctl, name) {
         return ctl.args[name];
@@ -13352,6 +13400,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.args = args;
       this.baseName = baseName;
       this.className = className;
+      this.isServer = !(this.isClient = this.client ? true : false);
       this.ctlID = this.args.id;
       this.controls = {};
       this.containers = {};
@@ -13379,48 +13428,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
     };
     Control.prototype.init = function() {};
-    Control.prototype.on = function(eventName, handler) {
-      var eh, _i, _len, _ref, _results;
-      if (eventName) {
-        if (_.isFunction(handler)) {
-          if (!this.eventHandlers[eventName]) {
-            this.eventHandlers[eventName] = [];
-          }
-          if (0 > _.indexOf(this.eventHandlers[eventName], handler)) {
-            return this.eventHandlers[eventName].push(handler);
-          }
-        } else if (this.eventHandlers[eventName]) {
-          _ref = this.eventHandlers[eventName];
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            eh = _ref[_i];
-            _results.push(eh.apply(this, handler));
-          }
-          return _results;
-        }
-      }
-    };
-    Control.prototype.onLoad = function() {
-      var ctl, id, prefix, _ref;
-      prefix = "cscript:";
-      this.el = $('#' + this.id());
-      _ref = this.controls;
-      for (id in _ref) {
-        ctl = _ref[id];
-        ctl.onLoad();
-      }
-      if (!this.parent) {
-        return $("a[href^='" + prefix + "']").each(function(i, a) {
-          try {
-            return a.href = 'javascript:' + ((CoffeeScript.compile(a.href.substr(prefix.length))).split('\n')).join('');
-          } catch (err) {
-            alert("CODE:" + ((unescape(a.href)).substr(prefix.length)) + ":CODE");
-            return a.href = "javascript:smio.client.socket.onError(\"" + err + "\");";
-          }
-        });
-      }
-    };
-    Control.prototype.onWindowResize = function(width, height) {};
     Control.prototype.renderJsonTemplate = function(tagKey, objTree, level) {
       var an, atts, attstr, av, buf, hasc, haso, kc, kt, name, pos, result, toAtt, toHtml, val;
       buf = '';
@@ -13520,27 +13527,21 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         return "!!UNKNOWN_TAG::" + name + "!!";
       }
     };
-    Control.prototype.syncUpdate = function(ctlDesc) {};
-    Control.prototype.un = function(eventName, handler) {
-      if (eventName && this.eventHandlers[eventName] && _.isFunction(handler)) {
-        return this.eventHandlers[eventName] = _.without(this.eventHandlers[eventName], handler);
-      }
-    };
     Control.prototype.r = function(name) {
       return this.res(name);
     };
     Control.prototype.res = function(name) {
       var i, parts, resSet, resSets, ret, _ref;
       ret = '';
-      if ((resSets = smio.resources)) {
+      if ((resSets = (this.isClient ? smio.resources : smio.inst.resourceSets))) {
         parts = this.baseName.split('_');
         for (i = _ref = parts.length - 1; _ref <= 0 ? i <= 0 : i >= 0; _ref <= 0 ? i++ : i--) {
-          if ((resSet = resSets[parts.slice(0, (i + 1) || 9e9).join('_')]) && (ret = resSet[name])) {
+          if ((resSet = resSets[parts.slice(0, (i + 1) || 9e9).join('_')]) && (ret = (this.isClient ? resSet[name] : resSet['en'][name]))) {
             break;
           }
         }
         if (!ret) {
-          ret = smio.resources.smoothio[name];
+          ret = this.isClient ? resSets.smoothio[name] : resSets.smoothio['en'][name];
         }
       }
       if (ret) {
@@ -13696,6 +13697,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           arr[pos] = val;
         }
         return arr;
+      },
+      removeLast: function(arr) {
+        return arr.slice(0, arr.length - 1);
       },
       toObject: function(arr, keyGen) {
         var i, obj, v, _len;
@@ -14206,6 +14210,46 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.init();
     }
     return Packs_Core_Controls_TextInput;
+  })();
+}).call(this);
+
+/** server/pub/_packs/Core/Controls/_smioctl_Toggle.js **/
+(function() {
+  /*
+  Auto-generated from Core/Controls/Toggle.ctl
+  */  var smio, smoothio;
+  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
+  };
+  smio = smoothio = global.smoothio;
+  smio.Packs_Core_Controls_Toggle = (function() {
+    __extends(Packs_Core_Controls_Toggle, smio.Control);
+    Packs_Core_Controls_Toggle.prototype.renderTemplate = function() {
+      return {
+        span: {
+          id: '',
+          input: {
+            id: 'input'
+          },
+          label: {
+            id: 'label',
+            "for": this.id('input'),
+            text: [this.args.label || '']
+          }
+        }
+      };
+    };
+    function Packs_Core_Controls_Toggle(client, parent, args) {
+      Packs_Core_Controls_Toggle.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_Toggle");
+      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
+      this.init();
+    }
+    return Packs_Core_Controls_Toggle;
   })();
 }).call(this);
 

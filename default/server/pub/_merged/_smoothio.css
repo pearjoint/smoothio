@@ -137,6 +137,7 @@ body {
   overflow: hidden;
 }
 .smio-blocking-overlay {
+  display: none;
   background: rgba(0,0,0,0.6);
   position: fixed;
   top: 0;

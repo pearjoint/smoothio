@@ -33,6 +33,9 @@
         }
         return arr;
       },
+      removeLast: function(arr) {
+        return arr.slice(0, arr.length - 1);
+      },
       toObject: function(arr, keyGen) {
         var i, obj, v, _len;
         obj = {};

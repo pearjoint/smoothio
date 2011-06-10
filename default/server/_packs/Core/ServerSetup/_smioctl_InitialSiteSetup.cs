@@ -2,12 +2,23 @@
 Auto-generated from Core/ServerSetup/InitialSiteSetup.ctl
 ###
 #if server
-require '../../../_jscript/Control'
+require '../../../_jscript/shared/Control'
 #endif
 smio = smoothio = global.smoothio
 class smio.Packs_Core_ServerSetup_InitialSiteSetup extends smio.Control
 
 
+#if server
+	
+	renderTemplate: ->
+		"div .smio-setup":
+			"id": ''
+			"div .smio-setup-outer .smio-setup-outer-top":
+				"div.smio-setup-header": [@r 'nojs_title']
+				"div.smio-setup-header-desc": [@r 'nojs_desc']
+	
+#endif
+	
 #if client
 	
 	renderTemplate: ->
@@ -55,7 +66,6 @@ class smio.Packs_Core_ServerSetup_InitialSiteSetup extends smio.Control
 	
 
 
-#if client
 	constructor: (client, parent, args) ->
 		super client, parent, args, "Core_ServerSetup", "Core_ServerSetup_InitialSiteSetup"
 		@jsSelf = "smio.client.allControls['" + @id() + "']"

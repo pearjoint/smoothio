@@ -20,6 +20,13 @@ class smio.Pack
 	load: ->
 		if (not @loaded) and (not @loadError?)
 			try
+				@inst.loadResourceSets @packPath, true, (fpath, fname, relpath) =>
+					parts = [@packName]
+					if (0 < relpath.indexOf '/')
+						parts.push smio.Util.Array.removeLast relpath.split '/'
+					if fname isnt 'pack'
+						parts.push fname
+					parts.join '_'
 				dontCopy = ['*.config', '*.res']
 				smio.logit (@inst.r 'log_pack_loading', @packName), 'packs.' + @packName
 				lastFilePath = cfgFilePath = node_path.join @packPath, 'pack.config'

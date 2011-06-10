@@ -10,12 +10,14 @@
     child.__super__ = parent.prototype;
     return child;
   };
-  require('../../../_jscript/Control');
+  require('../../../_jscript/shared/Control');
   smio = smoothio = global.smoothio;
   smio.Packs_Core_Controls_LinkButton = (function() {
     __extends(Packs_Core_Controls_LinkButton, smio.Control);
-    function Packs_Core_Controls_LinkButton() {
-      Packs_Core_Controls_LinkButton.__super__.constructor.apply(this, arguments);
+    function Packs_Core_Controls_LinkButton(client, parent, args) {
+      Packs_Core_Controls_LinkButton.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_LinkButton");
+      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
+      this.init();
     }
     return Packs_Core_Controls_LinkButton;
   })();

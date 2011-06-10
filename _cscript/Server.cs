@@ -58,13 +58,13 @@ class smio.Server
 		@status = 1
 		url = request.url
 		if url.indexOf 'http://' isnt 0 and url.indexOf 'https://' isnt 0
-			url = "#{if @isHttps then 'http' else 'https'}://#{@hostName}:#{@port}#{url}"
+			url = "#{if @isHttps then 'https' else 'http'}://#{@hostName}:#{@port}#{url}"
 		uri = node_url.parse url, true
 		uri.pathItems = (pathItem for pathItem in uri.pathname.split('/') when pathItem and pathItem.length)
 		if uri.pathItems.length is 1
 			if uri.pathItems[0] is 'robots.txt'
 				uri.pathItems = ['_', 'file', 'robots.txt']
-			if uri.pathItems[0].indexOf 'favicon' is 0 
+			if (uri.pathItems[0].indexOf 'favicon') is 0
 				uri.pathItems = ['_', 'file', uri.pathItems[0]]
 		uri.rawUrl = request.url
 		uri.url = url

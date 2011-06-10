@@ -97,7 +97,7 @@
       this.status = 1;
       url = request.url;
       if (url.indexOf('http://' !== 0 && url.indexOf('https://' !== 0))) {
-        url = "" + (this.isHttps ? 'http' : 'https') + "://" + this.hostName + ":" + this.port + url;
+        url = "" + (this.isHttps ? 'https' : 'http') + "://" + this.hostName + ":" + this.port + url;
       }
       uri = node_url.parse(url, true);
       uri.pathItems = (function() {
@@ -116,7 +116,7 @@
         if (uri.pathItems[0] === 'robots.txt') {
           uri.pathItems = ['_', 'file', 'robots.txt'];
         }
-        if (uri.pathItems[0].indexOf('favicon' === 0)) {
+        if ((uri.pathItems[0].indexOf('favicon')) === 0) {
           uri.pathItems = ['_', 'file', uri.pathItems[0]];
         }
       }

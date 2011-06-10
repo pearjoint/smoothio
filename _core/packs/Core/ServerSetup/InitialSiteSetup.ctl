@@ -1,3 +1,14 @@
+#if server
+
+renderTemplate: ->
+	"div .smio-setup":
+		"id": ''
+		"div .smio-setup-outer .smio-setup-outer-top":
+			"div.smio-setup-header": [@r 'nojs_title']
+			"div.smio-setup-header-desc": [@r 'nojs_desc']
+
+#endif
+
 #if client
 
 renderTemplate: ->

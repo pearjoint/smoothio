@@ -80,13 +80,18 @@
         return true;
       }
     };
-    Instance.prototype.loadResourceSets = function(dirPath, recurse) {
+    Instance.prototype.loadResourceSets = function(dirPath, recurse, getBaseName) {
       var errs;
       errs = [];
-      smio.walkDir(dirPath, null, __bind(function(fpath, fname) {
+      if (!_.isFunction(getBaseName)) {
+        getBaseName = function(fpath, fname, relpath) {
+          return fname;
+        };
+      }
+      smio.walkDir(dirPath, null, __bind(function(fpath, fname, relpath) {
         var generic, lpos, name, pos, resBaseName, resLang, resSet, specific, val, _ref, _results;
         if (_.isEndsWith(fname, '.res')) {
-          resBaseName = fname.substr(0, pos = fname.indexOf('.'));
+          resBaseName = getBaseName(fpath, fname.substr(0, pos = fname.indexOf('.')), relpath);
           if ('en' === (resLang = pos === (lpos = fname.lastIndexOf('.')) ? '' : fname.substr(pos + 1, lpos - pos - 1))) {
             resLang = '';
           }

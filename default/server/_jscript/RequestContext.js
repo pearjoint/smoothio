@@ -1,6 +1,7 @@
 (function() {
   var node_path, node_urlq, node_uuid, smio, _;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  require('./shared/Control');
   require('./Session');
   _ = require('underscore');
   node_path = require('path');
@@ -99,7 +100,7 @@
           }
         }
         if (!hasHandler) {
-          return this.serveFile('smoothio.html', respHeaders);
+          return this.servePage(respHeaders);
         }
       } catch (err) {
         respHeaders['Content-Type'] = 'text/plain';
@@ -118,6 +119,30 @@
         respHeaders['Content-Type'] = 'text/plain';
         this.httpResponse.writeHead(404, respHeaders);
         return this.httpResponse.end("404 File Not Found: " + (node_path.join(this.server.fileServer.root, filePath)));
+      }
+    };
+    RequestContext.prototype.servePage = function(respHeaders) {
+      var fileContent, placeholder, pos, session;
+      placeholder = "___smiopagecontent___";
+      respHeaders['Content-Type'] = 'text/html';
+      this.httpResponse.writeHead(200, respHeaders);
+      if (!smio.RequestContext.htmlContent) {
+        smio.RequestContext.htmlContent = smio.Util.FileSystem.readTextFile("server/pub/smoothio.html");
+      }
+      fileContent = smio.RequestContext.htmlContent;
+      pos = fileContent.indexOf(placeholder);
+      if (pos <= 0) {
+        return this.httpResponse.write(fileContent);
+      } else {
+        this.httpResponse.write(fileContent.substr(0, pos));
+        return (session = smio.Session.getBySessionID(this.server, this.smioCookie['sessid'])).handleFetch(this, {}, __bind(function(data) {
+          var ctl;
+          ctl = smio.Control.load(data['c']['']['_'], null, {
+            id: 'sm'
+          });
+          this.httpResponse.write(ctl.renderHtml());
+          return this.httpResponse.end(fileContent.substr(pos + placeholder.length));
+        }, this));
       }
     };
     return RequestContext;

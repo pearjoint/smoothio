@@ -59,12 +59,11 @@ class smio.Control
 Auto-generated from #{controlPath}
 ###
 #{"#if server"}
-require '#{smio.Util.String.times oneUp, pathParts.length}_jscript/Control'
+require '#{smio.Util.String.times oneUp, pathParts.length}_jscript/shared/Control'
 #{"#endif"}
 smio = smoothio = global.smoothio
 class smio.Packs_#{className} extends smio.Control
 #{decls}
-#{"#if client"}
 	constructor: (client, parent, args) ->
 		super client, parent, args, #{JSON.stringify baseName}, #{JSON.stringify className}
 		@jsSelf = "smio.client.allControls['" + @id() + "']"
@@ -127,10 +126,52 @@ class smio.Packs_#{className} extends smio.Control
 							coffeeScript += "#{br}__r.o.push t: #{JSON.stringify rp[0]}, s: #{JSON.stringify sarg}, a: #{jarg}"
 						else
 							coffeeScript += "#{br}__r.o.push @renderTag #{JSON.stringify rp[0]}, #{JSON.stringify sarg}, #{jarg}"
-			coffeeScript += "\n#{stimes '\t', indent}@_html = __r.o.join ''\n#{stimes '\t', indent - 1}if $el\n#{stimes '\t', indent}$el.html @_html\n#{stimes '\t', indent - 1}@_html\n#{"#endif"}\n"
+			coffeeScript += "\n#{stimes '\t', indent}@_html = __r.o.join ''\n#{stimes '\t', indent - 1}if $el\n#{stimes '\t', indent}$el.html @_html\n#{stimes '\t', indent - 1}@_html\n"
 		coffeeScript
+
+	@load: (className, parent, args) ->
+		parts = className.split '_'
+		path = '../../_packs/' + (parts[0...(parts.length - 1)].join '/') + '/_smioctl_' + _.last parts
+		require path
+		ctor = smio['Packs_' + className]
+		new ctor null, parent, args
+		 
 #endif
+
 #if client
+	on: (eventName, handler) ->
+		if eventName
+			if _.isFunction handler
+				if not @eventHandlers[eventName]
+					@eventHandlers[eventName] = []
+				if 0 > _.indexOf @eventHandlers[eventName], handler
+					@eventHandlers[eventName].push handler
+			else if @eventHandlers[eventName]
+				for eh in @eventHandlers[eventName]
+					eh.apply @, handler
+
+	onLoad: () ->
+		prefix = "cscript:"
+		@el = $('#' + @id())
+		for id, ctl of @controls
+			ctl.onLoad()
+		if not @parent
+			$("a[href^='#{prefix}']").each (i, a) ->
+				try
+					a.href = 'javascript:' + ((CoffeeScript.compile a.href.substr prefix.length).split '\n').join ''
+				catch err
+					alert "CODE:#{(unescape a.href).substr prefix.length}:CODE"
+					a.href = "javascript:smio.client.socket.onError(\"#{err}\");"
+
+	onWindowResize: (width, height) ->
+
+	syncUpdate: (ctlDesc) ->
+
+	un: (eventName, handler) ->
+		if eventName and @eventHandlers[eventName] and _.isFunction handler
+			@eventHandlers[eventName] = _.without @eventHandlers[eventName], handler
+#endif
+
 	@tagRenderers:
 		"arg": (ctl, name) ->
 			ctl.args[name]
@@ -161,6 +202,7 @@ class smio.Packs_#{className} extends smio.Control
 			((CoffeeScript.compile name).split '\n').join ''
 
 	constructor: (@client, @parent, @args, @baseName, @className) ->
+		@isServer = not (@isClient = if @client then true else false)
 		@ctlID = @args.id
 		@controls = {}
 		@containers = {}
@@ -181,32 +223,6 @@ class smio.Packs_#{className} extends smio.Control
 			myID
 
 	init: ->
-
-	on: (eventName, handler) ->
-		if eventName
-			if _.isFunction handler
-				if not @eventHandlers[eventName]
-					@eventHandlers[eventName] = []
-				if 0 > _.indexOf @eventHandlers[eventName], handler
-					@eventHandlers[eventName].push handler
-			else if @eventHandlers[eventName]
-				for eh in @eventHandlers[eventName]
-					eh.apply @, handler
-
-	onLoad: () ->
-		prefix = "cscript:"
-		@el = $('#' + @id())
-		for id, ctl of @controls
-			ctl.onLoad()
-		if not @parent
-			$("a[href^='#{prefix}']").each (i, a) ->
-				try
-					a.href = 'javascript:' + ((CoffeeScript.compile a.href.substr prefix.length).split '\n').join ''
-				catch err
-					alert "CODE:#{(unescape a.href).substr prefix.length}:CODE"
-					a.href = "javascript:smio.client.socket.onError(\"#{err}\");"
-
-	onWindowResize: (width, height) ->
 
 	renderJsonTemplate: (tagKey, objTree, level) ->
 		buf = ''
@@ -278,25 +294,17 @@ class smio.Packs_#{className} extends smio.Control
 		else
 			"!!UNKNOWN_TAG::#{name}!!"
 
-	syncUpdate: (ctlDesc) ->
-
-	un: (eventName, handler) ->
-		if eventName and @eventHandlers[eventName] and _.isFunction handler
-			@eventHandlers[eventName] = _.without @eventHandlers[eventName], handler
-
-#endif
-
 	r: (name) ->
 		@res name
 
 	res: (name) ->
 		ret = ''
-		if (resSets = smio.resources)
+		if (resSets = (if @isClient then smio.resources else smio.inst.resourceSets))
 			parts = @baseName.split '_'
 			for i in [(parts.length - 1)..0]
-				if (resSet = resSets[parts[0..i].join '_']) and (ret = resSet[name])
+				if (resSet = resSets[parts[0..i].join '_']) and (ret = (if @isClient then resSet[name] else resSet['en'][name]))
 					break
 			if not ret
-				ret = smio.resources.smoothio[name]
+				ret = if @isClient then resSets.smoothio[name] else resSets.smoothio['en'][name]
 		if ret then ret else (if @parent then (@parent.res name) else "!!RES::#{name}!!")
 

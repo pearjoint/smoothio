@@ -25,6 +25,17 @@
       var cfgFilePath, dc, dep, dontCopy, lastFilePath, pack, _i, _j, _len, _len2, _ref;
       if ((!this.loaded) && (!(this.loadError != null))) {
         try {
+          this.inst.loadResourceSets(this.packPath, true, __bind(function(fpath, fname, relpath) {
+            var parts;
+            parts = [this.packName];
+            if (0 < relpath.indexOf('/')) {
+              parts.push(smio.Util.Array.removeLast(relpath.split('/')));
+            }
+            if (fname !== 'pack') {
+              parts.push(fname);
+            }
+            return parts.join('_');
+          }, this));
           dontCopy = ['*.config', '*.res'];
           smio.logit(this.inst.r('log_pack_loading', this.packName), 'packs.' + this.packName);
           lastFilePath = cfgFilePath = node_path.join(this.packPath, 'pack.config');
