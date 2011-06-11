@@ -13870,6 +13870,17 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       randomInt: function(max) {
         return Math.floor(Math.random() * (max + 1));
       },
+      smallest: function(arr) {
+        var n, num, _i, _len;
+        num = void 0;
+        for (_i = 0, _len = arr.length; _i < _len; _i++) {
+          n = arr[_i];
+          if ((!(num != null)) || (n < num)) {
+            num = n;
+          }
+        }
+        return num;
+      },
       tryParseInt: function(val, def) {
         var num;
         num = parseInt(val + '');
@@ -14148,6 +14159,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         div: {
           id: '',
           "class": "smio-slidepanel " + this.args["class"],
+          'div #scrollbox .smio-slidepanel-scrollbox': {
+            'ul #items': ul
+          },
           'div #edgeprev .smio-slidepanel-edge .smio-slidepanel-edge-left': {
             'div .smio-slidepanel-edge-arr .x9668': {
               text: [this.r('slidepanel_prev')]
@@ -14157,9 +14171,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
             'div .smio-slidepanel-edge-arr .x9658': {
               text: [this.r('slidepanel_next')]
             }
-          },
-          'div #scrollbox .smio-slidepanel-scrollbox': {
-            'ul #items': ul
           }
         }
       };
@@ -14167,6 +14178,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     Packs_Core_Controls_SlidePanel.prototype.init = function() {
       this.curItem = 0;
       this.items = [];
+      this.scrolling = false;
       Packs_Core_Controls_SlidePanel.__super__.init.call(this);
       if (this.args.onItemSelect && _.isFunction(this.args.onItemSelect)) {
         return this.on('itemSelect', this.args.onItemSelect);
@@ -14180,20 +14192,35 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       (this.edgeNext = $("#" + (this.id('edgenext')))).click(__bind(function() {
         return this.scrollTo(this.curItem + 1);
       }, this));
-      this.scrollBox = $("#" + (this.id('scrollbox')));
+      (this.scrollBox = $("#" + (this.id('scrollbox')))).scroll(_.debounce((__bind(function() {
+        if (!this.scrolling) {
+          return this.scrollTo(null, true);
+        }
+      }, this)), 250));
       return this.scrollTo(0, true);
     };
     Packs_Core_Controls_SlidePanel.prototype.onWindowResize = function(w, h) {
       return this.scrollTo(this.curItem, true);
     };
     Packs_Core_Controls_SlidePanel.prototype.scrollTo = function(item, force) {
+      var distances, i, scrollLefts, tmp, _ref;
+      if (item === null) {
+        scrollLefts = [];
+        distances = [];
+        for (i = 0, _ref = this.items.length; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
+          scrollLefts.push((tmp = this.scrollBox.scrollLeft() + $("#" + (this.id('items_' + this.items[i]))).position().left - this.edgePrev.width()));
+          distances.push(Math.abs(tmp - this.scrollBox.scrollLeft()));
+        }
+        item = distances.indexOf(smio.Util.Number.smallest(distances));
+      }
       if (_.isString(item)) {
         item = this.items.indexOf(item);
       }
       if (((item < 0) || (item >= this.items.length)) && force) {
         item = 0;
       }
-      if ((force || item !== this.curItem) && (item >= 0) && (item < this.items.length)) {
+      if ((force || item !== this.curItem) && (item >= 0) && (item < this.items.length) && !this.scrolling) {
+        this.scrolling = true;
         this.edgePrev.css({
           display: item === 0 ? 'none' : 'block'
         });
@@ -14203,7 +14230,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         this.on('itemSelect', [this.curItem = item, this.items[item]]);
         return morpheus.tween(250, (__bind(function(pos) {
           return this.scrollBox.scrollLeft(pos);
-        }, this)), (function() {}), null, this.scrollBox.scrollLeft(), this.scrollBox.scrollLeft() + $("#" + (this.id('items_' + this.items[item]))).position().left - this.edgePrev.width());
+        }, this)), (__bind(function() {
+          return this.scrolling = false;
+        }, this)), null, this.scrollBox.scrollLeft(), this.scrollBox.scrollLeft() + $("#" + (this.id('items_' + this.items[item]))).position().left - this.edgePrev.width());
       }
     };
     function Packs_Core_Controls_SlidePanel(client, parent, args) {
@@ -14352,17 +14381,25 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio.Packs_Core_Controls_Toggle = (function() {
     __extends(Packs_Core_Controls_Toggle, smio.Control);
     Packs_Core_Controls_Toggle.prototype.renderTemplate = function() {
-      var ret;
+      var ischk, ret;
+      ischk = this.isCheckBox();
       ret = {
         span: {
-          "class": "smio-toggleinput smio-toggleinput-" + (smio.iif(this.args.checked, '', 'un')) + "checked smio-toggleinput-" + (this.getSharedClass()),
+          "class": "smio-toggleinput smio-toggleinput-" + (smio.iif(ischk, 'checkbox', 'radio')) + " smio-toggleinput-" + (smio.iif(this.args.checked, '', 'un')) + "checked smio-toggleinput-" + (this.getSharedClass()),
           id: '',
           span: {
             "class": "smio-toggleinput-btnlabel",
             span: {
               id: 'btn',
-              href: smio.Control.util.jsVoid,
-              "class": 'smio-toggleinput-btn'
+              "class": 'smio-toggleinput-btn',
+              span: {
+                id: 'btnglyph',
+                "class": 'smio-toggleinput-btnbtn',
+                span: {
+                  id: 'glyph',
+                  "class": 'smio-toggleinput-btnglyph'
+                }
+              }
             }
           }
         }
@@ -14371,10 +14408,11 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         id: 'input',
         name: this.args.toggleName,
         "class": 'smio-toggleinput',
-        type: smio.iif(this.isCheckBox(), 'checkbox', 'radio')
+        type: smio.iif(ischk, 'checkbox', 'radio')
       };
       if (this.args.checked) {
         ret.span.span.span.input.checked = 'checked';
+        ret.span.span.span.span.span.html = ['&#x2714;'];
       }
       if (this.args.labelText || this.args.labelHtml) {
         ret.span.span.label = {
@@ -14403,6 +14441,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         nuCls = smio.iif(this.val, 'smio-toggleinput-checked', 'smio-toggleinput-unchecked');
         unCls = smio.iif(this.val, 'smio-toggleinput-unchecked', 'smio-toggleinput-checked');
         this.el.removeClass(unCls).addClass(nuCls);
+        $("#" + (this.id('glyph'))).html(smio.iif(this.val, '&#x2714;', ''));
         if (!passive) {
           return $(".smio-toggleinput-" + (this.getSharedClass()) + " input.smio-toggleinput").each(__bind(function(i, e) {
             var ctl;
@@ -14480,14 +14519,16 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                       type: 'password'
                     },
                     "span .smio-setup-stepbox-form-label": {
-                      html: ['The Site owner specified above is:']
+                      html: ['The Hub owner specified above is:']
                     },
                     "Toggle #owner_login": {
                       labelHtml: this.r('owner_login', 'localhost'),
                       toggleName: 'owner_toggle',
-                      checked: true
+                      checked: true,
+                      type: 'checkbox'
                     },
                     "Toggle #owner_create": {
+                      type: 'checkbox',
                       labelHtml: this.r('owner_create', 'localhost'),
                       toggleName: 'owner_toggle'
                     }
@@ -14496,7 +14537,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                 "template": {
                   "div .smio-setup-stepbox-title": [this.r('steptitle_template')],
                   "div .smio-setup-stepbox-form": {
-                    html: ['boar<br/>blaa<br/><br/>foo<br/><br/>yeah right']
+                    text: ['Hub templates are not yet available.']
                   }
                 },
                 "finish": {

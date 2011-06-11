@@ -149,6 +149,10 @@ body {
   overflow: hidden;
 }
 .smio-blocking-overlay {
+  -moz-transition: all 4s;
+  -webkit-transition: all 4s;
+  -o-transition: all 4s;
+  transition: all 4s;
   display: none;
   background: rgba(0,0,0,0.6);
   position: fixed;
@@ -168,9 +172,39 @@ body {
 
 /** server/pub/_packs/Core/Controls/Toggle.css **/
 .smio-toggleinput-btn {
+  position: relative;
   display: inline;
-  padding: 0;
+  padding: 0 0.4em 0 0;
   margin: 0;
+}
+.smio-toggleinput-btnbtn {
+  display: inline-block;
+  vertical-align: top;
+  background: #f0f0f0;
+  border: 0.094em outset #ccc;
+  width: 0.9em;
+  height: 0.9em;
+  position: relative;
+  left: 0.2em;
+  top: 0.1em;
+  -webkit-border-radius: 0.2em;
+  -moz-border-radius: 0.2em;
+  border-radius: 0.2em;
+}
+.smio-toggleinput-btnglyph {
+  font-size: 1.25em;
+  position: absolute;
+  top: -0.25em;
+  left: -0.05em;
+  color: #30a060;
+}
+.smio-toggleinput-radio .smio-toggleinput-btnbtn {
+  -webkit-border-radius: 1em;
+  -moz-border-radius: 1em;
+  border-radius: 1em;
+}
+.smio-toggleinput-checked .smio-toggleinput-btnbtn {
+  border: 0.094em inset #ccc;
 }
 input.smio-toggleinput {
   opacity: 0;
@@ -256,20 +290,26 @@ input.smio-textinput:focus {
 /** server/pub/_packs/Core/Controls/SlidePanel.css **/
 div.smio-slidepanel {
   position: relative;
+  overflow: hidden;
+  white-space: nowrap;
 }
 div.smio-slidepanel-scrollbox {
-  overflow: hidden;
   white-space: nowrap;
+  overflow: auto;
+  position: relative;
+  width: 100%;
+  left: 0;
+  top: 2em;
 }
 div.smio-slidepanel-edge {
-  overflow: hidden;
-  white-space: nowrap;
   cursor: pointer;
   text-align: center;
   position: absolute;
   top: 0.25em;
   bottom: 0.15em;
   width: 3em;
+  overflow: hidden;
+  white-space: nowrap;
 }
 .smio-slidepanel-edge-arr {
   padding: 0.1em;
@@ -396,7 +436,7 @@ div.smio-setup {
   letter-spacing: -0.05em;
 }
 .smio-setup-stepslide > .smio-setup-stepbox {
-  padding: 1em 0 1em 0;
+  padding: 0 0 3em 0;
   width: 70%;
 }
 .smio-setup-stepslide .smio-slidepanel-edge {
@@ -437,14 +477,14 @@ div.smio-setup {
   -webkit-transition: background 0.5s;
   -o-transition: background 0.5s;
   transition: background 0.5s;
-  -webkit-border-radius: 1em;
-  -moz-border-radius: 1em;
-  border-radius: 1em;
+  -webkit-border-radius: 0.33em;
+  -moz-border-radius: 0.33em;
+  border-radius: 0.33em;
 }
 .smio-setup-stepbox-form span.smio-toggleinput-unchecked span.smio-toggleinput-btnlabel:hover {
-  -moz-box-shadow: 0 0.066em 0.3em #606060 inset;
-  -webkit-box-shadow: 0 0.066em 0.3em #606060 inset;
-  box-shadow: 0 0.066em 0.3em #606060 inset;
+  -moz-box-shadow: 0 0.07em 0.28em #909090 inset;
+  -webkit-box-shadow: 0 0.07em 0.28em #909090 inset;
+  box-shadow: 0 0.07em 0.28em #909090 inset;
   background: rgba(0,0,0,0.1);
 }
 .smio-setup-stepbox-form span.smio-toggleinput-checked {
@@ -452,7 +492,6 @@ div.smio-setup {
 }
 .smio-setup-stepbox-form span.smio-toggleinput-unchecked {
   color: #a0a0a0;
-  text-decoration: line-through;
 }
 .smio-setup-stepbox-form span.smio-textinput input.smio-textinput {
   width: 100%;

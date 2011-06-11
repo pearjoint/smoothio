@@ -7,15 +7,21 @@ $slide-edge-dark = 0.65
 
 div.smio-slidepanel
 	position relative
+	smio-nooverflow-nowrap()
 
 div.smio-slidepanel-scrollbox
-	smio-nooverflow-nowrap()
+	white-space nowrap
+	overflow auto
+	position relative
+	width 100%
+	left 0
+	top 2em
 
 div.smio-slidepanel-edge
-	smio-nooverflow-nowrap()
 	cursor pointer
 	text-align center
 	smio-posabs-tbw 0.25em 0.15em 3em
+	smio-nooverflow-nowrap()
 
 .smio-slidepanel-edge-arr
 	padding 0.1em

@@ -148,6 +148,10 @@ body {
   overflow: hidden;
 }
 .smio-blocking-overlay {
+  -moz-transition: all 4s;
+  -webkit-transition: all 4s;
+  -o-transition: all 4s;
+  transition: all 4s;
   display: none;
   background: rgba(0,0,0,0.6);
   position: fixed;

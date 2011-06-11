@@ -43,19 +43,21 @@ class smio.Packs_Core_ServerSetup_InitialSiteSetup extends smio.Control
 									labelText: @r 'owner_pass'
 									type: 'password'
 								"span .smio-setup-stepbox-form-label":
-									html: ['The Site owner specified above is:']
+									html: ['The Hub owner specified above is:']
 								"Toggle #owner_login":
 									labelHtml: @r 'owner_login', 'localhost'
 									toggleName: 'owner_toggle'
 									checked: true
+									type: 'checkbox'
 								"Toggle #owner_create":
+									type: 'checkbox'
 									labelHtml: @r 'owner_create', 'localhost'
 									toggleName: 'owner_toggle'
 						"template":
 							"div .smio-setup-stepbox-title":
 								[@r 'steptitle_template']
 							"div .smio-setup-stepbox-form":
-								html: ['boar<br/>blaa<br/><br/>foo<br/><br/>yeah right']
+								text: ['Hub templates are not yet available.']
 						"finish":
 							"div .smio-setup-stepbox-title":
 								[@r 'steptitle_finish']

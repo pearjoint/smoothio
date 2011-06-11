@@ -1,7 +1,37 @@
 .smio-toggleinput-btn {
+  position: relative;
   display: inline;
-  padding: 0;
+  padding: 0 0.4em 0 0;
   margin: 0;
+}
+.smio-toggleinput-btnbtn {
+  display: inline-block;
+  vertical-align: top;
+  background: #f0f0f0;
+  border: 0.094em outset #ccc;
+  width: 0.9em;
+  height: 0.9em;
+  position: relative;
+  left: 0.2em;
+  top: 0.1em;
+  -webkit-border-radius: 0.2em;
+  -moz-border-radius: 0.2em;
+  border-radius: 0.2em;
+}
+.smio-toggleinput-btnglyph {
+  font-size: 1.25em;
+  position: absolute;
+  top: -0.25em;
+  left: -0.05em;
+  color: #30a060;
+}
+.smio-toggleinput-radio .smio-toggleinput-btnbtn {
+  -webkit-border-radius: 1em;
+  -moz-border-radius: 1em;
+  border-radius: 1em;
+}
+.smio-toggleinput-checked .smio-toggleinput-btnbtn {
+  border: 0.094em inset #ccc;
 }
 input.smio-toggleinput {
   opacity: 0;

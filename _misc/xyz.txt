@@ -1,7 +1,12 @@
+USE CASES
 http://successfulsoftware.net/2011/06/08/3-low-competition-niches-in-retail-software/
 
+UI
 dribble.com
 github
 
+CSS
 http://dev.ajcates.com/css3-playground/
 
+DINGBATS
+http://www.danshort.com/HTMLentities/index.php?w=dingb

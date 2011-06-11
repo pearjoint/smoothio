@@ -15,17 +15,25 @@
   smio.Packs_Core_Controls_Toggle = (function() {
     __extends(Packs_Core_Controls_Toggle, smio.Control);
     Packs_Core_Controls_Toggle.prototype.renderTemplate = function() {
-      var ret;
+      var ischk, ret;
+      ischk = this.isCheckBox();
       ret = {
         span: {
-          "class": "smio-toggleinput smio-toggleinput-" + (smio.iif(this.args.checked, '', 'un')) + "checked smio-toggleinput-" + (this.getSharedClass()),
+          "class": "smio-toggleinput smio-toggleinput-" + (smio.iif(ischk, 'checkbox', 'radio')) + " smio-toggleinput-" + (smio.iif(this.args.checked, '', 'un')) + "checked smio-toggleinput-" + (this.getSharedClass()),
           id: '',
           span: {
             "class": "smio-toggleinput-btnlabel",
             span: {
               id: 'btn',
-              href: smio.Control.util.jsVoid,
-              "class": 'smio-toggleinput-btn'
+              "class": 'smio-toggleinput-btn',
+              span: {
+                id: 'btnglyph',
+                "class": 'smio-toggleinput-btnbtn',
+                span: {
+                  id: 'glyph',
+                  "class": 'smio-toggleinput-btnglyph'
+                }
+              }
             }
           }
         }
@@ -34,10 +42,11 @@
         id: 'input',
         name: this.args.toggleName,
         "class": 'smio-toggleinput',
-        type: smio.iif(this.isCheckBox(), 'checkbox', 'radio')
+        type: smio.iif(ischk, 'checkbox', 'radio')
       };
       if (this.args.checked) {
         ret.span.span.span.input.checked = 'checked';
+        ret.span.span.span.span.span.html = ['&#x2714;'];
       }
       if (this.args.labelText || this.args.labelHtml) {
         ret.span.span.label = {
@@ -66,6 +75,7 @@
         nuCls = smio.iif(this.val, 'smio-toggleinput-checked', 'smio-toggleinput-unchecked');
         unCls = smio.iif(this.val, 'smio-toggleinput-unchecked', 'smio-toggleinput-checked');
         this.el.removeClass(unCls).addClass(nuCls);
+        $("#" + (this.id('glyph'))).html(smio.iif(this.val, '&#x2714;', ''));
         if (!passive) {
           return $(".smio-toggleinput-" + (this.getSharedClass()) + " input.smio-toggleinput").each(__bind(function(i, e) {
             var ctl;

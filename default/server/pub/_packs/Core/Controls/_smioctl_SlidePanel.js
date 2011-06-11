@@ -36,6 +36,9 @@
         div: {
           id: '',
           "class": "smio-slidepanel " + this.args["class"],
+          'div #scrollbox .smio-slidepanel-scrollbox': {
+            'ul #items': ul
+          },
           'div #edgeprev .smio-slidepanel-edge .smio-slidepanel-edge-left': {
             'div .smio-slidepanel-edge-arr .x9668': {
               text: [this.r('slidepanel_prev')]
@@ -45,9 +48,6 @@
             'div .smio-slidepanel-edge-arr .x9658': {
               text: [this.r('slidepanel_next')]
             }
-          },
-          'div #scrollbox .smio-slidepanel-scrollbox': {
-            'ul #items': ul
           }
         }
       };
@@ -55,6 +55,7 @@
     Packs_Core_Controls_SlidePanel.prototype.init = function() {
       this.curItem = 0;
       this.items = [];
+      this.scrolling = false;
       Packs_Core_Controls_SlidePanel.__super__.init.call(this);
       if (this.args.onItemSelect && _.isFunction(this.args.onItemSelect)) {
         return this.on('itemSelect', this.args.onItemSelect);
@@ -68,20 +69,35 @@
       (this.edgeNext = $("#" + (this.id('edgenext')))).click(__bind(function() {
         return this.scrollTo(this.curItem + 1);
       }, this));
-      this.scrollBox = $("#" + (this.id('scrollbox')));
+      (this.scrollBox = $("#" + (this.id('scrollbox')))).scroll(_.debounce((__bind(function() {
+        if (!this.scrolling) {
+          return this.scrollTo(null, true);
+        }
+      }, this)), 250));
       return this.scrollTo(0, true);
     };
     Packs_Core_Controls_SlidePanel.prototype.onWindowResize = function(w, h) {
       return this.scrollTo(this.curItem, true);
     };
     Packs_Core_Controls_SlidePanel.prototype.scrollTo = function(item, force) {
+      var distances, i, scrollLefts, tmp, _ref;
+      if (item === null) {
+        scrollLefts = [];
+        distances = [];
+        for (i = 0, _ref = this.items.length; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
+          scrollLefts.push((tmp = this.scrollBox.scrollLeft() + $("#" + (this.id('items_' + this.items[i]))).position().left - this.edgePrev.width()));
+          distances.push(Math.abs(tmp - this.scrollBox.scrollLeft()));
+        }
+        item = distances.indexOf(smio.Util.Number.smallest(distances));
+      }
       if (_.isString(item)) {
         item = this.items.indexOf(item);
       }
       if (((item < 0) || (item >= this.items.length)) && force) {
         item = 0;
       }
-      if ((force || item !== this.curItem) && (item >= 0) && (item < this.items.length)) {
+      if ((force || item !== this.curItem) && (item >= 0) && (item < this.items.length) && !this.scrolling) {
+        this.scrolling = true;
         this.edgePrev.css({
           display: item === 0 ? 'none' : 'block'
         });
@@ -91,7 +107,9 @@
         this.on('itemSelect', [this.curItem = item, this.items[item]]);
         return morpheus.tween(250, (__bind(function(pos) {
           return this.scrollBox.scrollLeft(pos);
-        }, this)), (function() {}), null, this.scrollBox.scrollLeft(), this.scrollBox.scrollLeft() + $("#" + (this.id('items_' + this.items[item]))).position().left - this.edgePrev.width());
+        }, this)), (__bind(function() {
+          return this.scrolling = false;
+        }, this)), null, this.scrollBox.scrollLeft(), this.scrollBox.scrollLeft() + $("#" + (this.id('items_' + this.items[item]))).position().left - this.edgePrev.width());
       }
     };
     function Packs_Core_Controls_SlidePanel(client, parent, args) {

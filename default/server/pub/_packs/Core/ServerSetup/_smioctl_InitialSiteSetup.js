@@ -40,14 +40,16 @@
                       type: 'password'
                     },
                     "span .smio-setup-stepbox-form-label": {
-                      html: ['The Site owner specified above is:']
+                      html: ['The Hub owner specified above is:']
                     },
                     "Toggle #owner_login": {
                       labelHtml: this.r('owner_login', 'localhost'),
                       toggleName: 'owner_toggle',
-                      checked: true
+                      checked: true,
+                      type: 'checkbox'
                     },
                     "Toggle #owner_create": {
+                      type: 'checkbox',
                       labelHtml: this.r('owner_create', 'localhost'),
                       toggleName: 'owner_toggle'
                     }
@@ -56,7 +58,7 @@
                 "template": {
                   "div .smio-setup-stepbox-title": [this.r('steptitle_template')],
                   "div .smio-setup-stepbox-form": {
-                    html: ['boar<br/>blaa<br/><br/>foo<br/><br/>yeah right']
+                    text: ['Hub templates are not yet available.']
                   }
                 },
                 "finish": {
