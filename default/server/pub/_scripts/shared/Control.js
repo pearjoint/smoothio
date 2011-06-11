@@ -1,6 +1,6 @@
 (function() {
   var smio;
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var __slice = Array.prototype.slice, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   smio = global.smoothio;
   smio.Control = (function() {
     Control.prototype.on = function(eventName, handler) {
@@ -51,14 +51,18 @@
         return this.eventHandlers[eventName] = _.without(this.eventHandlers[eventName], handler);
       }
     };
+    Control.util = {
+      jsVoid: 'javascript:void(0);'
+    };
     Control.tagRenderers = {
       "arg": function(ctl, name) {
         return ctl.args[name];
       },
       "ctl": function(ctl, className, args, emptyIfMissing) {
-        var ctor;
+        var ctor, subCtl;
         if ((!ctl.controls[args.id]) && ((ctor = smio['Packs_' + ctl.baseName + '_' + className]) || (ctor = smio['Packs_' + ctl.baseName + '_Controls_' + className]) || (ctor = smio['Packs_Core_Controls_' + className]))) {
-          ctl.client.allControls[args.id] = ctl.controls[args.id] = new ctor(ctl.client, ctl, args);
+          subCtl = new ctor(ctl.client, ctl, args);
+          ctl.client.allControls[subCtl.id()] = ctl.controls[args.id] = subCtl;
         }
         if (ctl.controls[args.id]) {
           return ctl.controls[args.id].renderHtml();
@@ -87,8 +91,10 @@
         }
         return o.join('');
       },
-      "r": function(ctl, name) {
-        return ctl.res.apply(ctl, [name]);
+      "r": function() {
+        var args, ctl, name;
+        ctl = arguments[0], name = arguments[1], args = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
+        return ctl.res.apply(ctl, (_.toArray(arguments)).slice(1, arguments.length));
       },
       "tojs": function(ctl, name, args) {
         var pn, pv;
@@ -139,6 +145,7 @@
       buf = '';
       toHtml = smio.Util.String.htmlEncode;
       toAtt = __bind(function(an, av) {
+        av = "" + av;
         return " " + an + "=\"" + (toHtml(an === 'id' ? this.id(av) : av)) + "\"";
       }, this);
       if (!level) {
@@ -233,11 +240,14 @@
         return "!!UNKNOWN_TAG::" + name + "!!";
       }
     };
-    Control.prototype.r = function(name) {
-      return this.res(name);
+    Control.prototype.r = function() {
+      var args, name;
+      name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      return this.res.apply(this, _.toArray(arguments));
     };
-    Control.prototype.res = function(name) {
-      var i, parts, resSet, resSets, ret, _ref;
+    Control.prototype.res = function() {
+      var args, i, name, parts, resSet, resSets, ret, _ref;
+      name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       ret = '';
       if ((resSets = (this.isClient ? smio.resources : smio.inst.resourceSets))) {
         parts = this.baseName.split('_');
@@ -251,7 +261,11 @@
         }
       }
       if (ret) {
-        return ret;
+        if (args.length) {
+          return _.sprintf.apply(_, [ret].concat(__slice.call(args)));
+        } else {
+          return ret;
+        }
       } else {
         if (this.parent) {
           return this.parent.res(name);

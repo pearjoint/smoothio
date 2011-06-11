@@ -1,0 +1,17 @@
+.smio-toggleinput-btn {
+  display: inline;
+  padding: 0;
+  margin: 0;
+}
+input.smio-toggleinput {
+  opacity: 0;
+}
+label.smio-toggleinput {
+  padding-left: 0.5em;
+}
+.smio-toggleinput-unchecked .smio-toggleinput-btn {
+  xbackground: #00f;
+}
+.smio-toggleinput-checked .smio-toggleinput-btn {
+  xbackground: #008000;
+}

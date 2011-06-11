@@ -172,12 +172,15 @@ class smio.Packs_#{className} extends smio.Control
 			@eventHandlers[eventName] = _.without @eventHandlers[eventName], handler
 #endif
 
+	@util:
+		jsVoid: 'javascript:void(0);'
 	@tagRenderers:
 		"arg": (ctl, name) ->
 			ctl.args[name]
 		"ctl": (ctl, className, args, emptyIfMissing) ->
 			if (not ctl.controls[args.id]) and ((ctor = smio['Packs_' + ctl.baseName + '_' + className]) or (ctor = smio['Packs_' + ctl.baseName + '_Controls_' + className]) or (ctor = smio['Packs_Core_Controls_' + className] ))
-				ctl.client.allControls[args.id] = ctl.controls[args.id] = new ctor ctl.client, ctl, args
+				subCtl = new ctor ctl.client, ctl, args
+				ctl.client.allControls[subCtl.id()] = ctl.controls[args.id] = subCtl
 			if ctl.controls[args.id]
 				ctl.controls[args.id].renderHtml()
 			else if ctl.ctlRenderers[className]
@@ -194,8 +197,8 @@ class smio.Packs_#{className} extends smio.Control
 					else
 						o.push ctl.renderTag tmp.t, tmp.s, tmp.a
 			o.join ''
-		"r": (ctl, name) ->
-			ctl.res.apply ctl, [name]
+		"r": (ctl, name, args...) ->
+			ctl.res.apply ctl, (_.toArray arguments)[1...arguments.length]
 		"tojs": (ctl, name, args) ->
 			for pn, pv of args
 				name = name.replace pn, pv
@@ -229,6 +232,7 @@ class smio.Packs_#{className} extends smio.Control
 		buf = ''
 		toHtml = smio.Util.String.htmlEncode
 		toAtt = (an, av) =>
+			av = "#{av}"
 			" #{an}=\"#{toHtml if (an is 'id') then (@id av) else av}\""
 		if not level
 			level = 0
@@ -295,10 +299,10 @@ class smio.Packs_#{className} extends smio.Control
 		else
 			"!!UNKNOWN_TAG::#{name}!!"
 
-	r: (name) ->
-		@res name
+	r: (name, args...) ->
+		@res.apply @, _.toArray arguments
 
-	res: (name) ->
+	res: (name, args...) ->
 		ret = ''
 		if (resSets = (if @isClient then smio.resources else smio.inst.resourceSets))
 			parts = @baseName.split '_'
@@ -307,5 +311,5 @@ class smio.Packs_#{className} extends smio.Control
 					break
 			if not ret
 				ret = if @isClient then resSets.smoothio[name] else resSets.smoothio['en'][name]
-		if ret then ret else (if @parent then (@parent.res name) else "!!RES::#{name}!!")
+		if ret then (if args.length then (_.sprintf.apply _, [ret, args...]) else ret) else (if @parent then (@parent.res name) else "!!RES::#{name}!!")
 

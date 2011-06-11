@@ -12710,7 +12710,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 // Documentation: https://github.com/edtsech/underscore.string
 // Some code is borrowed from MooTools and Alexandru Marasteanu.
 
-// Version 1.0.0
+// Version 1.1.5
 
 (function(){
     // ------------------------- Baseline setup ---------------------------------
@@ -12719,6 +12719,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     var root = this;
 
     var nativeTrim = String.prototype.trim;
+
+    var parseNumber = function(source) { return source * 1 || 0; };
 
     function str_repeat(i, m) {
         for (var o = []; m > 0; o[--m] = i);
@@ -12756,10 +12758,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
             return _s.strip(str.replace(/\s+/g, ' '));
         },
 
-        isContains: function(str, needle){
-            return str.indexOf(needle) !== -1;
-        },
-
         count: function(str, substr){
             var count = 0, index;
             for (var i=0; i < str.length;) {
@@ -12770,12 +12768,18 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
             return count;
         },
 
+        chars: function(str) {
+            return str.split('');
+        },
+
         escapeHTML: function(str) {
-            return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                                  .replace(/"/g, '&quot;').replace(/'/g, "&apos;");
         },
 
         unescapeHTML: function(str) {
-            return String(str||'').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+            return String(str||'').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+                                  .replace(/&quot;/g, '"').replace(/&apos;/g, "'");
         },
 
         escapeRegExp: function(str){
@@ -12787,6 +12791,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
             var arr = str.split('');
             arr.splice(i, 0, substr);
             return arr.join('');
+        },
+
+        includes: function(str, needle){
+            return str.indexOf(needle) !== -1;
         },
 
         join: function(sep) {
@@ -12803,9 +12811,13 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
             return str;
         },
 
-        reverse: function(str){
-            return Array.prototype.reverse.apply(str.split('')).join('');
+        lines: function(str) {
+            return str.split("\n");
         },
+
+//        reverse: function(str){
+//            return Array.prototype.reverse.apply(str.split('')).join('');
+//        },
 
         splice: function(str, i, howmany, substr){
             var arr = str.split('');
@@ -12813,11 +12825,11 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
             return arr.join('');
         },
 
-        isStartsWith: function(str, starts){
+        startsWith: function(str, starts){
             return str.length >= starts.length && str.substring(0, starts.length) === starts;
         },
 
-        isEndsWith: function(str, ends){
+        endsWith: function(str, ends){
             return str.length >= ends.length && str.substring(str.length - ends.length) === ends;
         },
 
@@ -12836,6 +12848,20 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                 i+1 === arr.length ? arr[i] = word.join('') : arr[i] = word.join('') + ' ';
             }
             return arr.join('');
+        },
+
+        camelize: function(str){
+          return _s.trim(str).replace(/(\-|_|\s)+(.)?/g, function(match, separator, chr) {
+            return chr ? chr.toUpperCase() : '';
+          });
+        },
+
+        underscored: function(str){
+          return _s.trim(str).replace(/([a-z\d])([A-Z]+)/g, '$1_$2').replace(/\-|\s+/g, '_').toLowerCase();
+        },
+
+        dasherize: function(str){
+          return _s.trim(str).replace(/([a-z\d])([A-Z]+)/g, '$1-$2').replace(/^([A-Z]+)/, '-$1').replace(/\_|\s+/g, '-').toLowerCase();
         },
 
         trim: function(str, characters){
@@ -12860,6 +12886,54 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
             truncateStr = truncateStr || '...';
             return str.slice(0,length) + truncateStr;
         },
+
+        words: function(str, delimiter) {
+            delimiter = delimiter || " ";
+            return str.split(delimiter);
+        },
+
+
+        pad: function(str, length, padStr, type) {
+
+            var padding = '';
+            var padlen  = 0;
+
+            if (!padStr) { padStr = ' '; }
+            else if (padStr.length > 1) { padStr = padStr[0]; }
+            switch(type) {
+                case "right":
+                    padlen = (length - str.length);
+                    padding = str_repeat(padStr, padlen);
+                    str = str+padding;
+                    break;
+                case "both":
+                    padlen = (length - str.length);
+                    padding = {
+                        'left' : str_repeat(padStr, Math.ceil(padlen/2)),
+                        'right': str_repeat(padStr, Math.floor(padlen/2))
+                    };
+                    str = padding.left+str+padding.right;
+                    break;
+                default: // "left"
+                    padlen = (length - str.length);
+                    padding = str_repeat(padStr, padlen);;
+                    str = padding+str;
+            }
+            return str;
+        },
+
+        lpad: function(str, length, padStr) {
+            return _s.pad(str, length, padStr);
+        },
+
+        rpad: function(str, length, padStr) {
+            return _s.pad(str, length, padStr, 'right');
+        },
+
+        lrpad: function(str, length, padStr) {
+            return _s.pad(str, length, padStr, 'both');
+        },
+
 
         /**
          * Credits for this function goes to
@@ -12909,34 +12983,42 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                 f = f.substring(m[0].length);
             }
             return o.join('');
-        }
-    }
+        },
+
+        toNumber: function(str, decimals) {
+           return parseNumber(parseNumber(str).toFixed(parseNumber(decimals)));
+         },
+
+         strRight: function(sourceStr, sep){
+           var pos =  (!sep) ? -1 : sourceStr.indexOf(sep);
+           return (pos != -1) ? sourceStr.slice(pos+sep.length, sourceStr.length) : sourceStr;
+         },
+
+         strRightBack: function(sourceStr, sep){
+           var pos =  (!sep) ? -1 : sourceStr.lastIndexOf(sep);
+           return (pos != -1) ? sourceStr.slice(pos+sep.length, sourceStr.length) : sourceStr;
+         },
+
+         strLeft: function(sourceStr, sep){
+           var pos = (!sep) ? -1 : sourceStr.indexOf(sep);
+           return (pos != -1) ? sourceStr.slice(0, pos) : sourceStr;
+         },
+
+         strLeftBack: function(sourceStr, sep){
+           var pos = sourceStr.lastIndexOf(sep);
+           return (pos != -1) ? sourceStr.slice(0, pos) : sourceStr;
+         }
+
+    };
 
     // Aliases
 
-    _s.strip      = _s.trim;
-    _s.lstrip     = _s.ltrim;
-    _s.rstrip     = _s.rtrim;
-    _s.isIncludes = _s.isContains;
-
-    var depricatedAlias = function (funName, oldName) {
-        _s[oldName] = function () {
-            if (typeof console != 'undefined' && typeof console.log != 'undefined')
-                console.log(
-                    'Deprication warning: use "' + funName + '" instead "' + oldName + '". ' +
-                    '"' + oldName + '" will be removed after "undescore.string" 1.1'
-                );
-
-            return _s[funName].apply(_s, arguments);
-        };
-    };
-
-    depricatedAlias('isStartsWith', 'startsWith');
-    depricatedAlias('isEndsWith',   'endsWith');
-    depricatedAlias('isContains',   'contains');
-    depricatedAlias('isBlank',      'blank');
-
-    depricatedAlias('isIncludes',   'includes');
+    _s.strip  = _s.trim;
+    _s.lstrip = _s.ltrim;
+    _s.rstrip = _s.rtrim;
+    _s.center = _s.lrpad;
+    _s.ljust  = _s.lpad;
+    _s.rjust  = _s.rpad;
 
     // CommonJS module is defined
     if (typeof window === 'undefined' && typeof module !== 'undefined') {
@@ -13198,7 +13280,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         data = textStatus;
       }
       if (msg && (!data) && _.isString(msg)) {
-        if (_.isStartsWith(msg, '{')) {
+        if (_.startsWith(msg, '{')) {
           try {
             data = JSON.parse(msg);
           } catch (err) {
@@ -13295,7 +13377,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 /** server/pub/_scripts/shared/Control.js **/
 (function() {
   var smio;
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var __slice = Array.prototype.slice, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   smio = global.smoothio;
   smio.Control = (function() {
     Control.prototype.on = function(eventName, handler) {
@@ -13346,14 +13428,18 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         return this.eventHandlers[eventName] = _.without(this.eventHandlers[eventName], handler);
       }
     };
+    Control.util = {
+      jsVoid: 'javascript:void(0);'
+    };
     Control.tagRenderers = {
       "arg": function(ctl, name) {
         return ctl.args[name];
       },
       "ctl": function(ctl, className, args, emptyIfMissing) {
-        var ctor;
+        var ctor, subCtl;
         if ((!ctl.controls[args.id]) && ((ctor = smio['Packs_' + ctl.baseName + '_' + className]) || (ctor = smio['Packs_' + ctl.baseName + '_Controls_' + className]) || (ctor = smio['Packs_Core_Controls_' + className]))) {
-          ctl.client.allControls[args.id] = ctl.controls[args.id] = new ctor(ctl.client, ctl, args);
+          subCtl = new ctor(ctl.client, ctl, args);
+          ctl.client.allControls[subCtl.id()] = ctl.controls[args.id] = subCtl;
         }
         if (ctl.controls[args.id]) {
           return ctl.controls[args.id].renderHtml();
@@ -13382,8 +13468,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         }
         return o.join('');
       },
-      "r": function(ctl, name) {
-        return ctl.res.apply(ctl, [name]);
+      "r": function() {
+        var args, ctl, name;
+        ctl = arguments[0], name = arguments[1], args = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
+        return ctl.res.apply(ctl, (_.toArray(arguments)).slice(1, arguments.length));
       },
       "tojs": function(ctl, name, args) {
         var pn, pv;
@@ -13434,6 +13522,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       buf = '';
       toHtml = smio.Util.String.htmlEncode;
       toAtt = __bind(function(an, av) {
+        av = "" + av;
         return " " + an + "=\"" + (toHtml(an === 'id' ? this.id(av) : av)) + "\"";
       }, this);
       if (!level) {
@@ -13528,11 +13617,14 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         return "!!UNKNOWN_TAG::" + name + "!!";
       }
     };
-    Control.prototype.r = function(name) {
-      return this.res(name);
+    Control.prototype.r = function() {
+      var args, name;
+      name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      return this.res.apply(this, _.toArray(arguments));
     };
-    Control.prototype.res = function(name) {
-      var i, parts, resSet, resSets, ret, _ref;
+    Control.prototype.res = function() {
+      var args, i, name, parts, resSet, resSets, ret, _ref;
+      name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       ret = '';
       if ((resSets = (this.isClient ? smio.resources : smio.inst.resourceSets))) {
         parts = this.baseName.split('_');
@@ -13546,7 +13638,11 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         }
       }
       if (ret) {
-        return ret;
+        if (args.length) {
+          return _.sprintf.apply(_, [ret].concat(__slice.call(args)));
+        } else {
+          return ret;
+        }
       } else {
         if (this.parent) {
           return this.parent.res(name);
@@ -13928,14 +14024,18 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio.Packs_Core_Controls_LinkButton = (function() {
     __extends(Packs_Core_Controls_LinkButton, smio.Control);
     Packs_Core_Controls_LinkButton.prototype.renderTemplate = function() {
-      return {
+      var ret;
+      ret = {
         a: {
           id: '',
           "class": this.args["class"] || '',
-          href: this.args.href || 'javascript:void(0);',
-          _: [this.args.label]
+          href: this.args.href || smio.Control.util.jsVoid
         }
       };
+      if (this.args.labelText) {
+        ret.a.text = [this.args.labelText];
+      }
+      return ret;
     };
     Packs_Core_Controls_LinkButton.prototype.onLoad = function() {
       Packs_Core_Controls_LinkButton.__super__.onLoad.call(this);
@@ -14149,7 +14249,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         tab = _ref[_i];
         ret.div["LinkButton #" + tab + " ." + this.args.tabClass + " ." + (this.args.tabClass + (is1st ? '-active' : '-inactive'))] = {
-          label: [this.r(this.args.resPrefix + tab)],
+          labelText: [this.r(this.args.resPrefix + tab)],
           onClick: makeOnClick(tab)
         };
         is1st = false;
@@ -14218,6 +14318,12 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         "class": 'smio-textinput',
         type: this.args.type === 'password' ? 'password' : 'text'
       };
+      if (this.args.value) {
+        ret.span.input.value = this.args.value;
+      }
+      if (this.args.nospellcheck) {
+        ret.span.input.spellcheck = false;
+      }
       return ret;
     };
     function Packs_Core_Controls_TextInput(client, parent, args) {
@@ -14241,7 +14347,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     child.prototype = new ctor;
     child.__super__ = parent.prototype;
     return child;
-  };
+  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   smio = smoothio = global.smoothio;
   smio.Packs_Core_Controls_Toggle = (function() {
     __extends(Packs_Core_Controls_Toggle, smio.Control);
@@ -14249,25 +14355,78 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       var ret;
       ret = {
         span: {
-          "class": 'smio-toggleinput',
-          id: ''
+          "class": "smio-toggleinput smio-toggleinput-" + (smio.iif(this.args.checked, '', 'un')) + "checked smio-toggleinput-" + (this.getSharedClass()),
+          id: '',
+          span: {
+            "class": "smio-toggleinput-btnlabel",
+            span: {
+              id: 'btn',
+              href: smio.Control.util.jsVoid,
+              "class": 'smio-toggleinput-btn'
+            }
+          }
         }
       };
-      ret.span.input = {
+      ret.span.span.span.input = {
         id: 'input',
         name: this.args.toggleName,
         "class": 'smio-toggleinput',
-        disabled: 'disabled',
-        type: this.args.type === 'checkbox' ? 'checkbox' : 'radio'
+        type: smio.iif(this.isCheckBox(), 'checkbox', 'radio')
       };
-      if (this.args.labelText) {
-        ret.span.label = {
+      if (this.args.checked) {
+        ret.span.span.span.input.checked = 'checked';
+      }
+      if (this.args.labelText || this.args.labelHtml) {
+        ret.span.span.label = {
           id: 'label',
-          "for": this.id('input'),
-          html: [this.args.labelText]
+          "class": 'smio-toggleinput',
+          "for": this.id('input')
         };
+        ret.span.span.label[smio.iif(this.args.labelHtml, 'html', 'text')] = [smio.iif(this.args.labelHtml, this.args.labelHtml, this.args.labelText)];
       }
       return ret;
+    };
+    Packs_Core_Controls_Toggle.prototype.getSharedClass = function() {
+      return "" + (this.parent.id()) + "_" + (this.args.toggleName || '');
+    };
+    Packs_Core_Controls_Toggle.prototype.isCheckBox = function() {
+      return this.args.type === 'checkbox';
+    };
+    Packs_Core_Controls_Toggle.prototype.isRadioBox = function() {
+      return this.args.type !== 'checkbox';
+    };
+    Packs_Core_Controls_Toggle.prototype.onBlur = function() {};
+    Packs_Core_Controls_Toggle.prototype.onCheck = function(passive) {
+      var nuCls, unCls;
+      if (this.val !== this.elInput.prop('checked')) {
+        this.val = this.elInput.prop('checked');
+        nuCls = smio.iif(this.val, 'smio-toggleinput-checked', 'smio-toggleinput-unchecked');
+        unCls = smio.iif(this.val, 'smio-toggleinput-unchecked', 'smio-toggleinput-checked');
+        this.el.removeClass(unCls).addClass(nuCls);
+        if (!passive) {
+          return $(".smio-toggleinput-" + (this.getSharedClass()) + " input.smio-toggleinput").each(__bind(function(i, e) {
+            var ctl;
+            if (e.id !== this.id('input')) {
+              $(e).prop('checked', false);
+              if ((ctl = this.client.allControls[e.id.substr(0, e.id.lastIndexOf('_'))])) {
+                return ctl.onCheck(true);
+              }
+            }
+          }, this));
+        }
+      }
+    };
+    Packs_Core_Controls_Toggle.prototype.onFocus = function() {};
+    Packs_Core_Controls_Toggle.prototype.onLoad = function() {
+      Packs_Core_Controls_Toggle.__super__.onLoad.call(this);
+      (this.elInput = $("#" + (this.id('input')))).click(__bind(function() {
+        return this.onCheck();
+      }, this));
+      $("#" + (this.id('btn'))).click(__bind(function() {
+        this.elInput.prop('checked', true);
+        return this.onCheck();
+      }, this));
+      return this.val = this.elInput.prop('checked');
     };
     function Packs_Core_Controls_Toggle(client, parent, args) {
       Packs_Core_Controls_Toggle.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_Toggle");
@@ -14313,18 +14472,23 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                   'div .smio-setup-stepbox-title': [this.r('steptitle_owner')],
                   'div .smio-setup-stepbox-form': {
                     "TextInput #owner_name": {
-                      labelText: this.r('owner_name')
+                      labelText: this.r('owner_name'),
+                      nospellcheck: true
                     },
                     "TextInput #owner_pass": {
                       labelText: this.r('owner_pass'),
                       type: 'password'
                     },
+                    "span .smio-setup-stepbox-form-label": {
+                      html: ['The Site owner specified above is:']
+                    },
                     "Toggle #owner_login": {
-                      labelText: this.r('owner_login'),
-                      toggleName: 'owner_toggle'
+                      labelHtml: this.r('owner_login', 'localhost'),
+                      toggleName: 'owner_toggle',
+                      checked: true
                     },
                     "Toggle #owner_create": {
-                      labelText: this.r('owner_create'),
+                      labelHtml: this.r('owner_create', 'localhost'),
                       toggleName: 'owner_toggle'
                     }
                   }

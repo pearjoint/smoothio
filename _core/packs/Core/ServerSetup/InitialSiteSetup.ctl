@@ -28,14 +28,18 @@ renderTemplate: ->
 						'div .smio-setup-stepbox-form':
 							"TextInput #owner_name":
 								labelText: @r 'owner_name'
+								nospellcheck: true
 							"TextInput #owner_pass":
 								labelText: @r 'owner_pass'
 								type: 'password'
+							"span .smio-setup-stepbox-form-label":
+								html: ['The Site owner specified above is:']
 							"Toggle #owner_login":
-								labelText: @r 'owner_login'
+								labelHtml: @r 'owner_login', 'localhost'
 								toggleName: 'owner_toggle'
+								checked: true
 							"Toggle #owner_create":
-								labelText: @r 'owner_create'
+								labelHtml: @r 'owner_create', 'localhost'
 								toggleName: 'owner_toggle'
 					"template":
 						"div .smio-setup-stepbox-title":

@@ -90,7 +90,7 @@
       }
       smio.walkDir(dirPath, null, __bind(function(fpath, fname, relpath) {
         var generic, lpos, name, pos, resBaseName, resLang, resSet, specific, val, _ref, _results;
-        if (_.isEndsWith(fname, '.res')) {
+        if (_.endsWith(fname, '.res')) {
           resBaseName = getBaseName(fpath, fname.substr(0, pos = fname.indexOf('.')), relpath);
           if ('en' === (resLang = pos === (lpos = fname.lastIndexOf('.')) ? '' : fname.substr(pos + 1, lpos - pos - 1))) {
             resLang = '';

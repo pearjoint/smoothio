@@ -122,12 +122,12 @@ class smio.Util
 				if not node_path.existsSync path = node_path.join outDirPath, relDirPath
 					node_fs.mkdirSync path, smio.Util.FileSystem.mkdirMode
 		isPathMatch: (path, pattern) =>
-			if (begins = _.isStartsWith pattern, '*') and (ends = _.isEndsWith pattern, '*')
+			if (begins = _.startsWith pattern, '*') and (ends = _.endsWith pattern, '*')
 				path.indexOf (pattern.substr 1, pattern.length - 2) >= 0
 			else if begins
-				_.isEndsWith path, pattern.substr 1
+				_.endsWith path, pattern.substr 1
 			else if ends
-				_.isStartsWith path, (pattern.substr 0, pattern.length - 1)
+				_.startsWith path, (pattern.substr 0, pattern.length - 1)
 			else
 				path is pattern
 		readTextFile: (path) ->
@@ -174,9 +174,9 @@ class smio.Util
 						owner[propName].on 'close', closeLog
 						owner[propName].on 'error', closeLog
 					time = JSON.stringify(new Date())
-					if _.isEndsWith time, '"'
+					if _.endsWith time, '"'
 						time = time.substr 0, time.length - 1
-					if _.isStartsWith time, '"'
+					if _.startsWith time, '"'
 						time = time.substr 1
 					full += (line = time + ' - ' + oldLogFunc(line, cat) + '\n')
 					try

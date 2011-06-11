@@ -33,6 +33,12 @@
         "class": 'smio-textinput',
         type: this.args.type === 'password' ? 'password' : 'text'
       };
+      if (this.args.value) {
+        ret.span.input.value = this.args.value;
+      }
+      if (this.args.nospellcheck) {
+        ret.span.input.spellcheck = false;
+      }
       return ret;
     };
     function Packs_Core_Controls_TextInput(client, parent, args) {

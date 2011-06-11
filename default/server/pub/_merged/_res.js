@@ -1,7 +1,4 @@
-smio.resources['smoothio'] = {"connect":"Establishing your connection"};
-
-smio.resources['Core'] = {"packtest":"This is a wicked test."};
-
-smio.resources['Core_Controls'] = {"slidepanel_prev":"◄ Back","slidepanel_next":"Next ►"};
-
-smio.resources['Core_ServerSetup'] = {"title":"Setting up your first Site","desc":"This server does not contain any Sites yet. Create one below:","nojs_title":"No Site created yet","nojs_desc":"This server does not contain any Sites yet.","owner_name":"User name:","owner_pass":"Password:","owner_create":"Sign up","owner_login":"Sign in","steps_owner":"1. Specify owner","steps_template":"2. Select template","steps_finish":"3. Finish setup","steptitle_owner":"1. Site Owner","steptitle_template":"2. Site Template","steptitle_finish":"3. Create Site"};
+smio.resources={smoothio:{"connect":"Establishing your connection"},
+Core:{"packtest":"This is a wicked test."},
+Core_Controls:{"slidepanel_prev":"◄ Back","slidepanel_next":"Next ►"},
+Core_ServerSetup:{"title":"Setting up your first Site","desc":"This server does not contain any Sites yet. Create one below:","nojs_title":"No Site created yet","nojs_desc":"This server does not contain any Sites yet.","owner_name":"User name:","owner_pass":"Password:","owner_create":"...a new <b>%s</b> user account","owner_login":"...an existing <b>%s</b> account","steps_owner":"1. Specify owner","steps_template":"2. Select template","steps_finish":"3. Finish setup","steptitle_owner":"1. Site Owner","steptitle_template":"2. Site Template","steptitle_finish":"3. Create Site"}};

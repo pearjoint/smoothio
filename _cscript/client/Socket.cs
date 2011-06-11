@@ -104,7 +104,7 @@ class smio.Socket
 		if (not msg) and textStatus and not _.isString textStatus
 			data = textStatus
 		if msg and (not data) and _.isString msg
-			if _.isStartsWith msg, '{'
+			if _.startsWith msg, '{'
 				try
 					data = JSON.parse msg
 				catch err

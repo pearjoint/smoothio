@@ -51,14 +51,37 @@ div.smio-setup
 
 .smio-setup-stepbox-form
 	padding 1em 0 0 1.8em
+	color #606060
 
 .smio-setup-stepbox-form span.smio-textinput
 	display table-row
 	padding 0.5em 0 0.5em 0
 
+.smio-setup-stepbox-form-label
+	display block
+	padding 2em 0 0.5em 0
+	color #a0a0a0
+
 .smio-setup-stepbox-form span.smio-toggleinput
 	display block
-	padding 0.5em 0 0.5em 0
+	padding 0.2em 0 0.2em 6em
+	smio-transition color 0.5s
+
+.smio-setup-stepbox-form span.smio-toggleinput-btnlabel
+	padding 0.2em 1.5em 0.2em 0
+	smio-transition background 0.5s
+	smio-border-radius 1em
+
+.smio-setup-stepbox-form span.smio-toggleinput-unchecked span.smio-toggleinput-btnlabel:hover
+	smio-box-shadow 0 0.066em 0.3em #606060 inset
+	background rgba(0, 0, 0, 0.1)
+
+.smio-setup-stepbox-form span.smio-toggleinput-checked
+	color #303030
+
+.smio-setup-stepbox-form span.smio-toggleinput-unchecked
+	color #a0a0a0
+	text-decoration line-through
 
 .smio-setup-stepbox-form span.smio-textinput input.smio-textinput
 	width 100%
@@ -74,6 +97,7 @@ div.smio-setup
 	white-space nowrap
 
 .smio-setup-steptab
+	smio-border-radius 1em
 	font-size 0.95em
 	padding 0.2em 1em 0.2em 1em
 	display inline-block
@@ -81,12 +105,11 @@ div.smio-setup
 	text-shadow 0 0.098em #ffffff
 	smio-lcase()
 
-.smio-setup-steptab-inactive:hover
-	text-decoration underline
+.smio-setup-steptab-inactive:hover, .smio-setup-steptab-inactive:focus
+	text-decoration: underline
 
 .smio-setup-steptab-active
 	cursor default
-	smio-border-radius 1em
 	smio-box-shadow 0 0.066em 0.3em #606060 inset
 	background rgba(0, 0, 0, 0.1)
 	color #505050

@@ -14,14 +14,18 @@
   smio.Packs_Core_Controls_LinkButton = (function() {
     __extends(Packs_Core_Controls_LinkButton, smio.Control);
     Packs_Core_Controls_LinkButton.prototype.renderTemplate = function() {
-      return {
+      var ret;
+      ret = {
         a: {
           id: '',
           "class": this.args["class"] || '',
-          href: this.args.href || 'javascript:void(0);',
-          _: [this.args.label]
+          href: this.args.href || smio.Control.util.jsVoid
         }
       };
+      if (this.args.labelText) {
+        ret.a.text = [this.args.labelText];
+      }
+      return ret;
     };
     Packs_Core_Controls_LinkButton.prototype.onLoad = function() {
       Packs_Core_Controls_LinkButton.__super__.onLoad.call(this);

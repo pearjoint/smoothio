@@ -32,18 +32,23 @@
                   'div .smio-setup-stepbox-title': [this.r('steptitle_owner')],
                   'div .smio-setup-stepbox-form': {
                     "TextInput #owner_name": {
-                      labelText: this.r('owner_name')
+                      labelText: this.r('owner_name'),
+                      nospellcheck: true
                     },
                     "TextInput #owner_pass": {
                       labelText: this.r('owner_pass'),
                       type: 'password'
                     },
+                    "span .smio-setup-stepbox-form-label": {
+                      html: ['The Site owner specified above is:']
+                    },
                     "Toggle #owner_login": {
-                      labelText: this.r('owner_login'),
-                      toggleName: 'owner_toggle'
+                      labelHtml: this.r('owner_login', 'localhost'),
+                      toggleName: 'owner_toggle',
+                      checked: true
                     },
                     "Toggle #owner_create": {
-                      labelText: this.r('owner_create'),
+                      labelHtml: this.r('owner_create', 'localhost'),
                       toggleName: 'owner_toggle'
                     }
                   }

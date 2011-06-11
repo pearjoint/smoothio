@@ -31,7 +31,7 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         tab = _ref[_i];
         ret.div["LinkButton #" + tab + " ." + this.args.tabClass + " ." + (this.args.tabClass + (is1st ? '-active' : '-inactive'))] = {
-          label: [this.r(this.args.resPrefix + tab)],
+          labelText: [this.r(this.args.resPrefix + tab)],
           onClick: makeOnClick(tab)
         };
         is1st = false;

@@ -22,6 +22,10 @@ class smio.Packs_Core_Controls_TextInput extends smio.Control
 			id: 'input'
 			class: 'smio-textinput'
 			type: if @args.type is 'password' then 'password' else 'text'
+		if @args.value
+			ret.span.input.value = @args.value
+		if @args.nospellcheck
+			ret.span.input.spellcheck = false
 		ret
 	
 	

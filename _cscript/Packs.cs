@@ -47,7 +47,7 @@ class smio.Pack
 				smio.walkDir @packPath, null, (fpath, fname, relPath) =>
 					outDirPathClient = node_path.join "server/pub/_packs/#{@packName}", (relPath.substr 0, relPath.lastIndexOf '/')
 					outDirPathServer = node_path.join "server/_packs/#{@packName}", (relPath.substr 0, relPath.lastIndexOf '/')
-					if (_.isEndsWith fname, '.styl') and stylContent = smio.Util.FileSystem.readTextFile fpath
+					if (_.endsWith fname, '.styl') and stylContent = smio.Util.FileSystem.readTextFile fpath
 						lastFilePath = fpath
 						mixinPath = node_path.resolve '../_core/stylus/include/mixin'
 						stylus("@import '#{mixinPath}'\n#{stylContent}").set('filename', fpath).render (err, css) =>
@@ -56,9 +56,9 @@ class smio.Pack
 								smio.logit (@inst.r 'log_pack_error_compile', fpath, @inst.formatError err), 'packs.' + @packName
 							else if css
 								node_fs.writeFileSync (node_path.join outDirPathClient, (fname.substr 0, fname.lastIndexOf '.') + '.css'), css
-					else if _.isEndsWith fname, '.cs'
+					else if _.endsWith fname, '.cs'
 						smio.compileCoffeeScripts fpath, outDirPathServer, outDirPathClient, true, true
-					else if (_.isEndsWith fname, '.ctl') and tmplContent = smio.Util.FileSystem.readTextFile fpath
+					else if (_.endsWith fname, '.ctl') and tmplContent = smio.Util.FileSystem.readTextFile fpath
 						lastFilePath = fpath
 						if (ccsContent = smio.Control.compile @inst, tmplContent, node_path.join @packName, relPath)
 							node_fs.writeFileSync (node_path.join outDirPathServer, "_smioctl_" + (fname.substr 0, (fname.lastIndexOf '.')) + '.cs'), ccsContent

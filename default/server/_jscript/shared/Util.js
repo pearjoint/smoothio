@@ -195,12 +195,12 @@
       },
       isPathMatch: __bind(function(path, pattern) {
         var begins, ends;
-        if ((begins = _.isStartsWith(pattern, '*')) && (ends = _.isEndsWith(pattern, '*'))) {
+        if ((begins = _.startsWith(pattern, '*')) && (ends = _.endsWith(pattern, '*'))) {
           return path.indexOf((pattern.substr(1, pattern.length - 2)) >= 0);
         } else if (begins) {
-          return _.isEndsWith(path, pattern.substr(1));
+          return _.endsWith(path, pattern.substr(1));
         } else if (ends) {
-          return _.isStartsWith(path, pattern.substr(0, pattern.length - 1));
+          return _.startsWith(path, pattern.substr(0, pattern.length - 1));
         } else {
           return path === pattern;
         }
@@ -274,10 +274,10 @@
               owner[propName].on('error', closeLog);
             }
             time = JSON.stringify(new Date());
-            if (_.isEndsWith(time, '"')) {
+            if (_.endsWith(time, '"')) {
               time = time.substr(0, time.length - 1);
             }
-            if (_.isStartsWith(time, '"')) {
+            if (_.startsWith(time, '"')) {
               time = time.substr(1);
             }
             full += (line = time + ' - ' + oldLogFunc(line, cat) + '\n');

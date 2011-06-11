@@ -15,7 +15,13 @@
 				global['smoothio'] = {}
 			smio = global.smoothio;
 			smio.pageLoadError = null;
-			smio.resources = {};
+			smio.iif = function(test, ifTrue, ifFalse) {
+				if (arguments.length < 3)
+					ifFalse = false;
+				if (arguments.length < 2)
+					ifTrue = true;
+				return test ? ifTrue : ifFalse;
+			};
 
 			function onSmoothioNoCookie() {
 				$('#smio_offline').hide();

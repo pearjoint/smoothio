@@ -169,7 +169,7 @@
         data = textStatus;
       }
       if (msg && (!data) && _.isString(msg)) {
-        if (_.isStartsWith(msg, '{')) {
+        if (_.startsWith(msg, '{')) {
           try {
             data = JSON.parse(msg);
           } catch (err) {

@@ -72,7 +72,7 @@
             var args, ccsContent, mixinPath, outDirPathClient, outDirPathServer, pattern, stylContent, tmplContent;
             outDirPathClient = node_path.join("server/pub/_packs/" + this.packName, relPath.substr(0, relPath.lastIndexOf('/')));
             outDirPathServer = node_path.join("server/_packs/" + this.packName, relPath.substr(0, relPath.lastIndexOf('/')));
-            if ((_.isEndsWith(fname, '.styl')) && (stylContent = smio.Util.FileSystem.readTextFile(fpath))) {
+            if ((_.endsWith(fname, '.styl')) && (stylContent = smio.Util.FileSystem.readTextFile(fpath))) {
               lastFilePath = fpath;
               mixinPath = node_path.resolve('../_core/stylus/include/mixin');
               return stylus("@import '" + mixinPath + "'\n" + stylContent).set('filename', fpath).render(__bind(function(err, css) {
@@ -83,9 +83,9 @@
                   return node_fs.writeFileSync(node_path.join(outDirPathClient, (fname.substr(0, fname.lastIndexOf('.'))) + '.css'), css);
                 }
               }, this));
-            } else if (_.isEndsWith(fname, '.cs')) {
+            } else if (_.endsWith(fname, '.cs')) {
               return smio.compileCoffeeScripts(fpath, outDirPathServer, outDirPathClient, true, true);
-            } else if ((_.isEndsWith(fname, '.ctl')) && (tmplContent = smio.Util.FileSystem.readTextFile(fpath))) {
+            } else if ((_.endsWith(fname, '.ctl')) && (tmplContent = smio.Util.FileSystem.readTextFile(fpath))) {
               lastFilePath = fpath;
               if ((ccsContent = smio.Control.compile(this.inst, tmplContent, node_path.join(this.packName, relPath)))) {
                 node_fs.writeFileSync(node_path.join(outDirPathServer, "_smioctl_" + (fname.substr(0, fname.lastIndexOf('.'))) + '.cs'), ccsContent);

@@ -67,7 +67,7 @@ class smio.Instance
 			getBaseName = (fpath, fname, relpath) ->
 				fname
 		smio.walkDir dirPath, null, (fpath, fname, relpath) =>
-			if _.isEndsWith fname, '.res'
+			if _.endsWith fname, '.res'
 				resBaseName = getBaseName fpath, (fname.substr 0, pos = fname.indexOf '.'), relpath
 				if 'en' is (resLang = if pos is (lpos = fname.lastIndexOf '.') then '' else fname.substr pos + 1, lpos - pos - 1)
 					resLang = ''
