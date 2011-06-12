@@ -215,9 +215,15 @@ class smio.Packs_#{className} extends smio.Control
 		@idStack = []
 		@_html = ''
 
+	cls: ->
+		smio[@fullClassName()]
+
 	ctl: (ctlID) ->
 		c = @client.allControls ctlID
 		if c then c else @client.allControls @id(ctlID)
+
+	fullClassName: ->
+		"Packs_#{@className}"
 
 	id: (subID) ->
 		myID = if @parent then "#{@parent.id()}_#{@ctlID}" else @ctlID

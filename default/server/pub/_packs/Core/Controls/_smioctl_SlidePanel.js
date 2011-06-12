@@ -69,11 +69,7 @@
       (this.edgeNext = $("#" + (this.id('edgenext')))).click(__bind(function() {
         return this.scrollTo(this.curItem + 1);
       }, this));
-      (this.scrollBox = $("#" + (this.id('scrollbox')))).scroll(_.debounce((__bind(function() {
-        if (!this.scrolling) {
-          return this.scrollTo(null, true);
-        }
-      }, this)), 250));
+      this.scrollBox = $("#" + (this.id('scrollbox')));
       return this.scrollTo(0, true);
     };
     Packs_Core_Controls_SlidePanel.prototype.onWindowResize = function(w, h) {

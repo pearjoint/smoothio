@@ -13498,6 +13498,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.idStack = [];
       this._html = '';
     }
+    Control.prototype.cls = function() {
+      return smio[this.fullClassName()];
+    };
     Control.prototype.ctl = function(ctlID) {
       var c;
       c = this.client.allControls(ctlID);
@@ -13506,6 +13509,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       } else {
         return this.client.allControls(this.id(ctlID));
       }
+    };
+    Control.prototype.fullClassName = function() {
+      return "Packs_" + this.className;
     };
     Control.prototype.id = function(subID) {
       var myID;
@@ -14192,11 +14198,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       (this.edgeNext = $("#" + (this.id('edgenext')))).click(__bind(function() {
         return this.scrollTo(this.curItem + 1);
       }, this));
-      (this.scrollBox = $("#" + (this.id('scrollbox')))).scroll(_.debounce((__bind(function() {
-        if (!this.scrolling) {
-          return this.scrollTo(null, true);
-        }
-      }, this)), 250));
+      this.scrollBox = $("#" + (this.id('scrollbox')));
       return this.scrollTo(0, true);
     };
     Packs_Core_Controls_SlidePanel.prototype.onWindowResize = function(w, h) {
@@ -14380,6 +14382,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio = smoothio = global.smoothio;
   smio.Packs_Core_Controls_Toggle = (function() {
     __extends(Packs_Core_Controls_Toggle, smio.Control);
+    Packs_Core_Controls_Toggle.checkmark = '&#x2714;';
+    Packs_Core_Controls_Toggle.radiomark = '';
     Packs_Core_Controls_Toggle.prototype.renderTemplate = function() {
       var ischk, ret;
       ischk = this.isCheckBox();
@@ -14388,22 +14392,28 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           "class": "smio-toggleinput smio-toggleinput-" + (smio.iif(ischk, 'checkbox', 'radio')) + " smio-toggleinput-" + (smio.iif(this.args.checked, '', 'un')) + "checked smio-toggleinput-" + (this.getSharedClass()),
           id: '',
           span: {
+            id: 'btnlabel',
             "class": "smio-toggleinput-btnlabel",
             span: {
               id: 'btn',
               "class": 'smio-toggleinput-btn',
               span: {
                 id: 'btnglyph',
-                "class": 'smio-toggleinput-btnbtn',
-                span: {
-                  id: 'glyph',
-                  "class": 'smio-toggleinput-btnglyph'
-                }
+                "class": 'smio-toggleinput-btnbtn'
               }
             }
           }
         }
       };
+      if (ischk) {
+        ret.span.span.span['span #glyph'] = {
+          "class": 'smio-toggleinput-btnglyph'
+        };
+      } else {
+        ret.span.span.span.span['span #glyph'] = {
+          "class": 'smio-toggleinput-btnglyph'
+        };
+      }
       ret.span.span.span.input = {
         id: 'input',
         name: this.args.toggleName,
@@ -14412,7 +14422,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       };
       if (this.args.checked) {
         ret.span.span.span.input.checked = 'checked';
-        ret.span.span.span.span.span.html = ['&#x2714;'];
+        (smio.iif(ischk, ret.span.span.span, ret.span.span.span.span))['span #glyph'].html = [this.cls()[smio.iif(ischk, 'checkmark', 'radiomark')]];
       }
       if (this.args.labelText || this.args.labelHtml) {
         ret.span.span.label = {
@@ -14433,7 +14443,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     Packs_Core_Controls_Toggle.prototype.isRadioBox = function() {
       return this.args.type !== 'checkbox';
     };
-    Packs_Core_Controls_Toggle.prototype.onBlur = function() {};
     Packs_Core_Controls_Toggle.prototype.onCheck = function(passive) {
       var nuCls, unCls;
       if (this.val !== this.elInput.prop('checked')) {
@@ -14441,8 +14450,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         nuCls = smio.iif(this.val, 'smio-toggleinput-checked', 'smio-toggleinput-unchecked');
         unCls = smio.iif(this.val, 'smio-toggleinput-unchecked', 'smio-toggleinput-checked');
         this.el.removeClass(unCls).addClass(nuCls);
-        $("#" + (this.id('glyph'))).html(smio.iif(this.val, '&#x2714;', ''));
-        if (!passive) {
+        $("#" + (this.id('glyph'))).html(smio.iif(this.val, this.cls()[smio.iif(this.isCheckBox(), 'checkmark', 'radiomark')], ''));
+        if (this.isRadioBox() && !passive) {
           return $(".smio-toggleinput-" + (this.getSharedClass()) + " input.smio-toggleinput").each(__bind(function(i, e) {
             var ctl;
             if (e.id !== this.id('input')) {
@@ -14455,14 +14464,22 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         }
       }
     };
-    Packs_Core_Controls_Toggle.prototype.onFocus = function() {};
     Packs_Core_Controls_Toggle.prototype.onLoad = function() {
       Packs_Core_Controls_Toggle.__super__.onLoad.call(this);
-      (this.elInput = $("#" + (this.id('input')))).click(__bind(function() {
-        return this.onCheck();
+      (this.elInput = $("#" + (this.id('input')))).click(__bind(function(evt) {
+        this.onCheck();
+        if (this.isCheckBox()) {
+          return evt.stopPropagation();
+        }
+      }, this));
+      this.elInput.blur(__bind(function() {
+        return $("#" + (this.id('btnlabel'))).removeClass('smio-toggleinput-focused');
+      }, this));
+      this.elInput.focus(__bind(function() {
+        return $("#" + (this.id('btnlabel'))).addClass('smio-toggleinput-focused');
       }, this));
       $("#" + (this.id('btn'))).click(__bind(function() {
-        this.elInput.prop('checked', true);
+        this.elInput.prop('checked', this.isRadioBox() || !this.elInput.prop('checked'));
         return this.onCheck();
       }, this));
       return this.val = this.elInput.prop('checked');
@@ -14521,16 +14538,14 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                     "span .smio-setup-stepbox-form-label": {
                       html: ['The Hub owner specified above is:']
                     },
-                    "Toggle #owner_login": {
-                      labelHtml: this.r('owner_login', 'localhost'),
-                      toggleName: 'owner_toggle',
-                      checked: true,
-                      type: 'checkbox'
-                    },
                     "Toggle #owner_create": {
-                      type: 'checkbox',
+                      toggleName: 'owner_toggle',
                       labelHtml: this.r('owner_create', 'localhost'),
-                      toggleName: 'owner_toggle'
+                      checked: true
+                    },
+                    "Toggle #owner_login": {
+                      toggleName: 'owner_toggle',
+                      labelHtml: this.r('owner_login', 'localhost')
                     }
                   }
                 },

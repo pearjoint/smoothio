@@ -33,7 +33,8 @@ onLoad: ->
 	super()
 	(@edgePrev = $("##{@id 'edgeprev'}")).click => @scrollTo @curItem - 1
 	(@edgeNext = $("##{@id 'edgenext'}")).click => @scrollTo @curItem + 1
-	(@scrollBox = $("##{@id 'scrollbox'}")).scroll _.debounce (=> @scrollTo null, true if not @scrolling), 250
+	@scrollBox = $("##{@id 'scrollbox'}")
+	#.scroll _.debounce (=> @scrollTo null, true if not @scrolling), 250
 	@scrollTo 0, true
 
 onWindowResize: (w, h) ->

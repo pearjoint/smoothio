@@ -247,6 +247,9 @@
       this.idStack = [];
       this._html = '';
     }
+    Control.prototype.cls = function() {
+      return smio[this.fullClassName()];
+    };
     Control.prototype.ctl = function(ctlID) {
       var c;
       c = this.client.allControls(ctlID);
@@ -255,6 +258,9 @@
       } else {
         return this.client.allControls(this.id(ctlID));
       }
+    };
+    Control.prototype.fullClassName = function() {
+      return "Packs_" + this.className;
     };
     Control.prototype.id = function(subID) {
       var myID;

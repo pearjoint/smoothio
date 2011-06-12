@@ -14,6 +14,8 @@
   smio = smoothio = global.smoothio;
   smio.Packs_Core_Controls_Toggle = (function() {
     __extends(Packs_Core_Controls_Toggle, smio.Control);
+    Packs_Core_Controls_Toggle.checkmark = '&#x2714;';
+    Packs_Core_Controls_Toggle.radiomark = '';
     Packs_Core_Controls_Toggle.prototype.renderTemplate = function() {
       var ischk, ret;
       ischk = this.isCheckBox();
@@ -22,22 +24,28 @@
           "class": "smio-toggleinput smio-toggleinput-" + (smio.iif(ischk, 'checkbox', 'radio')) + " smio-toggleinput-" + (smio.iif(this.args.checked, '', 'un')) + "checked smio-toggleinput-" + (this.getSharedClass()),
           id: '',
           span: {
+            id: 'btnlabel',
             "class": "smio-toggleinput-btnlabel",
             span: {
               id: 'btn',
               "class": 'smio-toggleinput-btn',
               span: {
                 id: 'btnglyph',
-                "class": 'smio-toggleinput-btnbtn',
-                span: {
-                  id: 'glyph',
-                  "class": 'smio-toggleinput-btnglyph'
-                }
+                "class": 'smio-toggleinput-btnbtn'
               }
             }
           }
         }
       };
+      if (ischk) {
+        ret.span.span.span['span #glyph'] = {
+          "class": 'smio-toggleinput-btnglyph'
+        };
+      } else {
+        ret.span.span.span.span['span #glyph'] = {
+          "class": 'smio-toggleinput-btnglyph'
+        };
+      }
       ret.span.span.span.input = {
         id: 'input',
         name: this.args.toggleName,
@@ -46,7 +54,7 @@
       };
       if (this.args.checked) {
         ret.span.span.span.input.checked = 'checked';
-        ret.span.span.span.span.span.html = ['&#x2714;'];
+        (smio.iif(ischk, ret.span.span.span, ret.span.span.span.span))['span #glyph'].html = [this.cls()[smio.iif(ischk, 'checkmark', 'radiomark')]];
       }
       if (this.args.labelText || this.args.labelHtml) {
         ret.span.span.label = {
@@ -67,7 +75,6 @@
     Packs_Core_Controls_Toggle.prototype.isRadioBox = function() {
       return this.args.type !== 'checkbox';
     };
-    Packs_Core_Controls_Toggle.prototype.onBlur = function() {};
     Packs_Core_Controls_Toggle.prototype.onCheck = function(passive) {
       var nuCls, unCls;
       if (this.val !== this.elInput.prop('checked')) {
@@ -75,8 +82,8 @@
         nuCls = smio.iif(this.val, 'smio-toggleinput-checked', 'smio-toggleinput-unchecked');
         unCls = smio.iif(this.val, 'smio-toggleinput-unchecked', 'smio-toggleinput-checked');
         this.el.removeClass(unCls).addClass(nuCls);
-        $("#" + (this.id('glyph'))).html(smio.iif(this.val, '&#x2714;', ''));
-        if (!passive) {
+        $("#" + (this.id('glyph'))).html(smio.iif(this.val, this.cls()[smio.iif(this.isCheckBox(), 'checkmark', 'radiomark')], ''));
+        if (this.isRadioBox() && !passive) {
           return $(".smio-toggleinput-" + (this.getSharedClass()) + " input.smio-toggleinput").each(__bind(function(i, e) {
             var ctl;
             if (e.id !== this.id('input')) {
@@ -89,14 +96,22 @@
         }
       }
     };
-    Packs_Core_Controls_Toggle.prototype.onFocus = function() {};
     Packs_Core_Controls_Toggle.prototype.onLoad = function() {
       Packs_Core_Controls_Toggle.__super__.onLoad.call(this);
-      (this.elInput = $("#" + (this.id('input')))).click(__bind(function() {
-        return this.onCheck();
+      (this.elInput = $("#" + (this.id('input')))).click(__bind(function(evt) {
+        this.onCheck();
+        if (this.isCheckBox()) {
+          return evt.stopPropagation();
+        }
+      }, this));
+      this.elInput.blur(__bind(function() {
+        return $("#" + (this.id('btnlabel'))).removeClass('smio-toggleinput-focused');
+      }, this));
+      this.elInput.focus(__bind(function() {
+        return $("#" + (this.id('btnlabel'))).addClass('smio-toggleinput-focused');
       }, this));
       $("#" + (this.id('btn'))).click(__bind(function() {
-        this.elInput.prop('checked', true);
+        this.elInput.prop('checked', this.isRadioBox() || !this.elInput.prop('checked'));
         return this.onCheck();
       }, this));
       return this.val = this.elInput.prop('checked');

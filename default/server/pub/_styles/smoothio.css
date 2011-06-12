@@ -139,7 +139,7 @@ body {
   user-select: none;
   color: #303030;
   margin: 0;
-  background: #c0c0c0 url("/_/file/images/bg.png") repeat fixed center center;
+  background: #c0c0c0;
   overflow: hidden;
   font-family: Arial, Helvetica, Helvetica Neue, Sans-Serif;
 }
@@ -148,12 +148,9 @@ body {
   overflow: hidden;
 }
 .smio-blocking-overlay {
-  -moz-transition: all 4s;
-  -webkit-transition: all 4s;
-  -o-transition: all 4s;
-  transition: all 4s;
   display: none;
-  background: rgba(0,0,0,0.6);
+  background: -webkit-linear-gradient(rgba(0,0,0,0.5) 25%, rgba(0,0,0,0.7) 75%);
+  background-size: 0.25em;
   position: fixed;
   top: 0;
   left: 0;
@@ -165,6 +162,6 @@ body {
   line-height: 1.3em;
   font-size: 1.7em;
   color: #f0f0f0;
-  text-shadow: 0 0 0.6em #000;
+  text-shadow: 0 0 0.6em #fff;
   letter-spacing: -0.05em;
 }

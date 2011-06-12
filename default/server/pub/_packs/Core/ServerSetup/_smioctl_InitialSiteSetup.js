@@ -42,16 +42,14 @@
                     "span .smio-setup-stepbox-form-label": {
                       html: ['The Hub owner specified above is:']
                     },
-                    "Toggle #owner_login": {
-                      labelHtml: this.r('owner_login', 'localhost'),
-                      toggleName: 'owner_toggle',
-                      checked: true,
-                      type: 'checkbox'
-                    },
                     "Toggle #owner_create": {
-                      type: 'checkbox',
+                      toggleName: 'owner_toggle',
                       labelHtml: this.r('owner_create', 'localhost'),
-                      toggleName: 'owner_toggle'
+                      checked: true
+                    },
+                    "Toggle #owner_login": {
+                      toggleName: 'owner_toggle',
+                      labelHtml: this.r('owner_login', 'localhost')
                     }
                   }
                 },

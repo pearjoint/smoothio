@@ -27,7 +27,7 @@ div.smio-setup {
   -moz-box-shadow: 0 0.062em 0.35em #b0b0b0 inset;
   -webkit-box-shadow: 0 0.062em 0.35em #b0b0b0 inset;
   box-shadow: 0 0.062em 0.35em #b0b0b0 inset;
-  padding: 0 0.2em 0 0.2em;
+  padding: 0 0.2em 1em 0.2em;
   overflow: hidden;
   white-space: nowrap;
 }
@@ -73,33 +73,14 @@ div.smio-setup {
 }
 .smio-setup-stepbox-form span.smio-toggleinput {
   display: block;
-  padding: 0.2em 0 0.2em 6em;
+  padding: 0.35em 0 0.35em 6.15em;
   -moz-transition: color 0.5s;
   -webkit-transition: color 0.5s;
   -o-transition: color 0.5s;
   transition: color 0.5s;
 }
-.smio-setup-stepbox-form span.smio-toggleinput-btnlabel {
-  padding: 0.2em 1.5em 0.2em 0;
-  -moz-transition: background 0.5s;
-  -webkit-transition: background 0.5s;
-  -o-transition: background 0.5s;
-  transition: background 0.5s;
-  -webkit-border-radius: 0.33em;
-  -moz-border-radius: 0.33em;
-  border-radius: 0.33em;
-}
-.smio-setup-stepbox-form span.smio-toggleinput-unchecked span.smio-toggleinput-btnlabel:hover {
-  -moz-box-shadow: 0 0.07em 0.28em #909090 inset;
-  -webkit-box-shadow: 0 0.07em 0.28em #909090 inset;
-  box-shadow: 0 0.07em 0.28em #909090 inset;
-  background: rgba(0,0,0,0.1);
-}
-.smio-setup-stepbox-form span.smio-toggleinput-checked {
-  color: #303030;
-}
 .smio-setup-stepbox-form span.smio-toggleinput-unchecked {
-  color: #a0a0a0;
+  color: #909090;
 }
 .smio-setup-stepbox-form span.smio-textinput input.smio-textinput {
   width: 100%;

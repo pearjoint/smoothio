@@ -25,7 +25,7 @@ body
 	user-select: none;
 	color #303030
 	margin 0
-	background #c0c0c0 url('/_/file/images/bg.png') repeat fixed center center
+	background #c0c0c0
 	overflow hidden
 	font-family Arial, Helvetica, Helvetica Neue, Sans-Serif
 
@@ -33,10 +33,13 @@ body
 	height 100%
 	overflow hidden
 
+$dark = rgba(0, 0, 0, 0.7)
+$lite = rgba(0, 0, 0, 0.5)
+
 .smio-blocking-overlay
-	smio-transition all 4s
 	display none
-	background rgba(0, 0, 0, 0.6)
+	background -webkit-linear-gradient($lite 25%, $dark 75%);
+	background-size 0.25em
 	position fixed
 	top 0
 	left 0
@@ -48,6 +51,6 @@ body
 	line-height 1.3em
 	font-size: 1.7em
 	color #f0f0f0
-	text-shadow 0 0 0.6em #000000
+	text-shadow 0 0 0.6em #ffffff
 	smio-narrow()
 

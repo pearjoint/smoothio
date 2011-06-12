@@ -47,6 +47,11 @@ smio-transition()
 	-o-transition arguments
 	transition arguments
 
+smio-background-rgradient(col1, col2)
+	background col1
+	background -webkit-gradient(radial, 3 3, 4, 3 3, 1, from(col1), to(col2))
+	background -moz-radial-gradient(40% 40% 0deg, circle closest-side, col2, col1)
+
 smio-background-vgradient(col1, col2)
 	background -ms-linear-gradient(col1, col2)
 	background -webkit-gradient(linear, 0% 0%, 0% 100%, from(col1), to(col2))

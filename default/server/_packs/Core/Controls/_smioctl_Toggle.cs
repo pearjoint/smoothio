@@ -8,6 +8,9 @@ smio = smoothio = global.smoothio
 class smio.Packs_Core_Controls_Toggle extends smio.Control
 
 
+	@checkmark: '&#x2714;'
+	@radiomark: ''
+	
 	renderTemplate: ->
 		ischk = @isCheckBox()
 		ret =
@@ -15,6 +18,7 @@ class smio.Packs_Core_Controls_Toggle extends smio.Control
 				class: "smio-toggleinput smio-toggleinput-#{smio.iif ischk, 'checkbox', 'radio'} smio-toggleinput-#{smio.iif @args.checked, '', 'un'}checked smio-toggleinput-#{@getSharedClass()}"
 				id: ''
 				span:
+					id: 'btnlabel'
 					class: "smio-toggleinput-btnlabel"
 					span:
 						id: 'btn'
@@ -22,9 +26,10 @@ class smio.Packs_Core_Controls_Toggle extends smio.Control
 						span:
 							id: 'btnglyph'
 							class: 'smio-toggleinput-btnbtn'
-							span:
-								id: 'glyph'
-								class: 'smio-toggleinput-btnglyph'
+		if ischk
+			ret.span.span.span['span #glyph'] = class: 'smio-toggleinput-btnglyph'
+		else
+			ret.span.span.span.span['span #glyph'] = class: 'smio-toggleinput-btnglyph'
 		ret.span.span.span.input =
 			id: 'input'
 			name: @args.toggleName
@@ -32,7 +37,7 @@ class smio.Packs_Core_Controls_Toggle extends smio.Control
 			type: smio.iif ischk, 'checkbox', 'radio'
 		if @args.checked
 			ret.span.span.span.input.checked = 'checked'
-			ret.span.span.span.span.span.html = ['&#x2714;']
+			(smio.iif ischk, ret.span.span.span, ret.span.span.span.span)['span #glyph'].html = [@cls()[smio.iif ischk, 'checkmark', 'radiomark']]
 		if @args.labelText or @args.labelHtml
 			ret.span.span.label =
 				id: 'label'
@@ -50,29 +55,32 @@ class smio.Packs_Core_Controls_Toggle extends smio.Control
 	isRadioBox: ->
 		 @args.type isnt 'checkbox'
 	
-	onBlur: ->
-	
 	onCheck: (passive) ->
 		if @val isnt @elInput.prop 'checked'
 			@val = @elInput.prop 'checked'
 			nuCls = smio.iif @val, 'smio-toggleinput-checked', 'smio-toggleinput-unchecked'
 			unCls = smio.iif @val, 'smio-toggleinput-unchecked', 'smio-toggleinput-checked'
 			@el.removeClass(unCls).addClass nuCls
-			$("##{@id 'glyph'}").html smio.iif @val, '&#x2714;', ''
-			if not passive
+			$("##{@id 'glyph'}").html smio.iif @val, @cls()[smio.iif @isCheckBox(), 'checkmark', 'radiomark'], ''
+			if @isRadioBox() and not passive
 				$(".smio-toggleinput-#{@getSharedClass()} input.smio-toggleinput").each (i, e) =>
 					if e.id isnt @id 'input'
 						$(e).prop 'checked', false
 						if (ctl = @client.allControls[e.id.substr 0, e.id.lastIndexOf '_'])
 							ctl.onCheck true
 	
-	onFocus: ->
-	
 	onLoad: ->
 		super()
-		(@elInput = $ "##{@id 'input'}").click => @onCheck()
+		(@elInput = $ "##{@id 'input'}").click (evt) =>
+			@onCheck()
+			if @isCheckBox()
+				evt.stopPropagation()
+		@elInput.blur =>
+			$("##{@id 'btnlabel'}").removeClass 'smio-toggleinput-focused'
+		@elInput.focus =>
+			$("##{@id 'btnlabel'}").addClass 'smio-toggleinput-focused'
 		$("##{@id 'btn'}").click =>
-			@elInput.prop 'checked', true
+			@elInput.prop 'checked', @isRadioBox() or not @elInput.prop 'checked'
 			@onCheck()
 		@val = @elInput.prop 'checked'
 	

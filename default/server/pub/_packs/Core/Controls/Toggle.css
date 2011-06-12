@@ -1,47 +1,108 @@
+input.smio-toggleinput {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0;
+  margin: 0;
+  opacity: 0;
+}
+span.smio-toggleinput {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+}
 .smio-toggleinput-btn {
   position: relative;
   display: inline;
-  padding: 0 0.4em 0 0;
-  margin: 0;
+  padding: 0;
+  margin: 0 0.4em 0 0;
 }
 .smio-toggleinput-btnbtn {
   display: inline-block;
   vertical-align: top;
-  background: #f0f0f0;
   border: 0.094em outset #ccc;
   width: 0.9em;
   height: 0.9em;
   position: relative;
-  left: 0.2em;
-  top: 0.1em;
+  left: 0;
+  top: 0.125em;
   -webkit-border-radius: 0.2em;
   -moz-border-radius: 0.2em;
   border-radius: 0.2em;
+  background: -ms-linear-gradient(rgba(0,28,0,0), rgba(0,28,0,0.12));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(0,28,0,0)), to(rgba(0,28,0,0.12)));
+  background: -moz-linear-gradient(rgba(0,28,0,0), rgba(0,28,0,0.12));
+  background: -webkit-linear-gradient(rgba(0,28,0,0), rgba(0,28,0,0.12));
+  background: -o-linear-gradient(rgba(0,28,0,0), rgba(0,28,0,0.12));
 }
-.smio-toggleinput-btnglyph {
-  font-size: 1.25em;
-  position: absolute;
-  top: -0.25em;
-  left: -0.05em;
-  color: #30a060;
+.smio-toggleinput-checked .smio-toggleinput-btnbtn {
+  background: -ms-linear-gradient(rgba(0,28,0,0.12), rgba(0,28,0,0));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(0,28,0,0.12)), to(rgba(0,28,0,0)));
+  background: -moz-linear-gradient(rgba(0,28,0,0.12), rgba(0,28,0,0));
+  background: -webkit-linear-gradient(rgba(0,28,0,0.12), rgba(0,28,0,0));
+  background: -o-linear-gradient(rgba(0,28,0,0.12), rgba(0,28,0,0));
+  border: 0.094em inset #ccc;
 }
 .smio-toggleinput-radio .smio-toggleinput-btnbtn {
   -webkit-border-radius: 1em;
   -moz-border-radius: 1em;
   border-radius: 1em;
 }
-.smio-toggleinput-checked .smio-toggleinput-btnbtn {
+.smio-toggleinput-btnglyph {
+  font-size: 1.25em;
+  position: absolute;
+  top: -0.15em;
+  left: -0.02em;
+  color: #30a060;
+}
+.smio-toggleinput-radio.smio-toggleinput-checked .smio-toggleinput-btnglyph {
+  display: inline-block;
+  left: 21.5%;
+  right: 21.5%;
+  top: 21.5%;
+  bottom: 21.5%;
+  -webkit-border-radius: 1em;
+  -moz-border-radius: 1em;
+  border-radius: 1em;
+  background: #206040;
+  background: -webkit-gradient(radial, 3 3, 4, 3 3, 1, from(#206040), to(#70b090));
+  background: -moz-radial-gradient(40% 40% 0deg, circle closest-side, #70b090, #206040);
+}
+.smio-toggleinput-btnlabel {
+  padding-right: 0.4em;
+  border: 0.094em outset transparent;
+}
+.smio-toggleinput-focused .smio-toggleinput-btnbtn,
+.smio-toggleinput-unchecked .smio-toggleinput-btnlabel:hover .smio-toggleinput-btnbtn,
+.smio-toggleinput-checkbox .smio-toggleinput-btnlabel:hover .smio-toggleinput-btnbtn {
+  border: 0.094em outset transparent;
+  background: transparent;
+}
+.smio-toggleinput-focused,
+.smio-toggleinput-unchecked .smio-toggleinput-btnlabel:hover,
+.smio-toggleinput-checkbox .smio-toggleinput-btnlabel:hover {
+  border: 0.094em outset #ccc;
+  -webkit-border-radius: 0.2em;
+  -moz-border-radius: 0.2em;
+  border-radius: 0.2em;
+  background: -ms-linear-gradient(rgba(0,28,0,0), rgba(0,28,0,0.12));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(0,28,0,0)), to(rgba(0,28,0,0.12)));
+  background: -moz-linear-gradient(rgba(0,28,0,0), rgba(0,28,0,0.12));
+  background: -webkit-linear-gradient(rgba(0,28,0,0), rgba(0,28,0,0.12));
+  background: -o-linear-gradient(rgba(0,28,0,0), rgba(0,28,0,0.12));
+}
+.smio-toggleinput-radio .smio-toggleinput-focused,
+.smio-toggleinput-radio.smio-toggleinput-unchecked .smio-toggleinput-btnlabel:hover {
+  -webkit-border-radius: 1em;
+  -moz-border-radius: 1em;
+  border-radius: 1em;
+}
+.smio-toggleinput-checked .smio-toggleinput-focused,
+.smio-toggleinput-checkbox.smio-toggleinput-checked .smio-toggleinput-btnlabel:hover {
+  background: -ms-linear-gradient(rgba(0,28,0,0.12), rgba(0,28,0,0));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(0,28,0,0.12)), to(rgba(0,28,0,0)));
+  background: -moz-linear-gradient(rgba(0,28,0,0.12), rgba(0,28,0,0));
+  background: -webkit-linear-gradient(rgba(0,28,0,0.12), rgba(0,28,0,0));
+  background: -o-linear-gradient(rgba(0,28,0,0.12), rgba(0,28,0,0));
   border: 0.094em inset #ccc;
-}
-input.smio-toggleinput {
-  opacity: 0;
-}
-label.smio-toggleinput {
-  padding-left: 0.5em;
-}
-.smio-toggleinput-unchecked .smio-toggleinput-btn {
-  xbackground: #00f;
-}
-.smio-toggleinput-checked .smio-toggleinput-btn {
-  xbackground: #008000;
 }
