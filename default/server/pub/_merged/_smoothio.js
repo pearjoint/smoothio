@@ -14219,7 +14219,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       if (((item < 0) || (item >= this.items.length)) && force) {
         item = 0;
       }
-      if ((force || item !== this.curItem) && (item >= 0) && (item < this.items.length) && !this.scrolling) {
+      if ((force || item !== this.curItem) && (item >= 0) && (item < this.items.length)) {
         this.scrolling = true;
         this.edgePrev.css({
           display: item === 0 ? 'none' : 'block'

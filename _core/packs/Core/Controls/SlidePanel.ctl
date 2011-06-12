@@ -51,7 +51,7 @@ scrollTo: (item, force) ->
 		item = @items.indexOf item
 	if ((item < 0) or (item >= @items.length)) and force
 		item = 0
-	if (force or item isnt @curItem) and (item >= 0) and (item < @items.length) and not @scrolling
+	if (force or item isnt @curItem) and (item >= 0) and (item < @items.length)
 		@scrolling = true
 		@edgePrev.css display: if (item is 0) then 'none' else 'block'
 		@edgeNext.css display: if (item is (@items.length - 1)) then 'none' else 'block'
