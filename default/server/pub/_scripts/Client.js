@@ -29,7 +29,7 @@
       this.socket.connect();
       return setInterval((__bind(function() {
         return this.pageBody.css({
-          "background-image": "url('/_/file/images/bg" + (smio.Util.Number.randomInt(4)) + ".jpg')"
+          "xbackground-image": "url('/_/file/images/bg" + (smio.Util.Number.randomInt(4)) + ".jpg')"
         });
       }, this)), 5000);
     };

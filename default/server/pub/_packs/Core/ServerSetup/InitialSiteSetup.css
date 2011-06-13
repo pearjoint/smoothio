@@ -73,7 +73,7 @@ div.smio-setup {
 }
 .smio-setup-stepbox-form span.smio-toggleinput {
   display: block;
-  padding: 0.35em 0 0.35em 6.15em;
+  padding: 0.8em 0 0 6.15em;
   -moz-transition: color 0.5s;
   -webkit-transition: color 0.5s;
   -o-transition: color 0.5s;

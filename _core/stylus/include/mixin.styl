@@ -47,6 +47,23 @@ smio-transition()
 	-o-transition arguments
 	transition arguments
 
+smio-background-bgradient(col)
+	background-color col
+	background-size 1.3em, 2.9em, 3.7em, 5.3em
+	background -webkit-linear-gradient(0, rgba(255, 255, 255, 0.07) 50%, transparent 50%), -webkit-linear-gradient(0, rgba(255, 255, 255, 0.13) 50%, transparent 50%), -webkit-linear-gradient(0, transparent 50%, rgba(255, 255, 255, 0.17) 50%), -webkit-linear-gradient(0, transparent 50%, rgba(255, 255, 255, 0.19) 50%)
+	background -o-linear-gradient(0, rgba(255, 255, 255, 0.07) 50%, transparent 50%), -o-linear-gradient(0, rgba(255, 255, 255, 0.13) 50%, transparent 50%), -o-linear-gradient(0, transparent 50%, rgba(255, 255, 255, 0.17) 50%), -o-linear-gradient(0, transparent 50%, rgba(255, 255, 255, 0.19) 50%)
+	background -moz-linear-gradient(0, rgba(255, 255, 255, 0.07) 50%, transparent 50%), -moz-linear-gradient(0, rgba(255, 255, 255, 0.13) 50%, transparent 50%), -moz-linear-gradient(0, transparent 50%, rgba(255, 255, 255, 0.17) 50%), -moz-linear-gradient(0, transparent 50%, rgba(255, 255, 255, 0.19) 50%)
+	background -ms-linear-gradient(0, rgba(255, 255, 255, 0.07) 50%, transparent 50%), -ms-linear-gradient(0, rgba(255, 255, 255, 0.13) 50%, transparent 50%), -ms-linear-gradient(0, transparent 50%, rgba(255, 255, 255, 0.17) 50%), -ms-linear-gradient(0, transparent 50%, rgba(255, 255, 255, 0.19) 50%)
+
+smio-background-ogradient(col1, pc1, col2, pc2, size)
+	background col2
+	background -ms-linear-gradient(col1 pc1, col2 pc2);
+	background -xmoz-linear-gradient(col1 pc1, col2 pc2);
+	background -o-linear-gradient(col1 pc1, col2 pc2);
+	background -webkit-linear-gradient(col1 pc1, col2 pc2);
+	background -webkit-gradient(linear, 0% 0%, 0% 100%, from(col1), to(col2))
+	background-size size
+
 smio-background-rgradient(col1, col2)
 	background col1
 	background -webkit-gradient(radial, 3 3, 4, 3 3, 1, from(col1), to(col2))

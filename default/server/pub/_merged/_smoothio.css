@@ -140,9 +140,14 @@ body {
   user-select: none;
   color: #303030;
   margin: 0;
-  background: #c0c0c0;
   overflow: hidden;
   font-family: Arial, Helvetica, Helvetica Neue, Sans-Serif;
+  background-color: #c09050;
+  background-size: 1.3em, 2.9em, 3.7em, 5.3em;
+  background: -webkit-linear-gradient(0, rgba(255,255,255,0.07) 50%, transparent 50%), -webkit-linear-gradient(0, rgba(255,255,255,0.13) 50%, transparent 50%), -webkit-linear-gradient(0, transparent 50%, rgba(255,255,255,0.17) 50%), -webkit-linear-gradient(0, transparent 50%, rgba(255,255,255,0.19) 50%);
+  background: -o-linear-gradient(0, rgba(255,255,255,0.07) 50%, transparent 50%), -o-linear-gradient(0, rgba(255,255,255,0.13) 50%, transparent 50%), -o-linear-gradient(0, transparent 50%, rgba(255,255,255,0.17) 50%), -o-linear-gradient(0, transparent 50%, rgba(255,255,255,0.19) 50%);
+  background: -moz-linear-gradient(0, rgba(255,255,255,0.07) 50%, transparent 50%), -moz-linear-gradient(0, rgba(255,255,255,0.13) 50%, transparent 50%), -moz-linear-gradient(0, transparent 50%, rgba(255,255,255,0.17) 50%), -moz-linear-gradient(0, transparent 50%, rgba(255,255,255,0.19) 50%);
+  background: -ms-linear-gradient(0, rgba(255,255,255,0.07) 50%, transparent 50%), -ms-linear-gradient(0, rgba(255,255,255,0.13) 50%, transparent 50%), -ms-linear-gradient(0, transparent 50%, rgba(255,255,255,0.17) 50%), -ms-linear-gradient(0, transparent 50%, rgba(255,255,255,0.19) 50%);
 }
 .smio-main {
   height: 100%;
@@ -150,8 +155,6 @@ body {
 }
 .smio-blocking-overlay {
   display: none;
-  background: -webkit-linear-gradient(rgba(0,0,0,0.5) 25%, rgba(0,0,0,0.7) 75%);
-  background-size: 0.25em;
   position: fixed;
   top: 0;
   left: 0;
@@ -165,6 +168,13 @@ body {
   color: #f0f0f0;
   text-shadow: 0 0 0.6em #fff;
   letter-spacing: -0.05em;
+  background: rgba(0,0,0,0.7);
+  background: -ms-linear-gradient(rgba(0,0,0,0.5) 25%, rgba(0,0,0,0.7) 75%);
+  background: -xmoz-linear-gradient(rgba(0,0,0,0.5) 25%, rgba(0,0,0,0.7) 75%);
+  background: -o-linear-gradient(rgba(0,0,0,0.5) 25%, rgba(0,0,0,0.7) 75%);
+  background: -webkit-linear-gradient(rgba(0,0,0,0.5) 25%, rgba(0,0,0,0.7) 75%);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(0,0,0,0.5)), to(rgba(0,0,0,0.7)));
+  background-size: 0.25em;
 }
 
 /** server/pub/_packs/Core/Controls/Toggle.css **/
@@ -523,7 +533,7 @@ div.smio-setup {
 }
 .smio-setup-stepbox-form span.smio-toggleinput {
   display: block;
-  padding: 0.35em 0 0.35em 6.15em;
+  padding: 0.8em 0 0 6.15em;
   -moz-transition: color 0.5s;
   -webkit-transition: color 0.5s;
   -o-transition: color 0.5s;

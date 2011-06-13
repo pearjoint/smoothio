@@ -1,28 +1,36 @@
-Mon Jun 13 01:27:56 [initandlisten] MongoDB starting : pid=30366 port=61234 dbpath=/home/roxor/smoothio/default/server/dbs/ 64-bit 
-Mon Jun 13 01:27:56 [initandlisten] db version v1.8.1, pdfile version 4.5
-Mon Jun 13 01:27:56 [initandlisten] git version: a429cd4f535b2499cc4130b06ff7c26f41c00f04
-Mon Jun 13 01:27:56 [initandlisten] build sys info: Linux bs-linux64.10gen.cc 2.6.21.7-2.ec2.v1.2.fc8xen #1 SMP Fri Nov 20 17:48:28 EST 2009 x86_64 BOOST_LIB_VERSION=1_41
-Mon Jun 13 01:27:56 [initandlisten] waiting for connections on port 61234
-Mon Jun 13 01:27:56 [websvr] web admin interface listening on port 62234
-Mon Jun 13 01:27:56 [initandlisten] connection accepted from 127.0.0.1:48700 #1
-Mon Jun 13 01:27:57 [initandlisten] connection accepted from 127.0.0.1:48701 #2
-Mon Jun 13 01:27:57 [initandlisten] connection accepted from 127.0.0.1:48702 #3
-Mon Jun 13 01:27:58 [initandlisten] connection accepted from 127.0.0.1:48703 #4
-Mon Jun 13 01:27:58 [initandlisten] connection accepted from 127.0.0.1:48716 #5
-Mon Jun 13 01:27:59 [initandlisten] connection accepted from 127.0.0.1:48717 #6
-Mon Jun 13 01:28:07 [conn4] terminating, shutdown command received
-Mon Jun 13 01:28:07 dbexit: shutdown called
-Mon Jun 13 01:28:07 [conn4] shutdown: going to close listening sockets...
-Mon Jun 13 01:28:07 [conn4] closing listening socket: 5
-Mon Jun 13 01:28:07 [conn4] closing listening socket: 7
-Mon Jun 13 01:28:07 [conn4] closing listening socket: 8
-Mon Jun 13 01:28:07 [conn4] closing listening socket: 9
-Mon Jun 13 01:28:07 [conn4] removing socket file: /tmp/mongodb-61234.sock
-Mon Jun 13 01:28:07 [conn4] removing socket file: /tmp/mongodb-62234.sock
-Mon Jun 13 01:28:07 [conn4] shutdown: going to flush diaglog...
-Mon Jun 13 01:28:07 [conn4] shutdown: going to close sockets...
-Mon Jun 13 01:28:07 [conn4] shutdown: waiting for fs preallocator...
-Mon Jun 13 01:28:07 [conn4] shutdown: closing all files...
-Mon Jun 13 01:28:07 closeAllFiles() finished
-Mon Jun 13 01:28:07 [conn4] shutdown: removing fs lock...
-Mon Jun 13 01:28:07 dbexit: really exiting now
+Mon Jun 13 04:03:57 [initandlisten] MongoDB starting : pid=5515 port=61234 dbpath=/home/roxor/smoothio/default/server/dbs/ 64-bit 
+Mon Jun 13 04:03:57 [initandlisten] db version v1.8.1, pdfile version 4.5
+Mon Jun 13 04:03:57 [initandlisten] git version: a429cd4f535b2499cc4130b06ff7c26f41c00f04
+Mon Jun 13 04:03:57 [initandlisten] build sys info: Linux bs-linux64.10gen.cc 2.6.21.7-2.ec2.v1.2.fc8xen #1 SMP Fri Nov 20 17:48:28 EST 2009 x86_64 BOOST_LIB_VERSION=1_41
+Mon Jun 13 04:03:57 [initandlisten] waiting for connections on port 61234
+Mon Jun 13 04:03:57 [websvr] web admin interface listening on port 62234
+Mon Jun 13 04:03:57 [initandlisten] connection accepted from 127.0.0.1:44897 #1
+Mon Jun 13 04:03:58 [initandlisten] connection accepted from 127.0.0.1:44898 #2
+Mon Jun 13 04:03:58 [initandlisten] connection accepted from 127.0.0.1:44899 #3
+Mon Jun 13 04:03:59 [initandlisten] connection accepted from 127.0.0.1:44900 #4
+Mon Jun 13 04:03:59 [initandlisten] connection accepted from 127.0.0.1:44901 #5
+Mon Jun 13 04:04:00 [initandlisten] connection accepted from 127.0.0.1:44902 #6
+Mon Jun 13 04:04:16 [initandlisten] connection accepted from 127.0.0.1:44905 #7
+Mon Jun 13 04:04:44 [initandlisten] connection accepted from 127.0.0.1:44906 #8
+Mon Jun 13 04:05:00 [initandlisten] connection accepted from 127.0.0.1:44907 #9
+Mon Jun 13 04:05:16 [initandlisten] connection accepted from 127.0.0.1:44908 #10
+Mon Jun 13 04:05:24 [initandlisten] connection accepted from 127.0.0.1:44909 #11
+Mon Jun 13 04:06:34 [initandlisten] connection accepted from 127.0.0.1:41944 #12
+Mon Jun 13 04:07:38 [initandlisten] connection accepted from 127.0.0.1:42040 #13
+Mon Jun 13 04:08:42 [initandlisten] connection accepted from 127.0.0.1:42045 #14
+Mon Jun 13 04:09:34 [conn4] terminating, shutdown command received
+Mon Jun 13 04:09:34 dbexit: shutdown called
+Mon Jun 13 04:09:34 [conn4] shutdown: going to close listening sockets...
+Mon Jun 13 04:09:34 [conn4] closing listening socket: 5
+Mon Jun 13 04:09:34 [conn4] closing listening socket: 7
+Mon Jun 13 04:09:34 [conn4] closing listening socket: 8
+Mon Jun 13 04:09:34 [conn4] closing listening socket: 9
+Mon Jun 13 04:09:34 [conn4] removing socket file: /tmp/mongodb-61234.sock
+Mon Jun 13 04:09:34 [conn4] removing socket file: /tmp/mongodb-62234.sock
+Mon Jun 13 04:09:34 [conn4] shutdown: going to flush diaglog...
+Mon Jun 13 04:09:34 [conn4] shutdown: going to close sockets...
+Mon Jun 13 04:09:34 [conn4] shutdown: waiting for fs preallocator...
+Mon Jun 13 04:09:34 [conn4] shutdown: closing all files...
+Mon Jun 13 04:09:34 closeAllFiles() finished
+Mon Jun 13 04:09:34 [conn4] shutdown: removing fs lock...
+Mon Jun 13 04:09:34 dbexit: really exiting now
