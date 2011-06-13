@@ -9034,6 +9034,171 @@ jQuery.cookie = function(name, value, options) {
     }
 };
 
+/** ../_core/scripts/jquery.url.js **/
+// JQuery URL Parser plugin - https://github.com/allmarkedup/jQuery-URL-Parser
+// Written by Mark Perkins, mark@allmarkedup.com
+// License: http://unlicense.org/ (i.e. do what you want with it!)
+
+;(function($, undefined) {
+    
+    var tag2attr = {
+        a       : 'href',
+        img     : 'src',
+        form    : 'action',
+        base    : 'href',
+        script  : 'src',
+        iframe  : 'src',
+        link    : 'href'
+    },
+    
+	key = ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","fragment"], // keys available to query
+	
+	aliases = { "anchor" : "fragment" }, // aliases for backwards compatability
+
+	parser = {
+		strict  : /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*):?([^:@]*))?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,  //less intuitive, more accurate to the specs
+		loose   :  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*):?([^:@]*))?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/ // more intuitive, fails on relative paths and deviates from specs
+	},
+	
+	querystring_parser = /(?:^|&|;)([^&=;]*)=?([^&;]*)/g, // supports both ampersand and semicolon-delimted query string key/value pairs
+	
+	fragment_parser = /(?:^|&|;)([^&=;]*)=?([^&;]*)/g; // supports both ampersand and semicolon-delimted fragment key/value pairs
+	
+	function parseUri( url, strictMode )
+	{
+		var str = decodeURI( url ),
+		    res   = parser[ strictMode || false ? "strict" : "loose" ].exec( str ),
+		    uri = { attr : {}, param : {}, seg : {} },
+		    i   = 14;
+		
+		while ( i-- )
+		{
+			uri.attr[ key[i] ] = res[i] || "";
+		}
+		
+		// build query and fragment parameters
+		
+		uri.param['query'] = {};
+		uri.param['fragment'] = {};
+		
+		uri.attr['query'].replace( querystring_parser, function ( $0, $1, $2 ){
+			if ($1)
+			{
+				uri.param['query'][$1] = $2;
+			}
+		});
+		
+		uri.attr['fragment'].replace( fragment_parser, function ( $0, $1, $2 ){
+			if ($1)
+			{
+				uri.param['fragment'][$1] = $2;
+			}
+		});
+				
+		// split path and fragement into segments
+		
+        uri.seg['path'] = uri.attr.path.replace(/^\/+|\/+$/g,'').split('/');
+        
+        uri.seg['fragment'] = uri.attr.fragment.replace(/^\/+|\/+$/g,'').split('/');
+        
+        // compile a 'base' domain attribute
+        
+        uri.attr['base'] = uri.attr.host ? uri.attr.protocol+"://"+uri.attr.host + (uri.attr.port ? ":"+uri.attr.port : '') : '';
+        
+		return uri;
+	};
+	
+	function getAttrName( elm )
+	{
+		var tn = elm.tagName;
+		if ( tn !== undefined ) return tag2attr[tn.toLowerCase()];
+		return tn;
+	}
+	
+	$.fn.url = function( strictMode )
+	{
+	    var url = '';
+	    
+	    if ( this.length )
+	    {
+	        url = $(this).attr( getAttrName(this[0]) ) || '';
+	    }
+	    
+        return $.url({ url : url, strict : strictMode });
+	};
+	
+	$.url = function( opts )
+	{
+	    var url     = '',
+	        strict  = false;
+
+	    if ( typeof opts === 'string' )
+	    {
+	        url = opts;
+	    }
+	    else
+	    {
+	        opts = opts || {};
+	        strict = opts.strict || strict;
+            url = opts.url === undefined ? window.location.toString() : opts.url;
+	    }
+	    	            
+        return {
+            
+            data : parseUri(url, strict),
+            
+            // get various attributes from the URI
+            attr : function( attr )
+            {
+                attr = aliases[attr] || attr;
+                return attr !== undefined ? this.data.attr[attr] : this.data.attr;
+            },
+            
+            // return query string parameters
+            param : function( param )
+            {
+                return param !== undefined ? this.data.param.query[param] : this.data.param.query;
+            },
+            
+            // return fragment parameters
+            fparam : function( param )
+            {
+                return param !== undefined ? this.data.param.fragment[param] : this.data.param.fragment;
+            },
+            
+            // return path segments
+            segment : function( seg )
+            {
+                if ( seg === undefined )
+                {
+                    return this.data.seg.path;                    
+                }
+                else
+                {
+                    seg = seg < 0 ? this.data.seg.path.length + seg : seg - 1; // negative segments count from the end
+                    return this.data.seg.path[seg];                    
+                }
+            },
+            
+            // return fragment segments
+            fsegment : function( seg )
+            {
+                if ( seg === undefined )
+                {
+                    return this.data.seg.fragment;                    
+                }
+                else
+                {
+                    seg = seg < 0 ? this.data.seg.fragment.length + seg : seg - 1; // negative segments count from the end
+                    return this.data.seg.fragment[seg];                    
+                }
+            }
+            
+        };
+        
+	};
+	
+})(jQuery);
 /** ../_core/scripts/json2.js **/
 
 var JSON;
@@ -13050,6 +13215,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.pageBody = $('#smio_body');
       $('#smio_offline').text(smio.resources.smoothio.connect).append('<span id="smio_offline_blink" style="visibility: hidden;">_</span>');
       cookie = $.cookie('smoo');
+      this.pageUrl = $.url();
       try {
         this.smioCookie = JSON.parse(cookie);
       } catch (err) {
@@ -13068,9 +13234,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.socket.connect();
       return setInterval((__bind(function() {
         return this.pageBody.css({
-          "xbackground-image": "url('/_/file/images/bg" + (smio.Util.Number.randomInt(4)) + ".jpg')"
+          "background-image": "url('/_/file/images/bg" + (smio.Util.Number.randomInt(4)) + ".jpg')",
+          "background-size": "auto auto"
         });
-      }, this)), 5000);
+      }, this)), 4000);
     };
     Client.prototype.onWindowResize = function() {
       var ctl, h, id, w, _ref, _ref2, _results;
@@ -13248,7 +13415,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         $('#smio_favicon').attr({
           'href': '/_/file/images/bg.png'
         });
-        return $('#smio_offline').show();
+        $('#smio_offline').show();
+        if (this.client.allControls['']) {
+          return this.client.allControls[''].disable(true, true);
+        }
       }
     };
     Socket.prototype.onOnline = function() {
@@ -13257,6 +13427,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         if (this.offlineBlinkIntervalHandle) {
           clearInterval(this.offlineBlinkIntervalHandle);
           this.offlineBlinkIntervalHandle = null;
+        }
+        if (this.client.allControls['']) {
+          this.client.allControls[''].disable(false, true);
         }
         $('#smio_offline').hide();
         $('#smio_favicon').attr({
@@ -13380,6 +13553,30 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   var __slice = Array.prototype.slice, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   smio = global.smoothio;
   smio.Control = (function() {
+    Control.prototype.coreDisable = function(disable) {};
+    Control.prototype.disable = function(disable, isInherit) {
+      var ctl, id, _ref, _results;
+      if (!isInherit) {
+        this.disabled = disable;
+      } else if (!disable) {
+        disable = this.disabled;
+      }
+      if (this.el) {
+        if (disable) {
+          this.el.removeClass('smio-enabled').addClass('smio-disabled');
+        } else {
+          this.el.removeClass('smio-disabled').addClass('smio-enabled');
+        }
+      }
+      this.coreDisable(disable);
+      _ref = this.controls;
+      _results = [];
+      for (id in _ref) {
+        ctl = _ref[id];
+        _results.push(ctl.disable(disable, isInherit));
+      }
+      return _results;
+    };
     Control.prototype.on = function(eventName, handler) {
       var eh, _i, _len, _ref, _results;
       if (eventName) {
@@ -13405,6 +13602,11 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       var ctl, id, prefix, _ref;
       prefix = "cscript:";
       this.el = $('#' + this.id());
+      if (this.disabled) {
+        this.el.removeClass('smio-enabled').addClass('smio-disabled');
+      } else {
+        this.el.removeClass('smio-disabled').addClass('smio-enabled');
+      }
       _ref = this.controls;
       for (id in _ref) {
         ctl = _ref[id];
@@ -13422,6 +13624,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
     };
     Control.prototype.onWindowResize = function(width, height) {};
+    Control.prototype.sub = function(id) {
+      return $("#" + (this.id(id)));
+    };
     Control.prototype.syncUpdate = function(ctlDesc) {};
     Control.prototype.un = function(eventName, handler) {
       if (eventName && this.eventHandlers[eventName] && _.isFunction(handler)) {
@@ -13488,6 +13693,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.args = args;
       this.baseName = baseName;
       this.className = className;
+      this.disabled = smio.iif(this.args.disabled);
       this.isServer = !(this.isClient = this.client ? true : false);
       this.ctlID = this.args.id;
       this.controls = {};
@@ -14036,7 +14242,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     child.prototype = new ctor;
     child.__super__ = parent.prototype;
     return child;
-  };
+  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   smio = smoothio = global.smoothio;
   smio.Packs_Core_Controls_LinkButton = (function() {
     __extends(Packs_Core_Controls_LinkButton, smio.Control);
@@ -14049,16 +14255,24 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           href: this.args.href || smio.Control.util.jsVoid
         }
       };
+      if (this.disabled) {
+        ret.a.disabled = 'disabled';
+      }
       if (this.args.labelText) {
         ret.a.text = [this.args.labelText];
       }
       return ret;
     };
+    Packs_Core_Controls_LinkButton.prototype.coreDisable = function(disable) {
+      return this.el.prop('disabled', disable);
+    };
     Packs_Core_Controls_LinkButton.prototype.onLoad = function() {
       Packs_Core_Controls_LinkButton.__super__.onLoad.call(this);
-      if (this.args.onClick) {
-        return this.el.click(this.args.onClick);
-      }
+      return this.el.click(__bind(function() {
+        if (this.args.onClick && !(this.disabled || this.el.prop('disabled'))) {
+          return this.args.onClick();
+        }
+      }, this));
     };
     function Packs_Core_Controls_LinkButton(client, parent, args) {
       Packs_Core_Controls_LinkButton.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_LinkButton");
@@ -14198,7 +14412,11 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       (this.edgeNext = $("#" + (this.id('edgenext')))).click(__bind(function() {
         return this.scrollTo(this.curItem + 1);
       }, this));
-      this.scrollBox = $("#" + (this.id('scrollbox')));
+      (this.scrollBox = $("#" + (this.id('scrollbox')))).scroll(_.debounce((__bind(function() {
+        if (!this.scrolling) {
+          return this.scrollTo(null, true);
+        }
+      }, this)), 250));
       return this.scrollTo(0, true);
     };
     Packs_Core_Controls_SlidePanel.prototype.onWindowResize = function(w, h) {
@@ -14349,6 +14567,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         "class": 'smio-textinput',
         type: this.args.type === 'password' ? 'password' : 'text'
       };
+      if (this.disabled) {
+        ret.span.input.readonly = 'readonly';
+      }
       if (this.args.value) {
         ret.span.input.value = this.args.value;
       }
@@ -14356,6 +14577,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         ret.span.input.spellcheck = false;
       }
       return ret;
+    };
+    Packs_Core_Controls_TextInput.prototype.coreDisable = function(disable) {
+      return this.sub('input').prop('readonly', disable);
     };
     function Packs_Core_Controls_TextInput(client, parent, args) {
       Packs_Core_Controls_TextInput.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_TextInput");
@@ -14420,6 +14644,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         "class": 'smio-toggleinput',
         type: smio.iif(ischk, 'checkbox', 'radio')
       };
+      if (this.disabled) {
+        ret.span.span.span.input.disabled = 'disabled';
+      }
       if (this.args.checked) {
         ret.span.span.span.input.checked = 'checked';
         (smio.iif(ischk, ret.span.span.span, ret.span.span.span.span))['span #glyph'].html = [this.cls()[smio.iif(ischk, 'checkmark', 'radiomark')]];
@@ -14433,6 +14660,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         ret.span.span.label[smio.iif(this.args.labelHtml, 'html', 'text')] = [smio.iif(this.args.labelHtml, this.args.labelHtml, this.args.labelText)];
       }
       return ret;
+    };
+    Packs_Core_Controls_Toggle.prototype.coreDisable = function(disable) {
+      return this.sub('input').prop('disabled', disable);
     };
     Packs_Core_Controls_Toggle.prototype.getSharedClass = function() {
       return "" + (this.parent.id()) + "_" + (this.args.toggleName || '');
@@ -14479,8 +14709,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         return $("#" + (this.id('btnlabel'))).addClass('smio-toggleinput-focused');
       }, this));
       $("#" + (this.id('btn'))).click(__bind(function() {
-        this.elInput.prop('checked', this.isRadioBox() || !this.elInput.prop('checked'));
-        return this.onCheck();
+        if (!this.elInput.prop('disabled')) {
+          this.elInput.prop('checked', this.isRadioBox() || !this.elInput.prop('checked'));
+          return this.onCheck();
+        }
       }, this));
       return this.val = this.elInput.prop('checked');
     };
@@ -14510,11 +14742,16 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio.Packs_Core_ServerSetup_InitialSiteSetup = (function() {
     __extends(Packs_Core_ServerSetup_InitialSiteSetup, smio.Control);
     Packs_Core_ServerSetup_InitialSiteSetup.prototype.renderTemplate = function() {
+      var urlseg;
+      urlseg = _.trim(this.client.pageUrl.attr('directory'), '/');
+      urlseg = smio.iif(urlseg, "/" + urlseg + "/", '/');
       return {
         "div .smio-setup": {
           "id": '',
           "div .smio-setup-outer .smio-setup-outer-top": {
-            "div.smio-setup-header": [this.r('title')],
+            "div.smio-setup-header": {
+              html: [this.r('title', urlseg)]
+            },
             "div.smio-setup-header-desc": [this.r('desc')]
           },
           "div .smio-setup-inner": {
@@ -14535,17 +14772,19 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                       labelText: this.r('owner_pass'),
                       type: 'password'
                     },
-                    "span .smio-setup-stepbox-form-label": {
+                    "div .smio-setup-stepbox-form-label": {
                       html: ['The Hub owner specified above is:']
                     },
-                    "Toggle #owner_create": {
-                      toggleName: 'owner_toggle',
-                      labelHtml: this.r('owner_create', 'localhost'),
-                      checked: true
-                    },
-                    "Toggle #owner_login": {
-                      toggleName: 'owner_toggle',
-                      labelHtml: this.r('owner_login', 'localhost')
+                    "div": {
+                      "Toggle #owner_create": {
+                        toggleName: 'owner_toggle',
+                        labelHtml: this.r('owner_create', 'localhost'),
+                        checked: true
+                      },
+                      "Toggle #owner_login": {
+                        toggleName: 'owner_toggle',
+                        labelHtml: this.r('owner_login', 'localhost')
+                      }
                     }
                   }
                 },
@@ -14574,6 +14813,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           }
         }
       };
+    };
+    Packs_Core_ServerSetup_InitialSiteSetup.prototype.onLoad = function() {
+      Packs_Core_ServerSetup_InitialSiteSetup.__super__.onLoad.call(this);
+      return this.controls['stepslide'].controls['owner_name'].sub('input').focus();
     };
     Packs_Core_ServerSetup_InitialSiteSetup.prototype.onSlide = function(index, itemID) {
       return this.controls.steptabs.selectTab(itemID);

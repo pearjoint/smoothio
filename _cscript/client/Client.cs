@@ -9,6 +9,7 @@ class smio.Client
 		@pageBody = $('#smio_body')
 		$('#smio_offline').text(smio.resources.smoothio.connect).append('<span id="smio_offline_blink" style="visibility: hidden;">_</span>')
 		cookie = $.cookie 'smoo'
+		@pageUrl = $.url()
 		try
 			@smioCookie = JSON.parse cookie
 		catch err
@@ -21,7 +22,7 @@ class smio.Client
 
 	init: ->
 		@socket.connect()
-		setInterval (=> @pageBody.css "xbackground-image": "url('/_/file/images/bg#{smio.Util.Number.randomInt(4)}.jpg')"), 5000
+		setInterval (=> @pageBody.css "background-image": "url('/_/file/images/bg#{smio.Util.Number.randomInt(4)}.jpg')", "background-size": "auto auto"), 4000
 
 	onWindowResize: () ->
 		[w, h] = [@pageWindow.width(), @pageWindow.height()]

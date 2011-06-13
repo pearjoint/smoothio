@@ -11,6 +11,7 @@
       this.pageBody = $('#smio_body');
       $('#smio_offline').text(smio.resources.smoothio.connect).append('<span id="smio_offline_blink" style="visibility: hidden;">_</span>');
       cookie = $.cookie('smoo');
+      this.pageUrl = $.url();
       try {
         this.smioCookie = JSON.parse(cookie);
       } catch (err) {
@@ -29,9 +30,10 @@
       this.socket.connect();
       return setInterval((__bind(function() {
         return this.pageBody.css({
-          "xbackground-image": "url('/_/file/images/bg" + (smio.Util.Number.randomInt(4)) + ".jpg')"
+          "background-image": "url('/_/file/images/bg" + (smio.Util.Number.randomInt(4)) + ".jpg')",
+          "background-size": "auto auto"
         });
-      }, this)), 5000);
+      }, this)), 4000);
     };
     Client.prototype.onWindowResize = function() {
       var ctl, h, id, w, _ref, _ref2, _results;

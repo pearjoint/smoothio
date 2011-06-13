@@ -139,6 +139,22 @@ class smio.Packs_#{className} extends smio.Control
 #endif
 
 #if client
+	coreDisable: (disable) ->
+
+	disable: (disable, isInherit) ->
+		if not isInherit
+			@disabled = disable
+		else if not disable
+			disable = @disabled
+		if @el
+			if disable
+				@el.removeClass('smio-enabled').addClass 'smio-disabled'
+			else
+				@el.removeClass('smio-disabled').addClass 'smio-enabled'
+		@coreDisable disable
+		for id, ctl of @controls
+			ctl.disable disable, isInherit
+
 	on: (eventName, handler) ->
 		if eventName
 			if _.isFunction handler
@@ -153,6 +169,10 @@ class smio.Packs_#{className} extends smio.Control
 	onLoad: () ->
 		prefix = "cscript:"
 		@el = $('#' + @id())
+		if @disabled
+			@el.removeClass('smio-enabled').addClass 'smio-disabled'
+		else
+			@el.removeClass('smio-disabled').addClass 'smio-enabled'
 		for id, ctl of @controls
 			ctl.onLoad()
 		if not @parent
@@ -164,6 +184,9 @@ class smio.Packs_#{className} extends smio.Control
 					a.href = "javascript:smio.client.socket.onError(\"#{err}\");"
 
 	onWindowResize: (width, height) ->
+
+	sub: (id) ->
+		$ "##{@id id}"
 
 	syncUpdate: (ctlDesc) ->
 
@@ -205,6 +228,7 @@ class smio.Packs_#{className} extends smio.Control
 			((CoffeeScript.compile name).split '\n').join ''
 
 	constructor: (@client, @parent, @args, @baseName, @className) ->
+		@disabled = smio.iif @args.disabled
 		@isServer = not (@isClient = if @client then true else false)
 		@ctlID = @args.id
 		@controls = {}

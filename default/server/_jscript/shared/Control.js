@@ -237,6 +237,7 @@
       this.args = args;
       this.baseName = baseName;
       this.className = className;
+      this.disabled = smio.iif(this.args.disabled);
       this.isServer = !(this.isClient = this.client ? true : false);
       this.ctlID = this.args.id;
       this.controls = {};

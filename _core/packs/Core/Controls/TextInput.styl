@@ -3,15 +3,22 @@ input.smio-textinput
 	background transparent
 	border 0px none red
 	border-bottom 0.094em dotted #c0c0c0
-	smio-select text !important
-	smio-drag auto
 	padding 0.33em
 	font-weight bold
+	smio-select text !important
+	smio-drag auto
+	smio-border-radius 0.2em
+
+span.smio-textinput.smio-enabled input.smio-textinput:hover
+	smio-box-shadow 0 0.07em 0.28em #909090 inset
+	border-bottom 0px none red
 
 input.smio-textinput:focus
 	font-weight normal
-	smio-border-radius 0.2em
 	background #ffffff
 	smio-box-shadow 0 0.07em 0.28em #909090 inset
 	border-bottom 0px none red
+
+input.smio-textinput[readonly]:focus
+	background #f0f0f0
 

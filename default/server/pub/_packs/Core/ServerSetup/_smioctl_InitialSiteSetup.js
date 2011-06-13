@@ -14,11 +14,16 @@
   smio.Packs_Core_ServerSetup_InitialSiteSetup = (function() {
     __extends(Packs_Core_ServerSetup_InitialSiteSetup, smio.Control);
     Packs_Core_ServerSetup_InitialSiteSetup.prototype.renderTemplate = function() {
+      var urlseg;
+      urlseg = _.trim(this.client.pageUrl.attr('directory'), '/');
+      urlseg = smio.iif(urlseg, "/" + urlseg + "/", '/');
       return {
         "div .smio-setup": {
           "id": '',
           "div .smio-setup-outer .smio-setup-outer-top": {
-            "div.smio-setup-header": [this.r('title')],
+            "div.smio-setup-header": {
+              html: [this.r('title', urlseg)]
+            },
             "div.smio-setup-header-desc": [this.r('desc')]
           },
           "div .smio-setup-inner": {
@@ -39,17 +44,19 @@
                       labelText: this.r('owner_pass'),
                       type: 'password'
                     },
-                    "span .smio-setup-stepbox-form-label": {
+                    "div .smio-setup-stepbox-form-label": {
                       html: ['The Hub owner specified above is:']
                     },
-                    "Toggle #owner_create": {
-                      toggleName: 'owner_toggle',
-                      labelHtml: this.r('owner_create', 'localhost'),
-                      checked: true
-                    },
-                    "Toggle #owner_login": {
-                      toggleName: 'owner_toggle',
-                      labelHtml: this.r('owner_login', 'localhost')
+                    "div": {
+                      "Toggle #owner_create": {
+                        toggleName: 'owner_toggle',
+                        labelHtml: this.r('owner_create', 'localhost'),
+                        checked: true
+                      },
+                      "Toggle #owner_login": {
+                        toggleName: 'owner_toggle',
+                        labelHtml: this.r('owner_login', 'localhost')
+                      }
                     }
                   }
                 },
@@ -78,6 +85,10 @@
           }
         }
       };
+    };
+    Packs_Core_ServerSetup_InitialSiteSetup.prototype.onLoad = function() {
+      Packs_Core_ServerSetup_InitialSiteSetup.__super__.onLoad.call(this);
+      return this.controls['stepslide'].controls['owner_name'].sub('input').focus();
     };
     Packs_Core_ServerSetup_InitialSiteSetup.prototype.onSlide = function(index, itemID) {
       return this.controls.steptabs.selectTab(itemID);

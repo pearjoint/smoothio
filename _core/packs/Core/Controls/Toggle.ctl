@@ -25,6 +25,8 @@ renderTemplate: ->
 		name: @args.toggleName
 		class: 'smio-toggleinput'
 		type: smio.iif ischk, 'checkbox', 'radio'
+	if (@disabled)
+		ret.span.span.span.input.disabled = 'disabled'
 	if @args.checked
 		ret.span.span.span.input.checked = 'checked'
 		(smio.iif ischk, ret.span.span.span, ret.span.span.span.span)['span #glyph'].html = [@cls()[smio.iif ischk, 'checkmark', 'radiomark']]
@@ -35,6 +37,9 @@ renderTemplate: ->
 			for: @id 'input'
 		ret.span.span.label[smio.iif @args.labelHtml, 'html', 'text'] = [smio.iif @args.labelHtml, @args.labelHtml, @args.labelText]
 	ret
+
+coreDisable: (disable) ->
+	@sub('input').prop 'disabled', disable
 
 getSharedClass: ->
 	"#{@parent.id()}_#{@args.toggleName or ''}"
@@ -70,7 +75,8 @@ onLoad: ->
 	@elInput.focus =>
 		$("##{@id 'btnlabel'}").addClass 'smio-toggleinput-focused'
 	$("##{@id 'btn'}").click =>
-		@elInput.prop 'checked', @isRadioBox() or not @elInput.prop 'checked'
-		@onCheck()
+		if not @elInput.prop 'disabled'
+			@elInput.prop 'checked', @isRadioBox() or not @elInput.prop 'checked'
+			@onCheck()
 	@val = @elInput.prop 'checked'
 

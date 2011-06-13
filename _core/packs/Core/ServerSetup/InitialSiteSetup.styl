@@ -1,13 +1,16 @@
+$setup-tcorner = 0
+$setup-bcorner = 0.8em
 $setup-grad-base = rgb(255, 255, 255)
-$setup-grad-dark = 0.66
+$setup-grad-dark = 0.5
 $setup-grad-tlite = 0.88
-$setup-grad-blite = 0.95
+$setup-grad-blite = 0.92
 
 div.smio-setup
 	smio-box-shadow 0 0.4em 4.8em #909090
 	line-height 1.25
-	smio-posabs-trl 12% 20%
+	smio-posabs-trl 0 14%
 	smio-nooverflow-nowrap()
+	smio-border-radius $setup-tcorner $setup-tcorner $setup-bcorner $setup-bcorner
 
 .smio-setup-outer
 	padding 1em
@@ -15,11 +18,12 @@ div.smio-setup
 .smio-setup-outer-top
 	smio-background-vgradient rgba($setup-grad-base, $setup-grad-dark) rgba($setup-grad-base, $setup-grad-tlite)
 	smio-nooverflow-nowrap()
+	smio-border-radius $setup-tcorner $setup-tcorner 0 0
 
 .smio-setup-inner
 	background rgba($setup-grad-base, $setup-grad-blite)
 	smio-box-shadow 0 0.062em 0.35em #b0b0b0 inset
-	padding 0 0.2em 1em 0.2em
+	padding 0 0.2em 0 0.2em
 	smio-nooverflow-nowrap()
 
 .smio-setup-header
@@ -27,6 +31,13 @@ div.smio-setup
 	color #aa4400
 	text-shadow 0 0 0.6em #ffffff
 	smio-narrow()
+
+.smio-setup-header-detail
+	smio-transition opacity 0.5s
+	opacity 0
+
+div.smio-setup:hover .smio-setup-header-detail
+	opacity 1
 
 .smio-setup-header-desc
 	color #707070
@@ -44,9 +55,9 @@ div.smio-setup
 .smio-setup-stepbox-title
 	font-size 1.6em
 	text-shadow 0.05em 0.05em 0.15em #000
-	color #f6f6f6
+	color #f5f5f5
 	font-weight 900
-	smio-narrow()
+	smio-narrower()
 	smio-lcase()
 
 .smio-setup-stepbox-form
@@ -58,7 +69,6 @@ div.smio-setup
 	padding 0.5em 0 0.5em 0
 
 .smio-setup-stepbox-form-label
-	display block
 	padding 2em 0 0.5em 0
 	color #a0a0a0
 
@@ -79,9 +89,10 @@ div.smio-setup
 	padding 1em 1em 1em 0
 
 .smio-setup-steptabs
-	smio-background-vgradient rgba($setup-grad-base, $setup-grad-blite) rgba($setup-grad-base, $setup-grad-dark)
 	text-align center
 	white-space nowrap
+	smio-border-radius 0 0 $setup-bcorner $setup-bcorner
+	smio-background-vgradient rgba($setup-grad-base, $setup-grad-blite) rgba($setup-grad-base, $setup-grad-dark)
 
 .smio-setup-steptab
 	smio-border-radius 1em

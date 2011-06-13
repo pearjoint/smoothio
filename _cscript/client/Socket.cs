@@ -82,6 +82,8 @@ class smio.Socket
 				@offlineBlinkIntervalHandle = setInterval (=> @toggleOfflineBlink()), 500
 			$('#smio_favicon').attr 'href': '/_/file/images/bg.png'
 			$('#smio_offline').show()
+			if @client.allControls['']
+				@client.allControls[''].disable true, true
 
 	onOnline: ->
 		if @offline
@@ -89,6 +91,8 @@ class smio.Socket
 			if @offlineBlinkIntervalHandle
 				clearInterval @offlineBlinkIntervalHandle
 				@offlineBlinkIntervalHandle = null
+			if @client.allControls['']
+				@client.allControls[''].disable false, true
 			$('#smio_offline').hide()
 			$('#smio_favicon').attr 'href': '/_/file/images/smoothio.png'
 			if @socket

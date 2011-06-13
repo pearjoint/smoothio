@@ -137,7 +137,10 @@
         $('#smio_favicon').attr({
           'href': '/_/file/images/bg.png'
         });
-        return $('#smio_offline').show();
+        $('#smio_offline').show();
+        if (this.client.allControls['']) {
+          return this.client.allControls[''].disable(true, true);
+        }
       }
     };
     Socket.prototype.onOnline = function() {
@@ -146,6 +149,9 @@
         if (this.offlineBlinkIntervalHandle) {
           clearInterval(this.offlineBlinkIntervalHandle);
           this.offlineBlinkIntervalHandle = null;
+        }
+        if (this.client.allControls['']) {
+          this.client.allControls[''].disable(false, true);
         }
         $('#smio_offline').hide();
         $('#smio_favicon').attr({

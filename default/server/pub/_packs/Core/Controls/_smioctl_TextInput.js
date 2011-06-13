@@ -33,6 +33,9 @@
         "class": 'smio-textinput',
         type: this.args.type === 'password' ? 'password' : 'text'
       };
+      if (this.disabled) {
+        ret.span.input.readonly = 'readonly';
+      }
       if (this.args.value) {
         ret.span.input.value = this.args.value;
       }
@@ -40,6 +43,9 @@
         ret.span.input.spellcheck = false;
       }
       return ret;
+    };
+    Packs_Core_Controls_TextInput.prototype.coreDisable = function(disable) {
+      return this.sub('input').prop('readonly', disable);
     };
     function Packs_Core_Controls_TextInput(client, parent, args) {
       Packs_Core_Controls_TextInput.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_TextInput");

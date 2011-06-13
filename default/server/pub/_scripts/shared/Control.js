@@ -3,6 +3,30 @@
   var __slice = Array.prototype.slice, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   smio = global.smoothio;
   smio.Control = (function() {
+    Control.prototype.coreDisable = function(disable) {};
+    Control.prototype.disable = function(disable, isInherit) {
+      var ctl, id, _ref, _results;
+      if (!isInherit) {
+        this.disabled = disable;
+      } else if (!disable) {
+        disable = this.disabled;
+      }
+      if (this.el) {
+        if (disable) {
+          this.el.removeClass('smio-enabled').addClass('smio-disabled');
+        } else {
+          this.el.removeClass('smio-disabled').addClass('smio-enabled');
+        }
+      }
+      this.coreDisable(disable);
+      _ref = this.controls;
+      _results = [];
+      for (id in _ref) {
+        ctl = _ref[id];
+        _results.push(ctl.disable(disable, isInherit));
+      }
+      return _results;
+    };
     Control.prototype.on = function(eventName, handler) {
       var eh, _i, _len, _ref, _results;
       if (eventName) {
@@ -28,6 +52,11 @@
       var ctl, id, prefix, _ref;
       prefix = "cscript:";
       this.el = $('#' + this.id());
+      if (this.disabled) {
+        this.el.removeClass('smio-enabled').addClass('smio-disabled');
+      } else {
+        this.el.removeClass('smio-disabled').addClass('smio-enabled');
+      }
       _ref = this.controls;
       for (id in _ref) {
         ctl = _ref[id];
@@ -45,6 +74,9 @@
       }
     };
     Control.prototype.onWindowResize = function(width, height) {};
+    Control.prototype.sub = function(id) {
+      return $("#" + (this.id(id)));
+    };
     Control.prototype.syncUpdate = function(ctlDesc) {};
     Control.prototype.un = function(eventName, handler) {
       if (eventName && this.eventHandlers[eventName] && _.isFunction(handler)) {
@@ -111,6 +143,7 @@
       this.args = args;
       this.baseName = baseName;
       this.className = className;
+      this.disabled = smio.iif(this.args.disabled);
       this.isServer = !(this.isClient = this.client ? true : false);
       this.ctlID = this.args.id;
       this.controls = {};

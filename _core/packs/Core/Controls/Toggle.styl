@@ -59,19 +59,19 @@ span.smio-toggleinput
 	padding-right 0.4em
 	border 0.094em outset transparent
 
-.smio-toggleinput-focused .smio-toggleinput-btnbtn, .smio-toggleinput-unchecked .smio-toggleinput-btnlabel:hover .smio-toggleinput-btnbtn, .smio-toggleinput-checkbox .smio-toggleinput-btnlabel:hover .smio-toggleinput-btnbtn
+.smio-toggleinput-focused .smio-toggleinput-btnbtn, .smio-toggleinput-unchecked.smio-enabled .smio-toggleinput-btnlabel:hover .smio-toggleinput-btnbtn, .smio-enabled.smio-toggleinput-checkbox .smio-toggleinput-btnlabel:hover .smio-toggleinput-btnbtn
 	border 0.094em outset transparent
 	background transparent
 
-.smio-toggleinput-focused, .smio-toggleinput-unchecked .smio-toggleinput-btnlabel:hover, .smio-toggleinput-checkbox .smio-toggleinput-btnlabel:hover
+.smio-toggleinput-focused, .smio-toggleinput-unchecked.smio-enabled .smio-toggleinput-btnlabel:hover, .smio-toggleinput-checkbox.smio-enabled .smio-toggleinput-btnlabel:hover
 	border 0.094em outset #ccc
 	smio-border-radius 0.2em
 	smio-background-vgradient rgba($grad_color, $grad_lite), rgba($grad_color, $grad_dark)
 
-.smio-toggleinput-radio .smio-toggleinput-focused, .smio-toggleinput-radio.smio-toggleinput-unchecked .smio-toggleinput-btnlabel:hover
+.smio-toggleinput-radio .smio-toggleinput-focused, .smio-toggleinput-radio.smio-toggleinput-unchecked.smio-enabled .smio-toggleinput-btnlabel:hover
 	smio-border-radius 1em
 
-.smio-toggleinput-checked .smio-toggleinput-focused, .smio-toggleinput-checkbox.smio-toggleinput-checked .smio-toggleinput-btnlabel:hover
+.smio-toggleinput-checked .smio-toggleinput-focused, .smio-toggleinput-checkbox.smio-toggleinput-checked.smio-enabled .smio-toggleinput-btnlabel:hover
 	smio-background-vgradient rgba($grad_color, $grad_dark), rgba($grad_color, $grad_lite)
 	border 0.094em inset #ccc
 
