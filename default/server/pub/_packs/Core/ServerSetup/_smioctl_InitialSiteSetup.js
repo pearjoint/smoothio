@@ -30,10 +30,11 @@
                 return this.onSlide(i, id);
               }, this),
               items: {
-                "owner": {
+                "#owner": {
                   'div .smio-setup-stepbox-title': [this.r('steptitle_owner')],
                   'div .smio-setup-stepbox-form': {
                     "TextInput #owner_name": {
+                      autoFocus: true,
                       labelText: this.r('owner_name'),
                       nospellcheck: true
                     },
@@ -44,31 +45,43 @@
                     "div .smio-setup-stepbox-form-label": {
                       html: [this.r('owner_choice')]
                     },
-                    "div": {
-                      "Toggle #owner_create": {
-                        toggleName: 'owner_toggle',
-                        labelHtml: this.r('owner_create', 'localhost'),
-                        checked: true,
-                        disabled: true
-                      },
-                      "Toggle #owner_login": {
-                        toggleName: 'owner_toggle',
-                        labelHtml: this.r('owner_login', 'localhost'),
-                        disabled: true
+                    "Toggles #owner": {
+                      disabled: true,
+                      items: {
+                        "#create": {
+                          checked: true,
+                          labelHtml: this.r('owner_create', 'localhost')
+                        },
+                        "#login": {
+                          labelHtml: this.r('owner_login', 'localhost')
+                        }
                       }
                     }
                   }
                 },
-                "template": {
+                "#template": {
                   "div .smio-setup-stepbox-title": [this.r('steptitle_template')],
                   "div .smio-setup-stepbox-form": {
                     text: ['Hub templates are not yet available.']
                   }
                 },
-                "finish": {
+                "#finish": {
                   "div .smio-setup-stepbox-title": [this.r('steptitle_finish')],
                   "div .smio-setup-stepbox-form": {
-                    html: ['mooboar<br/><br/>blaa<br/><br/>foo<br/><br/>yeah right']
+                    "TextInput #hub_title": {
+                      required: true,
+                      placeholder: this.r('hub_titlehint'),
+                      labelText: this.r('hub_title')
+                    },
+                    "div .smio-setup-stepbox-form-label": {
+                      html: [this.r('hub_hint')]
+                    },
+                    "ul #hubhints": {
+                      "li #hubhint1": [this.r('hubhint1')],
+                      "li #hubhint2": [this.r('hubhint2')],
+                      "li #hubhint3": [this.r('hubhint3')],
+                      "li #hubhint4": [this.r('hubhint4')]
+                    }
                   }
                 }
               }
@@ -87,7 +100,7 @@
     };
     Packs_Core_ServerSetup_InitialSiteSetup.prototype.onLoad = function() {
       Packs_Core_ServerSetup_InitialSiteSetup.__super__.onLoad.call(this);
-      $('.smio-setup-header-detail').click(__bind(function() {
+      return $('.smio-setup-header-detail').click(__bind(function() {
         var nurl, port, urlseg;
         port = smio.iif(("" + (this.client.pageUrl.attr('port'))) === '80', '', ":" + (this.client.pageUrl.attr('port')));
         nurl = prompt(this.r('url_hint', this.client.pageUrl.attr('protocol'), this.client.pageUrl.attr('host'), port), urlseg = this.urlSeg());
@@ -98,7 +111,6 @@
           return location.replace(_.trim(nurl));
         }
       }, this));
-      return this.sub('stepslide/owner_name/input').focus();
     };
     Packs_Core_ServerSetup_InitialSiteSetup.prototype.onSlide = function(index, itemID) {
       return this.controls.steptabs.selectTab(itemID);

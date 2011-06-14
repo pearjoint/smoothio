@@ -1,11 +1,19 @@
 (function() {
   var smio;
-  var __slice = Array.prototype.slice, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __indexOf = Array.prototype.indexOf || function(item) {
+    for (var i = 0, l = this.length; i < l; i++) {
+      if (this[i] === item) return i;
+    }
+    return -1;
+  }, __slice = Array.prototype.slice;
   smio = global.smoothio;
   smio.Control = (function() {
     Control.prototype.coreDisable = function(disable) {};
     Control.prototype.disable = function(disable, isInherit) {
       var ctl, id, len, _ref;
+      if (!arguments.length) {
+        disable = isInherit = true;
+      }
       len = 0;
       if (!isInherit) {
         this.disabled = disable;
@@ -30,21 +38,24 @@
         return this.el[smio.iif(disable, 'addClass', 'removeClass')]('smio-disabledfaded');
       }
     };
+    Control.prototype.enable = function() {
+      return this.disable(false, true);
+    };
     Control.prototype.on = function(eventName, handler) {
-      var eh, _i, _len, _ref, _results;
+      var eh, _i, _len, _ref, _ref2, _results;
       if (eventName) {
         if (_.isFunction(handler)) {
           if (!this.eventHandlers[eventName]) {
             this.eventHandlers[eventName] = [];
           }
-          if (0 > _.indexOf(this.eventHandlers[eventName], handler)) {
+          if (_ref = !handler, __indexOf.call(this.eventHandlers[eventName], _ref) >= 0) {
             return this.eventHandlers[eventName].push(handler);
           }
         } else if (this.eventHandlers[eventName]) {
-          _ref = this.eventHandlers[eventName];
+          _ref2 = this.eventHandlers[eventName];
           _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            eh = _ref[_i];
+          for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+            eh = _ref2[_i];
             _results.push(eh.apply(this, handler));
           }
           return _results;
@@ -52,8 +63,7 @@
       }
     };
     Control.prototype.onLoad = function() {
-      var ctl, id, len, prefix, _ref, _ref2;
-      prefix = "cscript:";
+      var ctl, id, len, _ref, _ref2, _results;
       this.el = $('#' + this.id());
       if (this.disabled) {
         len = 0;
@@ -70,20 +80,12 @@
         this.el.removeClass('smio-disabled').addClass('smio-enabled');
       }
       _ref2 = this.controls;
+      _results = [];
       for (id in _ref2) {
         ctl = _ref2[id];
-        ctl.onLoad();
+        _results.push(ctl.onLoad());
       }
-      if (!this.parent) {
-        return $("a[href^='" + prefix + "']").each(function(i, a) {
-          try {
-            return a.href = 'javascript:' + ((CoffeeScript.compile(a.href.substr(prefix.length))).split('\n')).join('');
-          } catch (err) {
-            alert("CODE:" + ((unescape(a.href)).substr(prefix.length)) + ":CODE");
-            return a.href = "javascript:smio.client.socket.onError(\"" + err + "\");";
-          }
-        });
-      }
+      return _results;
     };
     Control.prototype.onWindowResize = function(width, height) {};
     Control.prototype.sub = function(id) {
@@ -162,6 +164,25 @@
       this.args = args;
       this.baseName = baseName;
       this.className = className;
+      this.res = __bind(this.res, this);
+      this.r = __bind(this.r, this);
+      this.renderTag = __bind(this.renderTag, this);
+      this.renderHtml = __bind(this.renderHtml, this);
+      this.renderJsonTemplate = __bind(this.renderJsonTemplate, this);
+      this.init = __bind(this.init, this);
+      this.id = __bind(this.id, this);
+      this.fullClassName = __bind(this.fullClassName, this);
+      this.ctl = __bind(this.ctl, this);
+      this.cls = __bind(this.cls, this);
+      this.un = __bind(this.un, this);
+      this.syncUpdate = __bind(this.syncUpdate, this);
+      this.sub = __bind(this.sub, this);
+      this.onWindowResize = __bind(this.onWindowResize, this);
+      this.onLoad = __bind(this.onLoad, this);
+      this.on = __bind(this.on, this);
+      this.enable = __bind(this.enable, this);
+      this.disable = __bind(this.disable, this);
+      this.coreDisable = __bind(this.coreDisable, this);
       this.disabled = smio.iif(this.args.disabled);
       this.isServer = !(this.isClient = this.client ? true : false);
       this.ctlID = this.args.id;
@@ -301,7 +322,7 @@
     Control.prototype.r = function() {
       var args, name;
       name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-      return this.res.apply(this, _.toArray(arguments));
+      return this.res.apply(this, [name].concat(__slice.call(args)));
     };
     Control.prototype.res = function() {
       var args, i, name, parts, resSet, resSets, ret, _ref;

@@ -73,7 +73,7 @@
       return this.sub('input').prop('disabled', disable);
     };
     Packs_Core_Controls_Toggle.prototype.getSharedClass = function() {
-      return "" + (this.parent.id()) + "_" + (this.args.toggleName || '');
+      return this.args.toggleName || this.id();
     };
     Packs_Core_Controls_Toggle.prototype.isCheckBox = function() {
       return this.args.type === 'checkbox';

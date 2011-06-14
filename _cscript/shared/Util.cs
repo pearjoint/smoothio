@@ -70,12 +70,6 @@ class smio.Util
 	@Number:
 		randomInt: (max) ->
 			Math.floor Math.random() * (max + 1)
-		smallest: (arr) ->
-			num = undefined
-			for n in arr
-				if (not num?) or (n < num)
-					num = n
-			num
 		tryParseInt: (val, def) ->
 			num = parseInt val + ''
 			if _.isNumber num then num else def

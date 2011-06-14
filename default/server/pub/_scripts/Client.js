@@ -4,7 +4,9 @@
   smio = global.smoothio;
   smio.Client = (function() {
     function Client() {
-      var cookie;
+      this.syncControls = __bind(this.syncControls, this);
+      this.onWindowResize = __bind(this.onWindowResize, this);
+      this.init = __bind(this.init, this);      var cookie;
       this.sleepy = false;
       this.allControls = {};
       this.pageWindow = $(window);
@@ -27,6 +29,7 @@
       }, this)), 300));
     }
     Client.prototype.init = function() {
+      alert("foobar"[3]);
       this.socket.connect();
       return setInterval((__bind(function() {
         return this.pageBody.css({

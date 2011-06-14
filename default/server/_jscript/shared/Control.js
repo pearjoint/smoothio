@@ -1,6 +1,6 @@
 (function() {
   var coffee, node_util, smio, _;
-  var __slice = Array.prototype.slice, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __slice = Array.prototype.slice;
   _ = require('underscore');
   _.mixin(require('underscore.string'));
   coffee = require('coffee-script');
@@ -74,11 +74,11 @@
             return _results;
           })(), _.identity)));
           if (isCmd) {
-            dynCmd = dyn.substr(0, posC);
-            dyn = dyn.substr(posC + 1);
-          } else if ((dyn.substr(0, 1)) === '=') {
+            dynCmd = dyn.slice(0, posC);
+            dyn = dyn.slice(posC + 1);
+          } else if (dyn[0] === '=') {
             dynCmd = '=';
-            dyn = dyn.substr(1);
+            dyn = dyn.slice(1);
           } else {
             dynCmd = '_';
           }
@@ -93,7 +93,7 @@
       if (renderParts && renderParts.length) {
         _ref4 = [-1, 3, 3, smio.Util.String.times], ind = _ref4[0], indent = _ref4[1], rind = _ref4[2], stimes = _ref4[3];
         subs = 0;
-        coffeeScript += "\n\trenderHtml: ($el) ->\n\t\tif not @_html\n\t\t\t__r = ctls: [], m: []\n\t\t\t__r.o = __r.m\n";
+        coffeeScript += "\n\trenderHtml: ($el) =>\n\t\tif not @_html\n\t\t\t__r = ctls: [], m: []\n\t\t\t__r.o = __r.m\n";
         for (_l = 0, _len4 = renderParts.length; _l < _len4; _l++) {
           rp = renderParts[_l];
           br = "\n" + (stimes('\t', rind));
@@ -237,6 +237,18 @@
       this.args = args;
       this.baseName = baseName;
       this.className = className;
+      this.res = __bind(this.res, this);
+      this.r = __bind(this.r, this);
+      this.renderTag = __bind(this.renderTag, this);
+      this.renderHtml = __bind(this.renderHtml, this);
+      this.renderJsonTemplate = __bind(this.renderJsonTemplate, this);
+      this.init = __bind(this.init, this);
+      this.id = __bind(this.id, this);
+      this.fullClassName = __bind(this.fullClassName, this);
+      this.ctl = __bind(this.ctl, this);
+      this.cls = __bind(this.cls, this);
+      this.Control = __bind(this.Control, this);
+      this.Control = __bind(this.Control, this);
       this.disabled = smio.iif(this.args.disabled);
       this.isServer = !(this.isClient = this.client ? true : false);
       this.ctlID = this.args.id;
@@ -376,7 +388,7 @@
     Control.prototype.r = function() {
       var args, name;
       name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-      return this.res.apply(this, _.toArray(arguments));
+      return this.res.apply(this, [name].concat(__slice.call(args)));
     };
     Control.prototype.res = function() {
       var args, i, name, parts, resSet, resSets, ret, _ref;

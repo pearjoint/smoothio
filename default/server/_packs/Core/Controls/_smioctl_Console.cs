@@ -24,7 +24,7 @@ class smio.Packs_Core_Controls_Console extends smio.Control
 		super client, parent, args, "Core_Controls", "Core_Controls_Console"
 		@jsSelf = "smio.client.allControls['" + @id() + "']"
 		@init()
-	renderHtml: ($el) ->
+	renderHtml: ($el) =>
 		if not @_html
 			__r = ctls: [], m: []
 			__r.o = __r.m

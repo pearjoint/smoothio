@@ -6,6 +6,24 @@
     function Socket(client, isSocketIO, host, secure, port) {
       var opts;
       this.client = client;
+      this.setTimers = __bind(this.setTimers, this);
+      this.setTimer = __bind(this.setTimer, this);
+      this.onSocketReconnecting = __bind(this.onSocketReconnecting, this);
+      this.onSocketReconnectFailed = __bind(this.onSocketReconnectFailed, this);
+      this.onSocketReconnect = __bind(this.onSocketReconnect, this);
+      this.onSocketDisconnect = __bind(this.onSocketDisconnect, this);
+      this.onSocketConnecting = __bind(this.onSocketConnecting, this);
+      this.onSocketConnectFailed = __bind(this.onSocketConnectFailed, this);
+      this.onSocketConnect = __bind(this.onSocketConnect, this);
+      this.onSocketClose = __bind(this.onSocketClose, this);
+      this.onSleepy = __bind(this.onSleepy, this);
+      this.onMessage = __bind(this.onMessage, this);
+      this.onOnline = __bind(this.onOnline, this);
+      this.onOffline = __bind(this.onOffline, this);
+      this.onError = __bind(this.onError, this);
+      this.newFetchRequest = __bind(this.newFetchRequest, this);
+      this.connect = __bind(this.connect, this);
+      this.clearTimers = __bind(this.clearTimers, this);
       this.offline = 1;
       this.initialFetchDone = false;
       if (isSocketIO) {
@@ -15,7 +33,7 @@
           rememberTransport: false,
           reconnect: true,
           connectTimeout: 5000,
-          secure: secure === true
+          secure: smio.iif(secure)
         };
         if (port) {
           opts.port = port;
@@ -82,9 +100,9 @@
                 freq.ticks(this.poll.lastFetchTime);
                 this.poll.msg.last = freq;
               }
-              return ($.post("/_/poll/" + (heartbeat ? 'p' : 'f') + "/?t=" + (smio.Util.DateTime.ticks()), JSON.stringify(freq.msg), (__bind(function(m, t, x) {
+              return $.post("/_/poll/" + (heartbeat ? 'p' : 'f') + "/?t=" + (smio.Util.DateTime.ticks()), JSON.stringify(freq.msg), (__bind(function(m, t, x) {
                 return this.onMessage(m, t, x);
-              }, this)), 'text')).error(__bind(function(x, t, e) {
+              }, this)), 'text').error(__bind(function(x, t, e) {
                 return this.onError(x, t, e);
               }, this));
             }
@@ -112,7 +130,7 @@
       if (!this.poll) {
         return alert(JSON.stringify(xhr));
       } else {
-        if (xhr && ((xhr.status === 0) && (xhr.readyState === 0)) || ((xhr.readyState === 4) && (xhr.status >= 12001) && (xhr.status <= 12156))) {
+        if (xhr && (((xhr.status === 0) && (xhr.readyState === 0)) || ((xhr.readyState === 4) && (xhr.status >= 12001) && (xhr.status <= 12156)))) {
           this.onOffline();
         } else {
           this.onOnline();
@@ -133,7 +151,7 @@
         });
         $('#smio_offline').show();
         if (this.client.allControls['']) {
-          return this.client.allControls[''].disable(true, true);
+          return this.client.allControls[''].disable();
         }
       }
     };
@@ -141,7 +159,7 @@
       if (this.offline) {
         this.offline = 0;
         if (this.client.allControls['']) {
-          this.client.allControls[''].disable(false, true);
+          this.client.allControls[''].enable();
         }
         $('#smio_offline').hide();
         $('#smio_favicon').attr({
@@ -232,7 +250,7 @@
       var obj, val;
       obj = this.poll.intervals[name];
       if (name === 'fetch' && !obj.val) {
-        obj.val = 10000;
+        obj.val = 5000;
       }
       val = this.client.sleepy ? obj.val * this.poll.intervals.sleepyFactor : obj.val;
       if (obj['handle']) {

@@ -9,7 +9,7 @@ smio = global.smoothio
 
 class smio.Control
 #if server
-	@compile: (@inst, ctlContent, controlPath) ->
+	@compile: (@inst, ctlContent, controlPath) =>
 		[inDyn, oneUp, contentParts, decls, renderParts, lastChar, lastContent, obj] = [false, '../', [], '', [], '', '', {}]
 		pathParts = ((controlPath.substr 0, controlPath.lastIndexOf '.').split '/')
 		baseName = pathParts[0...(pathParts.length - 1)].join '_'
@@ -43,11 +43,11 @@ class smio.Control
 				[dynCmd, posC, posS] = ['', (dyn.indexOf ':'), [(dyn.indexOf ' '), (dyn.indexOf '\t'), (dyn.indexOf '\r'), (dyn.indexOf '\n')]]
 				isCmd = (posC >= 0) and ((_.any (((tmpPos >= 0) and (tmpPos > posC)) for tmpPos in posS)) or (_.all ((tmpPos2 < 0) for tmpPos2 in posS), _.identity))
 				if isCmd
-					dynCmd = dyn.substr 0, posC
-					dyn = dyn.substr posC + 1
-				else if (dyn.substr 0, 1) is '='
+					dynCmd = dyn[0...posC]
+					dyn = dyn[posC + 1..]
+				else if dyn[0] is '='
 					dynCmd = '='
-					dyn = dyn.substr 1
+					dyn = dyn[1..]
 				else
 					dynCmd = '_'
 				if dynCmd is 'script'
@@ -72,7 +72,7 @@ class smio.Packs_#{className} extends smio.Control
 		if renderParts and renderParts.length
 			[ind, indent, rind, stimes] = [-1, 3, 3, smio.Util.String.times]
 			subs = 0
-			coffeeScript += "\n\trenderHtml: ($el) ->\n\t\tif not @_html\n\t\t\t__r = ctls: [], m: []\n\t\t\t__r.o = __r.m\n"
+			coffeeScript += "\n\trenderHtml: ($el) =>\n\t\tif not @_html\n\t\t\t__r = ctls: [], m: []\n\t\t\t__r.o = __r.m\n"
 			for rp in renderParts
 				br = "\n#{stimes '\t', rind}"
 				if _.isString rp
@@ -129,7 +129,7 @@ class smio.Packs_#{className} extends smio.Control
 			coffeeScript += "\n#{stimes '\t', indent}@_html = __r.o.join ''\n#{stimes '\t', indent - 1}if $el\n#{stimes '\t', indent}$el.html @_html\n#{stimes '\t', indent - 1}@_html\n"
 		coffeeScript
 
-	@load: (className, parent, args) ->
+	@load: (className, parent, args) =>
 		parts = className.split '_'
 		path = '../../_packs/' + (parts[0...(parts.length - 1)].join '/') + '/_smioctl_' + _.last parts
 		require path
@@ -139,9 +139,11 @@ class smio.Packs_#{className} extends smio.Control
 #endif
 
 #if client
-	coreDisable: (disable) ->
+	coreDisable: (disable) =>
 
-	disable: (disable, isInherit) ->
+	disable: (disable, isInherit) =>
+		if not arguments.length
+			disable = isInherit = true
 		len = 0
 		if not isInherit
 			@disabled = disable
@@ -159,19 +161,21 @@ class smio.Packs_#{className} extends smio.Control
 		if len is 0
 			@el[smio.iif disable, 'addClass', 'removeClass'] 'smio-disabledfaded'
 
-	on: (eventName, handler) ->
+	enable: =>
+		@disable(false, true)
+
+	on: (eventName, handler) =>
 		if eventName
 			if _.isFunction handler
 				if not @eventHandlers[eventName]
 					@eventHandlers[eventName] = []
-				if 0 > _.indexOf @eventHandlers[eventName], handler
+				if not handler in @eventHandlers[eventName]
 					@eventHandlers[eventName].push handler
 			else if @eventHandlers[eventName]
 				for eh in @eventHandlers[eventName]
 					eh.apply @, handler
 
-	onLoad: () ->
-		prefix = "cscript:"
+	onLoad: () =>
 		@el = $('#' + @id())
 		if @disabled
 			len = 0
@@ -184,26 +188,19 @@ class smio.Packs_#{className} extends smio.Control
 			@el.removeClass('smio-disabled').addClass 'smio-enabled'
 		for id, ctl of @controls
 			ctl.onLoad()
-		if not @parent
-			$("a[href^='#{prefix}']").each (i, a) ->
-				try
-					a.href = 'javascript:' + ((CoffeeScript.compile a.href.substr prefix.length).split '\n').join ''
-				catch err
-					alert "CODE:#{(unescape a.href).substr prefix.length}:CODE"
-					a.href = "javascript:smio.client.socket.onError(\"#{err}\");"
 
-	onWindowResize: (width, height) ->
+	onWindowResize: (width, height) =>
 
-	sub: (id) ->
+	sub: (id) =>
 		ctl = @
 		if (parts = id.split '/').length > 1
 			for i in [0...(parts.length - 1)]
 				ctl = ctl.controls[parts[i]]
 		$ "##{ctl.id parts[parts.length - 1]}"
 
-	syncUpdate: (ctlDesc) ->
+	syncUpdate: (ctlDesc) =>
 
-	un: (eventName, handler) ->
+	un: (eventName, handler) =>
 		if eventName and @eventHandlers[eventName] and _.isFunction handler
 			@eventHandlers[eventName] = _.without @eventHandlers[eventName], handler
 #endif
@@ -252,26 +249,26 @@ class smio.Packs_#{className} extends smio.Control
 		@idStack = []
 		@_html = ''
 
-	cls: ->
+	cls: =>
 		smio[@fullClassName()]
 
-	ctl: (ctlID) ->
+	ctl: (ctlID) =>
 		c = @client.allControls ctlID
 		if c then c else @client.allControls @id(ctlID)
 
-	fullClassName: ->
+	fullClassName: =>
 		"Packs_#{@className}"
 
-	id: (subID) ->
+	id: (subID) =>
 		myID = if @parent then "#{@parent.id()}_#{@ctlID}" else @ctlID
 		if (subID)
 			myID + '_' + (if @idStack.length then ((@idStack.join '_') + '_') else '') + subID
 		else
 			myID
 
-	init: ->
+	init: =>
 
-	renderJsonTemplate: (tagKey, objTree, level) ->
+	renderJsonTemplate: (tagKey, objTree, level) =>
 		buf = ''
 		toHtml = smio.Util.String.htmlEncode
 		toAtt = (an, av) =>
@@ -326,7 +323,7 @@ class smio.Packs_#{className} extends smio.Control
 				buf += "<#{kt}#{attstr}>#{if (_.isArray objTree) then (if (kt is 'html') then (objTree.join '') else (toHtml objTree.join '')) else objTree}</#{kt}>"
 		buf
 
-	renderHtml: ($el) ->
+	renderHtml: ($el) =>
 		if (not @_html) and @['renderTemplate'] and (_.isFunction @renderTemplate) and (objTree = @renderTemplate())
 			@_html = ''
 			for tagKey, subTree of objTree
@@ -335,17 +332,17 @@ class smio.Packs_#{className} extends smio.Control
 			$el.html @_html
 		@_html
 
-	renderTag: (name, sarg, jarg) ->
+	renderTag: (name, sarg, jarg) =>
 		renderer = smio.Control.tagRenderers[name]
 		if renderer
 			renderer(@, sarg, jarg)
 		else
 			"!!UNKNOWN_TAG::#{name}!!"
 
-	r: (name, args...) ->
-		@res.apply @, _.toArray arguments
+	r: (name, args...) =>
+		@res name, args...
 
-	res: (name, args...) ->
+	res: (name, args...) =>
 		ret = ''
 		if (resSets = (if @isClient then smio.resources else smio.inst.resourceSets))
 			parts = @baseName.split '_'

@@ -8,10 +8,21 @@ input.smio-textinput
 	background transparent
 	border 0px none red
 	border-bottom $hairline dotted #c0c0c0
-	padding 0.33em
+	padding 0.25em
 	font-weight bold
 	smio-select text
 	smio-drag auto
+	width 12em
+
+input.smio-textinput::-webkit-input-placeholder
+	font-weight normal
+	font-style italic
+	color #c0c0c0
+
+input.smio-textinput:-moz-placeholder
+	font-weight normal
+	font-style italic
+	color #c0c0c0
 
 span.smio-textinput.smio-enabled input.smio-textinput:hover
 	textboxoutline()

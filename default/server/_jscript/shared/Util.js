@@ -108,17 +108,6 @@
       randomInt: function(max) {
         return Math.floor(Math.random() * (max + 1));
       },
-      smallest: function(arr) {
-        var n, num, _i, _len;
-        num = void 0;
-        for (_i = 0, _len = arr.length; _i < _len; _i++) {
-          n = arr[_i];
-          if ((!(num != null)) || (n < num)) {
-            num = n;
-          }
-        }
-        return num;
-      },
       tryParseInt: function(val, def) {
         var num;
         num = parseInt(val + '');

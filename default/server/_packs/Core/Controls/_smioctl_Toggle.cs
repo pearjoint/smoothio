@@ -52,7 +52,7 @@ class smio.Packs_Core_Controls_Toggle extends smio.Control
 		@sub('input').prop 'disabled', disable
 	
 	getSharedClass: ->
-		"#{@parent.id()}_#{@args.toggleName or ''}"
+		@args.toggleName or @id()
 	
 	isCheckBox: ->
 		 @args.type is 'checkbox'

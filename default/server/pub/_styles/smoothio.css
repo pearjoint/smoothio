@@ -121,6 +121,11 @@ table {
   color: #f0f0f0 !important;
   text-shadow: none !important;
 }
+:-moz-selection {
+  background: rgba(0,0,0,0.75) !important;
+  color: #f0f0f0 !important;
+  text-shadow: none !important;
+}
 ::-moz-selection {
   background: rgba(0,0,0,0.75) !important;
   color: #f0f0f0 !important;
@@ -180,7 +185,7 @@ body {
   background: -o-linear-gradient(rgba(0,0,0,0.5) 25%, rgba(0,0,0,0.7) 75%);
   background: -webkit-linear-gradient(rgba(0,0,0,0.5) 25%, rgba(0,0,0,0.7) 75%);
   background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(0,0,0,0.5)), to(rgba(0,0,0,0.7)));
-  background-size: 0.25em;
+  background-size: 0.3em;
 }
 @-webkit-keyframes offblink {
   0% {

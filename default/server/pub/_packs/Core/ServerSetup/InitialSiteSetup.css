@@ -13,6 +13,14 @@ div.smio-setup {
   -moz-border-radius: 0 0 0.8em 0.8em;
   border-radius: 0 0 0.8em 0.8em;
 }
+@media only screen and (max-width: 1024px) {
+  div.smio-setup {
+    position: absolute;
+    top: 0;
+    right: 6%;
+    left: 6%;
+  }
+}
 .smio-setup-outer {
   padding: 1em;
 }
@@ -80,35 +88,47 @@ div.smio-setup:hover .smio-setup-header-detail {
   text-transform: lowercase;
 }
 .smio-setup-stepbox-form {
-  padding: 1em 0 0 1.8em;
+  padding: 1em 0 0 1.6em;
   color: #606060;
+  white-space: normal;
 }
 .smio-setup-stepbox-form span.smio-textinput {
-  display: table-row;
+  display: block;
+  width: 100%;
   padding: 0.5em 0 0.5em 0;
+  white-space: nowrap;
 }
 .smio-setup-stepbox-form-label {
   padding: 2em 0 0.5em 0;
   color: #909090;
 }
+li#sm_stepslide_items_finish .smio-setup-stepbox-form-label {
+  padding-top: 0;
+}
 .smio-setup-stepbox-form span.smio-toggleinput {
   display: block;
-  padding: 0.8em 0 0 6.15em;
-  -moz-transition: color 0.5s;
-  -webkit-transition: color 0.5s;
-  -o-transition: color 0.5s;
-  transition: color 0.5s;
+  padding: 0.8em 0 0 9em;
+}
+ul#sm_stepslide_hubhints {
+  padding-left: 6.5em;
 }
 .smio-setup-stepbox-form span.smio-toggleinput-unchecked {
   color: #909090;
 }
 .smio-setup-stepbox-form span.smio-textinput input.smio-textinput {
-  width: 100%;
+  xwidth: 100%;
 }
 .smio-setup-stepbox-form span.smio-textinput label {
-  display: table-cell;
+  display: inline-block;
   vertical-align: center;
   padding: 1em 1em 1em 0;
+  width: 8em;
+}
+.smio-setup-stepbox-form span.smio-textinput label#sm_stepslide_hub_title_label {
+  width: 4em;
+}
+.smio-setup-stepbox-form span.smio-textinput input#sm_stepslide_hub_title_input {
+  width: 23.5em;
 }
 .smio-setup-steptabs {
   text-align: center;

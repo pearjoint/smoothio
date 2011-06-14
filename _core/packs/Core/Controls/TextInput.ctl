@@ -14,6 +14,12 @@ renderTemplate: ->
 		type: if @args.type is 'password' then 'password' else 'text'
 	if (@disabled)
 		ret.span.input.readonly = 'readonly'
+	if @args.autoFocus
+		ret.span.input.autofocus = 'autofocus'
+	if @args.required
+		ret.span.input.required = 'required'
+	if @args.placeholder
+		ret.span.input.placeholder = @args.placeholder
 	if @args.value
 		ret.span.input.value = @args.value
 	if @args.nospellcheck

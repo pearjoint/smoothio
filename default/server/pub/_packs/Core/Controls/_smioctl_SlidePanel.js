@@ -25,6 +25,9 @@
         _ref = this.args.items;
         for (itemID in _ref) {
           item = _ref[itemID];
+          while (_.startsWith(itemID, '#')) {
+            itemID = itemID.substr(1);
+          }
           this.items.push(itemID);
           ul["li #items_" + itemID + " ." + (this.args.itemClass || '')] = item;
         }
@@ -88,7 +91,7 @@
           scrollLefts.push((tmp = this.scrollBox.scrollLeft() + $("#" + (this.id('items_' + this.items[i]))).position().left - this.edgePrev.width()));
           distances.push(Math.abs(tmp - this.scrollBox.scrollLeft()));
         }
-        item = distances.indexOf(smio.Util.Number.smallest(distances));
+        item = distances.indexOf(Math.min.apply(Math, distances));
       }
       if (_.isString(item)) {
         item = this.items.indexOf(item);

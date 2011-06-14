@@ -65,11 +65,11 @@ div.smio-slidepanel-edge:active .smio-slidepanel-edge-arr {
 }
 div.smio-slidepanel-edge-left {
   left: 0;
-  background: -ms-linear-gradient(left, rgba(250,250,250,0.95), rgba(250,250,250,0.15));
-  background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(250,250,250,0.95)), to(rgba(250,250,250,0.15)));
-  background: -moz-linear-gradient(left, rgba(250,250,250,0.95), rgba(250,250,250,0.15));
-  background: -webkit-linear-gradient(left, rgba(250,250,250,0.95), rgba(250,250,250,0.15));
-  background: -o-linear-gradient(left, rgba(250,250,250,0.95), rgba(250,250,250,0.15));
+  background: -ms-linear-gradient(left, rgba(248,248,248,0.95), rgba(248,248,248,0.15));
+  background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(248,248,248,0.95)), to(rgba(248,248,248,0.15)));
+  background: -moz-linear-gradient(left, rgba(248,248,248,0.95), rgba(248,248,248,0.15));
+  background: -webkit-linear-gradient(left, rgba(248,248,248,0.95), rgba(248,248,248,0.15));
+  background: -o-linear-gradient(left, rgba(248,248,248,0.95), rgba(248,248,248,0.15));
 }
 div.smio-slidepanel-edge-left .smio-slidepanel-edge-arr {
   -webkit-border-radius: 1em 0.33em 0.33em 1em;
@@ -83,11 +83,11 @@ div.smio-slidepanel-edge-right .smio-slidepanel-edge-arr {
 }
 div.smio-slidepanel-edge-right {
   right: 0;
-  background: -ms-linear-gradient(left, rgba(250,250,250,0.15), rgba(250,250,250,0.95));
-  background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(250,250,250,0.15)), to(rgba(250,250,250,0.95)));
-  background: -moz-linear-gradient(left, rgba(250,250,250,0.15), rgba(250,250,250,0.95));
-  background: -webkit-linear-gradient(left, rgba(250,250,250,0.15), rgba(250,250,250,0.95));
-  background: -o-linear-gradient(left, rgba(250,250,250,0.15), rgba(250,250,250,0.95));
+  background: -ms-linear-gradient(left, rgba(248,248,248,0.15), rgba(248,248,248,0.95));
+  background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(248,248,248,0.15)), to(rgba(248,248,248,0.95)));
+  background: -moz-linear-gradient(left, rgba(248,248,248,0.15), rgba(248,248,248,0.95));
+  background: -webkit-linear-gradient(left, rgba(248,248,248,0.15), rgba(248,248,248,0.95));
+  background: -o-linear-gradient(left, rgba(248,248,248,0.15), rgba(248,248,248,0.95));
 }
 ul.smio-slidepanel {
   list-style-type: none;

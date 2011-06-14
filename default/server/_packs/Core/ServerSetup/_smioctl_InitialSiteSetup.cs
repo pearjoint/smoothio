@@ -33,11 +33,12 @@ class smio.Packs_Core_ServerSetup_InitialSiteSetup extends smio.Control
 					itemClass: 'smio-setup-stepbox'
 					onItemSelect: (i, id) => @onSlide i, id
 					items:
-						"owner":
+						"#owner":
 							'div .smio-setup-stepbox-title':
 								[@r 'steptitle_owner']
 							'div .smio-setup-stepbox-form':
 								"TextInput #owner_name":
+									autoFocus: true
 									labelText: @r 'owner_name'
 									nospellcheck: true
 								"TextInput #owner_pass":
@@ -45,26 +46,34 @@ class smio.Packs_Core_ServerSetup_InitialSiteSetup extends smio.Control
 									type: 'password'
 								"div .smio-setup-stepbox-form-label":
 									html: [@r 'owner_choice']
-								"div":
-									"Toggle #owner_create":
-										toggleName: 'owner_toggle'
-										labelHtml: @r 'owner_create', 'localhost'
-										checked: true
-										disabled: true
-									"Toggle #owner_login":
-										toggleName: 'owner_toggle'
-										labelHtml: @r 'owner_login', 'localhost'
-										disabled: true
-						"template":
+								"Toggles #owner":
+									disabled: true
+									items:
+										"#create":
+											checked: true
+											labelHtml: @r 'owner_create', 'localhost'
+										"#login":
+											labelHtml: @r 'owner_login', 'localhost'
+						"#template":
 							"div .smio-setup-stepbox-title":
 								[@r 'steptitle_template']
 							"div .smio-setup-stepbox-form":
 								text: ['Hub templates are not yet available.']
-						"finish":
+						"#finish":
 							"div .smio-setup-stepbox-title":
 								[@r 'steptitle_finish']
 							"div .smio-setup-stepbox-form":
-								html: ['mooboar<br/><br/>blaa<br/><br/>foo<br/><br/>yeah right']
+								"TextInput #hub_title":
+									required: true
+									placeholder: @r 'hub_titlehint'
+									labelText: @r 'hub_title'
+								"div .smio-setup-stepbox-form-label":
+									html: [@r 'hub_hint']
+								"ul #hubhints":
+									"li #hubhint1": [@r 'hubhint1']
+									"li #hubhint2": [@r 'hubhint2']
+									"li #hubhint3": [@r 'hubhint3']
+									"li #hubhint4": [@r 'hubhint4']
 			"TabStrip #steptabs .smio-setup-outer .smio-setup-steptabs":
 				"tabClass": 'smio-setup-steptab'
 				"tabs": ['owner', 'template', 'finish']
@@ -80,7 +89,6 @@ class smio.Packs_Core_ServerSetup_InitialSiteSetup extends smio.Control
 				if not _.startsWith nurl, '/'
 					nurl = "/#{nurl}"
 				location.replace _.trim nurl
-		@sub('stepslide/owner_name/input').focus()
 	
 	onSlide: (index, itemID) ->
 		@controls.steptabs.selectTab itemID

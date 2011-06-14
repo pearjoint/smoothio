@@ -7,6 +7,8 @@ renderTemplate: ->
 			html: ['&nbsp;']
 	if @args.items
 		for itemID, item of @args.items
+			while _.startsWith itemID, '#'
+				itemID = itemID.substr 1
 			@items.push itemID
 			ul["li #items_#{itemID} .#{@args.itemClass or ''}"] = item
 	ul['li #liafter'] =
@@ -46,7 +48,7 @@ scrollTo: (item, force) ->
 		for i in [0...@items.length]
 			scrollLefts.push (tmp = (@scrollBox.scrollLeft() + $("##{@id 'items_' + @items[i]}").position().left - @edgePrev.width()))
 			distances.push Math.abs tmp - @scrollBox.scrollLeft()
-		item = distances.indexOf smio.Util.Number.smallest distances
+		item = distances.indexOf Math.min distances...
 	if _.isString item
 		item = @items.indexOf item
 	if ((item < 0) or (item >= @items.length)) and force

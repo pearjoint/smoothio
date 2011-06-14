@@ -2,7 +2,7 @@
   /*
   Auto-generated from Core/Controls/MainFrame.ctl
   */  var smio, smoothio;
-  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
     ctor.prototype = parent.prototype;
@@ -19,7 +19,7 @@
       return xy = "serverside";
     };
     function Packs_Core_Controls_MainFrame(client, parent, args) {
-      Packs_Core_Controls_MainFrame.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_MainFrame");
+      this.renderHtml = __bind(this.renderHtml, this);      Packs_Core_Controls_MainFrame.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_MainFrame");
       this.jsSelf = "smio.client.allControls['" + this.id() + "']";
       this.init();
     }

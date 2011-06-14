@@ -37,6 +37,15 @@
       if (this.disabled) {
         ret.span.input.readonly = 'readonly';
       }
+      if (this.args.autoFocus) {
+        ret.span.input.autofocus = 'autofocus';
+      }
+      if (this.args.required) {
+        ret.span.input.required = 'required';
+      }
+      if (this.args.placeholder) {
+        ret.span.input.placeholder = this.args.placeholder;
+      }
       if (this.args.value) {
         ret.span.input.value = this.args.value;
       }

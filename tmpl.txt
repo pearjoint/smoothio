@@ -1,4 +1,11 @@
 
+indexOf!
+substrs!
+=> in methods
+parens!
+for loops
+splats...
+
 
 CASE 1:
 
