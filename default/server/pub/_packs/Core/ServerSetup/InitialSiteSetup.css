@@ -50,6 +50,11 @@ div.smio-setup {
   transition: opacity 0.5s;
   opacity: 0;
 }
+.smio-setup-header-detail:hover,
+.smio-setup-header-detail:focus {
+  text-decoration: underline;
+  opacity: 1;
+}
 div.smio-setup:hover .smio-setup-header-detail {
   opacity: 1;
 }
@@ -84,7 +89,7 @@ div.smio-setup:hover .smio-setup-header-detail {
 }
 .smio-setup-stepbox-form-label {
   padding: 2em 0 0.5em 0;
-  color: #a0a0a0;
+  color: #909090;
 }
 .smio-setup-stepbox-form span.smio-toggleinput {
   display: block;
@@ -125,7 +130,7 @@ div.smio-setup:hover .smio-setup-header-detail {
   padding: 0.2em 1em 0.2em 1em;
   display: inline-block;
   color: #606060;
-  text-shadow: 0 0.098em #fff;
+  text-shadow: 0 0.094em #fff;
   text-transform: lowercase;
 }
 .smio-setup-steptab-inactive:hover,

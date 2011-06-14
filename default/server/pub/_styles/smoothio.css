@@ -117,16 +117,18 @@ table {
   border-spacing: 0;
 }
 ::selection {
-  color: #f0f0f0;
-  text-shadow: none;
+  background: rgba(0,0,0,0.75) !important;
+  color: #f0f0f0 !important;
+  text-shadow: none !important;
 }
 ::-moz-selection {
-  color: #f0f0f0;
-  text-shadow: none;
+  background: rgba(0,0,0,0.75) !important;
+  color: #f0f0f0 !important;
+  text-shadow: none !important;
 }
 a {
   text-decoration: none;
-  color: #303030;
+  color: inherit;
 }
 img {
   image-rendering: optimizeQuality;
@@ -134,16 +136,28 @@ img {
 }
 body {
   cursor: default;
-  user-select: none;
   color: #303030;
   margin: 0;
   font-family: Arial, Helvetica, Helvetica Neue, Sans-Serif;
+  -o-user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -o-user-drag: none;
+  -moz-user-drag: none;
+  -webkit-user-drag: none;
+  -ms-user-drag: none;
+  user-drag: none;
   background: -webkit-linear-gradient(0, rgba(255,255,255,0.07) 50%, transparent 50%), -webkit-linear-gradient(0, rgba(255,255,255,0.13) 50%, transparent 50%), -webkit-linear-gradient(0, transparent 50%, rgba(255,255,255,0.17) 50%), -webkit-linear-gradient(0, transparent 50%, rgba(255,255,255,0.19) 50%);
   background: -ms-linear-gradient(0, rgba(255,255,255,0.07) 50%, transparent 50%), -ms-linear-gradient(0, rgba(255,255,255,0.13) 50%, transparent 50%), -ms-linear-gradient(0, transparent 50%, rgba(255,255,255,0.17) 50%), -ms-linear-gradient(0, transparent 50%, rgba(255,255,255,0.19) 50%);
   background: -o-linear-gradient(0, rgba(255,255,255,0.07) 50%, transparent 50%), -o-linear-gradient(0, rgba(255,255,255,0.13) 50%, transparent 50%), -o-linear-gradient(0, transparent 50%, rgba(255,255,255,0.17) 50%), -o-linear-gradient(0, transparent 50%, rgba(255,255,255,0.19) 50%);
   background: -moz-linear-gradient(0, rgba(255,255,255,0.07) 50%, transparent 50%), -moz-linear-gradient(0, rgba(255,255,255,0.13) 50%, transparent 50%), -moz-linear-gradient(0, transparent 50%, rgba(255,255,255,0.17) 50%), -moz-linear-gradient(0, transparent 50%, rgba(255,255,255,0.19) 50%);
-  background-color: #c09050;
+  background-color: #d0c8b8;
   background-size: 1.3em, 2.9em, 3.7em, 5.3em;
+}
+.smio-disabledfaded {
+  opacity: 0.65;
 }
 .smio-blocking-overlay {
   display: none;
@@ -167,4 +181,21 @@ body {
   background: -webkit-linear-gradient(rgba(0,0,0,0.5) 25%, rgba(0,0,0,0.7) 75%);
   background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(0,0,0,0.5)), to(rgba(0,0,0,0.7)));
   background-size: 0.25em;
+}
+@-webkit-keyframes offblink {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+#smio_offline_blink {
+  -webkit-animation-name: offblink;
+  -webkit-animation-duration: 0.33s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-direction: alternate;
+  -webkit-animation-timing-function: linear;
+  text-decoration: blink;
 }

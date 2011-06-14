@@ -13213,7 +13213,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.allControls = {};
       this.pageWindow = $(window);
       this.pageBody = $('#smio_body');
-      $('#smio_offline').text(smio.resources.smoothio.connect).append('<span id="smio_offline_blink" style="visibility: hidden;">_</span>');
+      $('#smio_offline_msg').text(smio.resources.smoothio.connect);
       cookie = $.cookie('smoo');
       this.pageUrl = $.url();
       try {
@@ -13285,7 +13285,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       var opts;
       this.client = client;
       this.offline = 1;
-      this.offlineBlinkIntervalHandle = null;
       this.initialFetchDone = false;
       if (isSocketIO) {
         opts = {
@@ -13407,11 +13406,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     Socket.prototype.onOffline = function() {
       this.offline++;
       if (this.offline === 2) {
-        if (!this.offlineBlinkIntervalHandle) {
-          this.offlineBlinkIntervalHandle = setInterval((__bind(function() {
-            return this.toggleOfflineBlink();
-          }, this)), 500);
-        }
         $('#smio_favicon').attr({
           'href': '/_/file/images/bg.png'
         });
@@ -13424,10 +13418,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     Socket.prototype.onOnline = function() {
       if (this.offline) {
         this.offline = 0;
-        if (this.offlineBlinkIntervalHandle) {
-          clearInterval(this.offlineBlinkIntervalHandle);
-          this.offlineBlinkIntervalHandle = null;
-        }
         if (this.client.allControls['']) {
           this.client.allControls[''].disable(false, true);
         }
@@ -13519,6 +13509,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     Socket.prototype.setTimer = function(name, fn) {
       var obj, val;
       obj = this.poll.intervals[name];
+      if (name === 'fetch' && !obj.val) {
+        obj.val = 10000;
+      }
       val = this.client.sleepy ? obj.val * this.poll.intervals.sleepyFactor : obj.val;
       if (obj['handle']) {
         clearInterval(obj.handle);
@@ -13535,14 +13528,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         return this.poll.send(false);
       }, this));
     };
-    Socket.prototype.toggleOfflineBlink = function() {
-      var blink, vis;
-      blink = $('#smio_offline_blink');
-      vis = blink.css('visibility');
-      return blink.css({
-        visibility: (vis === 'hidden' ? 'visible' : 'hidden')
-      });
-    };
     return Socket;
   })();
 }).call(this);
@@ -13555,7 +13540,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio.Control = (function() {
     Control.prototype.coreDisable = function(disable) {};
     Control.prototype.disable = function(disable, isInherit) {
-      var ctl, id, _ref, _results;
+      var ctl, id, len, _ref;
+      len = 0;
       if (!isInherit) {
         this.disabled = disable;
       } else if (!disable) {
@@ -13570,12 +13556,14 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
       this.coreDisable(disable);
       _ref = this.controls;
-      _results = [];
       for (id in _ref) {
         ctl = _ref[id];
-        _results.push(ctl.disable(disable, isInherit));
+        len++;
+        ctl.disable(disable, isInherit);
       }
-      return _results;
+      if (len === 0) {
+        return this.el[smio.iif(disable, 'addClass', 'removeClass')]('smio-disabledfaded');
+      }
     };
     Control.prototype.on = function(eventName, handler) {
       var eh, _i, _len, _ref, _results;
@@ -13599,17 +13587,26 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
     };
     Control.prototype.onLoad = function() {
-      var ctl, id, prefix, _ref;
+      var ctl, id, len, prefix, _ref, _ref2;
       prefix = "cscript:";
       this.el = $('#' + this.id());
       if (this.disabled) {
+        len = 0;
         this.el.removeClass('smio-enabled').addClass('smio-disabled');
+        _ref = this.controls;
+        for (id in _ref) {
+          ctl = _ref[id];
+          len++;
+        }
+        if (len === 0) {
+          this.el.addClass('smio-disabledfaded');
+        }
       } else {
         this.el.removeClass('smio-disabled').addClass('smio-enabled');
       }
-      _ref = this.controls;
-      for (id in _ref) {
-        ctl = _ref[id];
+      _ref2 = this.controls;
+      for (id in _ref2) {
+        ctl = _ref2[id];
         ctl.onLoad();
       }
       if (!this.parent) {
@@ -13625,7 +13622,14 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     };
     Control.prototype.onWindowResize = function(width, height) {};
     Control.prototype.sub = function(id) {
-      return $("#" + (this.id(id)));
+      var ctl, i, parts, _ref;
+      ctl = this;
+      if ((parts = id.split('/')).length > 1) {
+        for (i = 0, _ref = parts.length - 1; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
+          ctl = ctl.controls[parts[i]];
+        }
+      }
+      return $("#" + (ctl.id(parts[parts.length - 1])));
     };
     Control.prototype.syncUpdate = function(ctlDesc) {};
     Control.prototype.un = function(eventName, handler) {
@@ -14742,15 +14746,12 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio.Packs_Core_ServerSetup_InitialSiteSetup = (function() {
     __extends(Packs_Core_ServerSetup_InitialSiteSetup, smio.Control);
     Packs_Core_ServerSetup_InitialSiteSetup.prototype.renderTemplate = function() {
-      var urlseg;
-      urlseg = _.trim(this.client.pageUrl.attr('directory'), '/');
-      urlseg = smio.iif(urlseg, "/" + urlseg + "/", '/');
       return {
         "div .smio-setup": {
           "id": '',
           "div .smio-setup-outer .smio-setup-outer-top": {
             "div.smio-setup-header": {
-              html: [this.r('title', urlseg)]
+              html: [this.r('title', 'smio-setup-header-detail', smio.Control.util.jsVoid, this.urlSeg())]
             },
             "div.smio-setup-header-desc": [this.r('desc')]
           },
@@ -14773,17 +14774,19 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                       type: 'password'
                     },
                     "div .smio-setup-stepbox-form-label": {
-                      html: ['The Hub owner specified above is:']
+                      html: [this.r('owner_choice')]
                     },
                     "div": {
                       "Toggle #owner_create": {
                         toggleName: 'owner_toggle',
                         labelHtml: this.r('owner_create', 'localhost'),
-                        checked: true
+                        checked: true,
+                        disabled: true
                       },
                       "Toggle #owner_login": {
                         toggleName: 'owner_toggle',
-                        labelHtml: this.r('owner_login', 'localhost')
+                        labelHtml: this.r('owner_login', 'localhost'),
+                        disabled: true
                       }
                     }
                   }
@@ -14816,13 +14819,29 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     };
     Packs_Core_ServerSetup_InitialSiteSetup.prototype.onLoad = function() {
       Packs_Core_ServerSetup_InitialSiteSetup.__super__.onLoad.call(this);
-      return this.controls['stepslide'].controls['owner_name'].sub('input').focus();
+      $('.smio-setup-header-detail').click(__bind(function() {
+        var nurl, port, urlseg;
+        port = smio.iif(("" + (this.client.pageUrl.attr('port'))) === '80', '', ":" + (this.client.pageUrl.attr('port')));
+        nurl = prompt(this.r('url_hint', this.client.pageUrl.attr('protocol'), this.client.pageUrl.attr('host'), port), urlseg = this.urlSeg());
+        if ((nurl != null) && nurl !== null && nurl !== urlseg) {
+          if (!_.startsWith(nurl, '/')) {
+            nurl = "/" + nurl;
+          }
+          return location.replace(_.trim(nurl));
+        }
+      }, this));
+      return this.sub('stepslide/owner_name/input').focus();
     };
     Packs_Core_ServerSetup_InitialSiteSetup.prototype.onSlide = function(index, itemID) {
       return this.controls.steptabs.selectTab(itemID);
     };
     Packs_Core_ServerSetup_InitialSiteSetup.prototype.onTabSelect = function(tabID) {
       return this.controls.stepslide.scrollTo(tabID);
+    };
+    Packs_Core_ServerSetup_InitialSiteSetup.prototype.urlSeg = function() {
+      var urlseg;
+      urlseg = _.trim(this.client.pageUrl.attr('path'), '/');
+      return urlseg = smio.iif(urlseg, "/" + urlseg + "/", '/');
     };
     function Packs_Core_ServerSetup_InitialSiteSetup(client, parent, args) {
       Packs_Core_ServerSetup_InitialSiteSetup.__super__.constructor.call(this, client, parent, args, "Core_ServerSetup", "Core_ServerSetup_InitialSiteSetup");

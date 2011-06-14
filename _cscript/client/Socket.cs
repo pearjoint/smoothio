@@ -3,7 +3,6 @@ smio = global.smoothio
 class smio.Socket
 	constructor: (@client, isSocketIO, host, secure, port) ->
 		@offline = 1
-		@offlineBlinkIntervalHandle = null
 		@initialFetchDone = false
 		if isSocketIO
 			opts = resource: '/_/sockio/', transports: ['websocket'], rememberTransport: false, reconnect: true, connectTimeout: 5000, secure: secure is true
@@ -78,8 +77,6 @@ class smio.Socket
 	onOffline: ->
 		@offline++
 		if @offline is 2
-			if not @offlineBlinkIntervalHandle
-				@offlineBlinkIntervalHandle = setInterval (=> @toggleOfflineBlink()), 500
 			$('#smio_favicon').attr 'href': '/_/file/images/bg.png'
 			$('#smio_offline').show()
 			if @client.allControls['']
@@ -88,9 +85,6 @@ class smio.Socket
 	onOnline: ->
 		if @offline
 			@offline = 0
-			if @offlineBlinkIntervalHandle
-				clearInterval @offlineBlinkIntervalHandle
-				@offlineBlinkIntervalHandle = null
 			if @client.allControls['']
 				@client.allControls[''].disable false, true
 			$('#smio_offline').hide()
@@ -162,6 +156,8 @@ class smio.Socket
 
 	setTimer: (name, fn) ->
 		obj = @poll.intervals[name]
+		if name is 'fetch' and not obj.val
+			obj.val = 10000
 		val = if @client.sleepy then (obj.val * @poll.intervals.sleepyFactor) else obj.val
 		if obj['handle']
 			clearInterval obj.handle
@@ -171,9 +167,4 @@ class smio.Socket
 	setTimers: ->
 		@setTimer 'heartbeat', () => @poll.send true
 		@setTimer 'fetch', () => @poll.send false
-
-	toggleOfflineBlink: ->
-		blink = $('#smio_offline_blink')
-		vis = blink.css 'visibility'
-		blink.css visibility: (if vis is 'hidden' then 'visible' else 'hidden')
 

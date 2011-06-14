@@ -24,6 +24,7 @@ _.mixin(require('underscore.string'));
 
 smio.instName = node_path.basename(process.cwd());
 smio.logBuffer = [];
+smio.resLangs = [''];
 
 smio.compileCoffeeScripts = function(dirOrFilePath, srvOutDirPath, cltOutDirPath, noWatch, lazyClient, nameIfSource) {
 	var files = (nameIfSource || node_fs.statSync(dirOrFilePath).isFile()) ? [null] : node_fs.readdirSync(dirOrFilePath), fileContent, fileContentClient, fileContentServer, javaScript, filePath, lines, ignore, doClient = !lazyClient;
@@ -151,27 +152,45 @@ function clearDirectory(dirPath, removeDirs) {
 }
 
 function compileClientResources(srcPaths, outDirPath, minify, watch) {
-	var dels = ['___resource_file_intro', 'x'], outScripts = {}, outScript, fileFunc = function(filePath, fileName, relPath) {
-		var resKey, json, resContent, pos, pos2, resLang;
+	var dels = ['___resource_file_intro', 'x'], all = { '': {} }, outScripts = {}, outScript, fileFunc = function(filePath, fileName, relPath) {
+		var resKey, json, pos, pos2, resLang;
 		if (_.endsWith(fileName, '.res') && ((pos = fileName.indexOf('.')) > 0) && ((pos2 = fileName.lastIndexOf('.')) > 0) && (resContent = node_fs.readFileSync(filePath, 'utf-8')) && (json = JSON.parse(resContent))) {
 			for (var i = 0, l = dels.length; i < l; i++) {
 				json[dels[i]] = null;
 				delete json[dels[i]];
 			}
-			resContent = JSON.stringify(json);
-			if (!outScripts[resLang = ((pos == pos2) ? '' : fileName.substr(pos + 1, (pos2 - pos) - 1))])
-				outScripts[resLang] = [];
+			resLang = ((pos == pos2) ? '' : fileName.substr(pos + 1, (pos2 - pos) - 1));
 			resKey = ((pos = relPath.indexOf('.')) > 0) ? relPath.substr(0, pos) : relPath;
 			if (_.endsWith(resKey, '/pack'))
 				resKey = resKey.substr(0, resKey.length - '/pack'.length);
 			resKey = resKey.split('/').join('_')
-			outScripts[resLang].push(resKey + ":" + resContent);
+			if (!all[resLang])
+				all[resLang] = {};
+			all[resLang][resKey] = json;
 			if (watch)
 				watchFile(filePath);
 		}
 	};
 	for (var i = 0, l = srcPaths.length; i < l; i++)
 		smio.walkDir(srcPaths[i], null, fileFunc, null, false, null, false, null, true);
+	for (var lang in all)
+		if (lang) {
+			if (_.indexOf(smio.resLangs, lang) < 0)
+				smio.resLangs.push(lang);
+			for (var resKey in all[''])
+				if (!all[lang][resKey])
+					all[lang][resKey] = all[''][resKey];
+				else
+					for (var rn in all[''][resKey])
+						if (!all[lang][resKey][rn])
+							all[lang][resKey][rn] = all[''][resKey][rn];
+		}
+	for (var lang in all)
+		for (var resKey in all[lang]) {
+			if (!outScripts[lang])
+				outScripts[lang] = [];
+			outScripts[lang].push(resKey + ':' + JSON.stringify(all[lang][resKey]));
+		}
 	for (var lang in outScripts) {
 		outScript = "smio.resources={" + outScripts[lang].join(',\n') + "};";
 		if (minify)

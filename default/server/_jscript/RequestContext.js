@@ -1,9 +1,10 @@
 (function() {
-  var node_path, node_urlq, node_uuid, smio, _;
+  var node_fs, node_path, node_urlq, node_uuid, smio, _;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   require('./shared/Control');
   require('./Session');
   _ = require('underscore');
+  node_fs = require('fs');
   node_path = require('path');
   node_uuid = require('node-uuid');
   node_urlq = require('querystring');
@@ -52,7 +53,7 @@
       }
     }
     RequestContext.prototype.handleRequest = function() {
-      var cfgKey, cfgVal, ctype, finish, fname, hasHandler, respHeaders;
+      var cfgKey, cfgVal, ctype, finish, fname, hasHandler, respHeaders, userlang;
       this.inst.lastRequestTime = new Date;
       if (!this.smioCookie['sessid']) {
         this.smioCookie['sessid'] = node_uuid();
@@ -79,7 +80,11 @@
               if ((cfgKey = this.uri.query['config'])) {
                 if (cfgKey === '_res.js') {
                   respHeaders['Content-Type'] = 'text/javascript';
-                  this.serveFile('_merged/_res.js', respHeaders);
+                  if (0 <= _.indexOf(smio.resLangs, (userlang = this.userLanguage()))) {
+                    this.serveFile("_merged/_res." + userlang + ".js", respHeaders);
+                  } else {
+                    this.serveFile("_merged/_res.js", respHeaders);
+                  }
                 } else if ((cfgVal = '' + smio.Util.Object.select(this.server.inst.config, cfgKey)) && (fname = this.uri.query[cfgVal])) {
                   if ((ctype = this.uri.query['type'])) {
                     respHeaders['Content-Type'] = ctype;
@@ -93,10 +98,14 @@
               }
               break;
             case "file":
-              this.serveFile(this.uri.pathItems.slice(2).join('/'), respHeaders);
+              if (this.uri.pathItems.length > 2) {
+                this.serveFile(this.uri.pathItems.slice(2).join('/'), respHeaders);
+              } else {
+                throw new Error("No file path specified");
+              }
               break;
             default:
-              hasHandler = false;
+              throw new Error("Unknown URL handler: '" + this.uri.pathItems[1] + "'");
           }
         }
         if (!hasHandler) {
@@ -108,18 +117,44 @@
         return this.httpResponse.end("500 Internal Server Error:\n" + (this.inst.formatError(err)));
       }
     };
-    RequestContext.prototype.serveFile = function(filePath, respHeaders) {
-      if (node_path.existsSync(node_path.join(this.server.fileServer.root, filePath))) {
-        return this.server.fileServer.serveFile(filePath, 200, respHeaders, this.httpRequest, this.httpResponse).addListener('error', __bind(function(err) {
-          respHeaders['Content-Type'] = 'text/plain';
-          this.httpResponse.writeHead(err.status, smio.Util.Object.mergeDefaults(err.headers, respHeaders));
-          return this.httpResponse.end(JSON.stringify(err));
-        }, this));
-      } else {
-        respHeaders['Content-Type'] = 'text/plain';
-        this.httpResponse.writeHead(404, respHeaders);
-        return this.httpResponse.end("404 File Not Found: " + (node_path.join(this.server.fileServer.root, filePath)));
+    RequestContext.prototype.userLanguage = function() {
+      var lq, pos, _i, _len, _ref;
+      if (!this['userLangs']) {
+        this.userLangs = [];
+        _ref = ("" + this.httpRequest.headers['accept-language']).split(',');
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          lq = _ref[_i];
+          if (0 <= (pos = lq.indexOf(';'))) {
+            lq = lq.substr(0, pos);
+          }
+          if (0 <= (pos = lq.indexOf('-'))) {
+            lq = lq.substr(0, pos);
+          }
+          if (0 > _.indexOf(this.userLangs, lq)) {
+            this.userLangs.push(lq);
+          }
+        }
       }
+      return smio.iif(this.userLangs.length, this.userLangs[0], '');
+    };
+    RequestContext.prototype.serveFile = function(filePath, respHeaders) {
+      return node_fs.stat(node_path.join(this.server.fileServer.root, filePath), __bind(function(err, stat) {
+        if (stat && stat.isFile()) {
+          return this.server.fileServer.serveFile(filePath, 200, respHeaders, this.httpRequest, this.httpResponse).addListener('error', __bind(function(err) {
+            respHeaders['Content-Type'] = 'text/plain';
+            this.httpResponse.writeHead(err.status, smio.Util.Object.mergeDefaults(err.headers, respHeaders));
+            return this.httpResponse.end(JSON.stringify(err));
+          }, this));
+        } else {
+          respHeaders['Content-Type'] = 'text/plain';
+          this.httpResponse.writeHead(smio.iif(err, 500, 404), respHeaders);
+          if (err && err['errno'] !== 2) {
+            return this.httpResponse.end("500 Internal Server Error:\n" + (this.inst.formatError(err)));
+          } else {
+            return this.httpResponse.end("404 File Not Found: " + (node_path.join(this.server.fileServer.root, filePath)));
+          }
+        }
+      }, this));
     };
     RequestContext.prototype.servePage = function(respHeaders) {
       var fileContent, placeholder, pos, session;

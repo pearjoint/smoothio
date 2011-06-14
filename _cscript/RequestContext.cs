@@ -2,6 +2,7 @@
 require './shared/Control'
 require './Session'
 _ = require 'underscore'
+node_fs = require 'fs'
 node_path = require 'path'
 node_uuid = require 'node-uuid'
 node_urlq = require 'querystring'
@@ -58,7 +59,10 @@ class smio.RequestContext
 						if (cfgKey = @uri.query['config'])
 							if cfgKey is '_res.js'
 								respHeaders['Content-Type'] = 'text/javascript'
-								@serveFile '_merged/_res.js', respHeaders
+								if 0 <= _.indexOf smio.resLangs, (userlang = @userLanguage())
+									@serveFile "_merged/_res.#{userlang}.js", respHeaders
+								else
+									@serveFile "_merged/_res.js", respHeaders
 							else if (cfgVal = '' + smio.Util.Object.select @server.inst.config, cfgKey) and (fname = @uri.query[cfgVal])
 								if (ctype = @uri.query['type'])
 									respHeaders['Content-Type'] = ctype
@@ -68,9 +72,12 @@ class smio.RequestContext
 							@httpResponse.writeHead 404, respHeaders
 							@httpResponse.end "404 File Not Found: #{node_path.join @server.fileServer.root, fname} (dynamic file)"
 					when "file"
-						@serveFile (@uri.pathItems[2...].join '/'), respHeaders
+						if @uri.pathItems.length > 2
+							@serveFile (@uri.pathItems[2...].join '/'), respHeaders
+						else
+							throw new Error "No file path specified"
 					else
-						hasHandler = false
+						throw new Error "Unknown URL handler: '#{@uri.pathItems[1]}'"
 			if not hasHandler
 				@servePage respHeaders
 		catch err
@@ -78,16 +85,33 @@ class smio.RequestContext
 			@httpResponse.writeHead 500, respHeaders
 			@httpResponse.end "500 Internal Server Error:\n#{@inst.formatError err}"
 
+	userLanguage: () ->
+		if not @['userLangs']
+			@userLangs = []
+			# de-de,de;q=0.8,en;q=0.5,en-us;q=0.3
+			for lq in "#{@httpRequest.headers['accept-language']}".split ','
+				if 0 <= (pos = lq.indexOf ';')
+					lq = lq.substr 0, pos
+				if 0 <= (pos = lq.indexOf '-')
+					lq = lq.substr 0, pos
+				if 0 > _.indexOf @userLangs, lq
+					@userLangs.push lq
+		smio.iif @userLangs.length, @userLangs[0], ''
+
 	serveFile: (filePath, respHeaders) ->
-		if node_path.existsSync node_path.join @server.fileServer.root, filePath
-			@server.fileServer.serveFile(filePath, 200, respHeaders, @httpRequest, @httpResponse).addListener 'error', (err) =>
+		node_fs.stat (node_path.join @server.fileServer.root, filePath), (err, stat) =>
+			if stat and stat.isFile()
+				@server.fileServer.serveFile(filePath, 200, respHeaders, @httpRequest, @httpResponse).addListener 'error', (err) =>
+					respHeaders['Content-Type'] = 'text/plain'
+					@httpResponse.writeHead err.status, smio.Util.Object.mergeDefaults err.headers, respHeaders
+					@httpResponse.end JSON.stringify err
+			else
 				respHeaders['Content-Type'] = 'text/plain'
-				@httpResponse.writeHead err.status, smio.Util.Object.mergeDefaults err.headers, respHeaders
-				@httpResponse.end JSON.stringify err
-		else
-			respHeaders['Content-Type'] = 'text/plain'
-			@httpResponse.writeHead 404, respHeaders
-			@httpResponse.end "404 File Not Found: #{node_path.join @server.fileServer.root, filePath}"
+				@httpResponse.writeHead (smio.iif err, 500, 404), respHeaders
+				if err and err['errno'] isnt 2
+					@httpResponse.end "500 Internal Server Error:\n#{@inst.formatError err}"
+				else
+					@httpResponse.end "404 File Not Found: #{node_path.join @server.fileServer.root, filePath}"
 
 	servePage: (respHeaders) ->
 		placeholder = "___smiopagecontent___"

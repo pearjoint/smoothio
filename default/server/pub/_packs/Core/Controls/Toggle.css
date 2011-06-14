@@ -1,10 +1,10 @@
 input.smio-toggleinput {
-  position: absolute;
-  top: 0;
-  left: 0;
   padding: 0;
   margin: 0;
   opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 span.smio-toggleinput {
   display: inline-block;
@@ -19,13 +19,12 @@ span.smio-toggleinput {
 }
 .smio-toggleinput-btnbtn {
   display: inline-block;
-  vertical-align: top;
   border: 0.094em outset #ccc;
+  position: relative;
+  top: 0.125em;
+  left: 0;
   width: 0.9em;
   height: 0.9em;
-  position: relative;
-  left: 0;
-  top: 0.125em;
   -webkit-border-radius: 0.2em;
   -moz-border-radius: 0.2em;
   border-radius: 0.2em;
@@ -50,17 +49,17 @@ span.smio-toggleinput {
 }
 .smio-toggleinput-btnglyph {
   font-size: 1.25em;
+  color: #30a060;
   position: absolute;
   top: -0.15em;
   left: -0.02em;
-  color: #30a060;
 }
 .smio-toggleinput-radio.smio-toggleinput-checked .smio-toggleinput-btnglyph {
   display: inline-block;
-  left: 21.5%;
-  right: 21.5%;
   top: 21.5%;
+  right: 21.5%;
   bottom: 21.5%;
+  left: 21.5%;
   -webkit-border-radius: 1em;
   -moz-border-radius: 1em;
   border-radius: 1em;
@@ -71,6 +70,9 @@ span.smio-toggleinput {
 .smio-toggleinput-btnlabel {
   padding-right: 0.4em;
   border: 0.094em outset transparent;
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
 }
 .smio-toggleinput-focused .smio-toggleinput-btnbtn,
 .smio-toggleinput-unchecked.smio-enabled .smio-toggleinput-btnlabel:hover .smio-toggleinput-btnbtn,

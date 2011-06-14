@@ -14,15 +14,12 @@
   smio.Packs_Core_ServerSetup_InitialSiteSetup = (function() {
     __extends(Packs_Core_ServerSetup_InitialSiteSetup, smio.Control);
     Packs_Core_ServerSetup_InitialSiteSetup.prototype.renderTemplate = function() {
-      var urlseg;
-      urlseg = _.trim(this.client.pageUrl.attr('directory'), '/');
-      urlseg = smio.iif(urlseg, "/" + urlseg + "/", '/');
       return {
         "div .smio-setup": {
           "id": '',
           "div .smio-setup-outer .smio-setup-outer-top": {
             "div.smio-setup-header": {
-              html: [this.r('title', urlseg)]
+              html: [this.r('title', 'smio-setup-header-detail', smio.Control.util.jsVoid, this.urlSeg())]
             },
             "div.smio-setup-header-desc": [this.r('desc')]
           },
@@ -45,17 +42,19 @@
                       type: 'password'
                     },
                     "div .smio-setup-stepbox-form-label": {
-                      html: ['The Hub owner specified above is:']
+                      html: [this.r('owner_choice')]
                     },
                     "div": {
                       "Toggle #owner_create": {
                         toggleName: 'owner_toggle',
                         labelHtml: this.r('owner_create', 'localhost'),
-                        checked: true
+                        checked: true,
+                        disabled: true
                       },
                       "Toggle #owner_login": {
                         toggleName: 'owner_toggle',
-                        labelHtml: this.r('owner_login', 'localhost')
+                        labelHtml: this.r('owner_login', 'localhost'),
+                        disabled: true
                       }
                     }
                   }
@@ -88,13 +87,29 @@
     };
     Packs_Core_ServerSetup_InitialSiteSetup.prototype.onLoad = function() {
       Packs_Core_ServerSetup_InitialSiteSetup.__super__.onLoad.call(this);
-      return this.controls['stepslide'].controls['owner_name'].sub('input').focus();
+      $('.smio-setup-header-detail').click(__bind(function() {
+        var nurl, port, urlseg;
+        port = smio.iif(("" + (this.client.pageUrl.attr('port'))) === '80', '', ":" + (this.client.pageUrl.attr('port')));
+        nurl = prompt(this.r('url_hint', this.client.pageUrl.attr('protocol'), this.client.pageUrl.attr('host'), port), urlseg = this.urlSeg());
+        if ((nurl != null) && nurl !== null && nurl !== urlseg) {
+          if (!_.startsWith(nurl, '/')) {
+            nurl = "/" + nurl;
+          }
+          return location.replace(_.trim(nurl));
+        }
+      }, this));
+      return this.sub('stepslide/owner_name/input').focus();
     };
     Packs_Core_ServerSetup_InitialSiteSetup.prototype.onSlide = function(index, itemID) {
       return this.controls.steptabs.selectTab(itemID);
     };
     Packs_Core_ServerSetup_InitialSiteSetup.prototype.onTabSelect = function(tabID) {
       return this.controls.stepslide.scrollTo(tabID);
+    };
+    Packs_Core_ServerSetup_InitialSiteSetup.prototype.urlSeg = function() {
+      var urlseg;
+      urlseg = _.trim(this.client.pageUrl.attr('path'), '/');
+      return urlseg = smio.iif(urlseg, "/" + urlseg + "/", '/');
     };
     function Packs_Core_ServerSetup_InitialSiteSetup(client, parent, args) {
       Packs_Core_ServerSetup_InitialSiteSetup.__super__.constructor.call(this, client, parent, args, "Core_ServerSetup", "Core_ServerSetup_InitialSiteSetup");

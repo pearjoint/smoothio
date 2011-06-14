@@ -7,7 +7,6 @@
       var opts;
       this.client = client;
       this.offline = 1;
-      this.offlineBlinkIntervalHandle = null;
       this.initialFetchDone = false;
       if (isSocketIO) {
         opts = {
@@ -129,11 +128,6 @@
     Socket.prototype.onOffline = function() {
       this.offline++;
       if (this.offline === 2) {
-        if (!this.offlineBlinkIntervalHandle) {
-          this.offlineBlinkIntervalHandle = setInterval((__bind(function() {
-            return this.toggleOfflineBlink();
-          }, this)), 500);
-        }
         $('#smio_favicon').attr({
           'href': '/_/file/images/bg.png'
         });
@@ -146,10 +140,6 @@
     Socket.prototype.onOnline = function() {
       if (this.offline) {
         this.offline = 0;
-        if (this.offlineBlinkIntervalHandle) {
-          clearInterval(this.offlineBlinkIntervalHandle);
-          this.offlineBlinkIntervalHandle = null;
-        }
         if (this.client.allControls['']) {
           this.client.allControls[''].disable(false, true);
         }
@@ -241,6 +231,9 @@
     Socket.prototype.setTimer = function(name, fn) {
       var obj, val;
       obj = this.poll.intervals[name];
+      if (name === 'fetch' && !obj.val) {
+        obj.val = 10000;
+      }
       val = this.client.sleepy ? obj.val * this.poll.intervals.sleepyFactor : obj.val;
       if (obj['handle']) {
         clearInterval(obj.handle);
@@ -256,14 +249,6 @@
       return this.setTimer('fetch', __bind(function() {
         return this.poll.send(false);
       }, this));
-    };
-    Socket.prototype.toggleOfflineBlink = function() {
-      var blink, vis;
-      blink = $('#smio_offline_blink');
-      vis = blink.css('visibility');
-      return blink.css({
-        visibility: (vis === 'hidden' ? 'visible' : 'hidden')
-      });
     };
     return Socket;
   })();

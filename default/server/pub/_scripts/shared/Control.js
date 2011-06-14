@@ -5,7 +5,8 @@
   smio.Control = (function() {
     Control.prototype.coreDisable = function(disable) {};
     Control.prototype.disable = function(disable, isInherit) {
-      var ctl, id, _ref, _results;
+      var ctl, id, len, _ref;
+      len = 0;
       if (!isInherit) {
         this.disabled = disable;
       } else if (!disable) {
@@ -20,12 +21,14 @@
       }
       this.coreDisable(disable);
       _ref = this.controls;
-      _results = [];
       for (id in _ref) {
         ctl = _ref[id];
-        _results.push(ctl.disable(disable, isInherit));
+        len++;
+        ctl.disable(disable, isInherit);
       }
-      return _results;
+      if (len === 0) {
+        return this.el[smio.iif(disable, 'addClass', 'removeClass')]('smio-disabledfaded');
+      }
     };
     Control.prototype.on = function(eventName, handler) {
       var eh, _i, _len, _ref, _results;
@@ -49,17 +52,26 @@
       }
     };
     Control.prototype.onLoad = function() {
-      var ctl, id, prefix, _ref;
+      var ctl, id, len, prefix, _ref, _ref2;
       prefix = "cscript:";
       this.el = $('#' + this.id());
       if (this.disabled) {
+        len = 0;
         this.el.removeClass('smio-enabled').addClass('smio-disabled');
+        _ref = this.controls;
+        for (id in _ref) {
+          ctl = _ref[id];
+          len++;
+        }
+        if (len === 0) {
+          this.el.addClass('smio-disabledfaded');
+        }
       } else {
         this.el.removeClass('smio-disabled').addClass('smio-enabled');
       }
-      _ref = this.controls;
-      for (id in _ref) {
-        ctl = _ref[id];
+      _ref2 = this.controls;
+      for (id in _ref2) {
+        ctl = _ref2[id];
         ctl.onLoad();
       }
       if (!this.parent) {
@@ -75,7 +87,14 @@
     };
     Control.prototype.onWindowResize = function(width, height) {};
     Control.prototype.sub = function(id) {
-      return $("#" + (this.id(id)));
+      var ctl, i, parts, _ref;
+      ctl = this;
+      if ((parts = id.split('/')).length > 1) {
+        for (i = 0, _ref = parts.length - 1; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
+          ctl = ctl.controls[parts[i]];
+        }
+      }
+      return $("#" + (ctl.id(parts[parts.length - 1])));
     };
     Control.prototype.syncUpdate = function(ctlDesc) {};
     Control.prototype.un = function(eventName, handler) {

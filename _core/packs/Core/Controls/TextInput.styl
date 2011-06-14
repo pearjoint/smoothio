@@ -1,24 +1,26 @@
+textboxoutline()
+	border-bottom $hairline solid transparent
+	smio-box-shadow 0 0.07em 0.28em #909090 inset
+	smio-border-radius 0.2em
+
 input.smio-textinput
 	cursor text
 	background transparent
 	border 0px none red
-	border-bottom 0.094em dotted #c0c0c0
+	border-bottom $hairline dotted #c0c0c0
 	padding 0.33em
 	font-weight bold
-	smio-select text !important
+	smio-select text
 	smio-drag auto
-	smio-border-radius 0.2em
 
 span.smio-textinput.smio-enabled input.smio-textinput:hover
-	smio-box-shadow 0 0.07em 0.28em #909090 inset
-	border-bottom 0px none red
+	textboxoutline()
 
 input.smio-textinput:focus
 	font-weight normal
 	background #ffffff
-	smio-box-shadow 0 0.07em 0.28em #909090 inset
-	border-bottom 0px none red
+	textboxoutline()
 
 input.smio-textinput[readonly]:focus
-	background #f0f0f0
+	background $collite
 

@@ -1,134 +1,51 @@
-Mon Jun 13 20:48:35 [initandlisten] MongoDB starting : pid=11730 port=61234 dbpath=/home/roxor/smoothio/default/server/dbs/ 64-bit 
-Mon Jun 13 20:48:35 [initandlisten] db version v1.8.1, pdfile version 4.5
-Mon Jun 13 20:48:35 [initandlisten] git version: a429cd4f535b2499cc4130b06ff7c26f41c00f04
-Mon Jun 13 20:48:35 [initandlisten] build sys info: Linux bs-linux64.10gen.cc 2.6.21.7-2.ec2.v1.2.fc8xen #1 SMP Fri Nov 20 17:48:28 EST 2009 x86_64 BOOST_LIB_VERSION=1_41
-Mon Jun 13 20:48:35 [initandlisten] waiting for connections on port 61234
-Mon Jun 13 20:48:35 [websvr] web admin interface listening on port 62234
-Mon Jun 13 20:48:36 [initandlisten] connection accepted from 127.0.0.1:50976 #1
-Mon Jun 13 20:48:36 [initandlisten] connection accepted from 127.0.0.1:50977 #2
-Mon Jun 13 20:48:37 [initandlisten] connection accepted from 127.0.0.1:50980 #3
-Mon Jun 13 20:48:37 [initandlisten] connection accepted from 127.0.0.1:50985 #4
-Mon Jun 13 20:48:37 [initandlisten] connection accepted from 127.0.0.1:50986 #5
-Mon Jun 13 20:48:37 [initandlisten] connection accepted from 127.0.0.1:50987 #6
-Mon Jun 13 20:48:45 [initandlisten] connection accepted from 127.0.0.1:50994 #7
-Mon Jun 13 20:48:45 [initandlisten] connection accepted from 127.0.0.1:50995 #8
-Mon Jun 13 20:48:51 [initandlisten] connection accepted from 127.0.0.1:50996 #9
-Mon Jun 13 20:49:01 [initandlisten] connection accepted from 127.0.0.1:50997 #10
-Mon Jun 13 20:49:07 [initandlisten] connection accepted from 127.0.0.1:50998 #11
-Mon Jun 13 20:49:17 [initandlisten] connection accepted from 127.0.0.1:50999 #12
-Mon Jun 13 20:49:23 [initandlisten] connection accepted from 127.0.0.1:51000 #13
-Mon Jun 13 20:49:33 [initandlisten] connection accepted from 127.0.0.1:51001 #14
-Mon Jun 13 20:49:39 [initandlisten] connection accepted from 127.0.0.1:51002 #15
-Mon Jun 13 20:49:49 [initandlisten] connection accepted from 127.0.0.1:51003 #16
-Mon Jun 13 20:49:55 [initandlisten] connection accepted from 127.0.0.1:51004 #17
-Mon Jun 13 20:50:11 [initandlisten] connection accepted from 127.0.0.1:51005 #18
-Mon Jun 13 20:50:18 [initandlisten] connection accepted from 127.0.0.1:51006 #19
-Mon Jun 13 20:50:27 [initandlisten] connection accepted from 127.0.0.1:51008 #20
-Mon Jun 13 20:50:43 [initandlisten] connection accepted from 127.0.0.1:51039 #21
-Mon Jun 13 20:50:59 [initandlisten] connection accepted from 127.0.0.1:51048 #22
-Mon Jun 13 20:51:15 [initandlisten] connection accepted from 127.0.0.1:51049 #23
-Mon Jun 13 20:51:22 [initandlisten] connection accepted from 127.0.0.1:51050 #24
-Mon Jun 13 20:51:31 [initandlisten] connection accepted from 127.0.0.1:51051 #25
-Mon Jun 13 20:51:47 [initandlisten] connection accepted from 127.0.0.1:39878 #26
-Mon Jun 13 20:52:03 [initandlisten] connection accepted from 127.0.0.1:39898 #27
-Mon Jun 13 20:52:19 [initandlisten] connection accepted from 127.0.0.1:39904 #28
-Mon Jun 13 20:52:26 [initandlisten] connection accepted from 127.0.0.1:39906 #29
-Mon Jun 13 20:52:35 [initandlisten] connection accepted from 127.0.0.1:39907 #30
-Mon Jun 13 20:52:51 [initandlisten] connection accepted from 127.0.0.1:39908 #31
-Mon Jun 13 20:53:07 [initandlisten] connection accepted from 127.0.0.1:39921 #32
-Mon Jun 13 20:53:23 [initandlisten] connection accepted from 127.0.0.1:39931 #33
-Mon Jun 13 20:53:30 [initandlisten] connection accepted from 127.0.0.1:39932 #34
-Mon Jun 13 20:53:39 [initandlisten] connection accepted from 127.0.0.1:39933 #35
-Mon Jun 13 20:53:54 [initandlisten] connection accepted from 127.0.0.1:39944 #36
-Mon Jun 13 20:54:11 [initandlisten] connection accepted from 127.0.0.1:40106 #37
-Mon Jun 13 20:54:26 [initandlisten] connection accepted from 127.0.0.1:40112 #38
-Mon Jun 13 20:54:34 [initandlisten] connection accepted from 127.0.0.1:40113 #39
-Mon Jun 13 20:54:42 [initandlisten] connection accepted from 127.0.0.1:40116 #40
-Mon Jun 13 20:54:58 [initandlisten] connection accepted from 127.0.0.1:40117 #41
-Mon Jun 13 20:55:14 [initandlisten] connection accepted from 127.0.0.1:40118 #42
-Mon Jun 13 20:55:30 [initandlisten] connection accepted from 127.0.0.1:40190 #43
-Mon Jun 13 20:55:38 [initandlisten] connection accepted from 127.0.0.1:40244 #44
-Mon Jun 13 20:55:46 [initandlisten] connection accepted from 127.0.0.1:40256 #45
-Mon Jun 13 20:56:02 [initandlisten] connection accepted from 127.0.0.1:40257 #46
-Mon Jun 13 20:56:18 [initandlisten] connection accepted from 127.0.0.1:40258 #47
-Mon Jun 13 20:56:34 [initandlisten] connection accepted from 127.0.0.1:40259 #48
-Mon Jun 13 20:56:42 [initandlisten] connection accepted from 127.0.0.1:59119 #49
-Mon Jun 13 20:56:50 [initandlisten] connection accepted from 127.0.0.1:59131 #50
-Mon Jun 13 20:57:07 [initandlisten] connection accepted from 127.0.0.1:59132 #51
-Mon Jun 13 20:57:23 [initandlisten] connection accepted from 127.0.0.1:59133 #52
-Mon Jun 13 20:57:25 [initandlisten] connection accepted from 127.0.0.1:59134 #53
-Mon Jun 13 20:57:39 [initandlisten] connection accepted from 127.0.0.1:59135 #54
-Mon Jun 13 20:57:41 [initandlisten] connection accepted from 127.0.0.1:59136 #55
-Mon Jun 13 20:57:55 [initandlisten] connection accepted from 127.0.0.1:59137 #56
-Mon Jun 13 20:57:57 [initandlisten] connection accepted from 127.0.0.1:59138 #57
-Mon Jun 13 20:58:11 [initandlisten] connection accepted from 127.0.0.1:59140 #58
-Mon Jun 13 20:58:13 [initandlisten] connection accepted from 127.0.0.1:59141 #59
-Mon Jun 13 20:58:27 [initandlisten] connection accepted from 127.0.0.1:59142 #60
-Mon Jun 13 20:58:29 [initandlisten] connection accepted from 127.0.0.1:59143 #61
-Mon Jun 13 20:58:43 [initandlisten] connection accepted from 127.0.0.1:59144 #62
-Mon Jun 13 20:58:45 [initandlisten] connection accepted from 127.0.0.1:59145 #63
-Mon Jun 13 20:58:59 [initandlisten] connection accepted from 127.0.0.1:59146 #64
-Mon Jun 13 20:59:01 [initandlisten] connection accepted from 127.0.0.1:59147 #65
-Mon Jun 13 20:59:15 [initandlisten] connection accepted from 127.0.0.1:59148 #66
-Mon Jun 13 20:59:17 [initandlisten] connection accepted from 127.0.0.1:59149 #67
-Mon Jun 13 20:59:31 [initandlisten] connection accepted from 127.0.0.1:59150 #68
-Mon Jun 13 20:59:33 [initandlisten] connection accepted from 127.0.0.1:59151 #69
-Mon Jun 13 20:59:47 [initandlisten] connection accepted from 127.0.0.1:59152 #70
-Mon Jun 13 20:59:49 [initandlisten] connection accepted from 127.0.0.1:59153 #71
-Mon Jun 13 21:00:03 [initandlisten] connection accepted from 127.0.0.1:59154 #72
-Mon Jun 13 21:00:05 [initandlisten] connection accepted from 127.0.0.1:59155 #73
-Mon Jun 13 21:00:19 [initandlisten] connection accepted from 127.0.0.1:59156 #74
-Mon Jun 13 21:00:21 [initandlisten] connection accepted from 127.0.0.1:59157 #75
-Mon Jun 13 21:00:35 [initandlisten] connection accepted from 127.0.0.1:59158 #76
-Mon Jun 13 21:00:37 [initandlisten] connection accepted from 127.0.0.1:59159 #77
-Mon Jun 13 21:00:51 [initandlisten] connection accepted from 127.0.0.1:59160 #78
-Mon Jun 13 21:00:53 [initandlisten] connection accepted from 127.0.0.1:59161 #79
-Mon Jun 13 21:01:07 [initandlisten] connection accepted from 127.0.0.1:59162 #80
-Mon Jun 13 21:01:09 [initandlisten] connection accepted from 127.0.0.1:59163 #81
-Mon Jun 13 21:01:23 [initandlisten] connection accepted from 127.0.0.1:59164 #82
-Mon Jun 13 21:01:25 [initandlisten] connection accepted from 127.0.0.1:59165 #83
-Mon Jun 13 21:01:39 [initandlisten] connection accepted from 127.0.0.1:52435 #84
-Mon Jun 13 21:01:41 [initandlisten] connection accepted from 127.0.0.1:52436 #85
-Mon Jun 13 21:01:55 [initandlisten] connection accepted from 127.0.0.1:52437 #86
-Mon Jun 13 21:01:57 [initandlisten] connection accepted from 127.0.0.1:52438 #87
-Mon Jun 13 21:02:11 [initandlisten] connection accepted from 127.0.0.1:52439 #88
-Mon Jun 13 21:02:27 [initandlisten] connection accepted from 127.0.0.1:52440 #89
-Mon Jun 13 21:02:43 [initandlisten] connection accepted from 127.0.0.1:52441 #90
-Mon Jun 13 21:02:59 [initandlisten] connection accepted from 127.0.0.1:52442 #91
-Mon Jun 13 21:03:15 [initandlisten] connection accepted from 127.0.0.1:52443 #92
-Mon Jun 13 21:03:23 [initandlisten] connection accepted from 127.0.0.1:52444 #93
-Mon Jun 13 21:03:31 [initandlisten] connection accepted from 127.0.0.1:52445 #94
-Mon Jun 13 21:03:47 [initandlisten] connection accepted from 127.0.0.1:52446 #95
-Mon Jun 13 21:04:03 [initandlisten] connection accepted from 127.0.0.1:52447 #96
-Mon Jun 13 21:04:19 [initandlisten] connection accepted from 127.0.0.1:52448 #97
-Mon Jun 13 21:04:27 [initandlisten] connection accepted from 127.0.0.1:52449 #98
-Mon Jun 13 21:04:35 [initandlisten] connection accepted from 127.0.0.1:52450 #99
-Mon Jun 13 21:04:51 [initandlisten] connection accepted from 127.0.0.1:52451 #100
-Mon Jun 13 21:05:07 [initandlisten] connection accepted from 127.0.0.1:52452 #101
-Mon Jun 13 21:05:23 [initandlisten] connection accepted from 127.0.0.1:52453 #102
-Mon Jun 13 21:05:31 [initandlisten] connection accepted from 127.0.0.1:52454 #103
-Mon Jun 13 21:05:39 [initandlisten] connection accepted from 127.0.0.1:52455 #104
-Mon Jun 13 21:05:55 [initandlisten] connection accepted from 127.0.0.1:52456 #105
-Mon Jun 13 21:06:11 [initandlisten] connection accepted from 127.0.0.1:52457 #106
-Mon Jun 13 21:06:27 [initandlisten] connection accepted from 127.0.0.1:52458 #107
-Mon Jun 13 21:06:35 [initandlisten] connection accepted from 127.0.0.1:55954 #108
-Mon Jun 13 21:06:43 [initandlisten] connection accepted from 127.0.0.1:55955 #109
-Mon Jun 13 21:06:59 [initandlisten] connection accepted from 127.0.0.1:55956 #110
-Mon Jun 13 21:07:15 [initandlisten] connection accepted from 127.0.0.1:55957 #111
-Mon Jun 13 21:07:31 [initandlisten] connection accepted from 127.0.0.1:55958 #112
-Mon Jun 13 21:07:58 [conn6] terminating, shutdown command received
-Mon Jun 13 21:07:58 dbexit: shutdown called
-Mon Jun 13 21:07:58 [conn6] shutdown: going to close listening sockets...
-Mon Jun 13 21:07:58 [conn6] closing listening socket: 5
-Mon Jun 13 21:07:58 [conn6] closing listening socket: 7
-Mon Jun 13 21:07:58 [conn6] closing listening socket: 8
-Mon Jun 13 21:07:58 [conn6] closing listening socket: 9
-Mon Jun 13 21:07:58 [conn6] removing socket file: /tmp/mongodb-61234.sock
-Mon Jun 13 21:07:58 [conn6] removing socket file: /tmp/mongodb-62234.sock
-Mon Jun 13 21:07:58 [conn6] shutdown: going to flush diaglog...
-Mon Jun 13 21:07:58 [conn6] shutdown: going to close sockets...
-Mon Jun 13 21:07:58 [conn6] shutdown: waiting for fs preallocator...
-Mon Jun 13 21:07:58 [conn6] shutdown: closing all files...
-Mon Jun 13 21:07:58 closeAllFiles() finished
-Mon Jun 13 21:07:58 [conn6] shutdown: removing fs lock...
-Mon Jun 13 21:07:58 dbexit: really exiting now
+Tue Jun 14 03:51:37 [initandlisten] MongoDB starting : pid=23979 port=61234 dbpath=/home/roxor/smoothio/default/server/dbs/ 64-bit 
+Tue Jun 14 03:51:37 [initandlisten] db version v1.8.1, pdfile version 4.5
+Tue Jun 14 03:51:37 [initandlisten] git version: a429cd4f535b2499cc4130b06ff7c26f41c00f04
+Tue Jun 14 03:51:37 [initandlisten] build sys info: Linux bs-linux64.10gen.cc 2.6.21.7-2.ec2.v1.2.fc8xen #1 SMP Fri Nov 20 17:48:28 EST 2009 x86_64 BOOST_LIB_VERSION=1_41
+Tue Jun 14 03:51:37 [initandlisten] waiting for connections on port 61234
+Tue Jun 14 03:51:37 [websvr] web admin interface listening on port 62234
+Tue Jun 14 03:51:37 [initandlisten] connection accepted from 127.0.0.1:42227 #1
+Tue Jun 14 03:51:38 [initandlisten] connection accepted from 127.0.0.1:42228 #2
+Tue Jun 14 03:51:38 [initandlisten] connection accepted from 127.0.0.1:42231 #3
+Tue Jun 14 03:51:39 [initandlisten] connection accepted from 127.0.0.1:42232 #4
+Tue Jun 14 03:51:51 [initandlisten] connection accepted from 127.0.0.1:49185 #5
+Tue Jun 14 03:51:52 [initandlisten] connection accepted from 127.0.0.1:49190 #6
+Tue Jun 14 03:51:56 [initandlisten] connection accepted from 127.0.0.1:49201 #7
+Tue Jun 14 03:51:56 [initandlisten] connection accepted from 127.0.0.1:49202 #8
+Tue Jun 14 03:52:27 [initandlisten] connection accepted from 127.0.0.1:49203 #9
+Tue Jun 14 03:52:43 [initandlisten] connection accepted from 127.0.0.1:49204 #10
+Tue Jun 14 03:52:59 [initandlisten] connection accepted from 127.0.0.1:49208 #11
+Tue Jun 14 03:53:15 [initandlisten] connection accepted from 127.0.0.1:49209 #12
+Tue Jun 14 03:53:15 [initandlisten] connection accepted from 127.0.0.1:49210 #13
+Tue Jun 14 03:53:31 [initandlisten] connection accepted from 127.0.0.1:49211 #14
+Tue Jun 14 03:53:47 [initandlisten] connection accepted from 127.0.0.1:49213 #15
+Tue Jun 14 03:53:48 [initandlisten] connection accepted from 127.0.0.1:49214 #16
+Tue Jun 14 03:53:48 [initandlisten] connection accepted from 127.0.0.1:49215 #17
+Tue Jun 14 03:54:04 [initandlisten] connection accepted from 127.0.0.1:49216 #18
+Tue Jun 14 03:54:19 [initandlisten] connection accepted from 127.0.0.1:49217 #19
+Tue Jun 14 03:54:20 [initandlisten] connection accepted from 127.0.0.1:49218 #20
+Tue Jun 14 03:54:36 [initandlisten] connection accepted from 127.0.0.1:49219 #21
+Tue Jun 14 03:54:52 [initandlisten] connection accepted from 127.0.0.1:49220 #22
+Tue Jun 14 03:55:08 [initandlisten] connection accepted from 127.0.0.1:49222 #23
+Tue Jun 14 03:55:23 [initandlisten] connection accepted from 127.0.0.1:49223 #24
+Tue Jun 14 03:55:24 [initandlisten] connection accepted from 127.0.0.1:49224 #25
+Tue Jun 14 03:55:40 [initandlisten] connection accepted from 127.0.0.1:49225 #26
+Tue Jun 14 03:55:56 [initandlisten] connection accepted from 127.0.0.1:49226 #27
+Tue Jun 14 03:56:25 [initandlisten] connection accepted from 127.0.0.1:49238 #28
+Tue Jun 14 03:56:25 [initandlisten] connection accepted from 127.0.0.1:49239 #29
+Tue Jun 14 03:57:24 [conn4] terminating, shutdown command received
+Tue Jun 14 03:57:24 dbexit: shutdown called
+Tue Jun 14 03:57:24 [conn4] shutdown: going to close listening sockets...
+Tue Jun 14 03:57:24 [conn4] closing listening socket: 5
+Tue Jun 14 03:57:24 [conn4] closing listening socket: 7
+Tue Jun 14 03:57:24 [conn4] closing listening socket: 8
+Tue Jun 14 03:57:24 [conn4] closing listening socket: 9
+Tue Jun 14 03:57:24 [conn4] removing socket file: /tmp/mongodb-61234.sock
+Tue Jun 14 03:57:24 [conn4] removing socket file: /tmp/mongodb-62234.sock
+Tue Jun 14 03:57:24 [conn4] shutdown: going to flush diaglog...
+Tue Jun 14 03:57:24 [conn4] shutdown: going to close sockets...
+Tue Jun 14 03:57:24 [conn4] shutdown: waiting for fs preallocator...
+Tue Jun 14 03:57:24 [conn4] shutdown: closing all files...
+Tue Jun 14 03:57:24 closeAllFiles() finished
+Tue Jun 14 03:57:24 [conn4] shutdown: removing fs lock...
+Tue Jun 14 03:57:24 dbexit: really exiting now

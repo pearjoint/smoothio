@@ -22,13 +22,11 @@ class smio.Packs_Core_ServerSetup_InitialSiteSetup extends smio.Control
 #if client
 	
 	renderTemplate: ->
-		urlseg = _.trim (@client.pageUrl.attr 'directory'), '/'
-		urlseg = smio.iif urlseg, "/#{urlseg}/", '/'
 		"div .smio-setup":
 			"id": ''
 			"div .smio-setup-outer .smio-setup-outer-top":
 				"div.smio-setup-header":
-					html: [@r 'title', urlseg]
+					html: [@r 'title', 'smio-setup-header-detail', smio.Control.util.jsVoid, @urlSeg()]
 				"div.smio-setup-header-desc": [@r 'desc']
 			"div .smio-setup-inner":
 				"SlidePanel #stepslide .smio-setup-stepslide":
@@ -46,15 +44,17 @@ class smio.Packs_Core_ServerSetup_InitialSiteSetup extends smio.Control
 									labelText: @r 'owner_pass'
 									type: 'password'
 								"div .smio-setup-stepbox-form-label":
-									html: ['The Hub owner specified above is:']
+									html: [@r 'owner_choice']
 								"div":
 									"Toggle #owner_create":
 										toggleName: 'owner_toggle'
 										labelHtml: @r 'owner_create', 'localhost'
 										checked: true
+										disabled: true
 									"Toggle #owner_login":
 										toggleName: 'owner_toggle'
 										labelHtml: @r 'owner_login', 'localhost'
+										disabled: true
 						"template":
 							"div .smio-setup-stepbox-title":
 								[@r 'steptitle_template']
@@ -73,13 +73,24 @@ class smio.Packs_Core_ServerSetup_InitialSiteSetup extends smio.Control
 	
 	onLoad: ->
 		super()
-		@controls['stepslide'].controls['owner_name'].sub('input').focus()
+		$('.smio-setup-header-detail').click =>
+			port = smio.iif "#{@client.pageUrl.attr 'port'}" is '80', '', ":#{@client.pageUrl.attr 'port'}"
+			nurl = (prompt (@r 'url_hint', (@client.pageUrl.attr 'protocol'), (@client.pageUrl.attr 'host'), port), urlseg = @urlSeg())
+			if nurl? and nurl isnt null and nurl isnt urlseg
+				if not _.startsWith nurl, '/'
+					nurl = "/#{nurl}"
+				location.replace _.trim nurl
+		@sub('stepslide/owner_name/input').focus()
 	
 	onSlide: (index, itemID) ->
 		@controls.steptabs.selectTab itemID
 	
 	onTabSelect: (tabID) ->
 		@controls.stepslide.scrollTo tabID
+	
+	urlSeg: ->
+		urlseg = _.trim (@client.pageUrl.attr 'path'), '/'
+		urlseg = smio.iif urlseg, "/#{urlseg}/", '/'
 	
 #endif
 	

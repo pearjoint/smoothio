@@ -2,8 +2,9 @@
 @import 'include/reset'
 
 smio-selection()
-	color #f0f0f0
-	text-shadow none
+	background rgba(0, 0, 0, 0.75) !important
+	color $collite !important
+	text-shadow none !important
 
 ::selection
 	smio-selection()
@@ -13,23 +14,23 @@ smio-selection()
 
 a
 	text-decoration none
-	color #303030
+	color inherit
 
 img
 	image-rendering optimizeQuality
 	-ms-interpolation-mode bicubic
 
-$bgblack = rgba(0, 0, 0, 0.4)
-$bgtrans = rgba(0, 0, 0, 0.1)
-$bgwhite = rgba(255, 255, 255, 0.2)
-
 body
 	cursor default
-	user-select: none;
-	color #303030
+	color $coldark
 	margin 0
 	font-family Arial, Helvetica, Helvetica Neue, Sans-Serif
-	smio-background-bgradient #c09050
+	smio-select none
+	smio-drag none
+	smio-background-bgradient $smcol
+
+.smio-disabledfaded
+	opacity 0.65
 
 .smio-blocking-overlay
 	display none
@@ -43,8 +44,22 @@ body
 	padding 18% 8% 8% 8%
 	line-height 1.3em
 	font-size: 1.7em
-	color #f0f0f0
+	color $collite
 	text-shadow 0 0 0.6em #000000
 	smio-narrow()
 	smio-background-ogradient rgba(0, 0, 0, 0.5), 25%, rgba(0, 0, 0, 0.7), 75%, 0.25em
+
+@keyframes offblink
+	0%
+		opacity 0
+	100%
+		opacity 1
+
+#smio_offline_blink
+	-webkit-animation-name offblink
+	-webkit-animation-duration 0.33s
+	-webkit-animation-iteration-count infinite
+	-webkit-animation-direction alternate
+	-webkit-animation-timing-function linear
+	text-decoration blink
 

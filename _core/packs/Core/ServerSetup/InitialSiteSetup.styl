@@ -5,11 +5,14 @@ $setup-grad-dark = 0.5
 $setup-grad-tlite = 0.88
 $setup-grad-blite = 0.92
 
+$colsetuplite = #909090
+$colsetupdark = #606060
+
 div.smio-setup
-	smio-box-shadow 0 0.4em 4.8em #909090
+	smio-box-shadow 0 0.4em 4.8em $colsetuplite
 	line-height 1.25
 	smio-posabs-trl 0 14%
-	smio-nooverflow-nowrap()
+	smio-nowrapflow()
 	smio-border-radius $setup-tcorner $setup-tcorner $setup-bcorner $setup-bcorner
 
 .smio-setup-outer
@@ -17,14 +20,14 @@ div.smio-setup
 
 .smio-setup-outer-top
 	smio-background-vgradient rgba($setup-grad-base, $setup-grad-dark) rgba($setup-grad-base, $setup-grad-tlite)
-	smio-nooverflow-nowrap()
+	smio-nowrapflow()
 	smio-border-radius $setup-tcorner $setup-tcorner 0 0
 
 .smio-setup-inner
 	background rgba($setup-grad-base, $setup-grad-blite)
 	smio-box-shadow 0 0.062em 0.35em #b0b0b0 inset
 	padding 0 0.2em 0 0.2em
-	smio-nooverflow-nowrap()
+	smio-nowrapflow()
 
 .smio-setup-header
 	font-size 2em
@@ -35,6 +38,10 @@ div.smio-setup
 .smio-setup-header-detail
 	smio-transition opacity 0.5s
 	opacity 0
+
+.smio-setup-header-detail:hover, .smio-setup-header-detail:focus
+	text-decoration underline
+	opacity 1
 
 div.smio-setup:hover .smio-setup-header-detail
 	opacity 1
@@ -62,7 +69,7 @@ div.smio-setup:hover .smio-setup-header-detail
 
 .smio-setup-stepbox-form
 	padding 1em 0 0 1.8em
-	color #606060
+	color $colsetupdark
 
 .smio-setup-stepbox-form span.smio-textinput
 	display table-row
@@ -70,7 +77,7 @@ div.smio-setup:hover .smio-setup-header-detail
 
 .smio-setup-stepbox-form-label
 	padding 2em 0 0.5em 0
-	color #a0a0a0
+	color $colsetuplite
 
 .smio-setup-stepbox-form span.smio-toggleinput
 	display block
@@ -78,7 +85,7 @@ div.smio-setup:hover .smio-setup-header-detail
 	smio-transition color 0.5s
 
 .smio-setup-stepbox-form span.smio-toggleinput-unchecked
-	color #909090
+	color $colsetuplite
 
 .smio-setup-stepbox-form span.smio-textinput input.smio-textinput
 	width 100%
@@ -99,8 +106,8 @@ div.smio-setup:hover .smio-setup-header-detail
 	font-size 0.95em
 	padding 0.2em 1em 0.2em 1em
 	display inline-block
-	color #606060
-	text-shadow 0 0.098em #ffffff
+	color $colsetupdark
+	text-shadow 0 $hairline #ffffff
 	smio-lcase()
 
 .smio-setup-steptab-inactive:hover, .smio-setup-steptab-inactive:focus
@@ -108,7 +115,7 @@ div.smio-setup:hover .smio-setup-header-detail
 
 .smio-setup-steptab-active
 	cursor default
-	smio-box-shadow 0 0.066em 0.3em #606060 inset
+	smio-box-shadow 0 0.066em 0.3em $colsetupdark inset
 	background rgba(0, 0, 0, 0.1)
 	color #505050
 

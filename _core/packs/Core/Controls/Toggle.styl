@@ -1,18 +1,20 @@
 $grad_color = rgb(0, 28, 0)
 $grad_dark = 0.12
 $grad_lite = 0
+$colborder = #cccccc
+$colbase = #30a060
+$coldark = #206040
+$collite = #70b090
 
 input.smio-toggleinput
-	position absolute
-	top 0
-	left 0
 	padding 0
 	margin 0
 	opacity 0
+	smio-posabs-tl 0
 
 span.smio-toggleinput
 	display: inline-block
-	smio-nooverflow-nowrap()
+	smio-nowrapflow()
 
 .smio-toggleinput-btn
 	position relative
@@ -22,49 +24,41 @@ span.smio-toggleinput
 
 .smio-toggleinput-btnbtn
 	display inline-block
-	vertical-align top
-	border 0.094em outset #ccc
-	width 0.9em
-	height 0.9em
-	position relative
-	left 0
-	top 0.125em
+	border $hairline outset $colborder
+	smio-posrel-tlwh 0.125em 0 0.9em
 	smio-border-radius 0.2em
 	smio-background-vgradient rgba($grad_color, $grad_lite), rgba($grad_color, $grad_dark)
 
 .smio-toggleinput-checked .smio-toggleinput-btnbtn
 	smio-background-vgradient rgba($grad_color, $grad_dark), rgba($grad_color, $grad_lite)
-	border 0.094em inset #ccc
+	border $hairline inset $colborder
 
 .smio-toggleinput-radio .smio-toggleinput-btnbtn
 	smio-border-radius 1em
 
 .smio-toggleinput-btnglyph
 	font-size 1.25em
-	position absolute
-	top -0.15em
-	left -0.02em
-	color #30a060
+	color $colbase
+	smio-posabs-tl -0.15em -0.02em
 
 .smio-toggleinput-radio.smio-toggleinput-checked .smio-toggleinput-btnglyph
 	display inline-block
-	left: 21.5%
-	right: 21.5%
-	top: 21.5%
-	bottom: 21.5%
+	smio-pos-trbl 21.5%
 	smio-border-radius 1em
-	smio-background-rgradient #206040, #70b090
+	smio-background-rgradient $coldark, $collite
 
 .smio-toggleinput-btnlabel
 	padding-right 0.4em
-	border 0.094em outset transparent
+	border $hairline outset transparent
+	display: inline-block
+	smio-nowrapflow()
 
 .smio-toggleinput-focused .smio-toggleinput-btnbtn, .smio-toggleinput-unchecked.smio-enabled .smio-toggleinput-btnlabel:hover .smio-toggleinput-btnbtn, .smio-enabled.smio-toggleinput-checkbox .smio-toggleinput-btnlabel:hover .smio-toggleinput-btnbtn
-	border 0.094em outset transparent
+	border $hairline outset transparent
 	background transparent
 
 .smio-toggleinput-focused, .smio-toggleinput-unchecked.smio-enabled .smio-toggleinput-btnlabel:hover, .smio-toggleinput-checkbox.smio-enabled .smio-toggleinput-btnlabel:hover
-	border 0.094em outset #ccc
+	border $hairline outset $colborder
 	smio-border-radius 0.2em
 	smio-background-vgradient rgba($grad_color, $grad_lite), rgba($grad_color, $grad_dark)
 
@@ -73,5 +67,5 @@ span.smio-toggleinput
 
 .smio-toggleinput-checked .smio-toggleinput-focused, .smio-toggleinput-checkbox.smio-toggleinput-checked.smio-enabled .smio-toggleinput-btnlabel:hover
 	smio-background-vgradient rgba($grad_color, $grad_dark), rgba($grad_color, $grad_lite)
-	border 0.094em inset #ccc
+	border $hairline inset $colborder
 

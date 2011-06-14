@@ -4,37 +4,37 @@ $slide-grad-dark = 0.15
 $slide-edge-base = rgb(48, 48, 48)
 $slide-edge-lite = 0.85
 $slide-edge-dark = 0.65
+$slide-edge-bcorner = 1em
+$slide-edge-scorner = 0.33em
 
 div.smio-slidepanel
 	position relative
-	smio-nooverflow-nowrap()
+	smio-nowrapflow()
 
 div.smio-slidepanel-scrollbox
-	smio-nooverflow-nowrap()
-	position relative
-	width 100%
-	left 0
+	smio-posrel-lw 0, 100%
 	top 2em
+	smio-nowrapflow()
 
 div.smio-slidepanel-edge
 	cursor pointer
 	text-align center
 	smio-posabs-tbw 0.25em 0.15em 3em
-	smio-nooverflow-nowrap()
+	smio-nowrapflow()
 
 .smio-slidepanel-edge-arr
 	padding 0.1em
-	smio-posabs-rbl 1em
+	smio-posabs-rbl $slide-edge-bcorner
 	text-align center
 	smio-box-shadow 0em 0.08em 0.25em #909090
-	border 0.092em #a0a0a0 outset
+	border $hairline #a0a0a0 outset
 	smio-background-vgradient rgba($slide-edge-base, $slide-edge-dark) rgba($slide-edge-base, $slide-edge-lite)
 	font-size 0.9em
-	text-shadow 0 -0.092em #404040
-	color #f0f0f0
+	text-shadow 0 $-hairline #404040
+	color $collite
 	opacity 0
 	smio-transition opacity 0.5s
-	smio-nooverflow-nowrap()
+	smio-nowrapflow()
 	smio-lcase()
 
 div.smio-slidepanel:hover .smio-slidepanel-edge-arr
@@ -44,6 +44,7 @@ div.smio-slidepanel-edge:hover .smio-slidepanel-edge-arr
 	opacity 1
 
 div.smio-slidepanel-edge:active .smio-slidepanel-edge-arr
+	border $hairline #a0a0a0 inset
 	smio-background-vgradient rgba($slide-edge-base, $slide-edge-lite) rgba($slide-edge-base, $slide-edge-dark)
 
 div.smio-slidepanel-edge-left
@@ -51,10 +52,10 @@ div.smio-slidepanel-edge-left
 	smio-background-hgradient rgba($slide-grad-base, $slide-grad-lite) rgba($slide-grad-base, $slide-grad-dark)
 
 div.smio-slidepanel-edge-left .smio-slidepanel-edge-arr
-	smio-border-radius 1em 0.33em 0.33em 1em
+	smio-border-radius $slide-edge-bcorner $slide-edge-scorner $slide-edge-scorner $slide-edge-bcorner
 
 div.smio-slidepanel-edge-right .smio-slidepanel-edge-arr
-	smio-border-radius 0.33em 1em 1em 0.33em
+	smio-border-radius $slide-edge-scorner $slide-edge-bcorner $slide-edge-bcorner $slide-edge-scorner
 
 div.smio-slidepanel-edge-right
 	right 0
@@ -67,5 +68,5 @@ ul.smio-slidepanel > li
 	display inline-block
 	vertical-align top
 	width 100%
-	smio-nooverflow-nowrap()
+	smio-nowrapflow()
 

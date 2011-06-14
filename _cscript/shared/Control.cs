@@ -142,6 +142,7 @@ class smio.Packs_#{className} extends smio.Control
 	coreDisable: (disable) ->
 
 	disable: (disable, isInherit) ->
+		len = 0
 		if not isInherit
 			@disabled = disable
 		else if not disable
@@ -153,7 +154,10 @@ class smio.Packs_#{className} extends smio.Control
 				@el.removeClass('smio-disabled').addClass 'smio-enabled'
 		@coreDisable disable
 		for id, ctl of @controls
+			len++
 			ctl.disable disable, isInherit
+		if len is 0
+			@el[smio.iif disable, 'addClass', 'removeClass'] 'smio-disabledfaded'
 
 	on: (eventName, handler) ->
 		if eventName
@@ -170,7 +174,12 @@ class smio.Packs_#{className} extends smio.Control
 		prefix = "cscript:"
 		@el = $('#' + @id())
 		if @disabled
+			len = 0
 			@el.removeClass('smio-enabled').addClass 'smio-disabled'
+			for id, ctl of @controls
+				len++
+			if len is 0
+				@el.addClass 'smio-disabledfaded'
 		else
 			@el.removeClass('smio-disabled').addClass 'smio-enabled'
 		for id, ctl of @controls
@@ -186,7 +195,11 @@ class smio.Packs_#{className} extends smio.Control
 	onWindowResize: (width, height) ->
 
 	sub: (id) ->
-		$ "##{@id id}"
+		ctl = @
+		if (parts = id.split '/').length > 1
+			for i in [0...(parts.length - 1)]
+				ctl = ctl.controls[parts[i]]
+		$ "##{ctl.id parts[parts.length - 1]}"
 
 	syncUpdate: (ctlDesc) ->
 

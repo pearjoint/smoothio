@@ -1,28 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 	<head>
 		<title>smoothio</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<script type="text/javascript" language="JavaScript">
-			var smioGlobalTest, smio, WEB_SOCKET_SWF_LOCATION = '/_/dynfile/?type=application/x-shockwave-flash&config=sockets.xdomain_swf&true=bin/websockx.swf&false=bin/websock.swf';
-			try {
-				smioGlobalTest = global;
-			} catch(err) {
-			}
-			if (!smioGlobalTest)
-				global = {};
-			if (!global['smoothio'])
-				global['smoothio'] = {}
-			smio = global.smoothio;
-			smio.pageLoadError = null;
-			smio.iif = function(test, ifTrue, ifFalse) {
-				if (arguments.length < 3)
-					ifFalse = false;
-				if (arguments.length < 2)
-					ifTrue = true;
-				return test ? ifTrue : ifFalse;
-			};
-
 			function onSmoothioNoCookie() {
 				$('#smio_offline').hide();
 				$('#smio_body').css({ "background-image": "none" }).html('<br/><br/><br/><br/><hr/>Either your session cookie expired or you have disabled browser cookies, and hence this application will not load.<br/><br/>Verify that cookies are enabled in your web browser, then try a complete reload (press CTRL+R).<hr/>Entweder ist Ihr Sitzungscookie abgelaufen oder Ihr Webbrowser unterst&uuml;tzt keine Cookies, und somit wird auch diese Anwendung nicht geladen.<br/><br/>Stellen Sie sicher, da&szlig; Ihr Webbrowser Cookies erlaubt, und versuchen Sie dann ein Komplett-Neuladen (STRG+R).<hr/>');
@@ -52,9 +33,27 @@
 		<style type="text/css"> span.smio-noscript { display: none; } </style>
 	</head>
 	<body id="smio_body" onload="onSmoothioPageLoad();" onblur="onSmoothioSleepy(true);" onfocus="onSmoothioSleepy(false);">
-		<div id="smio_offline" class="smio-blocking-overlay">Loading...</div>
+		<div id="smio_offline" class="smio-blocking-overlay"><span id="smio_offline_msg">Loading</span><span id="smio_offline_blink">_</span></div>
 		<script type="text/javascript" language="JavaScript" id="smio_prescript">
 			document.getElementById('smio_offline').style.display = 'block';
+			var smioGlobalTest, smio, WEB_SOCKET_SWF_LOCATION = '/_/dynfile/?type=application/x-shockwave-flash&config=sockets.xdomain_swf&true=bin/websockx.swf&false=bin/websock.swf';
+			try {
+				smioGlobalTest = global;
+			} catch(err) {
+			}
+			if (!smioGlobalTest)
+				global = {};
+			if (!global['smoothio'])
+				global['smoothio'] = {}
+			smio = global.smoothio;
+			smio.pageLoadError = null;
+			smio.iif = function(test, ifTrue, ifFalse) {
+				if (arguments.length < 3)
+					ifFalse = false;
+				if (arguments.length < 2)
+					ifTrue = true;
+				return test ? ifTrue : ifFalse;
+			};
 		</script>
 		<div id="smio_main" class="smio-main"><span class="smio-noscript" id="smio_noscript_content">___smiopagecontent___</span></div>
 		<noscript id="smio_noscript">

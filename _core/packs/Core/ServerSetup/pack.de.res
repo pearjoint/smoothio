@@ -1,0 +1,21 @@
+{
+	"___resource_file_intro"		:	"This formatting ensures no JSON-required commas or colons are ever missed. To add new resources, copy&paste the next line."
+,	"x"								:	"y"
+,	"title"							:	"Einrichten Ihres ersten Hubs <a class='%s' href='%s'>unter &#x279C; %s</a>"
+,	"desc"							:	"Dieser Server enthält noch keine Hubs. Erstellen Sie hier einen:"
+,	"url_hint"						:	"Ein Hub kann eine beliebige URL-Adresse Ihrer Wahl erhalten. Die URL Ihres neuen Hubs wird:\n\n%s://%s%s➜"
+,	"nojs_title"					:	"Noch kein Hub eingerichtet"
+,	"nojs_desc"						:	"Dieser Server enthält noch keine Hubs."
+,	"owner_name"					:	"Benutzername:"
+,	"owner_pass"					:	"Kennwort:"
+,	"owner_choice"					:	"Bei diesem Hub-Eigentümer handelt es sich um:"
+,	"owner_create"					:	"...ein <i>neues</i> <b>%s</b>-Benutzerkonto"
+,	"owner_login"					:	"...ein <i>bestehendes</i> <b>%s</b>-Konto"
+,	"steps_owner"					:	"➊  Eigentümer angeben"
+,	"steps_template"				:	"➋  Vorlage auswählen"
+,	"steps_finish"					:	"➌  Setup abschließen"
+,	"steptitle_owner"				:	"1. Hub-Eigentümer"
+,	"steptitle_template"			:	"2. Hub-Vorlage"
+,	"steptitle_finish"				:	"3. Hub erstellen"
+}
+

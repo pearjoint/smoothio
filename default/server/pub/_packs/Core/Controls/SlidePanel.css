@@ -4,12 +4,12 @@ div.smio-slidepanel {
   white-space: nowrap;
 }
 div.smio-slidepanel-scrollbox {
+  position: relative;
+  left: 0;
+  width: 100%;
+  top: 2em;
   overflow: hidden;
   white-space: nowrap;
-  position: relative;
-  width: 100%;
-  left: 0;
-  top: 2em;
 }
 div.smio-slidepanel-edge {
   cursor: pointer;
@@ -31,14 +31,14 @@ div.smio-slidepanel-edge {
   -moz-box-shadow: 0em 0.08em 0.25em #909090;
   -webkit-box-shadow: 0em 0.08em 0.25em #909090;
   box-shadow: 0em 0.08em 0.25em #909090;
-  border: 0.092em #a0a0a0 outset;
+  border: 0.094em #a0a0a0 outset;
   background: -ms-linear-gradient(rgba(48,48,48,0.65), rgba(48,48,48,0.85));
   background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(48,48,48,0.65)), to(rgba(48,48,48,0.85)));
   background: -moz-linear-gradient(rgba(48,48,48,0.65), rgba(48,48,48,0.85));
   background: -webkit-linear-gradient(rgba(48,48,48,0.65), rgba(48,48,48,0.85));
   background: -o-linear-gradient(rgba(48,48,48,0.65), rgba(48,48,48,0.85));
   font-size: 0.9em;
-  text-shadow: 0 -0.092em #404040;
+  text-shadow: 0 -0.094em #404040;
   color: #f0f0f0;
   opacity: 0;
   -moz-transition: opacity 0.5s;
@@ -56,6 +56,7 @@ div.smio-slidepanel-edge:hover .smio-slidepanel-edge-arr {
   opacity: 1;
 }
 div.smio-slidepanel-edge:active .smio-slidepanel-edge-arr {
+  border: 0.094em #a0a0a0 inset;
   background: -ms-linear-gradient(rgba(48,48,48,0.85), rgba(48,48,48,0.65));
   background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(48,48,48,0.85)), to(rgba(48,48,48,0.65)));
   background: -moz-linear-gradient(rgba(48,48,48,0.85), rgba(48,48,48,0.65));

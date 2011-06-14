@@ -7,7 +7,7 @@ class smio.Client
 		@allControls = {}
 		@pageWindow = $(window)
 		@pageBody = $('#smio_body')
-		$('#smio_offline').text(smio.resources.smoothio.connect).append('<span id="smio_offline_blink" style="visibility: hidden;">_</span>')
+		$('#smio_offline_msg').text smio.resources.smoothio.connect
 		cookie = $.cookie 'smoo'
 		@pageUrl = $.url()
 		try
