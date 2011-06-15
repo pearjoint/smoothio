@@ -9,11 +9,11 @@ class smio.Packs_Core_Controls_MainFrame extends smio.Control
 
 
 #if server
-	test: () ->
+	test: () =>
 		xy = "serverside"
 #endif
 #if client
-	test: () ->
+	test: () =>
 		xy = "clientside"
 #endif
 

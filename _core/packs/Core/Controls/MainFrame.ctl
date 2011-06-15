@@ -1,10 +1,10 @@
 <%script:
 #if server
-	test: () ->
+	test: () =>
 		xy = "serverside"
 #endif
 #if client
-	test: () ->
+	test: () =>
 		xy = "clientside"
 #endif
 %>

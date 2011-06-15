@@ -1,6 +1,6 @@
 #if client
 
-renderTemplate: ->
+renderTemplate: =>
 	ret =
 		a:
 			id: ''
@@ -8,17 +8,17 @@ renderTemplate: ->
 			href: @args.href or smio.Control.util.jsVoid
 	if (@disabled)
 		ret.a.disabled = 'disabled'
-	if @args.labelText
-		ret.a.text = [@args.labelText]
+	if @args.labelText or @args.labelHtml
+		@jsonTemplates_Label(ret.a)
 	ret
 
-coreDisable: (disable) ->
-	@el.prop 'disabled', disable
+coreDisable: (disable) =>
+	@el.prop('disabled', disable)
 
-onLoad: ->
+onLoad: =>
 	super()
 	@el.click =>
-		if @args.onClick and not (@disabled or @el.prop 'disabled')
+		if @args.onClick and not (@disabled or @el.prop('disabled'))
 			@args.onClick()
 
 #endif

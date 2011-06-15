@@ -13,5 +13,7 @@
 ,	"log_pack_loaded"				:	"PACKAGE '{0}': successfully loaded."
 ,	"log_server_error_start"		:	"ERROR starting SERVER '{0}':\n{1}"
 ,	"log_server_listening"			:	"SERVER '{0}' listening at {1}:{2}"
+,	"log_server_closing"			:	"Closing..."
+,	"log_server_closed"				:	"Closed."
 }
 

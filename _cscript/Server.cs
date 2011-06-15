@@ -27,7 +27,9 @@ class smio.Server
 		@httpServer = node_http.createServer (request, response) => @onRequest(request, response)
 		@fileServer = new node_static.Server('server/pub/')
 		@httpServer.on 'error', (err) => @onError(err)
-		@httpServer.on 'close', => @status = -1
+		@httpServer.on 'close', =>
+			smio.logit(@inst.r('log_server_closed'), 'servers.' + @serverName)
+			@status = -1
 		if @processes <= 1
 			@httpServer.listen(@port, hostName, => @onBind())
 		else
@@ -55,20 +57,25 @@ class smio.Server
 		smio.logit(@inst.r('log_server_error_start', @serverName, @inst.formatError(err)), 'servers.' + @serverName)
 
 	onRequest: (request, response) =>
-		@status = 1
-		url = request.url
-		if (url.indexOf('http://') isnt 0) and (url.indexOf('https://') isnt 0)
-			url = "#{if @isHttps then 'https' else 'http'}://#{@hostName}:#{@port}#{url}"
-		uri = node_url.parse(url, true)
-		uri.pathItems = (pathItem for pathItem in uri.pathname.split('/') when pathItem and pathItem.length)
-		if uri.pathItems.length is 1
-			if uri.pathItems[0] is 'robots.txt'
-				uri.pathItems = ['_', 'file', 'robots.txt']
-			if (uri.pathItems[0].indexOf 'favicon') is 0
-				uri.pathItems = ['_', 'file', uri.pathItems[0]]
-		uri.rawUrl = request.url
-		uri.url = url
-		ctx = new smio.RequestContext(@, uri, request, response, @inst.mongos['admin'], @inst.mongos['smoothio_shared'], @inst.mongos["smoothio__#{@serverName}"])
+		if @status < 0
+			@httpResponse.writeHead(500, 'Content-Type': 'text/plain')
+			@httpResponse.end("500 Internal Server Error:\nShutting down.")
+			@stop()
+		else
+			@status = 1
+			url = request.url
+			if (url.indexOf('http://') isnt 0) and (url.indexOf('https://') isnt 0)
+				url = "#{if @isHttps then 'https' else 'http'}://#{@hostName}:#{@port}#{url}"
+			uri = node_url.parse(url, true)
+			uri.pathItems = (pathItem for pathItem in uri.pathname.split('/') when pathItem and pathItem.length)
+			if uri.pathItems.length is 1
+				if uri.pathItems[0] is 'robots.txt'
+					uri.pathItems = ['_', 'file', 'robots.txt']
+				if (uri.pathItems[0].indexOf 'favicon') is 0
+					uri.pathItems = ['_', 'file', uri.pathItems[0]]
+			uri.rawUrl = request.url
+			uri.url = url
+			ctx = new smio.RequestContext(@, uri, request, response, @inst.mongos['admin'], @inst.mongos['smoothio_shared'], @inst.mongos["smoothio__#{@serverName}"])
 
 	onSocketConnect: (client) =>
 		if (sessid = @getSocketSessionID(client)) and (sess = smio.Session.getBySessionID(@, sessid))
@@ -95,9 +102,11 @@ class smio.Server
 				client.send("smoonocookie")
 
 	stop: =>
-		@status = 0
+		@status = -2
 		try
+			smio.logit(@inst.r('log_server_closing'), 'servers.' + @serverName)
 			@httpServer.close()
 		catch err
+			@onError(err)
 			@status = -1
 

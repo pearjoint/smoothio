@@ -2,7 +2,7 @@
   /*
   Auto-generated from Core/Controls/TextInput.ctl
   */  var smio, smoothio;
-  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
     ctor.prototype = parent.prototype;
@@ -18,20 +18,20 @@
       var ret;
       ret = {
         span: {
-          "class": 'smio-textinput',
+          "class": '= smio-textinput',
           id: ''
         }
       };
-      if (this.args.labelText) {
+      if (this.args.labelText || this.args.labelHtml) {
         ret.span.label = {
           id: 'label',
-          "for": this.id('input'),
-          html: [this.args.labelText]
+          "for": this.id('input')
         };
+        this.jsonTemplates_Label(ret.span.label);
       }
       ret.span.input = {
         id: 'input',
-        "class": 'smio-textinput',
+        "class": '= smio-textinput',
         type: this.args.type === 'password' ? 'password' : 'text'
       };
       if (this.disabled) {
@@ -58,7 +58,8 @@
       return this.sub('input').prop('readonly', disable);
     };
     function Packs_Core_Controls_TextInput(client, parent, args) {
-      Packs_Core_Controls_TextInput.__super__.constructor.call(this, client, parent, args);
+      this.coreDisable = __bind(this.coreDisable, this);
+      this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_TextInput.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
     Packs_Core_Controls_TextInput.prototype.className = function() {

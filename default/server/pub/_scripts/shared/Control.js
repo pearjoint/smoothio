@@ -172,6 +172,8 @@
       this.init = __bind(this.init, this);
       this.id = __bind(this.id, this);
       this.ctl = __bind(this.ctl, this);
+      this.cssClass = __bind(this.cssClass, this);
+      this.cssBaseClass = __bind(this.cssBaseClass, this);
       this.cls = __bind(this.cls, this);
       this.classPath = __bind(this.classPath, this);
       this.un = __bind(this.un, this);
@@ -194,6 +196,23 @@
     Control.prototype.cls = function() {
       return smio[this.classPath()];
     };
+    Control.prototype.cssBaseClass = function() {
+      return '';
+    };
+    Control.prototype.cssClass = function() {
+      var a, bc, sub, _i, _len;
+      a = ['smio'];
+      if ((bc = this.cssBaseClass())) {
+        a.push(bc);
+      }
+      for (_i = 0, _len = arguments.length; _i < _len; _i++) {
+        sub = arguments[_i];
+        if (sub) {
+          a.push(sub);
+        }
+      }
+      return a.join('-');
+    };
     Control.prototype.ctl = function(ctlID) {
       var c;
       if ((c = this.client.allControls[ctlID])) {
@@ -206,6 +225,9 @@
       return (this.parent ? "" + (this.parent.id()) + "_" + this.ctlID : this.ctlID) + (subID ? '_' + subID : '');
     };
     Control.prototype.init = function() {};
+    Control.prototype.jsonTemplates_Label = function(target) {
+      return target[this.args.labelHtml ? 'html' : '_'] = [this.args.labelHtml ? this.args.labelHtml : this.args.labelText];
+    };
     Control.prototype.jsSelf = function() {
       return "smio.client.allControls['" + this.id() + "']";
     };

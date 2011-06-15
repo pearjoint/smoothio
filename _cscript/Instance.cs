@@ -59,9 +59,10 @@ class smio.Instance
 
 	haveAllStopped: =>
 		for server in @servers
-			if server.status != -1
+			if server.status isnt -1
+				smio.logit "IS:#{server.status}"
 				return false
-		if @mongoIsLocal and @mongos['admin'] then @mongoHasShutDown else true
+		if (@mongoIsLocal and @mongos['admin']) then @mongoHasShutDown else true
 
 	loadResourceSets: (dirPath, recurse, getBaseName) =>
 		errs = []
@@ -169,18 +170,14 @@ class smio.Instance
 		-1
 
 	stop: =>
-		if @mongoIsLocal and @mongos['admin']
+		if @mongoIsLocal and (@mongos['admin']) and not @mongoHasShutDown
 			@mongos['admin'].connect (err, db) =>
 				if err?
 					smio.logit(JSON.stringify(err), 'mongodb')
-					@mongoHasShutDown = true
 				if db?
-					db.executeDbCommand "shutdown": 1, (err, result) =>
-						@mongoHasShutDown = true
+					db.executeDbCommand {"shutdown": 1}, (err, result) ->
 						smio.logit(JSON.stringify(err ? result), 'mongodb')
-					@mongoHasShutDown = true
-		else
-			@mongoHasShutDown = true
+		@mongoHasShutDown = true
 		for server in @servers
 			server.stop()
 

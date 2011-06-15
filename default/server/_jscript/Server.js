@@ -51,6 +51,7 @@
         return this.onError(err);
       }, this));
       this.httpServer.on('close', __bind(function() {
+        smio.logit(this.inst.r('log_server_closed'), 'servers.' + this.serverName);
         return this.status = -1;
       }, this));
       if (this.processes <= 1) {
@@ -102,35 +103,43 @@
     };
     Server.prototype.onRequest = function(request, response) {
       var ctx, pathItem, uri, url;
-      this.status = 1;
-      url = request.url;
-      if ((url.indexOf('http://') !== 0) && (url.indexOf('https://') !== 0)) {
-        url = "" + (this.isHttps ? 'https' : 'http') + "://" + this.hostName + ":" + this.port + url;
-      }
-      uri = node_url.parse(url, true);
-      uri.pathItems = (function() {
-        var _i, _len, _ref, _results;
-        _ref = uri.pathname.split('/');
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          pathItem = _ref[_i];
-          if (pathItem && pathItem.length) {
-            _results.push(pathItem);
+      if (this.status < 0) {
+        this.httpResponse.writeHead(500, {
+          'Content-Type': 'text/plain'
+        });
+        this.httpResponse.end("500 Internal Server Error:\nShutting down.");
+        return this.stop();
+      } else {
+        this.status = 1;
+        url = request.url;
+        if ((url.indexOf('http://') !== 0) && (url.indexOf('https://') !== 0)) {
+          url = "" + (this.isHttps ? 'https' : 'http') + "://" + this.hostName + ":" + this.port + url;
+        }
+        uri = node_url.parse(url, true);
+        uri.pathItems = (function() {
+          var _i, _len, _ref, _results;
+          _ref = uri.pathname.split('/');
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            pathItem = _ref[_i];
+            if (pathItem && pathItem.length) {
+              _results.push(pathItem);
+            }
+          }
+          return _results;
+        })();
+        if (uri.pathItems.length === 1) {
+          if (uri.pathItems[0] === 'robots.txt') {
+            uri.pathItems = ['_', 'file', 'robots.txt'];
+          }
+          if ((uri.pathItems[0].indexOf('favicon')) === 0) {
+            uri.pathItems = ['_', 'file', uri.pathItems[0]];
           }
         }
-        return _results;
-      })();
-      if (uri.pathItems.length === 1) {
-        if (uri.pathItems[0] === 'robots.txt') {
-          uri.pathItems = ['_', 'file', 'robots.txt'];
-        }
-        if ((uri.pathItems[0].indexOf('favicon')) === 0) {
-          uri.pathItems = ['_', 'file', uri.pathItems[0]];
-        }
+        uri.rawUrl = request.url;
+        uri.url = url;
+        return ctx = new smio.RequestContext(this, uri, request, response, this.inst.mongos['admin'], this.inst.mongos['smoothio_shared'], this.inst.mongos["smoothio__" + this.serverName]);
       }
-      uri.rawUrl = request.url;
-      uri.url = url;
-      return ctx = new smio.RequestContext(this, uri, request, response, this.inst.mongos['admin'], this.inst.mongos['smoothio_shared'], this.inst.mongos["smoothio__" + this.serverName]);
     };
     Server.prototype.onSocketConnect = function(client) {
       var sess, sessid;
@@ -166,10 +175,12 @@
       }
     };
     Server.prototype.stop = function() {
-      this.status = 0;
+      this.status = -2;
       try {
+        smio.logit(this.inst.r('log_server_closing'), 'servers.' + this.serverName);
         return this.httpServer.close();
       } catch (err) {
+        this.onError(err);
         return this.status = -1;
       }
     };

@@ -22,7 +22,9 @@
       }
     };
     function Packs_Core_Controls_Console(client, parent, args) {
-      this.renderHtml = __bind(this.renderHtml, this);      Packs_Core_Controls_Console.__super__.constructor.call(this, client, parent, args);
+      this.renderHtml = __bind(this.renderHtml, this);
+      this.onLoad = __bind(this.onLoad, this);
+      this.init = __bind(this.init, this);      Packs_Core_Controls_Console.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
     Packs_Core_Controls_Console.prototype.className = function() {

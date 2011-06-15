@@ -27,10 +27,11 @@ smio.logBuffer = [];
 smio.resLangs = [''];
 
 smio.compileCoffeeScripts = function(dirOrFilePath, srvOutDirPath, cltOutDirPath, noWatch, lazyClient, nameIfSource) {
-	var files = (nameIfSource || node_fs.statSync(dirOrFilePath).isFile()) ? [null] : node_fs.readdirSync(dirOrFilePath), fileContent, fileContentClient, fileContentServer, javaScript, filePath, lines, ignore, doClient = !lazyClient;
+	var files = (nameIfSource || node_fs.statSync(dirOrFilePath).isFile()) ? [null] : node_fs.readdirSync(dirOrFilePath), fileContent, fileContentClient, fileContentServer, javaScript, filePath, lines, consts, ignore, tmp, pos, doClient = !lazyClient;
 	for (var i = 0; i < files.length; i++) {
 		fileContentServer = '';
 		fileContentClient = '';
+		consts = null;
 		if (!files[i])
 			if (nameIfSource)
 				files[i] = nameIfSource;
@@ -42,10 +43,21 @@ smio.compileCoffeeScripts = function(dirOrFilePath, srvOutDirPath, cltOutDirPath
 			if (!noWatch)
 				watchFile(lastFilePath = filePath);
 			lines = fileContent.split('\n');
-			if (lazyClient)
-				for (var j = 0; j < lines.length; j++)
-					if (doClient = ((lines[j] == '#if client') || (lines[j] == '#if server')))
-						break;
+			for (var j = 0; j < lines.length; j++) {
+				if (lazyClient && ((lines[j] == '#if client') || (lines[j] == '#if server')))
+					doClient = true;
+				if (lines[j].indexOf('#const ') == 0) {
+					tmp = lines[j].substr(7);
+					if (!consts)
+						consts = {};
+					consts[tmp.substr(0, tmp.indexOf(' '))] = tmp.substr(tmp.indexOf(' ') + 1);
+				}
+			}
+			if (consts)
+				for (var cn in consts)
+					for (var j = 0; j < lines.length; j++)
+						while ((pos = lines[j].indexOf(cn)) >= 0)
+							lines[j] = lines[j].substr(0, pos) + consts[cn] + lines[j].substr(pos + cn.length);
 			if (srvOutDirPath) {
 				ignore = false;
 				for (var j = 0; j < lines.length; j++)
@@ -53,7 +65,7 @@ smio.compileCoffeeScripts = function(dirOrFilePath, srvOutDirPath, cltOutDirPath
 						ignore = true;
 					else if (lines[j] == '#endif')
 						ignore = false;
-					else if (!ignore)
+					else if ((!ignore) && (lines[j].indexOf('#const ') != 0))
 						fileContentServer += (lines[j] + '\n');
 			}
 			if (doClient && cltOutDirPath) {
@@ -63,7 +75,7 @@ smio.compileCoffeeScripts = function(dirOrFilePath, srvOutDirPath, cltOutDirPath
 						ignore = true;
 					else if (lines[j] == '#endif')
 						ignore = false;
-					else if (!ignore)
+					else if ((!ignore) && (lines[j].indexOf('#const ') != 0))
 						fileContentClient += (lines[j] + '\n');
 			}
 			if (srvOutDirPath && fileContentServer && (fileContentServer = _.trim(fileContentServer)) && (javaScript = coffee.compile(fileContentServer)))
@@ -313,8 +325,8 @@ function restartSmoothio() {
 			smio.inst.logFile = null;
 		}
 		process.exit(exitCode); // exit code != 1 and != 0 signals to SmoothioDaemon to restart
-	} else
-		smio.logit("Still waiting...");
+	} /*else
+		smio.logit("Still waiting...");*/
 }
 
 function startSmoothio() {

@@ -2,21 +2,21 @@
   /*
   Auto-generated from Core/Controls/SlidePanel.ctl
   */  var smio, smoothio;
-  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
     ctor.prototype = parent.prototype;
     child.prototype = new ctor;
     child.__super__ = parent.prototype;
     return child;
-  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  };
   smio = smoothio = global.smoothio;
   smio.Packs_Core_Controls_SlidePanel = (function() {
     __extends(Packs_Core_Controls_SlidePanel, smio.Control);
     Packs_Core_Controls_SlidePanel.prototype.renderTemplate = function() {
       var item, itemID, ul, _ref;
       ul = {
-        "class": "smio-slidepanel " + (this.args["class"] || ''),
+        "class": "= smio-slidepanel " + (this.args["class"] || ''),
         'li #libefore': {
           html: ['&nbsp;']
         }
@@ -38,18 +38,18 @@
       return {
         div: {
           id: '',
-          "class": "smio-slidepanel " + this.args["class"],
-          'div #scrollbox .smio-slidepanel-scrollbox': {
+          "class": "= smio-slidepanel " + this.args["class"],
+          'div #scrollbox .= smio-slidepanel-scrollbox': {
             'ul #items': ul
           },
-          'div #edgeprev .smio-slidepanel-edge .smio-slidepanel-edge-left': {
-            'div .smio-slidepanel-edge-arr .x9668': {
-              text: [this.r('slidepanel_prev')]
+          'div #edgeprev .= smio-slidepanel-edge .= smio-slidepanel-edge-left': {
+            'div .= smio-slidepanel-edge-arr .x9668': {
+              _: [this.r('slidepanel_prev')]
             }
           },
-          'div #edgenext .smio-slidepanel-edge .smio-slidepanel-edge-right': {
-            'div .smio-slidepanel-edge-arr .x9658': {
-              text: [this.r('slidepanel_next')]
+          'div #edgenext .= smio-slidepanel-edge .= smio-slidepanel-edge-right': {
+            'div .= smio-slidepanel-edge-arr .x9658': {
+              _: [this.r('slidepanel_next')]
             }
           }
         }
@@ -66,30 +66,33 @@
     };
     Packs_Core_Controls_SlidePanel.prototype.onLoad = function() {
       Packs_Core_Controls_SlidePanel.__super__.onLoad.call(this);
-      (this.edgePrev = $("#" + (this.id('edgeprev')))).click(__bind(function() {
+      this.sub('edgeprev').click(__bind(function() {
         return this.scrollTo(this.curItem - 1);
       }, this));
-      (this.edgeNext = $("#" + (this.id('edgenext')))).click(__bind(function() {
+      this.sub('edgenext').click(__bind(function() {
         return this.scrollTo(this.curItem + 1);
       }, this));
-      (this.scrollBox = $("#" + (this.id('scrollbox')))).scroll(_.debounce((__bind(function() {
+      this.sub('scrollbox').scroll(_.debounce((__bind(function() {
         if (!this.scrolling) {
           return this.scrollTo(null, true);
         }
-      }, this)), 250));
+      }, this)), 100));
       return this.scrollTo(0, true);
     };
     Packs_Core_Controls_SlidePanel.prototype.onWindowResize = function(w, h) {
       return this.scrollTo(this.curItem, true);
     };
     Packs_Core_Controls_SlidePanel.prototype.scrollTo = function(item, force) {
-      var distances, i, scrollLefts, tmp, _ref;
+      var distances, edgeNext, edgePrev, i, it, scrollBox, scrollLefts, tmp, _len, _ref, _ref2;
+      _ref = [this.sub('edgeprev'), this.sub('edgenext'), this.sub('scrollbox')], edgePrev = _ref[0], edgeNext = _ref[1], scrollBox = _ref[2];
       if (item === null) {
         scrollLefts = [];
         distances = [];
-        for (i = 0, _ref = this.items.length; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
-          scrollLefts.push((tmp = this.scrollBox.scrollLeft() + $("#" + (this.id('items_' + this.items[i]))).position().left - this.edgePrev.width()));
-          distances.push(Math.abs(tmp - this.scrollBox.scrollLeft()));
+        _ref2 = this.items;
+        for (i = 0, _len = _ref2.length; i < _len; i++) {
+          it = _ref2[i];
+          scrollLefts.push(tmp = scrollBox.scrollLeft() + this.sub('items_' + it).position().left - edgePrev.width());
+          distances.push(Math.abs(tmp - scrollBox.scrollLeft()));
         }
         item = distances.indexOf(Math.min.apply(Math, distances));
       }
@@ -101,22 +104,26 @@
       }
       if ((force || item !== this.curItem) && (item >= 0) && (item < this.items.length)) {
         this.scrolling = true;
-        this.edgePrev.css({
+        edgePrev.css({
           display: item === 0 ? 'none' : 'block'
         });
-        this.edgeNext.css({
+        edgeNext.css({
           display: item === (this.items.length - 1) ? 'none' : 'block'
         });
         this.on('itemSelect', [this.curItem = item, this.items[item]]);
         return morpheus.tween(250, (__bind(function(pos) {
-          return this.scrollBox.scrollLeft(pos);
+          return scrollBox.scrollLeft(pos);
         }, this)), (__bind(function() {
           return this.scrolling = false;
-        }, this)), null, this.scrollBox.scrollLeft(), this.scrollBox.scrollLeft() + $("#" + (this.id('items_' + this.items[item]))).position().left - this.edgePrev.width());
+        }, this)), null, scrollBox.scrollLeft(), scrollBox.scrollLeft() + this.sub('items_' + this.items[item]).position().left - edgePrev.width());
       }
     };
     function Packs_Core_Controls_SlidePanel(client, parent, args) {
-      Packs_Core_Controls_SlidePanel.__super__.constructor.call(this, client, parent, args);
+      this.scrollTo = __bind(this.scrollTo, this);
+      this.onWindowResize = __bind(this.onWindowResize, this);
+      this.onLoad = __bind(this.onLoad, this);
+      this.init = __bind(this.init, this);
+      this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_SlidePanel.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
     Packs_Core_Controls_SlidePanel.prototype.className = function() {

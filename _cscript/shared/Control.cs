@@ -10,12 +10,14 @@ smio = global.smoothio
 class smio.Control
 #if server
 	@compile: (@inst, ctlContent, controlPath) =>
-		[inDyn, oneUp, contentParts, decls, renderParts, lastChar, lastContent, obj] = [false, '../', [], '', [], '', '', {}]
+		[inDyn, oneUp, contentParts, decls, renderParts, lastChar, lastContent, obj, staToc] = [false, '../', [], '', [], '', '', {}, '@@']
 		pathParts = controlPath.substr(0, controlPath.lastIndexOf('.')).split('/')
 		baseName = pathParts[0 ... pathParts.length - 1].join('_')
 		className = pathParts.join('_')
 		if ctlContent and ctlContent[0] isnt '<'
 			ctlContent = '<%script:\n' + ((smio.iif(l[0] is '#', '', '\t') + l) for l in ctlContent.split('\n')).join('\n') + '\n%>'
+		while (pos = ctlContent.indexOf(staToc)) >= 0
+			ctlContent = ctlContent.substr(0, pos) + "smio[@classPath()]" + ctlContent.substr(pos + staToc.length)
 		for c in ctlContent
 			if ((lastChar + c) is '<%') and not inDyn
 				inDyn = true
@@ -249,6 +251,18 @@ class smio.Packs_#{className} extends smio.Control
 	cls: =>
 		smio[@classPath()]
 
+	cssBaseClass: =>
+		''
+
+	cssClass: () =>
+		a = ['smio']
+		if (bc = @cssBaseClass())
+			a.push(bc)
+		for sub in arguments
+			if sub
+				a.push(sub)
+		a.join('-')
+
 	ctl: (ctlID) =>
 		if (c = @client.allControls[ctlID]) then c else @client.allControls[@id(ctlID)]
 
@@ -257,6 +271,9 @@ class smio.Packs_#{className} extends smio.Control
 		(if @parent then "#{@parent.id()}_#{@ctlID}" else @ctlID) + (if subID then ('_' + subID) else '')
 
 	init: =>
+
+	jsonTemplates_Label: (target) ->
+		target[if @args.labelHtml then 'html' else '_'] = [if @args.labelHtml then @args.labelHtml else @args.labelText]
 
 	jsSelf: =>
 		"smio.client.allControls['" + @id() + "']"

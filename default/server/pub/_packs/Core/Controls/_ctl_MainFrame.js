@@ -18,7 +18,8 @@
       return xy = "clientside";
     };
     function Packs_Core_Controls_MainFrame(client, parent, args) {
-      this.renderHtml = __bind(this.renderHtml, this);      Packs_Core_Controls_MainFrame.__super__.constructor.call(this, client, parent, args);
+      this.renderHtml = __bind(this.renderHtml, this);
+      this.test = __bind(this.test, this);      Packs_Core_Controls_MainFrame.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
     Packs_Core_Controls_MainFrame.prototype.className = function() {

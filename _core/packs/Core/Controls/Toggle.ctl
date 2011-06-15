@@ -1,82 +1,84 @@
+#const $CC = smio-toggleinput
+
 @checkmark: '&#x2714;'
 @radiomark: ''
 
-renderTemplate: ->
+renderTemplate: =>
 	ischk = @isCheckBox()
 	ret =
 		span:
-			class: "smio-toggleinput smio-toggleinput-#{smio.iif ischk, 'checkbox', 'radio'} smio-toggleinput-#{smio.iif @args.checked, '', 'un'}checked smio-toggleinput-#{@getSharedClass()}"
+			class: "$CC $CC-#{if ischk then 'checkbox' else 'radio'} $CC-#{if @args.checked then '' else 'un'}checked $CC-#{@commonCssClass()}"
 			id: ''
 			span:
 				id: 'btnlabel'
-				class: "smio-toggleinput-btnlabel"
+				class: "$CC-btnlabel"
 				span:
 					id: 'btn'
-					class: 'smio-toggleinput-btn'
+					class: '$CC-btn'
 					span:
 						id: 'btnglyph'
-						class: 'smio-toggleinput-btnbtn'
-	if ischk
-		ret.span.span.span['span #glyph'] = class: 'smio-toggleinput-btnglyph'
-	else
-		ret.span.span.span.span['span #glyph'] = class: 'smio-toggleinput-btnglyph'
+						class: '$CC-btnbtn'
+	getGSpan = -> if ischk then ret.span.span.span else ret.span.span.span.span
+	getGSpan()['span #glyph'] = class: '$CC-btnglyph'
 	ret.span.span.span.input =
 		id: 'input'
 		name: @args.toggleName
-		class: 'smio-toggleinput'
-		type: smio.iif ischk, 'checkbox', 'radio'
+		class: '$CC'
+		type: if ischk then 'checkbox' else 'radio'
 	if (@disabled)
 		ret.span.span.span.input.disabled = 'disabled'
 	if @args.checked
 		ret.span.span.span.input.checked = 'checked'
-		(smio.iif ischk, ret.span.span.span, ret.span.span.span.span)['span #glyph'].html = [@cls()[smio.iif ischk, 'checkmark', 'radiomark']]
+		getGSpan()['span #glyph'].html = [@@[if ischk then 'checkmark' else 'radiomark']]
 	if @args.labelText or @args.labelHtml
 		ret.span.span.label =
 			id: 'label'
-			class: 'smio-toggleinput'
-			for: @id 'input'
-		ret.span.span.label[smio.iif @args.labelHtml, 'html', 'text'] = [smio.iif @args.labelHtml, @args.labelHtml, @args.labelText]
+			class: '$CC'
+			for: @id('input')
+		@jsonTemplates_Label(ret.span.span.label)
 	ret
 
-coreDisable: (disable) ->
-	@sub('input').prop 'disabled', disable
-
-getSharedClass: ->
+commonCssClass: =>
 	@args.toggleName or @id()
 
-isCheckBox: ->
+coreDisable: (disable) =>
+	@sub('input').prop('disabled', disable)
+
+isCheckBox: =>
 	 @args.type is 'checkbox'
 
-isRadioBox: ->
+isRadioBox: =>
 	 @args.type isnt 'checkbox'
 
-onCheck: (passive) ->
-	if @val isnt @elInput.prop 'checked'
-		@val = @elInput.prop 'checked'
-		nuCls = smio.iif @val, 'smio-toggleinput-checked', 'smio-toggleinput-unchecked'
-		unCls = smio.iif @val, 'smio-toggleinput-unchecked', 'smio-toggleinput-checked'
-		@el.removeClass(unCls).addClass nuCls
-		$("##{@id 'glyph'}").html smio.iif @val, @cls()[smio.iif @isCheckBox(), 'checkmark', 'radiomark'], ''
+onCheck: (passive) =>
+	[cc, el] = ['$CC', @sub('input')]
+	if @chk isnt el.prop('checked')
+		@chk = el.prop('checked')
+		nuCls = cc + (if @chk then '-checked' else '-unchecked')
+		unCls = cc + (if @chk then '-unchecked' else '-checked')
+		@el.removeClass(unCls).addClass(nuCls)
+		@sub('glyph').html(if not @chk then '' else @@[if @isCheckBox() then 'checkmark' else 'radiomark'])
 		if @isRadioBox() and not passive
-			$(".smio-toggleinput-#{@getSharedClass()} input.smio-toggleinput").each (i, e) =>
-				if e.id isnt @id 'input'
-					$(e).prop 'checked', false
-					if (ctl = @client.allControls[e.id.substr 0, e.id.lastIndexOf '_'])
-						ctl.onCheck true
+			$(".$CC-#{@commonCssClass()} input.$CC").each (i, e) =>
+				if e.id isnt @id('input')
+					$(e).prop('checked', false)
+					if (ctl = @client.allControls[e.id.substr(0, e.id.lastIndexOf('_'))])
+						ctl.onCheck(true)
 
-onLoad: ->
+onLoad: =>
 	super()
-	(@elInput = $ "##{@id 'input'}").click (evt) =>
+	(inp = @sub('input')).click (evt) =>
 		@onCheck()
 		if @isCheckBox()
 			evt.stopPropagation()
-	@elInput.blur =>
-		$("##{@id 'btnlabel'}").removeClass 'smio-toggleinput-focused'
-	@elInput.focus =>
-		$("##{@id 'btnlabel'}").addClass 'smio-toggleinput-focused'
-	$("##{@id 'btn'}").click =>
-		if not @elInput.prop 'disabled'
-			@elInput.prop 'checked', @isRadioBox() or not @elInput.prop 'checked'
+	inp.blur =>
+		@sub('btnlabel').removeClass('$CC-focused')
+	inp.focus =>
+		@sub('btnlabel').addClass('$CC-focused')
+	@sub('btn').click =>
+		el = @sub('input')
+		if not el.prop('disabled')
+			el.prop('checked', @isRadioBox() or not el.prop('checked'))
 			@onCheck()
-	@val = @elInput.prop 'checked'
+	@chk = inp.prop('checked')
 

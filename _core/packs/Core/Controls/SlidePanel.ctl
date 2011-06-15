@@ -1,64 +1,67 @@
+#const $CC = smio-slidepanel
+
 #if client
 
-renderTemplate: ->
+renderTemplate: =>
 	ul =
-		class: "smio-slidepanel #{@args.class or ''}"
+		class: "$CC #{@args.class or ''}"
 		'li #libefore':
 			html: ['&nbsp;']
 	if @args.items
 		for itemID, item of @args.items
-			while _.startsWith itemID, '#'
-				itemID = itemID.substr 1
-			@items.push itemID
+			while _.startsWith(itemID, '#')
+				itemID = itemID.substr(1)
+			@items.push(itemID)
 			ul["li #items_#{itemID} .#{@args.itemClass or ''}"] = item
 	ul['li #liafter'] =
 		html: ['&nbsp;']
 	div:
 		id: ''
-		class: "smio-slidepanel #{@args.class}"
-		'div #scrollbox .smio-slidepanel-scrollbox':
+		class: "$CC #{@args.class}"
+		'div #scrollbox .$CC-scrollbox':
 			'ul #items': ul
-		'div #edgeprev .smio-slidepanel-edge .smio-slidepanel-edge-left':
-			'div .smio-slidepanel-edge-arr .x9668': text: [@r 'slidepanel_prev']
-		'div #edgenext .smio-slidepanel-edge .smio-slidepanel-edge-right':
-			'div .smio-slidepanel-edge-arr .x9658': text: [@r 'slidepanel_next']
+		'div #edgeprev .$CC-edge .$CC-edge-left':
+			'div .$CC-edge-arr .x9668': _: [@r 'slidepanel_prev']
+		'div #edgenext .$CC-edge .$CC-edge-right':
+			'div .$CC-edge-arr .x9658': _: [@r 'slidepanel_next']
 
-init: ->
+init: =>
 	@curItem = 0
 	@items = []
 	@scrolling = false
 	super()
-	if @args.onItemSelect and _.isFunction @args.onItemSelect
+	if @args.onItemSelect and _.isFunction(@args.onItemSelect)
 		@on 'itemSelect', @args.onItemSelect
 
-onLoad: ->
+onLoad: =>
 	super()
-	(@edgePrev = $("##{@id 'edgeprev'}")).click => @scrollTo @curItem - 1
-	(@edgeNext = $("##{@id 'edgenext'}")).click => @scrollTo @curItem + 1
-	(@scrollBox = $("##{@id 'scrollbox'}")).scroll _.debounce (=> @scrollTo null, true if not @scrolling), 250
-	@scrollTo 0, true
+	@sub('edgeprev').click => @scrollTo(@curItem - 1)
+	@sub('edgenext').click => @scrollTo(@curItem + 1)
+	@sub('scrollbox').scroll _.debounce((=> @scrollTo(null, true) if not @scrolling), 100)
+	@scrollTo(0, true)
 
-onWindowResize: (w, h) ->
-	@scrollTo @curItem, true
+onWindowResize: (w, h) =>
+	@scrollTo(@curItem, true)
 
-scrollTo: (item, force) ->
+scrollTo: (item, force) =>
+	[edgePrev, edgeNext, scrollBox] = [@sub('edgeprev'), @sub('edgenext'), @sub('scrollbox')]
 	if item is null
 		scrollLefts = []
 		distances = []
-		for i in [0...@items.length]
-			scrollLefts.push (tmp = (@scrollBox.scrollLeft() + $("##{@id 'items_' + @items[i]}").position().left - @edgePrev.width()))
-			distances.push Math.abs tmp - @scrollBox.scrollLeft()
-		item = distances.indexOf Math.min distances...
-	if _.isString item
-		item = @items.indexOf item
+		for it, i in @items
+			scrollLefts.push(tmp = (scrollBox.scrollLeft() + @sub('items_' + it).position().left - edgePrev.width()))
+			distances.push(Math.abs(tmp - scrollBox.scrollLeft()))
+		item = distances.indexOf(Math.min(distances...))
+	if _.isString(item)
+		item = @items.indexOf(item)
 	if ((item < 0) or (item >= @items.length)) and force
 		item = 0
 	if (force or item isnt @curItem) and (item >= 0) and (item < @items.length)
 		@scrolling = true
-		@edgePrev.css display: if (item is 0) then 'none' else 'block'
-		@edgeNext.css display: if (item is (@items.length - 1)) then 'none' else 'block'
-		@on 'itemSelect', [@curItem = item, @items[item]]
-		morpheus.tween 250, ((pos) => @scrollBox.scrollLeft pos), (=> @scrolling = false), null, @scrollBox.scrollLeft(), @scrollBox.scrollLeft() + $("##{@id 'items_' + @items[item]}").position().left - @edgePrev.width()
+		edgePrev.css(display: if (item is 0) then 'none' else 'block')
+		edgeNext.css(display: if (item is (@items.length - 1)) then 'none' else 'block')
+		@on('itemSelect', [@curItem = item, @items[item]])
+		morpheus.tween(250, ((pos) => scrollBox.scrollLeft(pos)), (=> @scrolling = false), null, scrollBox.scrollLeft(), scrollBox.scrollLeft() + @sub('items_' + @items[item]).position().left - edgePrev.width())
 
 #endif
 

@@ -8,9 +8,9 @@
   smio = global.smoothio;
   smio.Control = (function() {
     Control.compile = function(inst, ctlContent, controlPath) {
-      var baseName, br, c, className, coffeeScript, contentParts, decls, dyn, dynCmd, inDyn, ind, indent, isCmd, jarg, l, lastChar, lastContent, lind, lines, obj, oneUp, part, pathParts, pos, posC, posS, renderParts, rind, rp, sarg, stimes, subs, tmpPos, tmpPos2, _i, _j, _k, _l, _len, _len2, _len3, _len4, _len5, _len6, _m, _n, _ref, _ref2, _ref3;
+      var baseName, br, c, className, coffeeScript, contentParts, decls, dyn, dynCmd, inDyn, ind, indent, isCmd, jarg, l, lastChar, lastContent, lind, lines, obj, oneUp, part, pathParts, pos, posC, posS, renderParts, rind, rp, sarg, staToc, stimes, subs, tmpPos, tmpPos2, _i, _j, _k, _l, _len, _len2, _len3, _len4, _len5, _len6, _m, _n, _ref, _ref2, _ref3;
       this.inst = inst;
-      _ref = [false, '../', [], '', [], '', '', {}], inDyn = _ref[0], oneUp = _ref[1], contentParts = _ref[2], decls = _ref[3], renderParts = _ref[4], lastChar = _ref[5], lastContent = _ref[6], obj = _ref[7];
+      _ref = [false, '../', [], '', [], '', '', {}, '@@'], inDyn = _ref[0], oneUp = _ref[1], contentParts = _ref[2], decls = _ref[3], renderParts = _ref[4], lastChar = _ref[5], lastContent = _ref[6], obj = _ref[7], staToc = _ref[8];
       pathParts = controlPath.substr(0, controlPath.lastIndexOf('.')).split('/');
       baseName = pathParts.slice(0, pathParts.length - 1).join('_');
       className = pathParts.join('_');
@@ -25,6 +25,9 @@
           }
           return _results;
         })()).join('\n') + '\n%>';
+      }
+      while ((pos = ctlContent.indexOf(staToc)) >= 0) {
+        ctlContent = ctlContent.substr(0, pos) + "smio[@classPath()]" + ctlContent.substr(pos + staToc.length);
       }
       for (_i = 0, _len = ctlContent.length; _i < _len; _i++) {
         c = ctlContent[_i];
@@ -249,6 +252,8 @@
       this.init = __bind(this.init, this);
       this.id = __bind(this.id, this);
       this.ctl = __bind(this.ctl, this);
+      this.cssClass = __bind(this.cssClass, this);
+      this.cssBaseClass = __bind(this.cssBaseClass, this);
       this.cls = __bind(this.cls, this);
       this.classPath = __bind(this.classPath, this);
       this.Control = __bind(this.Control, this);
@@ -264,6 +269,23 @@
     Control.prototype.cls = function() {
       return smio[this.classPath()];
     };
+    Control.prototype.cssBaseClass = function() {
+      return '';
+    };
+    Control.prototype.cssClass = function() {
+      var a, bc, sub, _i, _len;
+      a = ['smio'];
+      if ((bc = this.cssBaseClass())) {
+        a.push(bc);
+      }
+      for (_i = 0, _len = arguments.length; _i < _len; _i++) {
+        sub = arguments[_i];
+        if (sub) {
+          a.push(sub);
+        }
+      }
+      return a.join('-');
+    };
     Control.prototype.ctl = function(ctlID) {
       var c;
       if ((c = this.client.allControls[ctlID])) {
@@ -276,6 +298,9 @@
       return (this.parent ? "" + (this.parent.id()) + "_" + this.ctlID : this.ctlID) + (subID ? '_' + subID : '');
     };
     Control.prototype.init = function() {};
+    Control.prototype.jsonTemplates_Label = function(target) {
+      return target[this.args.labelHtml ? 'html' : '_'] = [this.args.labelHtml ? this.args.labelHtml : this.args.labelText];
+    };
     Control.prototype.jsSelf = function() {
       return "smio.client.allControls['" + this.id() + "']";
     };

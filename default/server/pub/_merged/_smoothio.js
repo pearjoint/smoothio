@@ -13727,6 +13727,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.init = __bind(this.init, this);
       this.id = __bind(this.id, this);
       this.ctl = __bind(this.ctl, this);
+      this.cssClass = __bind(this.cssClass, this);
+      this.cssBaseClass = __bind(this.cssBaseClass, this);
       this.cls = __bind(this.cls, this);
       this.classPath = __bind(this.classPath, this);
       this.un = __bind(this.un, this);
@@ -13749,6 +13751,23 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     Control.prototype.cls = function() {
       return smio[this.classPath()];
     };
+    Control.prototype.cssBaseClass = function() {
+      return '';
+    };
+    Control.prototype.cssClass = function() {
+      var a, bc, sub, _i, _len;
+      a = ['smio'];
+      if ((bc = this.cssBaseClass())) {
+        a.push(bc);
+      }
+      for (_i = 0, _len = arguments.length; _i < _len; _i++) {
+        sub = arguments[_i];
+        if (sub) {
+          a.push(sub);
+        }
+      }
+      return a.join('-');
+    };
     Control.prototype.ctl = function(ctlID) {
       var c;
       if ((c = this.client.allControls[ctlID])) {
@@ -13761,6 +13780,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       return (this.parent ? "" + (this.parent.id()) + "_" + this.ctlID : this.ctlID) + (subID ? '_' + subID : '');
     };
     Control.prototype.init = function() {};
+    Control.prototype.jsonTemplates_Label = function(target) {
+      return target[this.args.labelHtml ? 'html' : '_'] = [this.args.labelHtml ? this.args.labelHtml : this.args.labelText];
+    };
     Control.prototype.jsSelf = function() {
       return "smio.client.allControls['" + this.id() + "']";
     };
@@ -14252,7 +14274,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
     };
     function Packs_Core_Controls_Console(client, parent, args) {
-      this.renderHtml = __bind(this.renderHtml, this);      Packs_Core_Controls_Console.__super__.constructor.call(this, client, parent, args);
+      this.renderHtml = __bind(this.renderHtml, this);
+      this.onLoad = __bind(this.onLoad, this);
+      this.init = __bind(this.init, this);      Packs_Core_Controls_Console.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
     Packs_Core_Controls_Console.prototype.className = function() {
@@ -14299,14 +14323,14 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   /*
   Auto-generated from Core/Controls/LinkButton.ctl
   */  var smio, smoothio;
-  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
     ctor.prototype = parent.prototype;
     child.prototype = new ctor;
     child.__super__ = parent.prototype;
     return child;
-  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  };
   smio = smoothio = global.smoothio;
   smio.Packs_Core_Controls_LinkButton = (function() {
     __extends(Packs_Core_Controls_LinkButton, smio.Control);
@@ -14322,8 +14346,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       if (this.disabled) {
         ret.a.disabled = 'disabled';
       }
-      if (this.args.labelText) {
-        ret.a.text = [this.args.labelText];
+      if (this.args.labelText || this.args.labelHtml) {
+        this.jsonTemplates_Label(ret.a);
       }
       return ret;
     };
@@ -14339,7 +14363,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }, this));
     };
     function Packs_Core_Controls_LinkButton(client, parent, args) {
-      Packs_Core_Controls_LinkButton.__super__.constructor.call(this, client, parent, args);
+      this.onLoad = __bind(this.onLoad, this);
+      this.coreDisable = __bind(this.coreDisable, this);
+      this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_LinkButton.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
     Packs_Core_Controls_LinkButton.prototype.className = function() {
@@ -14373,7 +14399,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       return xy = "clientside";
     };
     function Packs_Core_Controls_MainFrame(client, parent, args) {
-      this.renderHtml = __bind(this.renderHtml, this);      Packs_Core_Controls_MainFrame.__super__.constructor.call(this, client, parent, args);
+      this.renderHtml = __bind(this.renderHtml, this);
+      this.test = __bind(this.test, this);      Packs_Core_Controls_MainFrame.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
     Packs_Core_Controls_MainFrame.prototype.className = function() {
@@ -14422,21 +14449,21 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   /*
   Auto-generated from Core/Controls/SlidePanel.ctl
   */  var smio, smoothio;
-  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
     ctor.prototype = parent.prototype;
     child.prototype = new ctor;
     child.__super__ = parent.prototype;
     return child;
-  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  };
   smio = smoothio = global.smoothio;
   smio.Packs_Core_Controls_SlidePanel = (function() {
     __extends(Packs_Core_Controls_SlidePanel, smio.Control);
     Packs_Core_Controls_SlidePanel.prototype.renderTemplate = function() {
       var item, itemID, ul, _ref;
       ul = {
-        "class": "smio-slidepanel " + (this.args["class"] || ''),
+        "class": "= smio-slidepanel " + (this.args["class"] || ''),
         'li #libefore': {
           html: ['&nbsp;']
         }
@@ -14458,18 +14485,18 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       return {
         div: {
           id: '',
-          "class": "smio-slidepanel " + this.args["class"],
-          'div #scrollbox .smio-slidepanel-scrollbox': {
+          "class": "= smio-slidepanel " + this.args["class"],
+          'div #scrollbox .= smio-slidepanel-scrollbox': {
             'ul #items': ul
           },
-          'div #edgeprev .smio-slidepanel-edge .smio-slidepanel-edge-left': {
-            'div .smio-slidepanel-edge-arr .x9668': {
-              text: [this.r('slidepanel_prev')]
+          'div #edgeprev .= smio-slidepanel-edge .= smio-slidepanel-edge-left': {
+            'div .= smio-slidepanel-edge-arr .x9668': {
+              _: [this.r('slidepanel_prev')]
             }
           },
-          'div #edgenext .smio-slidepanel-edge .smio-slidepanel-edge-right': {
-            'div .smio-slidepanel-edge-arr .x9658': {
-              text: [this.r('slidepanel_next')]
+          'div #edgenext .= smio-slidepanel-edge .= smio-slidepanel-edge-right': {
+            'div .= smio-slidepanel-edge-arr .x9658': {
+              _: [this.r('slidepanel_next')]
             }
           }
         }
@@ -14486,30 +14513,33 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     };
     Packs_Core_Controls_SlidePanel.prototype.onLoad = function() {
       Packs_Core_Controls_SlidePanel.__super__.onLoad.call(this);
-      (this.edgePrev = $("#" + (this.id('edgeprev')))).click(__bind(function() {
+      this.sub('edgeprev').click(__bind(function() {
         return this.scrollTo(this.curItem - 1);
       }, this));
-      (this.edgeNext = $("#" + (this.id('edgenext')))).click(__bind(function() {
+      this.sub('edgenext').click(__bind(function() {
         return this.scrollTo(this.curItem + 1);
       }, this));
-      (this.scrollBox = $("#" + (this.id('scrollbox')))).scroll(_.debounce((__bind(function() {
+      this.sub('scrollbox').scroll(_.debounce((__bind(function() {
         if (!this.scrolling) {
           return this.scrollTo(null, true);
         }
-      }, this)), 250));
+      }, this)), 100));
       return this.scrollTo(0, true);
     };
     Packs_Core_Controls_SlidePanel.prototype.onWindowResize = function(w, h) {
       return this.scrollTo(this.curItem, true);
     };
     Packs_Core_Controls_SlidePanel.prototype.scrollTo = function(item, force) {
-      var distances, i, scrollLefts, tmp, _ref;
+      var distances, edgeNext, edgePrev, i, it, scrollBox, scrollLefts, tmp, _len, _ref, _ref2;
+      _ref = [this.sub('edgeprev'), this.sub('edgenext'), this.sub('scrollbox')], edgePrev = _ref[0], edgeNext = _ref[1], scrollBox = _ref[2];
       if (item === null) {
         scrollLefts = [];
         distances = [];
-        for (i = 0, _ref = this.items.length; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
-          scrollLefts.push((tmp = this.scrollBox.scrollLeft() + $("#" + (this.id('items_' + this.items[i]))).position().left - this.edgePrev.width()));
-          distances.push(Math.abs(tmp - this.scrollBox.scrollLeft()));
+        _ref2 = this.items;
+        for (i = 0, _len = _ref2.length; i < _len; i++) {
+          it = _ref2[i];
+          scrollLefts.push(tmp = scrollBox.scrollLeft() + this.sub('items_' + it).position().left - edgePrev.width());
+          distances.push(Math.abs(tmp - scrollBox.scrollLeft()));
         }
         item = distances.indexOf(Math.min.apply(Math, distances));
       }
@@ -14521,22 +14551,26 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
       if ((force || item !== this.curItem) && (item >= 0) && (item < this.items.length)) {
         this.scrolling = true;
-        this.edgePrev.css({
+        edgePrev.css({
           display: item === 0 ? 'none' : 'block'
         });
-        this.edgeNext.css({
+        edgeNext.css({
           display: item === (this.items.length - 1) ? 'none' : 'block'
         });
         this.on('itemSelect', [this.curItem = item, this.items[item]]);
         return morpheus.tween(250, (__bind(function(pos) {
-          return this.scrollBox.scrollLeft(pos);
+          return scrollBox.scrollLeft(pos);
         }, this)), (__bind(function() {
           return this.scrolling = false;
-        }, this)), null, this.scrollBox.scrollLeft(), this.scrollBox.scrollLeft() + $("#" + (this.id('items_' + this.items[item]))).position().left - this.edgePrev.width());
+        }, this)), null, scrollBox.scrollLeft(), scrollBox.scrollLeft() + this.sub('items_' + this.items[item]).position().left - edgePrev.width());
       }
     };
     function Packs_Core_Controls_SlidePanel(client, parent, args) {
-      Packs_Core_Controls_SlidePanel.__super__.constructor.call(this, client, parent, args);
+      this.scrollTo = __bind(this.scrollTo, this);
+      this.onWindowResize = __bind(this.onWindowResize, this);
+      this.onLoad = __bind(this.onLoad, this);
+      this.init = __bind(this.init, this);
+      this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_SlidePanel.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
     Packs_Core_Controls_SlidePanel.prototype.className = function() {
@@ -14549,19 +14583,68 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   })();
 }).call(this);
 
-/** server/pub/_packs/Core/Controls/_ctl_TabStrip.js **/
+/** server/pub/_packs/Core/Controls/_ctl_Smoothio.js **/
 (function() {
   /*
-  Auto-generated from Core/Controls/TabStrip.ctl
+  Auto-generated from Core/Controls/Smoothio.ctl
   */  var smio, smoothio;
-  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
     ctor.prototype = parent.prototype;
     child.prototype = new ctor;
     child.__super__ = parent.prototype;
     return child;
-  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  };
+  smio = smoothio = global.smoothio;
+  smio.Packs_Core_Controls_Smoothio = (function() {
+    __extends(Packs_Core_Controls_Smoothio, smio.Control);
+    function Packs_Core_Controls_Smoothio(client, parent, args) {
+      this.renderHtml = __bind(this.renderHtml, this);      Packs_Core_Controls_Smoothio.__super__.constructor.call(this, client, parent, args);
+      this.init();
+    }
+    Packs_Core_Controls_Smoothio.prototype.className = function() {
+      return "Core_Controls_Smoothio";
+    };
+    Packs_Core_Controls_Smoothio.prototype.classNamespace = function() {
+      return "Core_Controls";
+    };
+    Packs_Core_Controls_Smoothio.prototype.renderHtml = function($el) {
+      var __r, _html;
+      __r = {
+        ctls: [],
+        m: []
+      };
+      __r.p = (function(r) {
+        return function(v) {
+          return r.o.push(v);
+        };
+      })(__r);
+      __r.o = __r.m;
+      __r.p("<!DOCTYPE html>\n<html lang=\"___smiolang___\">\n\t<head>\n\t\t<meta charset=\"utf-8\" />\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n\t\t<meta name=\"generator\" content=\"smooth.io\"/>\n\t\t<meta name=\"application-name\" content=\"smooth.io\"/>\n\t\t<title>smoothio</title>\n\t\t<script type=\"text/javascript\" language=\"JavaScript\">\n\t\t\tfunction onSmoothioNoCookie() {\n\t\t\t\t$('#smio_offline').hide();\n\t\t\t\t$('#smio_body').css({ \"background-image\": \"none\" }).html('<br/><br/><br/><br/><hr/>Either your session cookie expired or you have disabled browser cookies, and hence this application will not load.<br/><br/>Verify that cookies are enabled in your web browser, then try a complete reload (press CTRL+R).<hr/>Entweder ist Ihr Sitzungscookie abgelaufen oder Ihr Webbrowser unterst&uuml;tzt keine Cookies, und somit wird auch diese Anwendung nicht geladen.<br/><br/>Stellen Sie sicher, da&szlig; Ihr Webbrowser Cookies erlaubt, und versuchen Sie dann ein Komplett-Neuladen (STRG+R).<hr/>');\n\t\t\t}\n\n\t\t\tfunction onSmoothioPageLoad() {\n\t\t\t\t$('#smio_noscript, #smio_prescript, #smio_noscript_content').remove();\n\t\t\t\tif (smio.pageLoadError)\n\t\t\t\t\tdocument.getElementById('smio_body').innerHTML = '<br/><br/><br/><br/><hr/>Required core script <b>' + smio.pageLoadError + '</b> could not be loaded and hence this application will not load.<br/><br/>Try a complete reload (press CTRL+R) as this was probably just a temporary disruption.<hr/>Erforderliches Kernscript <b>' + smio.pageLoadError + '</b> konnte nicht geladen werden und somit wird auch diese Anwendung nicht geladen.<br/><br/>Versuchen Sie ein Komplett-Neuladen (STRG+R), da dies wahrscheinlich nur eine kurzzeitige St&ouml;rung war.<hr/>';\n\t\t\t\telse if (!(smio.client = new smio.Client()).sessionID)\n\t\t\t\t\tonSmoothioNoCookie();\n\t\t\t\telse\n\t\t\t\t\tsmio.client.init();\n\t\t\t}\n\n\t\t\tfunction onSmoothioProgress() {\n\t\t\t}\n\n\t\t\tfunction onSmoothioSleepy(sleepy) {\n\t\t\t\tif (smio.client && smio.client.socket && (sleepy != smio.client.sleepy))\n\t\t\t\t\tsmio.client.socket.onSleepy(smio.client.sleepy = sleepy);\n\t\t\t}\n\n\t\t\tfunction onScriptError(scriptName) {\n\t\t\t\tsmio.pageLoadError = scriptName;\n\t\t\t}\n\t\t</script>\n\t\t<link rel=\"stylesheet\" href=\"/_/file/_merged/_smoothio.css\"/>\n\t\t<link rel=\"shortcut icon\" type=\"image/png\" id=\"smio_favicon\" href=\"/_/file/images/smoothio.png\" />\n\t\t<style type=\"text/css\"> span.smio-noscript { display: none; } </style>\n\t</head>\n\t<body id=\"smio_body\" onload=\"onSmoothioPageLoad();\" onblur=\"onSmoothioSleepy(true);\" onfocus=\"onSmoothioSleepy(false);\">\n\t\t<div id=\"smio_offline\" class=\"smio-blocking-overlay\"><span id=\"smio_offline_msg\"></span><span id=\"smio_offline_blink\">&nbsp;&#x273F;</span></div>\n\t\t<script type=\"text/javascript\" language=\"JavaScript\" id=\"smio_prescript\">\n\t\t\tdocument.getElementById('smio_offline').style.display = 'block';\n\t\t\tvar smioGlobalTest, smio, WEB_SOCKET_SWF_LOCATION = '/_/dynfile/?type=application/x-shockwave-flash&config=sockets.xdomain_swf&true=bin/websockx.swf&false=bin/websock.swf';\n\t\t\ttry {\n\t\t\t\tsmioGlobalTest = global;\n\t\t\t} catch(err) {\n\t\t\t}\n\t\t\tif (!smioGlobalTest)\n\t\t\t\tglobal = {};\n\t\t\tif (!global['smoothio'])\n\t\t\t\tglobal['smoothio'] = {}\n\t\t\tsmio = global.smoothio;\n\t\t\tsmio.pageLoadError = null;\n\t\t\tsmio.iif = function(test, ifTrue, ifFalse) {\n\t\t\t\tif (arguments.length < 3)\n\t\t\t\t\tifFalse = false;\n\t\t\t\tif (arguments.length < 2)\n\t\t\t\t\tifTrue = true;\n\t\t\t\treturn test ? ifTrue : ifFalse;\n\t\t\t};\n\t\t</script>\n\t\t<noscript id=\"smio_noscript\">\n\t\t\t<style type=\"text/css\"> span.smio-noscript { display: block !important; } </style>\n\t\t</noscript>\n\t\t<div id=\"smio_main\" class=\"smio-main\"><span class=\"smio-noscript\" id=\"smio_noscript_content\">___smiopagecontent___</span></div>\n\t\t<script type=\"text/javascript\" language=\"JavaScript\" src=\"/_/dynfile/?config=_res.js\" onerror=\"onScriptError('_res.js');\" defer=\"defer\" async=\"async\"></script>\n\t\t<script type=\"text/javascript\" language=\"JavaScript\" src=\"/_/file/_merged/_smoothio.js\" onerror=\"onScriptError('_smoothio.js');\" defer=\"defer\" async=\"async\"></script>\n\t\t<!--xscript type=\"text/javascript\" language=\"JavaScript\" src=\"/_/file/coffee-script.js\" onerror=\"onScriptError('coffee-script.js');\" defer=\"defer\" async=\"async\"></xscript-->\n\t</body>\n</html>\n\n");
+      _html = __r.o.join('');
+      if ($el) {
+        $el.html(_html);
+      }
+      return _html;
+    };
+    return Packs_Core_Controls_Smoothio;
+  })();
+}).call(this);
+
+/** server/pub/_packs/Core/Controls/_ctl_TabStrip.js **/
+(function() {
+  /*
+  Auto-generated from Core/Controls/TabStrip.ctl
+  */  var smio, smoothio;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
+  };
   smio = smoothio = global.smoothio;
   smio.Packs_Core_Controls_TabStrip = (function() {
     __extends(Packs_Core_Controls_TabStrip, smio.Control);
@@ -14591,24 +14674,25 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       return ret;
     };
     Packs_Core_Controls_TabStrip.prototype.selectTab = function(tabID) {
-      var a, cls, incls, t, _i, _len, _ref;
-      a = $("#" + (this.id(tabID)));
+      var a, cls, t, uncls, _i, _len, _ref;
+      a = this.sub(tabID);
       cls = "" + this.args.tabClass + "-active";
-      incls = "" + this.args.tabClass + "-inactive";
+      uncls = "" + this.args.tabClass + "-inactive";
       if (!a.hasClass(cls)) {
         _ref = this.args.tabs;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           t = _ref[_i];
-          $("#" + (this.id(t))).removeClass(cls).addClass(incls);
+          this.sub(t).removeClass(cls).addClass(uncls);
         }
-        a.removeClass(incls).addClass(cls);
+        a.removeClass(uncls).addClass(cls);
         if (this.args.onTabSelect) {
           return this.args.onTabSelect(tabID);
         }
       }
     };
     function Packs_Core_Controls_TabStrip(client, parent, args) {
-      Packs_Core_Controls_TabStrip.__super__.constructor.call(this, client, parent, args);
+      this.selectTab = __bind(this.selectTab, this);
+      this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_TabStrip.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
     Packs_Core_Controls_TabStrip.prototype.className = function() {
@@ -14626,7 +14710,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   /*
   Auto-generated from Core/Controls/TextInput.ctl
   */  var smio, smoothio;
-  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
     ctor.prototype = parent.prototype;
@@ -14641,20 +14725,20 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       var ret;
       ret = {
         span: {
-          "class": 'smio-textinput',
+          "class": '= smio-textinput',
           id: ''
         }
       };
-      if (this.args.labelText) {
+      if (this.args.labelText || this.args.labelHtml) {
         ret.span.label = {
           id: 'label',
-          "for": this.id('input'),
-          html: [this.args.labelText]
+          "for": this.id('input')
         };
+        this.jsonTemplates_Label(ret.span.label);
       }
       ret.span.input = {
         id: 'input',
-        "class": 'smio-textinput',
+        "class": '= smio-textinput',
         type: this.args.type === 'password' ? 'password' : 'text'
       };
       if (this.disabled) {
@@ -14681,7 +14765,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       return this.sub('input').prop('readonly', disable);
     };
     function Packs_Core_Controls_TextInput(client, parent, args) {
-      Packs_Core_Controls_TextInput.__super__.constructor.call(this, client, parent, args);
+      this.coreDisable = __bind(this.coreDisable, this);
+      this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_TextInput.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
     Packs_Core_Controls_TextInput.prototype.className = function() {
@@ -14699,77 +14784,78 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   /*
   Auto-generated from Core/Controls/Toggle.ctl
   */  var smio, smoothio;
-  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
     ctor.prototype = parent.prototype;
     child.prototype = new ctor;
     child.__super__ = parent.prototype;
     return child;
-  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  };
   smio = smoothio = global.smoothio;
   smio.Packs_Core_Controls_Toggle = (function() {
     __extends(Packs_Core_Controls_Toggle, smio.Control);
     Packs_Core_Controls_Toggle.checkmark = '&#x2714;';
     Packs_Core_Controls_Toggle.radiomark = '';
     Packs_Core_Controls_Toggle.prototype.renderTemplate = function() {
-      var ischk, ret;
+      var getGSpan, ischk, ret;
       ischk = this.isCheckBox();
       ret = {
         span: {
-          "class": "smio-toggleinput smio-toggleinput-" + (smio.iif(ischk, 'checkbox', 'radio')) + " smio-toggleinput-" + (smio.iif(this.args.checked, '', 'un')) + "checked smio-toggleinput-" + (this.getSharedClass()),
+          "class": "= smio-toggleinput = smio-toggleinput-" + (ischk ? 'checkbox' : 'radio') + " = smio-toggleinput-" + (this.args.checked ? '' : 'un') + "checked = smio-toggleinput-" + (this.commonCssClass()),
           id: '',
           span: {
             id: 'btnlabel',
-            "class": "smio-toggleinput-btnlabel",
+            "class": "= smio-toggleinput-btnlabel",
             span: {
               id: 'btn',
-              "class": 'smio-toggleinput-btn',
+              "class": '= smio-toggleinput-btn',
               span: {
                 id: 'btnglyph',
-                "class": 'smio-toggleinput-btnbtn'
+                "class": '= smio-toggleinput-btnbtn'
               }
             }
           }
         }
       };
-      if (ischk) {
-        ret.span.span.span['span #glyph'] = {
-          "class": 'smio-toggleinput-btnglyph'
-        };
-      } else {
-        ret.span.span.span.span['span #glyph'] = {
-          "class": 'smio-toggleinput-btnglyph'
-        };
-      }
+      getGSpan = function() {
+        if (ischk) {
+          return ret.span.span.span;
+        } else {
+          return ret.span.span.span.span;
+        }
+      };
+      getGSpan()['span #glyph'] = {
+        "class": '= smio-toggleinput-btnglyph'
+      };
       ret.span.span.span.input = {
         id: 'input',
         name: this.args.toggleName,
-        "class": 'smio-toggleinput',
-        type: smio.iif(ischk, 'checkbox', 'radio')
+        "class": '= smio-toggleinput',
+        type: ischk ? 'checkbox' : 'radio'
       };
       if (this.disabled) {
         ret.span.span.span.input.disabled = 'disabled';
       }
       if (this.args.checked) {
         ret.span.span.span.input.checked = 'checked';
-        (smio.iif(ischk, ret.span.span.span, ret.span.span.span.span))['span #glyph'].html = [this.cls()[smio.iif(ischk, 'checkmark', 'radiomark')]];
+        getGSpan()['span #glyph'].html = [smio[this.classPath()][ischk ? 'checkmark' : 'radiomark']];
       }
       if (this.args.labelText || this.args.labelHtml) {
         ret.span.span.label = {
           id: 'label',
-          "class": 'smio-toggleinput',
+          "class": '= smio-toggleinput',
           "for": this.id('input')
         };
-        ret.span.span.label[smio.iif(this.args.labelHtml, 'html', 'text')] = [smio.iif(this.args.labelHtml, this.args.labelHtml, this.args.labelText)];
+        this.jsonTemplates_Label(ret.span.span.label);
       }
       return ret;
     };
+    Packs_Core_Controls_Toggle.prototype.commonCssClass = function() {
+      return this.args.toggleName || this.id();
+    };
     Packs_Core_Controls_Toggle.prototype.coreDisable = function(disable) {
       return this.sub('input').prop('disabled', disable);
-    };
-    Packs_Core_Controls_Toggle.prototype.getSharedClass = function() {
-      return this.args.toggleName || this.id();
     };
     Packs_Core_Controls_Toggle.prototype.isCheckBox = function() {
       return this.args.type === 'checkbox';
@@ -14778,15 +14864,16 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       return this.args.type !== 'checkbox';
     };
     Packs_Core_Controls_Toggle.prototype.onCheck = function(passive) {
-      var nuCls, unCls;
-      if (this.val !== this.elInput.prop('checked')) {
-        this.val = this.elInput.prop('checked');
-        nuCls = smio.iif(this.val, 'smio-toggleinput-checked', 'smio-toggleinput-unchecked');
-        unCls = smio.iif(this.val, 'smio-toggleinput-unchecked', 'smio-toggleinput-checked');
+      var cc, el, nuCls, unCls, _ref;
+      _ref = ['= smio-toggleinput', this.sub('input')], cc = _ref[0], el = _ref[1];
+      if (this.chk !== el.prop('checked')) {
+        this.chk = el.prop('checked');
+        nuCls = cc + (this.chk ? '-checked' : '-unchecked');
+        unCls = cc + (this.chk ? '-unchecked' : '-checked');
         this.el.removeClass(unCls).addClass(nuCls);
-        $("#" + (this.id('glyph'))).html(smio.iif(this.val, this.cls()[smio.iif(this.isCheckBox(), 'checkmark', 'radiomark')], ''));
+        this.sub('glyph').html(!this.chk ? '' : smio[this.classPath()][this.isCheckBox() ? 'checkmark' : 'radiomark']);
         if (this.isRadioBox() && !passive) {
-          return $(".smio-toggleinput-" + (this.getSharedClass()) + " input.smio-toggleinput").each(__bind(function(i, e) {
+          return $(".= smio-toggleinput-" + (this.commonCssClass()) + " input.= smio-toggleinput").each(__bind(function(i, e) {
             var ctl;
             if (e.id !== this.id('input')) {
               $(e).prop('checked', false);
@@ -14799,29 +14886,38 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
     };
     Packs_Core_Controls_Toggle.prototype.onLoad = function() {
+      var inp;
       Packs_Core_Controls_Toggle.__super__.onLoad.call(this);
-      (this.elInput = $("#" + (this.id('input')))).click(__bind(function(evt) {
+      (inp = this.sub('input')).click(__bind(function(evt) {
         this.onCheck();
         if (this.isCheckBox()) {
           return evt.stopPropagation();
         }
       }, this));
-      this.elInput.blur(__bind(function() {
-        return $("#" + (this.id('btnlabel'))).removeClass('smio-toggleinput-focused');
+      inp.blur(__bind(function() {
+        return this.sub('btnlabel').removeClass('= smio-toggleinput-focused');
       }, this));
-      this.elInput.focus(__bind(function() {
-        return $("#" + (this.id('btnlabel'))).addClass('smio-toggleinput-focused');
+      inp.focus(__bind(function() {
+        return this.sub('btnlabel').addClass('= smio-toggleinput-focused');
       }, this));
-      $("#" + (this.id('btn'))).click(__bind(function() {
-        if (!this.elInput.prop('disabled')) {
-          this.elInput.prop('checked', this.isRadioBox() || !this.elInput.prop('checked'));
+      this.sub('btn').click(__bind(function() {
+        var el;
+        el = this.sub('input');
+        if (!el.prop('disabled')) {
+          el.prop('checked', this.isRadioBox() || !el.prop('checked'));
           return this.onCheck();
         }
       }, this));
-      return this.val = this.elInput.prop('checked');
+      return this.chk = inp.prop('checked');
     };
     function Packs_Core_Controls_Toggle(client, parent, args) {
-      Packs_Core_Controls_Toggle.__super__.constructor.call(this, client, parent, args);
+      this.onLoad = __bind(this.onLoad, this);
+      this.onCheck = __bind(this.onCheck, this);
+      this.isRadioBox = __bind(this.isRadioBox, this);
+      this.isCheckBox = __bind(this.isCheckBox, this);
+      this.coreDisable = __bind(this.coreDisable, this);
+      this.commonCssClass = __bind(this.commonCssClass, this);
+      this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_Toggle.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
     Packs_Core_Controls_Toggle.prototype.className = function() {
@@ -14839,7 +14935,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   /*
   Auto-generated from Core/Controls/Toggles.ctl
   */  var smio, smoothio;
-  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
     ctor.prototype = parent.prototype;
@@ -14865,9 +14961,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           if (!item['toggleName']) {
             item.toggleName = this.id('toggle');
           }
-          if (this.args.type === 'bullets') {
-            item.checked = true;
-          }
           if (this.args.disabled) {
             item.disabled = this.args.disabled;
           }
@@ -14879,7 +14972,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       };
     };
     function Packs_Core_Controls_Toggles(client, parent, args) {
-      Packs_Core_Controls_Toggles.__super__.constructor.call(this, client, parent, args);
+      this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_Toggles.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
     Packs_Core_Controls_Toggles.prototype.className = function() {
@@ -14897,14 +14990,14 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   /*
   Auto-generated from Core/ServerSetup/InitialHubSetup.ctl
   */  var smio, smoothio;
-  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
     ctor.prototype = parent.prototype;
     child.prototype = new ctor;
     child.__super__ = parent.prototype;
     return child;
-  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  };
   smio = smoothio = global.smoothio;
   smio.Packs_Core_ServerSetup_InitialHubSetup = (function() {
     __extends(Packs_Core_ServerSetup_InitialHubSetup, smio.Control);
@@ -14913,17 +15006,15 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         "div .smio-setup": {
           "id": '',
           "div .smio-setup-outer .smio-setup-outer-top": {
-            "div.smio-setup-header": {
+            "div .smio-setup-header": {
               html: [this.r('title', 'smio-setup-header-detail', smio.Control.util.jsVoid, this.urlSeg())]
             },
-            "div.smio-setup-header-desc": [this.r('desc')]
+            "div .smio-setup-header-desc": [this.r('desc')]
           },
           "div .smio-setup-inner": {
             "SlidePanel #stepslide .smio-setup-stepslide": {
               itemClass: 'smio-setup-stepbox',
-              onItemSelect: __bind(function(i, id) {
-                return this.onSlide(i, id);
-              }, this),
+              onItemSelect: this.onSlide,
               items: {
                 "#owner": {
                   'div .smio-setup-stepbox-title': [this.r('steptitle_owner')],
@@ -14997,9 +15088,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       Packs_Core_ServerSetup_InitialHubSetup.__super__.onLoad.call(this);
       return $('.smio-setup-header-detail').click(__bind(function() {
         var nurl, port, urlseg;
-        port = smio.iif(("" + (this.client.pageUrl.attr('port'))) === '80', '', ":" + (this.client.pageUrl.attr('port')));
+        port = ("" + (this.client.pageUrl.attr('port'))) === '80' ? '' : ":" + (this.client.pageUrl.attr('port'));
         nurl = prompt(this.r('url_hint', this.client.pageUrl.attr('protocol'), this.client.pageUrl.attr('host'), port), urlseg = this.urlSeg());
-        if ((nurl != null) && nurl !== null && nurl !== urlseg) {
+        if ((nurl != null) && (nurl !== null) && (nurl !== urlseg)) {
           if (!_.startsWith(nurl, '/')) {
             nurl = "/" + nurl;
           }
@@ -15015,11 +15106,18 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.urlSeg = function() {
       var urlseg;
-      urlseg = _.trim(this.client.pageUrl.attr('path'), '/');
-      return urlseg = smio.iif(urlseg, "/" + urlseg + "/", '/');
+      if ((urlseg = _.trim(this.client.pageUrl.attr('path'), '/'))) {
+        return "/" + urlseg + "/";
+      } else {
+        return '/';
+      }
     };
     function Packs_Core_ServerSetup_InitialHubSetup(client, parent, args) {
-      Packs_Core_ServerSetup_InitialHubSetup.__super__.constructor.call(this, client, parent, args);
+      this.urlSeg = __bind(this.urlSeg, this);
+      this.onTabSelect = __bind(this.onTabSelect, this);
+      this.onSlide = __bind(this.onSlide, this);
+      this.onLoad = __bind(this.onLoad, this);
+      this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_ServerSetup_InitialHubSetup.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
     Packs_Core_ServerSetup_InitialHubSetup.prototype.className = function() {

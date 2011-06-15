@@ -13,5 +13,7 @@
 ,	"log_pack_loaded"				:	"PAKET '{0}': erfolgreich geladen."
 ,	"log_server_error_start"		:	"FEHLER beim Starten von SERVER '{0}':\n{1}"
 ,	"log_server_listening"			:	"SERVER '{0}' gestartet unter {1}:{2}"
+,	"log_server_closing"			:	"Anhalten..."
+,	"log_server_closed"				:	"Beendet."
 }
 

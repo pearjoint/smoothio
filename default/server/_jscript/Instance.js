@@ -82,6 +82,7 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         server = _ref[_i];
         if (server.status !== -1) {
+          smio.logit("IS:" + server.status);
           return false;
         }
       }
@@ -249,25 +250,21 @@
     };
     Instance.prototype.stop = function() {
       var server, _i, _len, _ref, _results;
-      if (this.mongoIsLocal && this.mongos['admin']) {
+      if (this.mongoIsLocal && this.mongos['admin'] && !this.mongoHasShutDown) {
         this.mongos['admin'].connect(__bind(function(err, db) {
           if (err != null) {
             smio.logit(JSON.stringify(err), 'mongodb');
-            this.mongoHasShutDown = true;
           }
           if (db != null) {
-            db.executeDbCommand({
+            return db.executeDbCommand({
               "shutdown": 1
-            }, __bind(function(err, result) {
-              this.mongoHasShutDown = true;
+            }, function(err, result) {
               return smio.logit(JSON.stringify(err != null ? err : result), 'mongodb');
-            }, this));
-            return this.mongoHasShutDown = true;
+            });
           }
         }, this));
-      } else {
-        this.mongoHasShutDown = true;
       }
+      this.mongoHasShutDown = true;
       _ref = this.servers;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {

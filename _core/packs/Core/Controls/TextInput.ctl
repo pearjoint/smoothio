@@ -1,16 +1,18 @@
-renderTemplate: ->
+#const $CC = smio-textinput
+
+renderTemplate: =>
 	ret =
 		span:
-			class: 'smio-textinput'
+			class: '$CC'
 			id: ''
-	if @args.labelText
+	if @args.labelText or @args.labelHtml
 		ret.span.label =
 			id: 'label'
-			for: @id 'input'
-			html: [@args.labelText]
+			for: @id('input')
+		@jsonTemplates_Label(ret.span.label)
 	ret.span.input=
 		id: 'input'
-		class: 'smio-textinput'
+		class: '$CC'
 		type: if @args.type is 'password' then 'password' else 'text'
 	if (@disabled)
 		ret.span.input.readonly = 'readonly'
@@ -26,6 +28,6 @@ renderTemplate: ->
 		ret.span.input.spellcheck = false
 	ret
 
-coreDisable: (disable) ->
-	@sub('input').prop 'readonly', disable
+coreDisable: (disable) =>
+	@sub('input').prop('readonly', disable)
 

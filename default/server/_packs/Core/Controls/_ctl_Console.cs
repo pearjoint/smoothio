@@ -9,13 +9,13 @@ class smio.Packs_Core_Controls_Console extends smio.Control
 
 
 #if client
-	init: ->
+	init: =>
 
-	onLoad: ($el) ->
+	onLoad: ($el) =>
 		super()
 		if not @args['topDown']
-			$("##{@id()}_detail").insertBefore "##{@id()}_ever"
-			$("##{@id()}_hover").insertBefore "##{@id()}_ever"
+			$("##{@id()}_detail").insertBefore("##{@id()}_ever")
+			$("##{@id()}_hover").insertBefore("##{@id()}_ever")
 
 #endif
 
