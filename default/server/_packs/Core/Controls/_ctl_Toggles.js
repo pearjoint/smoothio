@@ -10,6 +10,7 @@
     child.__super__ = parent.prototype;
     return child;
   };
+  require('../../../_jscript/shared/Control');
   smio = smoothio = global.smoothio;
   smio.Packs_Core_Controls_Toggles = (function() {
     __extends(Packs_Core_Controls_Toggles, smio.Control);
@@ -42,10 +43,15 @@
       };
     };
     function Packs_Core_Controls_Toggles(client, parent, args) {
-      Packs_Core_Controls_Toggles.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_Toggles");
-      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
+      Packs_Core_Controls_Toggles.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
+    Packs_Core_Controls_Toggles.prototype.className = function() {
+      return "Core_Controls_Toggles";
+    };
+    Packs_Core_Controls_Toggles.prototype.classNamespace = function() {
+      return "Core_Controls";
+    };
     return Packs_Core_Controls_Toggles;
   })();
 }).call(this);

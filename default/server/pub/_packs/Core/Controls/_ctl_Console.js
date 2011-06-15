@@ -22,35 +22,43 @@
       }
     };
     function Packs_Core_Controls_Console(client, parent, args) {
-      this.renderHtml = __bind(this.renderHtml, this);      Packs_Core_Controls_Console.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_Console");
-      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
+      this.renderHtml = __bind(this.renderHtml, this);      Packs_Core_Controls_Console.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
+    Packs_Core_Controls_Console.prototype.className = function() {
+      return "Core_Controls_Console";
+    };
+    Packs_Core_Controls_Console.prototype.classNamespace = function() {
+      return "Core_Controls";
+    };
     Packs_Core_Controls_Console.prototype.renderHtml = function($el) {
-      var __r;
-      if (!this._html) {
-        __r = {
-          ctls: [],
-          m: []
+      var __r, _html;
+      __r = {
+        ctls: [],
+        m: []
+      };
+      __r.p = (function(r) {
+        return function(v) {
+          return r.o.push(v);
         };
-        __r.o = __r.m;
-        __r.o.push("\n<div id=\"");
-        __r.o.push(this.id());
-        __r.o.push("\" class=\"smio-console smio-console-");
-        __r.o.push(this.args['topDown'] ? 'top' : 'bottom');
-        __r.o.push("\">\n\t<div id=\"");
-        __r.o.push(this.id());
-        __r.o.push("_ever\" class=\"smio-console-ever\">header</div>\n\t<div id=\"");
-        __r.o.push(this.id());
-        __r.o.push("_hover\" class=\"smio-console-hover\" style=\"display: none;\">hover</div>\n\t<div id=\"");
-        __r.o.push(this.id());
-        __r.o.push("_detail\" class=\"smio-console-detail\" style=\"display: none;\">details</div>\n</div>\n\n");
-        this._html = __r.o.join('');
-      }
+      })(__r);
+      __r.o = __r.m;
+      __r.p("\n<div id=\"");
+      __r.p(this.id());
+      __r.p("\" class=\"smio-console smio-console-");
+      __r.p(this.args['topDown'] ? 'top' : 'bottom');
+      __r.p("\">\n\t<div id=\"");
+      __r.p(this.id());
+      __r.p("_ever\" class=\"smio-console-ever\">header</div>\n\t<div id=\"");
+      __r.p(this.id());
+      __r.p("_hover\" class=\"smio-console-hover\" style=\"display: none;\">hover</div>\n\t<div id=\"");
+      __r.p(this.id());
+      __r.p("_detail\" class=\"smio-console-detail\" style=\"display: none;\">details</div>\n</div>\n\n");
+      _html = __r.o.join('');
       if ($el) {
-        $el.html(this._html);
+        $el.html(_html);
       }
-      return this._html;
+      return _html;
     };
     return Packs_Core_Controls_Console;
   })();

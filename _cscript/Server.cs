@@ -16,7 +16,7 @@ class smio.Server
 	constructor: (@inst, @serverName, @hostName, @port, @processes) ->
 		hostName = @hostName
 		localHostName = node_os.hostname()
-		if @inst.config.smoothio.dns_preresolve.enabled or process.platform is 'cygwin'
+		if @inst.config.smoothio.dns_preresolve.enabled or (process.platform is 'cygwin')
 			for host, ip of @inst.config.smoothio.dns_preresolve.hostnames
 				if (hostName is host) or ((host is '$localhostname') and hostName is localHostName)
 					hostName = ip
@@ -24,42 +24,42 @@ class smio.Server
 		@sockLogFile = null
 		@status = 0
 		@isHttps = false
-		@httpServer = node_http.createServer (request, response) => @onRequest request, response
-		@fileServer = new node_static.Server 'server/pub/'
-		@httpServer.on 'error', (err) => @onError err
+		@httpServer = node_http.createServer (request, response) => @onRequest(request, response)
+		@fileServer = new node_static.Server('server/pub/')
+		@httpServer.on 'error', (err) => @onError(err)
 		@httpServer.on 'close', => @status = -1
 		if @processes <= 1
-			@httpServer.listen @port, hostName, => @onBind()
+			@httpServer.listen(@port, hostName, => @onBind())
 		else
-			node_multi.listen { "port": @port, "nodes": @processes }, @httpServer
+			node_multi.listen({port: @port, nodes: @processes }, @httpServer)
 		@sockLogFile = null
-		if sockLogPath = @inst.expandLogPath @inst.config.sockets.logpath
-			sockLogger = smio.Util.Server.setupLogFile @, 'sockLogFile', false, sockLogPath, (msg) -> msg
+		if sockLogPath = @inst.expandLogPath(@inst.config.sockets.logpath)
+			sockLogger = smio.Util.Server.setupLogFile(@, 'sockLogFile', false, sockLogPath, (msg) -> msg)
 		else
-			sockLogger = () ->
-		@socket = socketio.listen @httpServer, resource: '/_/sockio/', flashPolicyServer: false, log: sockLogger
-		@socket.on 'clientConnect', (client) => @onSocketConnect client
-		@socket.on 'clientDisconnect', (client) => @onSocketDisconnect client
-		@socket.on 'clientMessage', (msg, client) => @onSocketMessage msg, client
+			sockLogger = ->
+		@socket = socketio.listen(@httpServer, resource: '/_/sockio/', flashPolicyServer: false, log: sockLogger)
+		@socket.on 'clientConnect', (client) => @onSocketConnect(client)
+		@socket.on 'clientDisconnect', (client) => @onSocketDisconnect(client)
+		@socket.on 'clientMessage', (msg, client) => @onSocketMessage(msg, client)
 
-	getSocketSessionID: (client) ->
+	getSocketSessionID: (client) =>
 		if not smio.Server.sockSessions[client.sessionId]
-			smio.Server.sockSessions[client.sessionId] = (smio.RequestContext.parseSmioCookie client['request']?['headers']?['cookie']).sessid
+			smio.Server.sockSessions[client.sessionId] = smio.RequestContext.parseSmioCookie(client['request']?['headers']?['cookie']).sessid
 		smio.Server.sockSessions[client.sessionId]
 
-	onBind: ->
+	onBind: =>
 		@status = 1
-		smio.logit (@inst.r 'log_server_listening', @serverName, @hostName, @port), 'servers.' + @serverName
+		smio.logit(@inst.r('log_server_listening', @serverName, @hostName, @port), 'servers.' + @serverName)
 
-	onError: (err) ->
-		smio.logit (@inst.r 'log_server_error_start', @serverName, @inst.formatError err), 'servers.' + @serverName
+	onError: (err) =>
+		smio.logit(@inst.r('log_server_error_start', @serverName, @inst.formatError(err)), 'servers.' + @serverName)
 
-	onRequest: (request, response) ->
+	onRequest: (request, response) =>
 		@status = 1
 		url = request.url
-		if url.indexOf 'http://' isnt 0 and url.indexOf 'https://' isnt 0
+		if (url.indexOf('http://') isnt 0) and (url.indexOf('https://') isnt 0)
 			url = "#{if @isHttps then 'https' else 'http'}://#{@hostName}:#{@port}#{url}"
-		uri = node_url.parse url, true
+		uri = node_url.parse(url, true)
 		uri.pathItems = (pathItem for pathItem in uri.pathname.split('/') when pathItem and pathItem.length)
 		if uri.pathItems.length is 1
 			if uri.pathItems[0] is 'robots.txt'
@@ -68,17 +68,17 @@ class smio.Server
 				uri.pathItems = ['_', 'file', uri.pathItems[0]]
 		uri.rawUrl = request.url
 		uri.url = url
-		ctx = new smio.RequestContext @, uri, request, response, @inst.mongos['admin'], @inst.mongos['smoothio_shared'], @inst.mongos["smoothio__#{@serverName}"]
+		ctx = new smio.RequestContext(@, uri, request, response, @inst.mongos['admin'], @inst.mongos['smoothio_shared'], @inst.mongos["smoothio__#{@serverName}"])
 
-	onSocketConnect: (client) ->
-		if (sessid = @getSocketSessionID client) and (sess = smio.Session.getBySessionID @, sessid)
+	onSocketConnect: (client) =>
+		if (sessid = @getSocketSessionID(client)) and (sess = smio.Session.getBySessionID(@, sessid))
 			sess.onInit()
-			client.send client.sessionId
+			client.send(client.sessionId)
 		else
-			client.send "smoonocookie"
+			client.send("smoonocookie")
 
-	onSocketDisconnect: (client) ->
-		if (sessid = @getSocketSessionID client) and (sess = smio.Session.all[sessid])
+	onSocketDisconnect: (client) =>
+		if (sessid = @getSocketSessionID(client)) and (sess = smio.Session.all[sessid])
 			sess.onEnd()
 			smio.Session.all[sessid] = null
 			delete smio.Session.all[sessid]
@@ -86,14 +86,15 @@ class smio.Server
 			smio.Server.sockSessions[client.sessionId] = null
 			delete smio.Server.sockSessions[client.sessionId]
 
-	onSocketMessage: (message, client) ->
+	onSocketMessage: (message, client) =>
 		if message
-			if (sessid = @getSocketSessionID client) and (sess = smio.Session.getBySessionID @, sessid)
-				sess.handleFetch null, message, (data) -> client.send JSON.stringify data
+			if (sessid = @getSocketSessionID(client)) and (sess = smio.Session.getBySessionID(@, sessid))
+				sess.handleFetch null, message, (data) ->
+					client.send(JSON.stringify(data))
 			else
-				client.send "smoonocookie"
+				client.send("smoonocookie")
 
-	stop: ->
+	stop: =>
 		@status = 0
 		try
 			@httpServer.close()

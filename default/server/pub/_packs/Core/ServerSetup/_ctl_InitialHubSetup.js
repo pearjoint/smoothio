@@ -1,6 +1,6 @@
 (function() {
   /*
-  Auto-generated from Core/ServerSetup/InitialSiteSetup.ctl
+  Auto-generated from Core/ServerSetup/InitialHubSetup.ctl
   */  var smio, smoothio;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
@@ -11,9 +11,9 @@
     return child;
   }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   smio = smoothio = global.smoothio;
-  smio.Packs_Core_ServerSetup_InitialSiteSetup = (function() {
-    __extends(Packs_Core_ServerSetup_InitialSiteSetup, smio.Control);
-    Packs_Core_ServerSetup_InitialSiteSetup.prototype.renderTemplate = function() {
+  smio.Packs_Core_ServerSetup_InitialHubSetup = (function() {
+    __extends(Packs_Core_ServerSetup_InitialHubSetup, smio.Control);
+    Packs_Core_ServerSetup_InitialHubSetup.prototype.renderTemplate = function() {
       return {
         "div .smio-setup": {
           "id": '',
@@ -98,8 +98,8 @@
         }
       };
     };
-    Packs_Core_ServerSetup_InitialSiteSetup.prototype.onLoad = function() {
-      Packs_Core_ServerSetup_InitialSiteSetup.__super__.onLoad.call(this);
+    Packs_Core_ServerSetup_InitialHubSetup.prototype.onLoad = function() {
+      Packs_Core_ServerSetup_InitialHubSetup.__super__.onLoad.call(this);
       return $('.smio-setup-header-detail').click(__bind(function() {
         var nurl, port, urlseg;
         port = smio.iif(("" + (this.client.pageUrl.attr('port'))) === '80', '', ":" + (this.client.pageUrl.attr('port')));
@@ -112,22 +112,27 @@
         }
       }, this));
     };
-    Packs_Core_ServerSetup_InitialSiteSetup.prototype.onSlide = function(index, itemID) {
+    Packs_Core_ServerSetup_InitialHubSetup.prototype.onSlide = function(index, itemID) {
       return this.controls.steptabs.selectTab(itemID);
     };
-    Packs_Core_ServerSetup_InitialSiteSetup.prototype.onTabSelect = function(tabID) {
+    Packs_Core_ServerSetup_InitialHubSetup.prototype.onTabSelect = function(tabID) {
       return this.controls.stepslide.scrollTo(tabID);
     };
-    Packs_Core_ServerSetup_InitialSiteSetup.prototype.urlSeg = function() {
+    Packs_Core_ServerSetup_InitialHubSetup.prototype.urlSeg = function() {
       var urlseg;
       urlseg = _.trim(this.client.pageUrl.attr('path'), '/');
       return urlseg = smio.iif(urlseg, "/" + urlseg + "/", '/');
     };
-    function Packs_Core_ServerSetup_InitialSiteSetup(client, parent, args) {
-      Packs_Core_ServerSetup_InitialSiteSetup.__super__.constructor.call(this, client, parent, args, "Core_ServerSetup", "Core_ServerSetup_InitialSiteSetup");
-      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
+    function Packs_Core_ServerSetup_InitialHubSetup(client, parent, args) {
+      Packs_Core_ServerSetup_InitialHubSetup.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
-    return Packs_Core_ServerSetup_InitialSiteSetup;
+    Packs_Core_ServerSetup_InitialHubSetup.prototype.className = function() {
+      return "Core_ServerSetup_InitialHubSetup";
+    };
+    Packs_Core_ServerSetup_InitialHubSetup.prototype.classNamespace = function() {
+      return "Core_ServerSetup";
+    };
+    return Packs_Core_ServerSetup_InitialHubSetup;
   })();
 }).call(this);

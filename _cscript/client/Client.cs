@@ -21,7 +21,6 @@ class smio.Client
 		@pageWindow.resize(_.debounce((=> @onWindowResize()), 300))
 
 	init: =>
-		alert "foobar"[3]
 		@socket.connect()
 		setInterval((=> @pageBody.css("background-image": "url('/_/file/images/bg#{smio.Util.Number.randomInt(4)}.jpg')", "background-size": "auto auto")), 4000)
 

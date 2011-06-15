@@ -11,49 +11,46 @@ class smio.Control
 #if server
 	@compile: (@inst, ctlContent, controlPath) =>
 		[inDyn, oneUp, contentParts, decls, renderParts, lastChar, lastContent, obj] = [false, '../', [], '', [], '', '', {}]
-		pathParts = ((controlPath.substr 0, controlPath.lastIndexOf '.').split '/')
-		baseName = pathParts[0...(pathParts.length - 1)].join '_'
-		className = pathParts.join '_'
-		if ctlContent and '<' isnt ctlContent.substr 0, 1
-			lines = []
-			for l in ctlContent.split '\n'
-				lines.push (if ('#' isnt l.substr 0, 1) then '\t' else '') + l
-			ctlContent = "<%script:\n#{lines.join '\n'}\n%>"
+		pathParts = controlPath.substr(0, controlPath.lastIndexOf('.')).split('/')
+		baseName = pathParts[0 ... pathParts.length - 1].join('_')
+		className = pathParts.join('_')
+		if ctlContent and ctlContent[0] isnt '<'
+			ctlContent = '<%script:\n' + ((smio.iif(l[0] is '#', '', '\t') + l) for l in ctlContent.split('\n')).join('\n') + '\n%>'
 		for c in ctlContent
 			if ((lastChar + c) is '<%') and not inDyn
 				inDyn = true
 				if lastContent
-					contentParts.push "s": lastContent.substr 0, lastContent.length - 1
+					contentParts.push("s": lastContent.substr(0, lastContent.length - 1))
 					lastContent = ''
 			else if ((lastChar + c) is '%>') and inDyn
 				inDyn = false
 				if lastContent
-					contentParts.push "d": lastContent.substr 0, lastContent.length - 1
+					contentParts.push("d": lastContent.substr(0, lastContent.length - 1))
 					lastContent = ''
 			else
 				lastContent += c
 			lastChar = c
 		if lastContent
 			obj[if inDyn then 'd' else 's'] = lastContent
-			contentParts.push obj
+			contentParts.push(obj)
 		for part in contentParts
 			if part['s']
-				renderParts.push part['s']
+				renderParts.push(part['s'])
 			else if dyn = part['d']
-				[dynCmd, posC, posS] = ['', (dyn.indexOf ':'), [(dyn.indexOf ' '), (dyn.indexOf '\t'), (dyn.indexOf '\r'), (dyn.indexOf '\n')]]
-				isCmd = (posC >= 0) and ((_.any (((tmpPos >= 0) and (tmpPos > posC)) for tmpPos in posS)) or (_.all ((tmpPos2 < 0) for tmpPos2 in posS), _.identity))
+				[dynCmd, posC, posS] = ['', dyn.indexOf(':'), [dyn.indexOf(' '), dyn.indexOf('\t'), dyn.indexOf('\r'), dyn.indexOf('\n')]]
+				isCmd = (posC >= 0) and (_.any((((tmpPos >= 0) and (tmpPos > posC)) for tmpPos in posS)) or _.all(((tmpPos2 < 0) for tmpPos2 in posS), _.identity))
 				if isCmd
-					dynCmd = dyn[0...posC]
-					dyn = dyn[posC + 1..]
+					dynCmd = dyn.substr(0, posC)
+					dyn = dyn.substr(posC + 1)
 				else if dyn[0] is '='
 					dynCmd = '='
-					dyn = dyn[1..]
+					dyn = dyn.substr(1)
 				else
 					dynCmd = '_'
 				if dynCmd is 'script'
 					decls += "\n#{dyn}\n"
 				else
-					renderParts.push [dynCmd, dyn]
+					renderParts.push([dynCmd, dyn])
 		coffeeScript = """
 ###
 Auto-generated from #{controlPath}
@@ -65,53 +62,58 @@ smio = smoothio = global.smoothio
 class smio.Packs_#{className} extends smio.Control
 #{decls}
 	constructor: (client, parent, args) ->
-		super client, parent, args, #{JSON.stringify baseName}, #{JSON.stringify className}
-		@jsSelf = "smio.client.allControls['" + @id() + "']"
+		super client, parent, args
 		@init()
+
+	className: ->
+		#{JSON.stringify className}
+
+	classNamespace: ->
+		#{JSON.stringify baseName}
 """
 		if renderParts and renderParts.length
-			[ind, indent, rind, stimes] = [-1, 3, 3, smio.Util.String.times]
+			[ind, indent, rind, stimes] = [-1, 3, 2, smio.Util.String.times]
 			subs = 0
-			coffeeScript += "\n\trenderHtml: ($el) =>\n\t\tif not @_html\n\t\t\t__r = ctls: [], m: []\n\t\t\t__r.o = __r.m\n"
+			coffeeScript += "\n\trenderHtml: ($el) =>\n\t\t__r = ctls: [], m: []\n\t\t__r.p = ((r) -> (v) -> r.o.push v) __r\n\t\t__r.o = __r.m\n"
 			for rp in renderParts
 				br = "\n#{stimes '\t', rind}"
-				if _.isString rp
-					coffeeScript += "#{br}__r.o.push #{JSON.stringify rp}"
-				else if (_.isArray rp) and rp.length and rp.length > 1
+				if _.isString(rp)
+					coffeeScript += "#{br}__r.p #{JSON.stringify rp}"
+				else if _.isArray(rp) and rp.length and rp.length > 1
 					if rp[0] is '='
-						coffeeScript += "#{br}__r.o.push #{rp[1]}"
+						coffeeScript += "#{br}__r.p #{rp[1]}"
 					else if rp[0] is '_'
-						lines = rp[1].split '\n'
+						lines = rp[1].split('\n')
 						rp[1] = ''
 						if lines and lines.length
 							for l in lines
-								if l and l.length and (_.trim l)
+								if l and l.length and _.trim(l)
 									if ind < 0
 										ind = 0
-										for i in [0...l.length]
-											if (l.substr i, 1) is '\t'
+										for c in l
+											if c is '\t'
 												ind++
 											else
 												break
 									rind = indent + ind
 									rp[1] += "\n#{stimes '\t', indent}#{l.substr ind}"
 							if lines.length > 1
-								l = _.last lines
+								l = _.last(lines)
 								lind = 0
-								for i in [0...l.length]
-									if (l.substr i, 1) is '\t'
+								for c in l
+									if c is '\t'
 										lind++
 									else
 										break
 								rind = indent + (lind - ind)
-							if rp[1] and (_.trim rp[1]) and (_.trim rp[1], ' ', '\t', '\r', '\n')
+							if rp[1] and _.trim(rp[1]) and _.trim(rp[1], ' ', '\t', '\r', '\n')
 								coffeeScript += "#{rp[1]}"
 					else
 						sarg = rp[1]
 						jarg = null
-						if (pos = sarg.indexOf '{') > 0
-							jarg = sarg.substr pos
-							sarg = _.trim sarg.substr 0, pos
+						if (pos = sarg.indexOf('{')) > 0
+							jarg = sarg.substr(pos)
+							sarg = _.trim(sarg.substr(0, pos))
 						if rp[0] is 'begin'
 							subs = subs + 1
 							coffeeScript += "#{br}tmp = []#{br}__r.ctls.push o: tmp, c: #{JSON.stringify sarg}, args: #{jarg}#{br}__r.o = tmp"
@@ -119,23 +121,21 @@ class smio.Packs_#{className} extends smio.Control
 							subs = subs - 1
 							coffeeScript += "#{br}tmp = __r.ctls.pop()#{br}__r.o = " + (if subs then "__r.ctls[#{subs - 1}].o" else '__r.m')
 							if subs
-								coffeeScript += "#{br}__r.o.push t: 'ctl', s: tmp.c, a: (smio.Util.Object.mergeDefaults tmp.args, __o: tmp.o)"
+								coffeeScript += "#{br}__r.p t: 'ctl', s: tmp.c, a: (smio.Util.Object.mergeDefaults tmp.args, __o: tmp.o)"
 							else
-								coffeeScript += "#{br}__r.o.push @renderTag 'ctl', tmp.c, smio.Util.Object.mergeDefaults tmp.args, __o: tmp.o"
+								coffeeScript += "#{br}__r.p @renderTag 'ctl', tmp.c, smio.Util.Object.mergeDefaults tmp.args, __o: tmp.o"
 						else if subs
-							coffeeScript += "#{br}__r.o.push t: #{JSON.stringify rp[0]}, s: #{JSON.stringify sarg}, a: #{jarg}"
+							coffeeScript += "#{br}__r.p t: #{JSON.stringify rp[0]}, s: #{JSON.stringify sarg}, a: #{jarg}"
 						else
-							coffeeScript += "#{br}__r.o.push @renderTag #{JSON.stringify rp[0]}, #{JSON.stringify sarg}, #{jarg}"
-			coffeeScript += "\n#{stimes '\t', indent}@_html = __r.o.join ''\n#{stimes '\t', indent - 1}if $el\n#{stimes '\t', indent}$el.html @_html\n#{stimes '\t', indent - 1}@_html\n"
+							coffeeScript += "#{br}__r.p @renderTag #{JSON.stringify rp[0]}, #{JSON.stringify sarg}, #{jarg}"
+			coffeeScript += "\n#{stimes '\t', indent - 1}_html = __r.o.join ''\n#{stimes '\t', indent - 1}if $el\n#{stimes '\t', indent}$el.html _html\n#{stimes '\t', indent - 1}_html\n"
 		coffeeScript
 
 	@load: (className, parent, args) =>
-		parts = className.split '_'
-		path = '../../_packs/' + (parts[0...(parts.length - 1)].join '/') + '/_smioctl_' + _.last parts
-		require path
-		ctor = smio['Packs_' + className]
-		new ctor null, parent, args
-		 
+		parts = className.split('_')
+		require('../../_packs/' + parts[0...parts.length - 1].join('/') + '/_ctl_' + _.last(parts))
+		new (smio['Packs_' + className])(null, parent, args)
+
 #endif
 
 #if client
@@ -144,48 +144,48 @@ class smio.Packs_#{className} extends smio.Control
 	disable: (disable, isInherit) =>
 		if not arguments.length
 			disable = isInherit = true
-		len = 0
 		if not isInherit
 			@disabled = disable
 		else if not disable
 			disable = @disabled
 		if @el
 			if disable
-				@el.removeClass('smio-enabled').addClass 'smio-disabled'
+				@el.removeClass('smio-enabled').addClass('smio-disabled')
 			else
-				@el.removeClass('smio-disabled').addClass 'smio-enabled'
-		@coreDisable disable
+				@el.removeClass('smio-disabled').addClass('smio-enabled')
+		@coreDisable(disable)
+		len = 0
 		for id, ctl of @controls
 			len++
-			ctl.disable disable, isInherit
+			ctl.disable(disable, isInherit)
 		if len is 0
-			@el[smio.iif disable, 'addClass', 'removeClass'] 'smio-disabledfaded'
+			@el[if disable then 'addClass' else 'removeClass']('smio-disabledfaded')
 
 	enable: =>
 		@disable(false, true)
 
 	on: (eventName, handler) =>
 		if eventName
-			if _.isFunction handler
-				if not @eventHandlers[eventName]
-					@eventHandlers[eventName] = []
-				if not handler in @eventHandlers[eventName]
-					@eventHandlers[eventName].push handler
-			else if @eventHandlers[eventName]
-				for eh in @eventHandlers[eventName]
-					eh.apply @, handler
+			ehs = @['eventHandlers']
+			if _.isFunction(handler)
+				if not ehs
+					ehs = @['eventHandlers'] = {}
+				if not ehs[eventName]
+					ehs[eventName] = []
+				if not (handler in ehs[eventName])
+					ehs[eventName].push handler
+			else if ehs and ehs[eventName]
+				for eh in ehs[eventName]
+					eh.apply(@, handler)
 
 	onLoad: () =>
 		@el = $('#' + @id())
 		if @disabled
-			len = 0
-			@el.removeClass('smio-enabled').addClass 'smio-disabled'
-			for id, ctl of @controls
-				len++
-			if len is 0
-				@el.addClass 'smio-disabledfaded'
+			@el.removeClass('smio-enabled').addClass('smio-disabled')
+			if smio.Util.Object.empty(@controls)
+				@el.addClass('smio-disabledfaded')
 		else
-			@el.removeClass('smio-disabled').addClass 'smio-enabled'
+			@el.removeClass('smio-disabled').addClass('smio-enabled')
 		for id, ctl of @controls
 			ctl.onLoad()
 
@@ -193,16 +193,16 @@ class smio.Packs_#{className} extends smio.Control
 
 	sub: (id) =>
 		ctl = @
-		if (parts = id.split '/').length > 1
-			for i in [0...(parts.length - 1)]
+		if (parts = id.split('/')).length > 1
+			for i in [0...parts.length - 1]
 				ctl = ctl.controls[parts[i]]
-		$ "##{ctl.id parts[parts.length - 1]}"
+		$("##{ctl.id(parts[parts.length - 1])}")
 
 	syncUpdate: (ctlDesc) =>
 
 	un: (eventName, handler) =>
-		if eventName and @eventHandlers[eventName] and _.isFunction handler
-			@eventHandlers[eventName] = _.without @eventHandlers[eventName], handler
+		if eventName and (ehs = @['eventHandlers']) and ehs[eventName] and _.isFunction(handler)
+			ehs[eventName] = _.without(ehs[eventName], handler)
 #endif
 
 	@util:
@@ -211,89 +211,82 @@ class smio.Packs_#{className} extends smio.Control
 		"arg": (ctl, name) ->
 			ctl.args[name]
 		"ctl": (ctl, className, args, emptyIfMissing) ->
-			if (not ctl.controls[args.id]) and ((ctor = smio['Packs_' + ctl.baseName + '_' + className]) or (ctor = smio['Packs_' + ctl.baseName + '_Controls_' + className]) or (ctor = smio['Packs_Core_Controls_' + className] ))
-				subCtl = new ctor ctl.client, ctl, args
+			if (not ctl.controls[args.id]) and ((ctor = smio["Packs_#{ctl.classNamespace()}_#{className}"]) or (ctor = smio["Packs_#{ctl.classNamespace()}_Controls_#{className}"]) or (ctor = smio["Packs_Core_Controls_#{className}"] ))
+				subCtl = new ctor(ctl.client, ctl, args)
 				ctl.client.allControls[subCtl.id()] = ctl.controls[args.id] = subCtl
 			if ctl.controls[args.id]
 				ctl.controls[args.id].renderHtml()
-			else if ctl.ctlRenderers[className]
-				ctl.ctlRenderers[className] className, args
+			else if (renderFunc = ctl["renderHtml_#{className}"])
+				renderFunc(className, args)
 			else
 				if emptyIfMissing then '' else "!!CONTROL_NOT_FOUND::#{className}!!"
 		"inner": (ctl, name, args) ->
 			o = []
 			a = if args then args else ctl.args
 			if (a['__o'] and a.__o['length'])
-				for i in [0...a.__o.length]
-					if _.isString (tmp = a.__o[i])
-						o.push tmp
+				for ao in a.__o
+					if _.isString(ao)
+						o.push(ao)
 					else
-						o.push ctl.renderTag tmp.t, tmp.s, tmp.a
-			o.join ''
+						o.push(ctl.renderTag(ao.t, ao.s, ao.a))
+			o.join('')
 		"r": (ctl, name, args...) ->
-			ctl.res.apply ctl, (_.toArray arguments)[1...arguments.length]
+			ctl.res name, args...
 		"tojs": (ctl, name, args) ->
 			for pn, pv of args
-				name = name.replace pn, pv
-			((CoffeeScript.compile name).split '\n').join ''
+				name = name.replace(pn, pv)
+			CoffeeScript.compile(name).split('\n').join('')
 
-	constructor: (@client, @parent, @args, @baseName, @className) ->
-		@disabled = smio.iif @args.disabled
-		@isServer = not (@isClient = if @client then true else false)
+	constructor: (@client, @parent, @args) ->
+		@disabled = smio.iif(@args.disabled)
 		@ctlID = @args.id
 		@controls = {}
-		@containers = {}
-		@ctlRenderers = {}
-		@eventHandlers = {}
 		@el = null
-		@idStack = []
-		@_html = ''
+
+	classPath: =>
+		"Packs_#{@className()}"
 
 	cls: =>
-		smio[@fullClassName()]
+		smio[@classPath()]
 
 	ctl: (ctlID) =>
-		c = @client.allControls ctlID
-		if c then c else @client.allControls @id(ctlID)
-
-	fullClassName: =>
-		"Packs_#{@className}"
+		if (c = @client.allControls[ctlID]) then c else @client.allControls[@id(ctlID)]
 
 	id: (subID) =>
-		myID = if @parent then "#{@parent.id()}_#{@ctlID}" else @ctlID
-		if (subID)
-			myID + '_' + (if @idStack.length then ((@idStack.join '_') + '_') else '') + subID
-		else
-			myID
+		# (if @idStack.length then ((@idStack.join '_') + '_') else '')
+		(if @parent then "#{@parent.id()}_#{@ctlID}" else @ctlID) + (if subID then ('_' + subID) else '')
 
 	init: =>
+
+	jsSelf: =>
+		"smio.client.allControls['" + @id() + "']"
 
 	renderJsonTemplate: (tagKey, objTree, level) =>
 		buf = ''
 		toHtml = smio.Util.String.htmlEncode
 		toAtt = (an, av) =>
 			av = "#{av}"
-			" #{an}=\"#{toHtml if (an is 'id') then (@id av) else av}\""
+			" #{an}=\"#{toHtml(if (an is 'id') then @id(av) else av)}\""
 		if not level
 			level = 0
-		if (kt = _.trim tagKey)
+		if (kt = _.trim(tagKey))
 			atts = {}
 			attstr = ''
 			kc = []
-			while (pos = kt.lastIndexOf '.') > 0
-				kc.push _.trim kt.substr pos + 1
-				kt = _.trim kt.substr 0, pos
+			while (pos = kt.lastIndexOf('.')) > 0
+				kc.push(_.trim(kt.substr(pos + 1)))
+				kt = _.trim(kt.substr(0, pos))
 			if kc.length
-				atts['class'] = kc.join ' '
-			if (pos = kt.lastIndexOf '#') > 0
-				atts.id = _.trim kt.substr pos + 1
-				kt = _.trim kt.substr 0, pos
+				atts['class'] = kc.join(' ')
+			if (pos = kt.lastIndexOf('#')) > 0
+				atts.id = _.trim(kt.substr(pos + 1))
+				kt = _.trim(kt.substr(0, pos))
 			for an, av of atts
-				attstr += toAtt an, av
+				attstr += toAtt(an, av)
 			if not objTree
 				buf += "<#{kt}#{attstr}/>"
 			else if typeof(objTree) is 'object'
-				if (result = smio.Control.tagRenderers.ctl @, kt, (smio.Util.Object.mergeDefaults (_.clone objTree), atts), true)
+				if (result = smio.Control.tagRenderers.ctl(@, kt, smio.Util.Object.mergeDefaults(_.clone(objTree), atts), true))
 					buf += result
 				else
 					buf += "<#{kt}#{attstr}"
@@ -301,36 +294,36 @@ class smio.Packs_#{className} extends smio.Control
 					haso = false
 					for name, val of objTree
 						if val?
-							if (_.isArray val) or (typeof(val) is 'object')
+							if _.isArray(val) or (typeof(val) is 'object')
 								haso = true
 							else
-								buf += toAtt name, val
+								buf += toAtt(name, val)
 					if haso
 						for name, val of objTree
 							if val
-								if _.isArray val
+								if _.isArray(val)
 									if not hasc
 										hasc = true
 										buf += ">"
-									buf += (if (name is '_') then (toHtml val.join '') else if (name is 'html') then (val.join '') else @renderJsonTemplate name, (toHtml val.join ''), level + 1)
+									buf += (if (name is '_') then toHtml(val.join '') else if (name is 'html') then val.join('') else @renderJsonTemplate(name, toHtml(val.join('')), level + 1))
 								else if (typeof(val) is 'object')
 									if not hasc
 										hasc = true
 										buf += ">"
-									buf += @renderJsonTemplate name, val, level + 1
+									buf += @renderJsonTemplate(name, val, level + 1)
 					buf += (if hasc then "</#{kt}>" else "/>")
 			else
-				buf += "<#{kt}#{attstr}>#{if (_.isArray objTree) then (if (kt is 'html') then (objTree.join '') else (toHtml objTree.join '')) else objTree}</#{kt}>"
+				buf += "<#{kt}#{attstr}>#{if _.isArray(objTree) then (if (kt is 'html') then objTree.join('') else toHtml(objTree.join(''))) else objTree}</#{kt}>"
 		buf
 
 	renderHtml: ($el) =>
-		if (not @_html) and @['renderTemplate'] and (_.isFunction @renderTemplate) and (objTree = @renderTemplate())
-			@_html = ''
+		_html = ''
+		if @['renderTemplate'] and _.isFunction(@renderTemplate) and (objTree = @renderTemplate())
 			for tagKey, subTree of objTree
-				@_html += @renderJsonTemplate tagKey, subTree
+				_html += @renderJsonTemplate(tagKey, subTree)
 		if $el
-			$el.html @_html
-		@_html
+			$el.html(_html)
+		_html
 
 	renderTag: (name, sarg, jarg) =>
 		renderer = smio.Control.tagRenderers[name]
@@ -340,16 +333,16 @@ class smio.Packs_#{className} extends smio.Control
 			"!!UNKNOWN_TAG::#{name}!!"
 
 	r: (name, args...) =>
-		@res name, args...
+		@res(name, args...)
 
 	res: (name, args...) =>
 		ret = ''
-		if (resSets = (if @isClient then smio.resources else smio.inst.resourceSets))
-			parts = @baseName.split '_'
+		if (resSets = (if @client then smio.resources else smio.inst.resourceSets))
+			parts = @classNamespace().split('_')
 			for i in [(parts.length - 1)..0]
-				if (resSet = resSets[parts[0..i].join '_']) and (ret = (if @isClient then resSet[name] else resSet['en'][name]))
+				if (resSet = resSets[parts[0..i].join('_')]) and (ret = (if @client then resSet[name] else resSet['en'][name]))
 					break
 			if not ret
-				ret = if @isClient then resSets.smoothio[name] else resSets.smoothio['en'][name]
+				ret = if @client then resSets.smoothio[name] else resSets.smoothio['en'][name]
 		if ret then (if args.length then (_.sprintf.apply _, [ret, args...]) else ret) else (if @parent then (@parent.res name) else "!!RES::#{name}!!")
 

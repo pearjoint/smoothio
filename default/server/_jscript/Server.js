@@ -20,9 +20,17 @@
       this.hostName = hostName;
       this.port = port;
       this.processes = processes;
+      this.stop = __bind(this.stop, this);
+      this.onSocketMessage = __bind(this.onSocketMessage, this);
+      this.onSocketDisconnect = __bind(this.onSocketDisconnect, this);
+      this.onSocketConnect = __bind(this.onSocketConnect, this);
+      this.onRequest = __bind(this.onRequest, this);
+      this.onError = __bind(this.onError, this);
+      this.onBind = __bind(this.onBind, this);
+      this.getSocketSessionID = __bind(this.getSocketSessionID, this);
       hostName = this.hostName;
       localHostName = node_os.hostname();
-      if (this.inst.config.smoothio.dns_preresolve.enabled || process.platform === 'cygwin') {
+      if (this.inst.config.smoothio.dns_preresolve.enabled || (process.platform === 'cygwin')) {
         _ref = this.inst.config.smoothio.dns_preresolve.hostnames;
         for (host in _ref) {
           ip = _ref[host];
@@ -51,8 +59,8 @@
         }, this));
       } else {
         node_multi.listen({
-          "port": this.port,
-          "nodes": this.processes
+          port: this.port,
+          nodes: this.processes
         }, this.httpServer);
       }
       this.sockLogFile = null;
@@ -81,7 +89,7 @@
     Server.prototype.getSocketSessionID = function(client) {
       var _ref, _ref2;
       if (!smio.Server.sockSessions[client.sessionId]) {
-        smio.Server.sockSessions[client.sessionId] = (smio.RequestContext.parseSmioCookie((_ref = client['request']) != null ? (_ref2 = _ref['headers']) != null ? _ref2['cookie'] : void 0 : void 0)).sessid;
+        smio.Server.sockSessions[client.sessionId] = smio.RequestContext.parseSmioCookie((_ref = client['request']) != null ? (_ref2 = _ref['headers']) != null ? _ref2['cookie'] : void 0 : void 0).sessid;
       }
       return smio.Server.sockSessions[client.sessionId];
     };
@@ -96,7 +104,7 @@
       var ctx, pathItem, uri, url;
       this.status = 1;
       url = request.url;
-      if (url.indexOf('http://' !== 0 && url.indexOf('https://' !== 0))) {
+      if ((url.indexOf('http://') !== 0) && (url.indexOf('https://') !== 0)) {
         url = "" + (this.isHttps ? 'https' : 'http') + "://" + this.hostName + ":" + this.port + url;
       }
       uri = node_url.parse(url, true);

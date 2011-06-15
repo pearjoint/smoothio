@@ -10,15 +10,22 @@ node_util = require 'util'
 smio = global.smoothio
 
 class smio.Util
+
 	@Array:
-		add: (arr, val) ->
-			copy = _.clone arr
-			copy.push val
+		add: (arr, vals...) ->
+			copy = _.clone(arr)
+			for v in vals
+				copy.push(v)
 			copy
+		ensure: (arr, vals...) ->
+			for v in vals
+				if not v in arr
+					arr.push(v)
+			arr
 		ensurePos: (arr, val, pos) ->
-			if pos <= arr.length and (index = arr.indexOf val) isnt pos
+			if (pos <= arr.length) and ((index = arr.indexOf(val)) isnt pos)
 				if index >= 0
-					for i in [index...arr.length]
+					for v, i in arr
 						arr[i] = arr[i + 1]
 					arr.length--
 				arr.length++
@@ -38,7 +45,7 @@ class smio.Util
 		addMinutes: (minutes, dt) ->
 			if not dt
 				dt = new Date()
-			dt.setTime dt.getTime() + (minutes * 60 * 1000)
+			dt.setTime(dt.getTime() + (minutes * 60 * 1000))
 			dt
 		ticks: (dt) ->
 			if not dt
@@ -48,14 +55,15 @@ class smio.Util
 			if not dt
 				dt = new Date()
 			pad = (fn, inc) ->
-				v = if typeof fn isnt 'function' then fn else fn.apply dt
-				v = v + inc if inc? and inc > 0
-				if (v + '').length isnt 1 then v else '0' + v
-			"#{dt.getFullYear()}-#{pad dt.getMonth, 1}-#{pad dt.getDate}-#{pad dt.getHours}-#{dt.getMinutes()}-#{dt.getSeconds()}"
+				v = if (typeof(fn) isnt 'function') then fn else fn.apply(dt)
+				if inc? and inc > 0
+					v = v + inc
+				if "#{v}".length isnt 1 then v else '0' + v
+			"#{dt.getFullYear()}-#{pad(dt.getMonth, 1)}-#{pad(dt.getDate)}-#{pad(dt.getHours)}-#{dt.getMinutes()}-#{dt.getSeconds()}"
 		utcTicks: (dt) ->
 			if not dt
 				dt = new Date()
-			Date.UTC dt.getFullYear(), dt.getMonth(), dt.getDate(), dt.getHours(), dt.getMinutes(), dt.getSeconds(), dt.getMilliseconds()
+			Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate(), dt.getHours(), dt.getMinutes(), dt.getSeconds(), dt.getMilliseconds())
 
 	@Runtime:
 		parallel: (funs, finish) ->
@@ -65,27 +73,31 @@ class smio.Util
 				if (++done) is len
 					finish()
 			for fn in funs
-				fn checkDone
+				fn(checkDone)
 
 	@Number:
 		randomInt: (max) ->
-			Math.floor Math.random() * (max + 1)
+			Math.floor(Math.random() * (max + 1))
 		tryParseInt: (val, def) ->
-			num = parseInt val + ''
-			if _.isNumber num then num else def
+			num = parseInt("#{val}")
+			if _.isNumber(num) then num else def
 
 	@Object:
+		empty: (obj) ->
+			for p of obj
+				return false
+			true
 		mergeDefaults: (cfg, defs) ->
 			if not cfg
 				cfg = {}
 			for defKey, defVal of defs
-				if (not cfg[defKey]?) or (typeof cfg[defKey] isnt typeof defVal)
+				if (not cfg[defKey]?) or (typeof(cfg[defKey]) isnt typeof(defVal))
 					cfg[defKey] = defVal
-				else if (typeof cfg[defKey] is 'object') and (typeof defVal is 'object')
-					cfg[defKey] = smio.Util.Object.mergeDefaults cfg[defKey], defVal
+				else if (typeof(cfg[defKey]) is 'object') and (typeof(defVal) is 'object')
+					cfg[defKey] = smio.Util.Object.mergeDefaults(cfg[defKey], defVal)
 			cfg
 		select: (obj, path) ->
-			parts = if path then path.split '.' else null
+			parts = if path then path.split('.') else null
 			last = if path then obj else null
 			if parts and last
 				for p in parts
@@ -95,43 +107,44 @@ class smio.Util
 
 	@String:
 		htmlEncode: (str) ->
-			[ret, tmp] = ['', _.escapeHTML str]
+			[ret, tmp] = ['', _.escapeHTML(str)]
 			len = tmp.length
-			for i in [0...len]
+			for c, i in tmp
 				if (cc = tmp.charCodeAt i) > 127
-					ret += "&##{cc};"
+					ret += ("&##{cc};")
 				else
-					ret += tmp.substr i, 1
+					ret += c
 			ret
 		replace: (str, replace) ->
 			for val, repl of replace
-				while (pos = str.indexOf val) >= 0
-					str = (str.substr 0, pos) + repl + (str.substr pos + val.length)
+				while (pos = str.indexOf(val)) >= 0
+					str = str.substr(0, pos) + repl + str.substr(pos + val.length)
 			str
 		times: (str, times) ->
-			a = new Array times
-			(a[x] = str) for x in [0...times]
-			a.join ''
+			a = new Array(times)
+			for x in [0...times]
+				a[x] = str
+			a.join('')
 
 #if server
 	@FileSystem:
 		mkdirMode: 0777
 		ensureDirs: (srcDirPath, outDirPath) ->
 			smio.walkDir srcDirPath, null, null, null, null, null, true, (curDirPath, _, relDirPath) =>
-				path = node_path.join outDirPath, relDirPath
-				if not node_path.existsSync path = node_path.join outDirPath, relDirPath
-					node_fs.mkdirSync path, smio.Util.FileSystem.mkdirMode
+				path = node_path.join(outDirPath, relDirPath)
+				if not node_path.existsSync(path = node_path.join(outDirPath, relDirPath))
+					node_fs.mkdirSync(path, smio.Util.FileSystem.mkdirMode)
 		isPathMatch: (path, pattern) =>
-			if (begins = _.startsWith pattern, '*') and (ends = _.endsWith pattern, '*')
-				path.indexOf (pattern.substr 1, pattern.length - 2) >= 0
+			if (begins = _.startsWith(pattern, '*')) and (ends = _.endsWith(pattern, '*'))
+				pattern.substr(1, pattern.length - 2) in path
 			else if begins
-				_.endsWith path, pattern.substr 1
+				_.endsWith(path, pattern.substr(1))
 			else if ends
-				_.startsWith path, (pattern.substr 0, pattern.length - 1)
+				_.startsWith(path, pattern.substr(0, pattern.length - 1))
 			else
 				path is pattern
 		readTextFile: (path) ->
-			node_fs.readFileSync path, 'utf-8'
+			node_fs.readFileSync(path, 'utf-8')
 
 	@Server:
 		formatError: (err, details, stack) ->
@@ -139,23 +152,23 @@ class smio.Util
 				lines = []
 				for name, val of err
 					if name? and val? and name isnt (if stack then 'message' else 'stack')
-						lines.push "\t#{name}: #{val}"
-				lines.join '\n'
+						lines.push("\t#{name}: #{val}")
+				lines.join('\n')
 			else if stack and err['stack']?
-				(if err['ml_error_filepath']? then ('[ ' + err['ml_error_filepath'] + ' ] -- ') else '') + err.stack
+				(if err['ml_error_filepath']? then ("[ #{err['ml_error_filepath']} ] -- ") else '') + err.stack
 			else
-				(if err['ml_error_filepath']? then ('[ ' + err['ml_error_filepath'] + ' ] -- ') else '') + err
+				(if err['ml_error_filepath']? then ("[ #{err['ml_error_filepath']} ] -- ") else '') + err
 		parseCookies: (cookies) ->
 			c = {}
 			if cookies
-				for cookie in cookies.split ';'
-					if (parts = cookie.split '=') and parts.length
-						c[parts[0]] = if parts.length > 1 then parts[1] else ''
+				for cookie in cookies.split(';')
+					if (parts = cookie.split('=')) and parts.length
+						c[parts[0]] = if (parts.length > 1) then parts[1] else ''
 			c
 		setupLogFile: (owner, propName, smioBuf, logPath, oldLogFunc) ->
 			if logPath
 				try
-					node_fs.unlinkSync logPath
+					node_fs.unlinkSync(logPath)
 				return (line, cat) ->
 					closeLog = () ->
 						try
@@ -170,16 +183,16 @@ class smio.Util
 					if owner[propName] and not owner[propName].writable
 						closeLog()
 					if not owner[propName]
-						owner[propName] = node_fs.createWriteStream logPath, encoding: 'utf-8', mode: 0666
+						owner[propName] = node_fs.createWriteStream(logPath, encoding: 'utf-8', mode: 0666)
 						owner[propName].on 'close', closeLog
 						owner[propName].on 'error', closeLog
 					time = JSON.stringify(new Date())
-					if _.endsWith time, '"'
-						time = time.substr 0, time.length - 1
-					if _.startsWith time, '"'
-						time = time.substr 1
+					if _.endsWith(time, '"')
+						time = time.substr(0, time.length - 1)
+					if _.startsWith(time, '"')
+						time = time.substr(1)
 					full += (line = time + ' - ' + oldLogFunc(line, cat) + '\n')
 					try
-						owner[propName].write full
+						owner[propName].write(full)
 #endif
 

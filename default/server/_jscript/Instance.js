@@ -16,13 +16,24 @@
   smio = global.smoothio;
   smio.Instance = (function() {
     function Instance() {
-      var resErrs;
+      this.stop = __bind(this.stop, this);
+      this.start = __bind(this.start, this);
+      this.res = __bind(this.res, this);
+      this.r = __bind(this.r, this);
+      this.loadResourceSets = __bind(this.loadResourceSets, this);
+      this.haveAllStopped = __bind(this.haveAllStopped, this);
+      this.getUptime = __bind(this.getUptime, this);
+      this.getDbServer = __bind(this.getDbServer, this);
+      this.getDb = __bind(this.getDb, this);
+      this.formatError = __bind(this.formatError, this);
+      this.finalizeStart = __bind(this.finalizeStart, this);      var resErrs;
       this.logFile = null;
-      this.initTime = new Date;
+      this.initTime = new Date();
       this.lastRequestTime = null;
       this.restartMinUptime = 60;
       this.resourceSets = {};
       this.servers = [];
+      this.mongoHasShutDown = false;
       this.mongos = {};
       if ((resErrs = this.loadResourceSets('../_core/res/server', false)) && resErrs.length) {
         throw resErrs[0];
@@ -31,7 +42,7 @@
     Instance.prototype.expandLogPath = function(path) {
       var dt, pos;
       if (path && ((pos = path.indexOf('*')) > 0)) {
-        dt = new Date;
+        dt = new Date();
         path = "" + (path.substr(0, pos)) + (smio.Util.DateTime.toString(dt)) + (path.substr(pos + 1));
       }
       return path;
@@ -46,7 +57,7 @@
       _results = [];
       for (sname in _ref) {
         scfg = _ref[sname];
-        _results.push((sname != null) && (scfg != null) && (scfg['host'] != null) && (scfg['port'] != null) && (!(scfg['disabled'] === true)) ? (server = new smio.Server(this, sname, scfg.host, scfg.port, 1), this.servers.push(server), this.mongos["smoothio__" + sname] = this.getDb(this.mongo, "smoothio__" + sname, "smoothio " + sname, lastInterval += 500)) : void 0);
+        _results.push((sname != null) && (scfg != null) && (scfg['host'] != null) && (scfg['port'] != null) && !(scfg['disabled'] === true) ? (server = new smio.Server(this, sname, scfg.host, scfg.port, 1), this.servers.push(server), this.mongos["smoothio__" + sname] = this.getDb(this.mongo, "smoothio__" + sname, "smoothio " + sname, lastInterval += 500)) : void 0);
       }
       return _results;
     };
@@ -58,12 +69,12 @@
     };
     Instance.prototype.getDbServer = function() {
       return new mongodb.Server(this.mongoConfig.host, this.mongoConfig.port, {
-        "autoReconnect": true,
-        "auto_reconnect": true
+        autoReconnect: true,
+        auto_reconnect: true
       });
     };
     Instance.prototype.getUptime = function() {
-      return ((new Date).getTime() / 1000) - (this.initTime.getTime() / 1000);
+      return (new Date().getTime() / 1000) - (this.initTime.getTime() / 1000);
     };
     Instance.prototype.haveAllStopped = function() {
       var server, _i, _len, _ref;
@@ -71,7 +82,7 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         server = _ref[_i];
         if (server.status !== -1) {
-          false;
+          return false;
         }
       }
       if (this.mongoIsLocal && this.mongos['admin']) {
@@ -109,7 +120,7 @@
             this.resourceSets[resBaseName][resLang] = {};
           }
           try {
-            _ref = resSet = JSON.parse(smio.Util.FileSystem.readTextFile(fpath));
+            _ref = (resSet = JSON.parse(smio.Util.FileSystem.readTextFile(fpath)));
             _results = [];
             for (name in _ref) {
               val = _ref[name];
@@ -147,11 +158,11 @@
         val = this.resourceSets[resSet][lang][resName] + '';
       }
       if (args && args.length) {
-        val = smio.Util.String.replace(val, smio.Util.Array.toObject(args, function(_, i) {
+        val = smio.Util.String.replace(val, smio.Util.Array.toObject(args, (function(_, i) {
           return '{' + i + '}';
-        }));
+        })));
       }
-      if ((!val) && lang !== 'en') {
+      if ((!val) && (lang !== 'en')) {
         val = this.res.apply(this, [resSet, resName, 'en'].concat(__slice.call(args)));
       }
       return val;
@@ -215,9 +226,9 @@
         return 1;
       }
       this.mongoConfig = this.config.mongodb;
-      this.autoRestart = this.config.smoothio.autorestart.on_files_changed === true && this.config.smoothio.processes === 1 ? true : false;
+      this.autoRestart = this.config.smoothio.autorestart.on_files_changed && (this.config.smoothio.processes === 1);
       this.restartMinUptime = this.config.smoothio.autorestart.on_crash_after_uptime_secs;
-      if (this.mongoIsLocal = (process.platform !== 'cygwin') && this.mongoConfig.host === defHost) {
+      if ((this.mongoIsLocal = (process.platform !== 'cygwin') && (this.mongoConfig.host === defHost))) {
         mongoLogPath = this.expandLogPath(this.mongoConfig.logpath);
         try {
           node_fs.unlinkSync(node_path.join(this.mongoConfig.dbpath, "mongod.lock"));
@@ -227,7 +238,7 @@
             smio.logit(this.r('log_mongo_error_start', this.formatError(err)), 'mongodb');
             return 1;
           } else {
-            smio.logit(stdout.trim(), 'mongodb');
+            smio.logit(_.trim(stdout), 'mongodb');
             return this.finalizeStart();
           }
         }, this));

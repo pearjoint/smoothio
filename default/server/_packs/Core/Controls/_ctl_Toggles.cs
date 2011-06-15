@@ -29,6 +29,11 @@ class smio.Packs_Core_Controls_Toggles extends smio.Control
 
 
 	constructor: (client, parent, args) ->
-		super client, parent, args, "Core_Controls", "Core_Controls_Toggles"
-		@jsSelf = "smio.client.allControls['" + @id() + "']"
+		super client, parent, args
 		@init()
+
+	className: ->
+		"Core_Controls_Toggles"
+
+	classNamespace: ->
+		"Core_Controls"

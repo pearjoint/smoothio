@@ -1,26 +1,48 @@
 (function() {
   var smio;
+  var __slice = Array.prototype.slice, __indexOf = Array.prototype.indexOf || function(item) {
+    for (var i = 0, l = this.length; i < l; i++) {
+      if (this[i] === item) return i;
+    }
+    return -1;
+  };
   smio = global.smoothio;
   smio.Util = (function() {
     function Util() {}
     Util.Array = {
-      add: function(arr, val) {
-        var copy;
+      add: function() {
+        var arr, copy, v, vals, _i, _len;
+        arr = arguments[0], vals = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
         copy = _.clone(arr);
-        copy.push(val);
+        for (_i = 0, _len = vals.length; _i < _len; _i++) {
+          v = vals[_i];
+          copy.push(v);
+        }
         return copy;
       },
+      ensure: function() {
+        var arr, v, vals, _i, _len, _ref;
+        arr = arguments[0], vals = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+        for (_i = 0, _len = vals.length; _i < _len; _i++) {
+          v = vals[_i];
+          if (_ref = !v, __indexOf.call(arr, _ref) >= 0) {
+            arr.push(v);
+          }
+        }
+        return arr;
+      },
       ensurePos: function(arr, val, pos) {
-        var i, index, _ref, _ref2;
-        if (pos <= arr.length && (index = arr.indexOf(val)) !== pos) {
+        var i, index, v, _len, _ref;
+        if ((pos <= arr.length) && ((index = arr.indexOf(val)) !== pos)) {
           if (index >= 0) {
-            for (i = index, _ref = arr.length; index <= _ref ? i < _ref : i > _ref; index <= _ref ? i++ : i--) {
+            for (i = 0, _len = arr.length; i < _len; i++) {
+              v = arr[i];
               arr[i] = arr[i + 1];
             }
             arr.length--;
           }
           arr.length++;
-          for (i = _ref2 = arr.length - 1; _ref2 <= pos ? i < pos : i > pos; _ref2 <= pos ? i++ : i--) {
+          for (i = _ref = arr.length - 1; _ref <= pos ? i < pos : i > pos; _ref <= pos ? i++ : i--) {
             arr[i] = arr[i - 1];
           }
           arr[pos] = val;
@@ -65,7 +87,7 @@
           if ((inc != null) && inc > 0) {
             v = v + inc;
           }
-          if ((v + '').length !== 1) {
+          if (("" + v).length !== 1) {
             return v;
           } else {
             return '0' + v;
@@ -104,7 +126,7 @@
       },
       tryParseInt: function(val, def) {
         var num;
-        num = parseInt(val + '');
+        num = parseInt("" + val);
         if (_.isNumber(num)) {
           return num;
         } else {
@@ -113,6 +135,13 @@
       }
     };
     Util.Object = {
+      empty: function(obj) {
+        var p;
+        for (p in obj) {
+          return false;
+        }
+        return true;
+      },
       mergeDefaults: function(cfg, defs) {
         var defKey, defVal;
         if (!cfg) {
@@ -145,14 +174,15 @@
     };
     Util.String = {
       htmlEncode: function(str) {
-        var cc, i, len, ret, tmp, _ref;
+        var c, cc, i, len, ret, tmp, _len, _ref;
         _ref = ['', _.escapeHTML(str)], ret = _ref[0], tmp = _ref[1];
         len = tmp.length;
-        for (i = 0; 0 <= len ? i < len : i > len; 0 <= len ? i++ : i--) {
+        for (i = 0, _len = tmp.length; i < _len; i++) {
+          c = tmp[i];
           if ((cc = tmp.charCodeAt(i)) > 127) {
             ret += "&#" + cc + ";";
           } else {
-            ret += tmp.substr(i, 1);
+            ret += c;
           }
         }
         return ret;
@@ -162,7 +192,7 @@
         for (val in replace) {
           repl = replace[val];
           while ((pos = str.indexOf(val)) >= 0) {
-            str = (str.substr(0, pos)) + repl + (str.substr(pos + val.length));
+            str = str.substr(0, pos) + repl + str.substr(pos + val.length);
           }
         }
         return str;

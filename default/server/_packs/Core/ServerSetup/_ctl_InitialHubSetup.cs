@@ -1,11 +1,11 @@
 ###
-Auto-generated from Core/ServerSetup/InitialSiteSetup.ctl
+Auto-generated from Core/ServerSetup/InitialHubSetup.ctl
 ###
 #if server
 require '../../../_jscript/shared/Control'
 #endif
 smio = smoothio = global.smoothio
-class smio.Packs_Core_ServerSetup_InitialSiteSetup extends smio.Control
+class smio.Packs_Core_ServerSetup_InitialHubSetup extends smio.Control
 
 
 #if server
@@ -31,7 +31,8 @@ class smio.Packs_Core_ServerSetup_InitialSiteSetup extends smio.Control
 			"div .smio-setup-inner":
 				"SlidePanel #stepslide .smio-setup-stepslide":
 					itemClass: 'smio-setup-stepbox'
-					onItemSelect: (i, id) => @onSlide i, id
+					onItemSelect: (i, id) =>
+						@onSlide i, id
 					items:
 						"#owner":
 							'div .smio-setup-stepbox-title':
@@ -106,6 +107,11 @@ class smio.Packs_Core_ServerSetup_InitialSiteSetup extends smio.Control
 
 
 	constructor: (client, parent, args) ->
-		super client, parent, args, "Core_ServerSetup", "Core_ServerSetup_InitialSiteSetup"
-		@jsSelf = "smio.client.allControls['" + @id() + "']"
+		super client, parent, args
 		@init()
+
+	className: ->
+		"Core_ServerSetup_InitialHubSetup"
+
+	classNamespace: ->
+		"Core_ServerSetup"

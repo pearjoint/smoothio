@@ -6,20 +6,22 @@
   smio = global.smoothio;
   smio.Database = (function() {
     function Database(inst, mongo, name, title, interval) {
+      var fn;
       this.inst = inst;
       this.mongo = mongo;
       this.name = name;
       this.title = title;
       this.db = new mongodb.Db(this.name, this.mongo, {
-        "strict": false,
-        "native_parser": false
+        strict: false,
+        native_parser: false
       });
       if (interval) {
-        setTimeout((__bind(function() {
+        fn = __bind(function() {
           return this.connect(__bind(function(err, db) {
-            return smio.logit(this.inst.r((err ? 'log_mongo_error_dbnoconnect' : 'log_mongo_dbconnected'), this.title, (err ? this.inst.formatError(err) : '')), 'mongodb.' + this.name);
+            return smio.logit(this.inst.r(smio.iif(err, 'log_mongo_error_dbnoconnect', 'log_mongo_dbconnected'), this.title, err ? this.inst.formatError(err) : ''), 'mongodb.' + this.name);
           }, this));
-        }, this)), interval);
+        }, this);
+        setTimeout(fn, interval);
       }
     }
     Database.prototype.connect = function(func) {

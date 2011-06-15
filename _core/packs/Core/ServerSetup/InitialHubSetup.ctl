@@ -21,7 +21,8 @@ renderTemplate: ->
 		"div .smio-setup-inner":
 			"SlidePanel #stepslide .smio-setup-stepslide":
 				itemClass: 'smio-setup-stepbox'
-				onItemSelect: (i, id) => @onSlide i, id
+				onItemSelect: (i, id) =>
+					@onSlide i, id
 				items:
 					"#owner":
 						'div .smio-setup-stepbox-title':

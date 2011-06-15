@@ -1,6 +1,7 @@
 (function() {
   var smio, _;
-  require('./Site');
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  require('./Hub');
   require('./shared/FetchRequestMessage');
   require('./shared/FetchResponseMessage');
   require('./shared/Util');
@@ -22,10 +23,12 @@
       this.server = server;
       this.sessionID = sessionID;
       this.socket = socket;
-      this.inst = this.server.inst;
+      this.onInit = __bind(this.onInit, this);
+      this.onEnd = __bind(this.onEnd, this);
+      this.handleFetch = __bind(this.handleFetch, this);
     }
     Session.prototype.handleFetch = function(rc, fr, finish) {
-      var freq, fresp, isSocket, site;
+      var freq, fresp, hub, isSocket;
       isSocket = rc === null;
       fresp = new smio.FetchResponseMessage();
       if (!fr) {
@@ -40,14 +43,14 @@
       }
       if (fr && !_.isString(fr)) {
         freq = new smio.FetchRequestMessage(fr);
-        site = new smio.Site(this, freq.url(), rc);
+        hub = new smio.Hub(this, freq.url(), rc);
         if (freq.settings()) {
           fresp.settings({
             interval_heartbeat: 4500,
             interval_fetch: 16000
           });
         }
-        return site.getControlUpdates(freq.ticks(), function(err, ctl) {
+        return hub.getControlUpdates(freq.ticks(), function(err, ctl) {
           if (err) {
             fresp.errors(err);
           }

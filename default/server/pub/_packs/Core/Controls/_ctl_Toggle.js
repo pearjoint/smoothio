@@ -124,10 +124,15 @@
       return this.val = this.elInput.prop('checked');
     };
     function Packs_Core_Controls_Toggle(client, parent, args) {
-      Packs_Core_Controls_Toggle.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_Toggle");
-      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
+      Packs_Core_Controls_Toggle.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
+    Packs_Core_Controls_Toggle.prototype.className = function() {
+      return "Core_Controls_Toggle";
+    };
+    Packs_Core_Controls_Toggle.prototype.classNamespace = function() {
+      return "Core_Controls";
+    };
     return Packs_Core_Controls_Toggle;
   })();
 }).call(this);

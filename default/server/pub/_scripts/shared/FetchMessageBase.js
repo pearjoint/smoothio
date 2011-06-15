@@ -1,10 +1,14 @@
 (function() {
   var smio;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   smio = global.smoothio;
   smio.FetchMessageBase = (function() {
     function FetchMessageBase(msg, funcs) {
       var args, name;
       this.msg = msg;
+      this.ticks = __bind(this.ticks, this);
+      this.settings = __bind(this.settings, this);
+      this.clear = __bind(this.clear, this);
       if (!this.msg) {
         this.msg = {};
       }
@@ -14,11 +18,9 @@
       }
     }
     FetchMessageBase.prototype.clear = function() {
-      var k, _i, _len, _ref, _results;
-      _ref = this.msg;
+      var k, _results;
       _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        k = _ref[_i];
+      for (k in this.msg) {
         this.msg[k] = null;
         _results.push(delete this.msg[k]);
       }

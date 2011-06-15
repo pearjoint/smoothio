@@ -10,6 +10,7 @@
     child.__super__ = parent.prototype;
     return child;
   };
+  require('../../../_jscript/shared/Control');
   smio = smoothio = global.smoothio;
   smio.Packs_Core_Controls_TextInput = (function() {
     __extends(Packs_Core_Controls_TextInput, smio.Control);
@@ -57,10 +58,15 @@
       return this.sub('input').prop('readonly', disable);
     };
     function Packs_Core_Controls_TextInput(client, parent, args) {
-      Packs_Core_Controls_TextInput.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_TextInput");
-      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
+      Packs_Core_Controls_TextInput.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
+    Packs_Core_Controls_TextInput.prototype.className = function() {
+      return "Core_Controls_TextInput";
+    };
+    Packs_Core_Controls_TextInput.prototype.classNamespace = function() {
+      return "Core_Controls";
+    };
     return Packs_Core_Controls_TextInput;
   })();
 }).call(this);

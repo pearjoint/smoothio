@@ -15,10 +15,15 @@
   smio.Packs_Core_Controls_SlidePanel = (function() {
     __extends(Packs_Core_Controls_SlidePanel, smio.Control);
     function Packs_Core_Controls_SlidePanel(client, parent, args) {
-      Packs_Core_Controls_SlidePanel.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_SlidePanel");
-      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
+      Packs_Core_Controls_SlidePanel.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
+    Packs_Core_Controls_SlidePanel.prototype.className = function() {
+      return "Core_Controls_SlidePanel";
+    };
+    Packs_Core_Controls_SlidePanel.prototype.classNamespace = function() {
+      return "Core_Controls";
+    };
     return Packs_Core_Controls_SlidePanel;
   })();
 }).call(this);

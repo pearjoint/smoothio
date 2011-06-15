@@ -1,5 +1,5 @@
 
-require './Site'
+require './Hub'
 require './shared/FetchRequestMessage'
 require './shared/FetchResponseMessage'
 require './shared/Util'
@@ -14,37 +14,36 @@ class smio.Session
 		sess = null
 		if sessionID
 			if not (sess = @all[sessionID])
-				@all[sessionID] = sess = new smio.Session server, sessionID, server.socket
+				@all[sessionID] = sess = new smio.Session(server, sessionID, server.socket)
 		sess
 
 	constructor: (@server, @sessionID, @socket) ->
-		@inst = @server.inst
 
-	handleFetch: (rc, fr, finish) ->
+	handleFetch: (rc, fr, finish) =>
 		isSocket = rc is null
 		fresp = new smio.FetchResponseMessage()
 		if not fr
 			fr = rc.postData
-		if _.isString fr
+		if _.isString(fr)
 			try
-				fr = JSON.parse fr
+				fr = JSON.parse(fr)
 			catch err
-				fresp.errors err
-		if fr and not _.isString fr
-			freq = new smio.FetchRequestMessage fr
-			site = new smio.Site @, freq.url(), rc
+				fresp.errors(err)
+		if fr and not _.isString(fr)
+			freq = new smio.FetchRequestMessage(fr)
+			hub = new smio.Hub(@, freq.url(), rc)
 			if freq.settings()
-				fresp.settings interval_heartbeat: 4500, interval_fetch: 16000
-			site.getControlUpdates freq.ticks(), (err, ctl) ->
+				fresp.settings(interval_heartbeat: 4500, interval_fetch: 16000)
+			hub.getControlUpdates freq.ticks(), (err, ctl) ->
 				if err
-					fresp.errors err
+					fresp.errors(err)
 				if ctl
-					fresp.controls ctl
+					fresp.controls(ctl)
 				if not isSocket
-					fresp.ticks smio.Util.DateTime.utcTicks()
-				finish fresp.msg
+					fresp.ticks(smio.Util.DateTime.utcTicks())
+				finish(fresp.msg)
 
-	onEnd: ->
+	onEnd: =>
 
-	onInit: ->
+	onInit: =>
 

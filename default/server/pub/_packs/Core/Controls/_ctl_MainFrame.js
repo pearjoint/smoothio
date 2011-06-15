@@ -18,37 +18,45 @@
       return xy = "clientside";
     };
     function Packs_Core_Controls_MainFrame(client, parent, args) {
-      this.renderHtml = __bind(this.renderHtml, this);      Packs_Core_Controls_MainFrame.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_MainFrame");
-      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
+      this.renderHtml = __bind(this.renderHtml, this);      Packs_Core_Controls_MainFrame.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
+    Packs_Core_Controls_MainFrame.prototype.className = function() {
+      return "Core_Controls_MainFrame";
+    };
+    Packs_Core_Controls_MainFrame.prototype.classNamespace = function() {
+      return "Core_Controls";
+    };
     Packs_Core_Controls_MainFrame.prototype.renderHtml = function($el) {
-      var __r;
-      if (!this._html) {
-        __r = {
-          ctls: [],
-          m: []
+      var __r, _html;
+      __r = {
+        ctls: [],
+        m: []
+      };
+      __r.p = (function(r) {
+        return function(v) {
+          return r.o.push(v);
         };
-        __r.o = __r.m;
-        __r.o.push("\n<div class=\"smio-main\" id=\"");
-        __r.o.push(this.id());
-        __r.o.push("\">\n\t");
-        __r.o.push(this.renderTag("ctl", "Console", {
-          id: 'ctop',
-          topDown: true
-        }));
-        __r.o.push("\n\t<div class=\"smio-console smio-console-main\"></div>\n\t");
-        __r.o.push(this.renderTag("ctl", "Console", {
-          id: 'cbottom',
-          topDown: false
-        }));
-        __r.o.push("\n</div>\n\n");
-        this._html = __r.o.join('');
-      }
+      })(__r);
+      __r.o = __r.m;
+      __r.p("\n<div class=\"smio-main\" id=\"");
+      __r.p(this.id());
+      __r.p("\">\n\t");
+      __r.p(this.renderTag("ctl", "Console", {
+        id: 'ctop',
+        topDown: true
+      }));
+      __r.p("\n\t<div class=\"smio-console smio-console-main\"></div>\n\t");
+      __r.p(this.renderTag("ctl", "Console", {
+        id: 'cbottom',
+        topDown: false
+      }));
+      __r.p("\n</div>\n\n");
+      _html = __r.o.join('');
       if ($el) {
-        $el.html(this._html);
+        $el.html(_html);
       }
-      return this._html;
+      return _html;
     };
     return Packs_Core_Controls_MainFrame;
   })();

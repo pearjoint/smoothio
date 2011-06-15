@@ -206,7 +206,110 @@ body {
   text-decoration: blink;
 }
 
-/** server/pub/_packs/Core/Controls/Toggle.css **/
+/** server/pub/_packs/Core/Controls/_styl_SlidePanel.css **/
+div.smio-slidepanel {
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+div.smio-slidepanel-scrollbox {
+  position: relative;
+  left: 0;
+  width: 100%;
+  top: 2em;
+  overflow: hidden;
+  white-space: nowrap;
+}
+div.smio-slidepanel-edge {
+  cursor: pointer;
+  text-align: center;
+  position: absolute;
+  top: 0.25em;
+  bottom: 0.15em;
+  width: 3em;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.smio-slidepanel-edge-arr {
+  padding: 0.1em;
+  position: absolute;
+  left: 1em;
+  right: 1em;
+  bottom: 1em;
+  text-align: center;
+  -moz-box-shadow: 0em 0.08em 0.25em #909090;
+  -webkit-box-shadow: 0em 0.08em 0.25em #909090;
+  box-shadow: 0em 0.08em 0.25em #909090;
+  border: 0.094em #a0a0a0 outset;
+  background: -ms-linear-gradient(rgba(48,48,48,0.65), rgba(48,48,48,0.85));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(48,48,48,0.65)), to(rgba(48,48,48,0.85)));
+  background: -moz-linear-gradient(rgba(48,48,48,0.65), rgba(48,48,48,0.85));
+  background: -webkit-linear-gradient(rgba(48,48,48,0.65), rgba(48,48,48,0.85));
+  background: -o-linear-gradient(rgba(48,48,48,0.65), rgba(48,48,48,0.85));
+  font-size: 0.9em;
+  text-shadow: 0 -0.094em #404040;
+  color: #f0f0f0;
+  opacity: 0;
+  -moz-transition: opacity 0.5s;
+  -webkit-transition: opacity 0.5s;
+  -o-transition: opacity 0.5s;
+  transition: opacity 0.5s;
+  overflow: hidden;
+  white-space: nowrap;
+  text-transform: lowercase;
+}
+div.smio-slidepanel:hover .smio-slidepanel-edge-arr {
+  opacity: 0.7;
+}
+div.smio-slidepanel-edge:hover .smio-slidepanel-edge-arr {
+  opacity: 1;
+}
+div.smio-slidepanel-edge:active .smio-slidepanel-edge-arr {
+  border: 0.094em #a0a0a0 inset;
+  background: -ms-linear-gradient(rgba(48,48,48,0.85), rgba(48,48,48,0.65));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(48,48,48,0.85)), to(rgba(48,48,48,0.65)));
+  background: -moz-linear-gradient(rgba(48,48,48,0.85), rgba(48,48,48,0.65));
+  background: -webkit-linear-gradient(rgba(48,48,48,0.85), rgba(48,48,48,0.65));
+  background: -o-linear-gradient(rgba(48,48,48,0.85), rgba(48,48,48,0.65));
+}
+div.smio-slidepanel-edge-left {
+  left: 0;
+  background: -ms-linear-gradient(left, rgba(248,248,248,0.95), rgba(248,248,248,0.15));
+  background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(248,248,248,0.95)), to(rgba(248,248,248,0.15)));
+  background: -moz-linear-gradient(left, rgba(248,248,248,0.95), rgba(248,248,248,0.15));
+  background: -webkit-linear-gradient(left, rgba(248,248,248,0.95), rgba(248,248,248,0.15));
+  background: -o-linear-gradient(left, rgba(248,248,248,0.95), rgba(248,248,248,0.15));
+}
+div.smio-slidepanel-edge-left .smio-slidepanel-edge-arr {
+  -webkit-border-radius: 1em 0.33em 0.33em 1em;
+  -moz-border-radius: 1em 0.33em 0.33em 1em;
+  border-radius: 1em 0.33em 0.33em 1em;
+}
+div.smio-slidepanel-edge-right .smio-slidepanel-edge-arr {
+  -webkit-border-radius: 0.33em 1em 1em 0.33em;
+  -moz-border-radius: 0.33em 1em 1em 0.33em;
+  border-radius: 0.33em 1em 1em 0.33em;
+}
+div.smio-slidepanel-edge-right {
+  right: 0;
+  background: -ms-linear-gradient(left, rgba(248,248,248,0.15), rgba(248,248,248,0.95));
+  background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(248,248,248,0.15)), to(rgba(248,248,248,0.95)));
+  background: -moz-linear-gradient(left, rgba(248,248,248,0.15), rgba(248,248,248,0.95));
+  background: -webkit-linear-gradient(left, rgba(248,248,248,0.15), rgba(248,248,248,0.95));
+  background: -o-linear-gradient(left, rgba(248,248,248,0.15), rgba(248,248,248,0.95));
+}
+ul.smio-slidepanel {
+  list-style-type: none;
+}
+ul.smio-slidepanel > li {
+  display: inline-block;
+  vertical-align: top;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/** server/pub/_packs/Core/Controls/_styl_Toggle.css **/
 input.smio-toggleinput {
   padding: 0;
   margin: 0;
@@ -318,7 +421,7 @@ span.smio-toggleinput {
   border: 0.094em inset #ccc;
 }
 
-/** server/pub/_packs/Core/Controls/TextInput.css **/
+/** server/pub/_packs/Core/Controls/_styl_TextInput.css **/
 input.smio-textinput {
   cursor: text;
   background: transparent;
@@ -372,7 +475,7 @@ input.smio-textinput[readonly]:focus {
   background: #f0f0f0;
 }
 
-/** server/pub/_packs/Core/Controls/Console.css **/
+/** server/pub/_packs/Core/Controls/_styl_Console.css **/
 .smio-console {
   text-align: center;
   overflow: hidden;
@@ -409,110 +512,7 @@ input.smio-textinput[readonly]:focus {
   box-shadow: 0 0 16px #303030;
 }
 
-/** server/pub/_packs/Core/Controls/SlidePanel.css **/
-div.smio-slidepanel {
-  position: relative;
-  overflow: hidden;
-  white-space: nowrap;
-}
-div.smio-slidepanel-scrollbox {
-  position: relative;
-  left: 0;
-  width: 100%;
-  top: 2em;
-  overflow: hidden;
-  white-space: nowrap;
-}
-div.smio-slidepanel-edge {
-  cursor: pointer;
-  text-align: center;
-  position: absolute;
-  top: 0.25em;
-  bottom: 0.15em;
-  width: 3em;
-  overflow: hidden;
-  white-space: nowrap;
-}
-.smio-slidepanel-edge-arr {
-  padding: 0.1em;
-  position: absolute;
-  left: 1em;
-  right: 1em;
-  bottom: 1em;
-  text-align: center;
-  -moz-box-shadow: 0em 0.08em 0.25em #909090;
-  -webkit-box-shadow: 0em 0.08em 0.25em #909090;
-  box-shadow: 0em 0.08em 0.25em #909090;
-  border: 0.094em #a0a0a0 outset;
-  background: -ms-linear-gradient(rgba(48,48,48,0.65), rgba(48,48,48,0.85));
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(48,48,48,0.65)), to(rgba(48,48,48,0.85)));
-  background: -moz-linear-gradient(rgba(48,48,48,0.65), rgba(48,48,48,0.85));
-  background: -webkit-linear-gradient(rgba(48,48,48,0.65), rgba(48,48,48,0.85));
-  background: -o-linear-gradient(rgba(48,48,48,0.65), rgba(48,48,48,0.85));
-  font-size: 0.9em;
-  text-shadow: 0 -0.094em #404040;
-  color: #f0f0f0;
-  opacity: 0;
-  -moz-transition: opacity 0.5s;
-  -webkit-transition: opacity 0.5s;
-  -o-transition: opacity 0.5s;
-  transition: opacity 0.5s;
-  overflow: hidden;
-  white-space: nowrap;
-  text-transform: lowercase;
-}
-div.smio-slidepanel:hover .smio-slidepanel-edge-arr {
-  opacity: 0.7;
-}
-div.smio-slidepanel-edge:hover .smio-slidepanel-edge-arr {
-  opacity: 1;
-}
-div.smio-slidepanel-edge:active .smio-slidepanel-edge-arr {
-  border: 0.094em #a0a0a0 inset;
-  background: -ms-linear-gradient(rgba(48,48,48,0.85), rgba(48,48,48,0.65));
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(48,48,48,0.85)), to(rgba(48,48,48,0.65)));
-  background: -moz-linear-gradient(rgba(48,48,48,0.85), rgba(48,48,48,0.65));
-  background: -webkit-linear-gradient(rgba(48,48,48,0.85), rgba(48,48,48,0.65));
-  background: -o-linear-gradient(rgba(48,48,48,0.85), rgba(48,48,48,0.65));
-}
-div.smio-slidepanel-edge-left {
-  left: 0;
-  background: -ms-linear-gradient(left, rgba(248,248,248,0.95), rgba(248,248,248,0.15));
-  background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(248,248,248,0.95)), to(rgba(248,248,248,0.15)));
-  background: -moz-linear-gradient(left, rgba(248,248,248,0.95), rgba(248,248,248,0.15));
-  background: -webkit-linear-gradient(left, rgba(248,248,248,0.95), rgba(248,248,248,0.15));
-  background: -o-linear-gradient(left, rgba(248,248,248,0.95), rgba(248,248,248,0.15));
-}
-div.smio-slidepanel-edge-left .smio-slidepanel-edge-arr {
-  -webkit-border-radius: 1em 0.33em 0.33em 1em;
-  -moz-border-radius: 1em 0.33em 0.33em 1em;
-  border-radius: 1em 0.33em 0.33em 1em;
-}
-div.smio-slidepanel-edge-right .smio-slidepanel-edge-arr {
-  -webkit-border-radius: 0.33em 1em 1em 0.33em;
-  -moz-border-radius: 0.33em 1em 1em 0.33em;
-  border-radius: 0.33em 1em 1em 0.33em;
-}
-div.smio-slidepanel-edge-right {
-  right: 0;
-  background: -ms-linear-gradient(left, rgba(248,248,248,0.15), rgba(248,248,248,0.95));
-  background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba(248,248,248,0.15)), to(rgba(248,248,248,0.95)));
-  background: -moz-linear-gradient(left, rgba(248,248,248,0.15), rgba(248,248,248,0.95));
-  background: -webkit-linear-gradient(left, rgba(248,248,248,0.15), rgba(248,248,248,0.95));
-  background: -o-linear-gradient(left, rgba(248,248,248,0.15), rgba(248,248,248,0.95));
-}
-ul.smio-slidepanel {
-  list-style-type: none;
-}
-ul.smio-slidepanel > li {
-  display: inline-block;
-  vertical-align: top;
-  width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-/** server/pub/_packs/Core/ServerSetup/InitialSiteSetup.css **/
+/** server/pub/_packs/Core/ServerSetup/_styl_InitialHubSetup.css **/
 div.smio-setup {
   -moz-box-shadow: 0 0.4em 4.8em #909090;
   -webkit-box-shadow: 0 0.4em 4.8em #909090;

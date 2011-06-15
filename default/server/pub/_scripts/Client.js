@@ -29,7 +29,6 @@
       }, this)), 300));
     }
     Client.prototype.init = function() {
-      alert("foobar"[3]);
       this.socket.connect();
       return setInterval((__bind(function() {
         return this.pageBody.css({

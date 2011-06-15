@@ -37,6 +37,11 @@ class smio.Packs_Core_Controls_LinkButton extends smio.Control
 
 
 	constructor: (client, parent, args) ->
-		super client, parent, args, "Core_Controls", "Core_Controls_LinkButton"
-		@jsSelf = "smio.client.allControls['" + @id() + "']"
+		super client, parent, args
 		@init()
+
+	className: ->
+		"Core_Controls_LinkButton"
+
+	classNamespace: ->
+		"Core_Controls"

@@ -14,7 +14,6 @@
       if (!arguments.length) {
         disable = isInherit = true;
       }
-      len = 0;
       if (!isInherit) {
         this.disabled = disable;
       } else if (!disable) {
@@ -28,6 +27,7 @@
         }
       }
       this.coreDisable(disable);
+      len = 0;
       _ref = this.controls;
       for (id in _ref) {
         ctl = _ref[id];
@@ -35,27 +35,31 @@
         ctl.disable(disable, isInherit);
       }
       if (len === 0) {
-        return this.el[smio.iif(disable, 'addClass', 'removeClass')]('smio-disabledfaded');
+        return this.el[disable ? 'addClass' : 'removeClass']('smio-disabledfaded');
       }
     };
     Control.prototype.enable = function() {
       return this.disable(false, true);
     };
     Control.prototype.on = function(eventName, handler) {
-      var eh, _i, _len, _ref, _ref2, _results;
+      var eh, ehs, _i, _len, _ref, _results;
       if (eventName) {
+        ehs = this['eventHandlers'];
         if (_.isFunction(handler)) {
-          if (!this.eventHandlers[eventName]) {
-            this.eventHandlers[eventName] = [];
+          if (!ehs) {
+            ehs = this['eventHandlers'] = {};
           }
-          if (_ref = !handler, __indexOf.call(this.eventHandlers[eventName], _ref) >= 0) {
-            return this.eventHandlers[eventName].push(handler);
+          if (!ehs[eventName]) {
+            ehs[eventName] = [];
           }
-        } else if (this.eventHandlers[eventName]) {
-          _ref2 = this.eventHandlers[eventName];
+          if (!(__indexOf.call(ehs[eventName], handler) >= 0)) {
+            return ehs[eventName].push(handler);
+          }
+        } else if (ehs && ehs[eventName]) {
+          _ref = ehs[eventName];
           _results = [];
-          for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-            eh = _ref2[_i];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            eh = _ref[_i];
             _results.push(eh.apply(this, handler));
           }
           return _results;
@@ -63,26 +67,20 @@
       }
     };
     Control.prototype.onLoad = function() {
-      var ctl, id, len, _ref, _ref2, _results;
+      var ctl, id, _ref, _results;
       this.el = $('#' + this.id());
       if (this.disabled) {
-        len = 0;
         this.el.removeClass('smio-enabled').addClass('smio-disabled');
-        _ref = this.controls;
-        for (id in _ref) {
-          ctl = _ref[id];
-          len++;
-        }
-        if (len === 0) {
+        if (smio.Util.Object.empty(this.controls)) {
           this.el.addClass('smio-disabledfaded');
         }
       } else {
         this.el.removeClass('smio-disabled').addClass('smio-enabled');
       }
-      _ref2 = this.controls;
+      _ref = this.controls;
       _results = [];
-      for (id in _ref2) {
-        ctl = _ref2[id];
+      for (id in _ref) {
+        ctl = _ref[id];
         _results.push(ctl.onLoad());
       }
       return _results;
@@ -100,8 +98,9 @@
     };
     Control.prototype.syncUpdate = function(ctlDesc) {};
     Control.prototype.un = function(eventName, handler) {
-      if (eventName && this.eventHandlers[eventName] && _.isFunction(handler)) {
-        return this.eventHandlers[eventName] = _.without(this.eventHandlers[eventName], handler);
+      var ehs;
+      if (eventName && (ehs = this['eventHandlers']) && ehs[eventName] && _.isFunction(handler)) {
+        return ehs[eventName] = _.without(ehs[eventName], handler);
       }
     };
     Control.util = {
@@ -112,15 +111,15 @@
         return ctl.args[name];
       },
       "ctl": function(ctl, className, args, emptyIfMissing) {
-        var ctor, subCtl;
-        if ((!ctl.controls[args.id]) && ((ctor = smio['Packs_' + ctl.baseName + '_' + className]) || (ctor = smio['Packs_' + ctl.baseName + '_Controls_' + className]) || (ctor = smio['Packs_Core_Controls_' + className]))) {
+        var ctor, renderFunc, subCtl;
+        if ((!ctl.controls[args.id]) && ((ctor = smio["Packs_" + (ctl.classNamespace()) + "_" + className]) || (ctor = smio["Packs_" + (ctl.classNamespace()) + "_Controls_" + className]) || (ctor = smio["Packs_Core_Controls_" + className]))) {
           subCtl = new ctor(ctl.client, ctl, args);
           ctl.client.allControls[subCtl.id()] = ctl.controls[args.id] = subCtl;
         }
         if (ctl.controls[args.id]) {
           return ctl.controls[args.id].renderHtml();
-        } else if (ctl.ctlRenderers[className]) {
-          return ctl.ctlRenderers[className](className, args);
+        } else if ((renderFunc = ctl["renderHtml_" + className])) {
+          return renderFunc(className, args);
         } else {
           if (emptyIfMissing) {
             return '';
@@ -130,15 +129,17 @@
         }
       },
       "inner": function(ctl, name, args) {
-        var a, i, o, tmp, _ref;
+        var a, ao, o, _i, _len, _ref;
         o = [];
         a = args ? args : ctl.args;
         if (a['__o'] && a.__o['length']) {
-          for (i = 0, _ref = a.__o.length; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
-            if (_.isString((tmp = a.__o[i]))) {
-              o.push(tmp);
+          _ref = a.__o;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            ao = _ref[_i];
+            if (_.isString(ao)) {
+              o.push(ao);
             } else {
-              o.push(ctl.renderTag(tmp.t, tmp.s, tmp.a));
+              o.push(ctl.renderTag(ao.t, ao.s, ao.a));
             }
           }
         }
@@ -147,7 +148,7 @@
       "r": function() {
         var args, ctl, name;
         ctl = arguments[0], name = arguments[1], args = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
-        return ctl.res.apply(ctl, (_.toArray(arguments)).slice(1, arguments.length));
+        return ctl.res.apply(ctl, [name].concat(__slice.call(args)));
       },
       "tojs": function(ctl, name, args) {
         var pn, pv;
@@ -155,25 +156,24 @@
           pv = args[pn];
           name = name.replace(pn, pv);
         }
-        return ((CoffeeScript.compile(name)).split('\n')).join('');
+        return CoffeeScript.compile(name).split('\n').join('');
       }
     };
-    function Control(client, parent, args, baseName, className) {
+    function Control(client, parent, args) {
       this.client = client;
       this.parent = parent;
       this.args = args;
-      this.baseName = baseName;
-      this.className = className;
       this.res = __bind(this.res, this);
       this.r = __bind(this.r, this);
       this.renderTag = __bind(this.renderTag, this);
       this.renderHtml = __bind(this.renderHtml, this);
       this.renderJsonTemplate = __bind(this.renderJsonTemplate, this);
+      this.jsSelf = __bind(this.jsSelf, this);
       this.init = __bind(this.init, this);
       this.id = __bind(this.id, this);
-      this.fullClassName = __bind(this.fullClassName, this);
       this.ctl = __bind(this.ctl, this);
       this.cls = __bind(this.cls, this);
+      this.classPath = __bind(this.classPath, this);
       this.un = __bind(this.un, this);
       this.syncUpdate = __bind(this.syncUpdate, this);
       this.sub = __bind(this.sub, this);
@@ -184,41 +184,31 @@
       this.disable = __bind(this.disable, this);
       this.coreDisable = __bind(this.coreDisable, this);
       this.disabled = smio.iif(this.args.disabled);
-      this.isServer = !(this.isClient = this.client ? true : false);
       this.ctlID = this.args.id;
       this.controls = {};
-      this.containers = {};
-      this.ctlRenderers = {};
-      this.eventHandlers = {};
       this.el = null;
-      this.idStack = [];
-      this._html = '';
     }
+    Control.prototype.classPath = function() {
+      return "Packs_" + (this.className());
+    };
     Control.prototype.cls = function() {
-      return smio[this.fullClassName()];
+      return smio[this.classPath()];
     };
     Control.prototype.ctl = function(ctlID) {
       var c;
-      c = this.client.allControls(ctlID);
-      if (c) {
+      if ((c = this.client.allControls[ctlID])) {
         return c;
       } else {
-        return this.client.allControls(this.id(ctlID));
+        return this.client.allControls[this.id(ctlID)];
       }
-    };
-    Control.prototype.fullClassName = function() {
-      return "Packs_" + this.className;
     };
     Control.prototype.id = function(subID) {
-      var myID;
-      myID = this.parent ? "" + (this.parent.id()) + "_" + this.ctlID : this.ctlID;
-      if (subID) {
-        return myID + '_' + (this.idStack.length ? (this.idStack.join('_')) + '_' : '') + subID;
-      } else {
-        return myID;
-      }
+      return (this.parent ? "" + (this.parent.id()) + "_" + this.ctlID : this.ctlID) + (subID ? '_' + subID : '');
     };
     Control.prototype.init = function() {};
+    Control.prototype.jsSelf = function() {
+      return "smio.client.allControls['" + this.id() + "']";
+    };
     Control.prototype.renderJsonTemplate = function(tagKey, objTree, level) {
       var an, atts, attstr, av, buf, hasc, haso, kc, kt, name, pos, result, toAtt, toHtml, val;
       buf = '';
@@ -261,7 +251,7 @@
             for (name in objTree) {
               val = objTree[name];
               if (val != null) {
-                if ((_.isArray(val)) || (typeof val === 'object')) {
+                if (_.isArray(val) || (typeof val === 'object')) {
                   haso = true;
                 } else {
                   buf += toAtt(name, val);
@@ -297,18 +287,18 @@
       return buf;
     };
     Control.prototype.renderHtml = function($el) {
-      var objTree, subTree, tagKey;
-      if ((!this._html) && this['renderTemplate'] && (_.isFunction(this.renderTemplate)) && (objTree = this.renderTemplate())) {
-        this._html = '';
+      var objTree, subTree, tagKey, _html;
+      _html = '';
+      if (this['renderTemplate'] && _.isFunction(this.renderTemplate) && (objTree = this.renderTemplate())) {
         for (tagKey in objTree) {
           subTree = objTree[tagKey];
-          this._html += this.renderJsonTemplate(tagKey, subTree);
+          _html += this.renderJsonTemplate(tagKey, subTree);
         }
       }
       if ($el) {
-        $el.html(this._html);
+        $el.html(_html);
       }
-      return this._html;
+      return _html;
     };
     Control.prototype.renderTag = function(name, sarg, jarg) {
       var renderer;
@@ -328,15 +318,15 @@
       var args, i, name, parts, resSet, resSets, ret, _ref;
       name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       ret = '';
-      if ((resSets = (this.isClient ? smio.resources : smio.inst.resourceSets))) {
-        parts = this.baseName.split('_');
+      if ((resSets = (this.client ? smio.resources : smio.inst.resourceSets))) {
+        parts = this.classNamespace().split('_');
         for (i = _ref = parts.length - 1; _ref <= 0 ? i <= 0 : i >= 0; _ref <= 0 ? i++ : i--) {
-          if ((resSet = resSets[parts.slice(0, (i + 1) || 9e9).join('_')]) && (ret = (this.isClient ? resSet[name] : resSet['en'][name]))) {
+          if ((resSet = resSets[parts.slice(0, (i + 1) || 9e9).join('_')]) && (ret = (this.client ? resSet[name] : resSet['en'][name]))) {
             break;
           }
         }
         if (!ret) {
-          ret = this.isClient ? resSets.smoothio[name] : resSets.smoothio['en'][name];
+          ret = this.client ? resSets.smoothio[name] : resSets.smoothio['en'][name];
         }
       }
       if (ret) {

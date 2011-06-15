@@ -10,6 +10,7 @@ smio = global.smoothio
 
 
 class smio.PromiseProxy
+
 	constructor: (obj) ->
 		@__smioprox =
 			prot: if obj.prototype then obj.prototype else (if obj.constructor then obj.constructor.prototype else obj.__proto__)

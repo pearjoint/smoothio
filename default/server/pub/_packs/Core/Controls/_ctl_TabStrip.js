@@ -56,10 +56,15 @@
       }
     };
     function Packs_Core_Controls_TabStrip(client, parent, args) {
-      Packs_Core_Controls_TabStrip.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_TabStrip");
-      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
+      Packs_Core_Controls_TabStrip.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
+    Packs_Core_Controls_TabStrip.prototype.className = function() {
+      return "Core_Controls_TabStrip";
+    };
+    Packs_Core_Controls_TabStrip.prototype.classNamespace = function() {
+      return "Core_Controls";
+    };
     return Packs_Core_Controls_TabStrip;
   })();
 }).call(this);

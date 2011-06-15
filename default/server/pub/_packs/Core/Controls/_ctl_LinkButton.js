@@ -42,10 +42,15 @@
       }, this));
     };
     function Packs_Core_Controls_LinkButton(client, parent, args) {
-      Packs_Core_Controls_LinkButton.__super__.constructor.call(this, client, parent, args, "Core_Controls", "Core_Controls_LinkButton");
-      this.jsSelf = "smio.client.allControls['" + this.id() + "']";
+      Packs_Core_Controls_LinkButton.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
+    Packs_Core_Controls_LinkButton.prototype.className = function() {
+      return "Core_Controls_LinkButton";
+    };
+    Packs_Core_Controls_LinkButton.prototype.classNamespace = function() {
+      return "Core_Controls";
+    };
     return Packs_Core_Controls_LinkButton;
   })();
 }).call(this);

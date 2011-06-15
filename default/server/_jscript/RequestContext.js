@@ -1,6 +1,11 @@
 (function() {
   var node_fs, node_path, node_urlq, node_uuid, smio, _;
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __indexOf = Array.prototype.indexOf || function(item) {
+    for (var i = 0, l = this.length; i < l; i++) {
+      if (this[i] === item) return i;
+    }
+    return -1;
+  };
   require('./shared/Control');
   require('./Session');
   _ = require('underscore');
@@ -37,6 +42,10 @@
       this.adminDB = adminDB;
       this.sharedDB = sharedDB;
       this.serverDB = serverDB;
+      this.servePage = __bind(this.servePage, this);
+      this.serveFile = __bind(this.serveFile, this);
+      this.userLanguage = __bind(this.userLanguage, this);
+      this.handleRequest = __bind(this.handleRequest, this);
       this.inst = this.server.inst;
       this.postData = null;
       this.smioCookie = smio.RequestContext.parseSmioCookie(this.cookies = smio.Util.Server.parseCookies(this.httpRequest.headers['cookie']));
@@ -53,8 +62,8 @@
       }
     }
     RequestContext.prototype.handleRequest = function() {
-      var cfgKey, cfgVal, ctype, finish, fname, hasHandler, respHeaders, userlang;
-      this.inst.lastRequestTime = new Date;
+      var cfgKey, cfgVal, ctype, finish, fname, hasHandler, respHeaders, userlang, _ref;
+      this.inst.lastRequestTime = new Date();
       if (!this.smioCookie['sessid']) {
         this.smioCookie['sessid'] = node_uuid();
       }
@@ -62,7 +71,7 @@
         'Set-Cookie': "smoo=" + (node_urlq.escape(JSON.stringify(this.smioCookie))) + "; path=/"
       };
       try {
-        if (hasHandler = this.uri.pathItems.length && this.uri.pathItems[0] === '_' && this.uri.pathItems.length >= 2) {
+        if ((hasHandler = this.uri.pathItems.length && (this.uri.pathItems[0] === '_') && (this.uri.pathItems.length >= 2))) {
           switch (this.uri.pathItems[1]) {
             case "poll":
               respHeaders['Content-Type'] = 'text/plain';
@@ -71,7 +80,7 @@
                 return this.httpResponse.end(JSON.stringify(data));
               }, this);
               if (this.uri.pathItems[2] === 'f') {
-                (smio.Session.getBySessionID(this.server, this.smioCookie['sessid'])).handleFetch(this, null, finish);
+                smio.Session.getBySessionID(this.server, this.smioCookie['sessid']).handleFetch(this, null, finish);
               } else {
                 finish({});
               }
@@ -80,7 +89,7 @@
               if ((cfgKey = this.uri.query['config'])) {
                 if (cfgKey === '_res.js') {
                   respHeaders['Content-Type'] = 'text/javascript';
-                  if (0 <= _.indexOf(smio.resLangs, (userlang = this.userLanguage()))) {
+                  if (_ref = (userlang = this.userLanguage()), __indexOf.call(smio.resLangs, _ref) >= 0) {
                     this.serveFile("_merged/_res." + userlang + ".js", respHeaders);
                   } else {
                     this.serveFile("_merged/_res.js", respHeaders);
