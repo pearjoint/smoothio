@@ -84,48 +84,51 @@ class smio.RequestContext
 			@httpResponse.writeHead(500, respHeaders)
 			@httpResponse.end("500 Internal Server Error:\n#{@inst.formatError(err)}")
 
-	userLanguage: () =>
+	userLanguage: (def) =>
 		if not @['userLangs']
 			@userLangs = []
 			# de-de,de;q=0.8,en;q=0.5,en-us;q=0.3
-			for lq in "#{@httpRequest.headers['accept-language']}".split ','
-				if 0 <= (pos = lq.indexOf ';')
-					lq = lq.substr 0, pos
-				if 0 <= (pos = lq.indexOf '-')
-					lq = lq.substr 0, pos
-				if 0 > _.indexOf @userLangs, lq
-					@userLangs.push lq
-		smio.iif @userLangs.length, @userLangs[0], ''
+			for lq in "#{@httpRequest.headers['accept-language']}".split(',')
+				if (pos = lq.indexOf(';')) >= 0
+					lq = lq.substr(0, pos)
+				if (pos = lq.indexOf('-')) >= 0
+					lq = lq.substr(0, pos)
+				if not (lq in @userLangs)
+					@userLangs.push(lq)
+		ret = smio.iif(@userLangs.length, @userLangs[0], '')
+		smio.iif(ret, ret, def or '')
 
 	serveFile: (filePath, respHeaders) =>
-		node_fs.stat (node_path.join @server.fileServer.root, filePath), (err, stat) =>
+		node_fs.stat node_path.join(@server.fileServer.root, filePath), (err, stat) =>
 			if stat and stat.isFile()
 				@server.fileServer.serveFile(filePath, 200, respHeaders, @httpRequest, @httpResponse).addListener 'error', (err) =>
 					respHeaders['Content-Type'] = 'text/plain'
-					@httpResponse.writeHead err.status, smio.Util.Object.mergeDefaults err.headers, respHeaders
-					@httpResponse.end JSON.stringify err
+					@httpResponse.writeHead(err.status, smio.Util.Object.mergeDefaults(err.headers, respHeaders))
+					@httpResponse.end(JSON.stringify(err))
 			else
 				respHeaders['Content-Type'] = 'text/plain'
-				@httpResponse.writeHead (smio.iif err, 500, 404), respHeaders
-				if err and err['errno'] isnt 2
-					@httpResponse.end "500 Internal Server Error:\n#{@inst.formatError err}"
+				@httpResponse.writeHead(smio.iif(err, 500, 404), respHeaders)
+				if err and (err['errno'] isnt 2)
+					@httpResponse.end("500 Internal Server Error:\n#{@inst.formatError(err)}")
 				else
-					@httpResponse.end "404 File Not Found: #{node_path.join @server.fileServer.root, filePath}"
+					@httpResponse.end("404 File Not Found: #{node_path.join(@server.fileServer.root, filePath)}")
 
 	servePage: (respHeaders) =>
-		placeholder = "___smiopagecontent___"
+		[placeholder1, placeholder2] = ['___smiolang___', '___smiopagecontent___']
 		respHeaders['Content-Type'] = 'text/html'
-		@httpResponse.writeHead 200, respHeaders
+		@httpResponse.writeHead(200, respHeaders)
 		if not smio.RequestContext.htmlContent
-			smio.RequestContext.htmlContent = smio.Util.FileSystem.readTextFile "server/pub/smoothio.html"
+			smio.RequestContext.htmlContent = smio.Util.FileSystem.readTextFile("server/pub/smoothio.html")
 		fileContent = smio.RequestContext.htmlContent
-		pos = fileContent.indexOf placeholder
-		if pos <= 0
-			@httpResponse.write fileContent
+		if (pos1 = fileContent.indexOf(placeholder1))
+			@httpResponse.write(fileContent.substr(0, pos1) + @userLanguage('en'))
+			fileContent = fileContent.substr(pos1 + placeholder1.length)
+		if (pos2 = fileContent.indexOf(placeholder2)) <= 0
+			@httpResponse.write(fileContent)
 		else
-			@httpResponse.write fileContent.substr 0, pos
-			(session = smio.Session.getBySessionID @server, @smioCookie['sessid']).handleFetch @, {}, (data) =>
-				ctl = smio.Control.load data['c']['']['_'], null, id: 'sm'
-				@httpResponse.write ctl.renderHtml()
-				@httpResponse.end fileContent.substr pos + placeholder.length
+			@httpResponse.write(fileContent.substr 0, pos2)
+			(session = smio.Session.getBySessionID(@server, @smioCookie['sessid'])).handleFetch @, {}, (data) =>
+				ctl = smio.Control.load(data['c']['']['_'], null, id: 'sm')
+				@httpResponse.write(ctl.renderHtml())
+				@httpResponse.end(fileContent.substr(pos2 + placeholder2.length))
 

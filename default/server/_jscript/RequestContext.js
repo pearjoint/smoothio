@@ -126,25 +126,26 @@
         return this.httpResponse.end("500 Internal Server Error:\n" + (this.inst.formatError(err)));
       }
     };
-    RequestContext.prototype.userLanguage = function() {
-      var lq, pos, _i, _len, _ref;
+    RequestContext.prototype.userLanguage = function(def) {
+      var lq, pos, ret, _i, _len, _ref;
       if (!this['userLangs']) {
         this.userLangs = [];
         _ref = ("" + this.httpRequest.headers['accept-language']).split(',');
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           lq = _ref[_i];
-          if (0 <= (pos = lq.indexOf(';'))) {
+          if ((pos = lq.indexOf(';')) >= 0) {
             lq = lq.substr(0, pos);
           }
-          if (0 <= (pos = lq.indexOf('-'))) {
+          if ((pos = lq.indexOf('-')) >= 0) {
             lq = lq.substr(0, pos);
           }
-          if (0 > _.indexOf(this.userLangs, lq)) {
+          if (!(__indexOf.call(this.userLangs, lq) >= 0)) {
             this.userLangs.push(lq);
           }
         }
       }
-      return smio.iif(this.userLangs.length, this.userLangs[0], '');
+      ret = smio.iif(this.userLangs.length, this.userLangs[0], '');
+      return smio.iif(ret, ret, def || '');
     };
     RequestContext.prototype.serveFile = function(filePath, respHeaders) {
       return node_fs.stat(node_path.join(this.server.fileServer.root, filePath), __bind(function(err, stat) {
@@ -157,7 +158,7 @@
         } else {
           respHeaders['Content-Type'] = 'text/plain';
           this.httpResponse.writeHead(smio.iif(err, 500, 404), respHeaders);
-          if (err && err['errno'] !== 2) {
+          if (err && (err['errno'] !== 2)) {
             return this.httpResponse.end("500 Internal Server Error:\n" + (this.inst.formatError(err)));
           } else {
             return this.httpResponse.end("404 File Not Found: " + (node_path.join(this.server.fileServer.root, filePath)));
@@ -166,26 +167,29 @@
       }, this));
     };
     RequestContext.prototype.servePage = function(respHeaders) {
-      var fileContent, placeholder, pos, session;
-      placeholder = "___smiopagecontent___";
+      var fileContent, placeholder1, placeholder2, pos1, pos2, session, _ref;
+      _ref = ['___smiolang___', '___smiopagecontent___'], placeholder1 = _ref[0], placeholder2 = _ref[1];
       respHeaders['Content-Type'] = 'text/html';
       this.httpResponse.writeHead(200, respHeaders);
       if (!smio.RequestContext.htmlContent) {
         smio.RequestContext.htmlContent = smio.Util.FileSystem.readTextFile("server/pub/smoothio.html");
       }
       fileContent = smio.RequestContext.htmlContent;
-      pos = fileContent.indexOf(placeholder);
-      if (pos <= 0) {
+      if ((pos1 = fileContent.indexOf(placeholder1))) {
+        this.httpResponse.write(fileContent.substr(0, pos1) + this.userLanguage('en'));
+        fileContent = fileContent.substr(pos1 + placeholder1.length);
+      }
+      if ((pos2 = fileContent.indexOf(placeholder2)) <= 0) {
         return this.httpResponse.write(fileContent);
       } else {
-        this.httpResponse.write(fileContent.substr(0, pos));
+        this.httpResponse.write(fileContent.substr(0, pos2));
         return (session = smio.Session.getBySessionID(this.server, this.smioCookie['sessid'])).handleFetch(this, {}, __bind(function(data) {
           var ctl;
           ctl = smio.Control.load(data['c']['']['_'], null, {
             id: 'sm'
           });
           this.httpResponse.write(ctl.renderHtml());
-          return this.httpResponse.end(fileContent.substr(pos + placeholder.length));
+          return this.httpResponse.end(fileContent.substr(pos2 + placeholder2.length));
         }, this));
       }
     };
