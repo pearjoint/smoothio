@@ -16,7 +16,7 @@
     Packs_Core_Controls_SlidePanel.prototype.renderTemplate = function() {
       var item, itemID, ul, _ref;
       ul = {
-        "class": "= smio-slidepanel " + (this.args["class"] || ''),
+        "class": "smio-slidepanel " + (this.args["class"] || ''),
         'li #libefore': {
           html: ['&nbsp;']
         }
@@ -38,17 +38,17 @@
       return {
         div: {
           id: '',
-          "class": "= smio-slidepanel " + this.args["class"],
-          'div #scrollbox .= smio-slidepanel-scrollbox': {
+          "class": "smio-slidepanel " + this.args["class"],
+          'div #scrollbox .smio-slidepanel-scrollbox': {
             'ul #items': ul
           },
-          'div #edgeprev .= smio-slidepanel-edge .= smio-slidepanel-edge-left': {
-            'div .= smio-slidepanel-edge-arr .x9668': {
+          'div #edgeprev .smio-slidepanel-edge .smio-slidepanel-edge-left': {
+            'div .smio-slidepanel-edge-arr .x9668': {
               _: [this.r('slidepanel_prev')]
             }
           },
-          'div #edgenext .= smio-slidepanel-edge .= smio-slidepanel-edge-right': {
-            'div .= smio-slidepanel-edge-arr .x9658': {
+          'div #edgenext .smio-slidepanel-edge .smio-slidepanel-edge-right': {
+            'div .smio-slidepanel-edge-arr .x9658': {
               _: [this.r('slidepanel_next')]
             }
           }
@@ -83,16 +83,18 @@
       return this.scrollTo(this.curItem, true);
     };
     Packs_Core_Controls_SlidePanel.prototype.scrollTo = function(item, force) {
-      var distances, edgeNext, edgePrev, i, it, scrollBox, scrollLefts, tmp, _len, _ref, _ref2;
-      _ref = [this.sub('edgeprev'), this.sub('edgenext'), this.sub('scrollbox')], edgePrev = _ref[0], edgeNext = _ref[1], scrollBox = _ref[2];
+      var bounce, curPos, distances, edgeNext, edgePrev, goalPos, i, it, onDone, rnd, scrollBox, scrollLefts, tmp, _len, _ref, _ref2;
+      _ref = [this.sub('edgeprev'), this.sub('edgenext'), this.sub('scrollbox'), true], edgePrev = _ref[0], edgeNext = _ref[1], scrollBox = _ref[2], bounce = _ref[3];
+      curPos = scrollBox.scrollLeft();
       if (item === null) {
+        bounce = false;
         scrollLefts = [];
         distances = [];
         _ref2 = this.items;
         for (i = 0, _len = _ref2.length; i < _len; i++) {
           it = _ref2[i];
-          scrollLefts.push(tmp = scrollBox.scrollLeft() + this.sub('items_' + it).position().left - edgePrev.width());
-          distances.push(Math.abs(tmp - scrollBox.scrollLeft()));
+          scrollLefts.push(tmp = curPos + this.sub('items_' + it).position().left - edgePrev.width());
+          distances.push(Math.abs(tmp - curPos));
         }
         item = distances.indexOf(Math.min.apply(Math, distances));
       }
@@ -102,6 +104,12 @@
       if (((item < 0) || (item >= this.items.length)) && force) {
         item = 0;
       }
+      onDone = __bind(function() {
+        this.scrolling = false;
+        if (bounce) {
+          return this.scrollTo(null, true);
+        }
+      }, this);
       if ((force || item !== this.curItem) && (item >= 0) && (item < this.items.length)) {
         this.scrolling = true;
         edgePrev.css({
@@ -111,11 +119,11 @@
           display: item === (this.items.length - 1) ? 'none' : 'block'
         });
         this.on('itemSelect', [this.curItem = item, this.items[item]]);
-        return morpheus.tween(250, (__bind(function(pos) {
+        goalPos = curPos + this.sub('items_' + this.items[item]).position().left - edgePrev.width();
+        rnd = smio.Util.Number.randomInt(48) + 48;
+        return morpheus.tween(200, (__bind(function(pos) {
           return scrollBox.scrollLeft(pos);
-        }, this)), (__bind(function() {
-          return this.scrolling = false;
-        }, this)), null, scrollBox.scrollLeft(), scrollBox.scrollLeft() + this.sub('items_' + this.items[item]).position().left - edgePrev.width());
+        }, this)), onDone, null, curPos, (bounce ? (goalPos < curPos ? -rnd : rnd) : 0) + goalPos);
       }
     };
     function Packs_Core_Controls_SlidePanel(client, parent, args) {

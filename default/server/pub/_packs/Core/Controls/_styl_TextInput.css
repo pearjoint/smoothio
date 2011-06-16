@@ -15,7 +15,7 @@ input.smio-textinput {
   -webkit-user-drag: auto;
   -ms-user-drag: auto;
   user-drag: auto;
-  width: 12em;
+  width: 17em;
 }
 input.smio-textinput::-webkit-input-placeholder {
   font-weight: normal;

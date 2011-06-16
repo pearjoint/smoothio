@@ -1,4 +1,4 @@
-#const $CC = smio-toggleinput
+#const $CC smio-toggleinput
 
 @checkmark: '&#x2714;'
 @radiomark: ''
@@ -22,7 +22,7 @@ renderTemplate: =>
 	getGSpan()['span #glyph'] = class: '$CC-btnglyph'
 	ret.span.span.span.input =
 		id: 'input'
-		name: @args.toggleName
+		name: @args.name
 		class: '$CC'
 		type: if ischk then 'checkbox' else 'radio'
 	if (@disabled)
@@ -39,7 +39,7 @@ renderTemplate: =>
 	ret
 
 commonCssClass: =>
-	@args.toggleName or @id()
+	@args.name or @id()
 
 coreDisable: (disable) =>
 	@sub('input').prop('disabled', disable)

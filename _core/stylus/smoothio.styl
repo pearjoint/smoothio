@@ -2,11 +2,14 @@
 @import 'include/reset'
 
 smio-selection()
-	background rgba(0, 0, 0, 0.75) !important
+	background-color rgba(0, 0, 0, 0.75) !important
 	color $collite !important
 	text-shadow none !important
 
 ::selection
+	smio-selection()
+
+::-webkit-selection
 	smio-selection()
 
 :-moz-selection

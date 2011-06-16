@@ -114,21 +114,16 @@ class smio.RequestContext
 					@httpResponse.end("404 File Not Found: #{node_path.join(@server.fileServer.root, filePath)}")
 
 	servePage: (respHeaders) =>
-		[placeholder1, placeholder2] = ['___smiolang___', '___smiopagecontent___']
-		respHeaders['Content-Type'] = 'text/html'
-		@httpResponse.writeHead(200, respHeaders)
-		if not smio.RequestContext.htmlContent
-			smio.RequestContext.htmlContent = smio.Util.FileSystem.readTextFile("server/pub/smoothio.html")
-		fileContent = smio.RequestContext.htmlContent
-		if (pos1 = fileContent.indexOf(placeholder1))
-			@httpResponse.write(fileContent.substr(0, pos1) + @userLanguage('en'))
-			fileContent = fileContent.substr(pos1 + placeholder1.length)
-		if (pos2 = fileContent.indexOf(placeholder2)) <= 0
-			@httpResponse.write(fileContent)
-		else
-			@httpResponse.write(fileContent.substr 0, pos2)
-			(session = smio.Session.getBySessionID(@server, @smioCookie['sessid'])).handleFetch @, {}, (data) =>
+		(session = smio.Session.getBySessionID(@server, @smioCookie['sessid'])).handleFetch @, {}, (data) =>
+			try
 				ctl = smio.Control.load(data['c']['']['_'], null, id: 'sm')
-				@httpResponse.write(ctl.renderHtml())
-				@httpResponse.end(fileContent.substr(pos2 + placeholder2.length))
+				mainCtl = smio.Control.load('Core_Controls_Smoothio', null, id: '', htmlContent: ctl.renderHtml(), lang: userlang, title: 'smooth.io', appname: 'smooth.io')
+				respHeaders['Content-Type'] = 'text/html'
+				respHeaders['Content-Language'] = userlang = @userLanguage('en')
+				@httpResponse.writeHead(200, respHeaders)
+				@httpResponse.end(mainCtl.renderHtml())
+			catch err
+				respHeaders['Content-Type'] = 'text/plain'
+				@httpResponse.writeHead(500, respHeaders)
+				@httpResponse.end("500 Internal Server Error:\n#{@inst.formatError(err)}")
 

@@ -22,7 +22,7 @@ class smio.Client
 
 	init: =>
 		@socket.connect()
-		setInterval((=> @pageBody.css("background-image": "url('/_/file/images/bg#{smio.Util.Number.randomInt(4)}.jpg')", "background-size": "auto auto")), 4000)
+		@pageBody.css("background-image": "url('/_/file/images/bg0.jpg')", "background-size": "auto auto")
 
 	onWindowResize: () =>
 		[w, h] = [@pageWindow.width(), @pageWindow.height()]

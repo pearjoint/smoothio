@@ -20,17 +20,17 @@
       ischk = this.isCheckBox();
       ret = {
         span: {
-          "class": "= smio-toggleinput = smio-toggleinput-" + (ischk ? 'checkbox' : 'radio') + " = smio-toggleinput-" + (this.args.checked ? '' : 'un') + "checked = smio-toggleinput-" + (this.commonCssClass()),
+          "class": "smio-toggleinput smio-toggleinput-" + (ischk ? 'checkbox' : 'radio') + " smio-toggleinput-" + (this.args.checked ? '' : 'un') + "checked smio-toggleinput-" + (this.commonCssClass()),
           id: '',
           span: {
             id: 'btnlabel',
-            "class": "= smio-toggleinput-btnlabel",
+            "class": "smio-toggleinput-btnlabel",
             span: {
               id: 'btn',
-              "class": '= smio-toggleinput-btn',
+              "class": 'smio-toggleinput-btn',
               span: {
                 id: 'btnglyph',
-                "class": '= smio-toggleinput-btnbtn'
+                "class": 'smio-toggleinput-btnbtn'
               }
             }
           }
@@ -44,12 +44,12 @@
         }
       };
       getGSpan()['span #glyph'] = {
-        "class": '= smio-toggleinput-btnglyph'
+        "class": 'smio-toggleinput-btnglyph'
       };
       ret.span.span.span.input = {
         id: 'input',
-        name: this.args.toggleName,
-        "class": '= smio-toggleinput',
+        name: this.args.name,
+        "class": 'smio-toggleinput',
         type: ischk ? 'checkbox' : 'radio'
       };
       if (this.disabled) {
@@ -62,7 +62,7 @@
       if (this.args.labelText || this.args.labelHtml) {
         ret.span.span.label = {
           id: 'label',
-          "class": '= smio-toggleinput',
+          "class": 'smio-toggleinput',
           "for": this.id('input')
         };
         this.jsonTemplates_Label(ret.span.span.label);
@@ -70,7 +70,7 @@
       return ret;
     };
     Packs_Core_Controls_Toggle.prototype.commonCssClass = function() {
-      return this.args.toggleName || this.id();
+      return this.args.name || this.id();
     };
     Packs_Core_Controls_Toggle.prototype.coreDisable = function(disable) {
       return this.sub('input').prop('disabled', disable);
@@ -83,7 +83,7 @@
     };
     Packs_Core_Controls_Toggle.prototype.onCheck = function(passive) {
       var cc, el, nuCls, unCls, _ref;
-      _ref = ['= smio-toggleinput', this.sub('input')], cc = _ref[0], el = _ref[1];
+      _ref = ['smio-toggleinput', this.sub('input')], cc = _ref[0], el = _ref[1];
       if (this.chk !== el.prop('checked')) {
         this.chk = el.prop('checked');
         nuCls = cc + (this.chk ? '-checked' : '-unchecked');
@@ -91,7 +91,7 @@
         this.el.removeClass(unCls).addClass(nuCls);
         this.sub('glyph').html(!this.chk ? '' : smio[this.classPath()][this.isCheckBox() ? 'checkmark' : 'radiomark']);
         if (this.isRadioBox() && !passive) {
-          return $(".= smio-toggleinput-" + (this.commonCssClass()) + " input.= smio-toggleinput").each(__bind(function(i, e) {
+          return $(".smio-toggleinput-" + (this.commonCssClass()) + " input.smio-toggleinput").each(__bind(function(i, e) {
             var ctl;
             if (e.id !== this.id('input')) {
               $(e).prop('checked', false);
@@ -113,10 +113,10 @@
         }
       }, this));
       inp.blur(__bind(function() {
-        return this.sub('btnlabel').removeClass('= smio-toggleinput-focused');
+        return this.sub('btnlabel').removeClass('smio-toggleinput-focused');
       }, this));
       inp.focus(__bind(function() {
-        return this.sub('btnlabel').addClass('= smio-toggleinput-focused');
+        return this.sub('btnlabel').addClass('smio-toggleinput-focused');
       }, this));
       this.sub('btn').click(__bind(function() {
         var el;

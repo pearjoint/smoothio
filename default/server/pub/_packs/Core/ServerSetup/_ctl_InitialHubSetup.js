@@ -31,20 +31,32 @@
                 "#owner": {
                   'div .smio-setup-stepbox-title': [this.r('steptitle_owner')],
                   'div .smio-setup-stepbox-form': {
-                    "TextInput #owner_name": {
-                      autoFocus: true,
-                      labelText: this.r('owner_name'),
-                      nospellcheck: true
-                    },
-                    "TextInput #owner_pass": {
-                      labelText: this.r('owner_pass'),
-                      type: 'password'
+                    "Controls #user": {
+                      ctltype: 'TextInput',
+                      required: true,
+                      nospellcheck: true,
+                      labelText: __bind(function(id) {
+                        return this.r("owner_" + id);
+                      }, this),
+                      placeholder: __bind(function(id) {
+                        return this.r("owner_" + id + "hint");
+                      }, this),
+                      type: __bind(function(id) {
+                        if (id !== 'name') {
+                          return 'password';
+                        } else {
+                          return '';
+                        }
+                      }, this),
+                      items: ['#name', '#pass', '#pass2']
                     },
                     "div .smio-setup-stepbox-form-label": {
                       html: [this.r('owner_choice')]
                     },
-                    "Toggles #owner": {
+                    "Controls #owner": {
+                      ctltype: 'Toggle',
                       disabled: true,
+                      name: this.id('owner_toggle'),
                       items: {
                         "#create": {
                           checked: true,
@@ -73,12 +85,6 @@
                     },
                     "div .smio-setup-stepbox-form-label": {
                       html: [this.r('hub_hint')]
-                    },
-                    "ul #hubhints": {
-                      "li #hubhint1": [this.r('hubhint1')],
-                      "li #hubhint2": [this.r('hubhint2')],
-                      "li #hubhint3": [this.r('hubhint3')],
-                      "li #hubhint4": [this.r('hubhint4')]
                     }
                   }
                 }

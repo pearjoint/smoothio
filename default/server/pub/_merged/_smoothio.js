@@ -13234,12 +13234,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     }
     Client.prototype.init = function() {
       this.socket.connect();
-      return setInterval((__bind(function() {
-        return this.pageBody.css({
-          "background-image": "url('/_/file/images/bg" + (smio.Util.Number.randomInt(4)) + ".jpg')",
-          "background-size": "auto auto"
-        });
-      }, this)), 4000);
+      return this.pageBody.css({
+        "background-image": "url('/_/file/images/bg0.jpg')",
+        "background-size": "auto auto"
+      });
     };
     Client.prototype.onWindowResize = function() {
       var ctl, h, id, w, _ref, _ref2, _results;
@@ -14318,6 +14316,77 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   })();
 }).call(this);
 
+/** server/pub/_packs/Core/Controls/_ctl_Controls.js **/
+(function() {
+  /*
+  Auto-generated from Core/Controls/Controls.ctl
+  */  var smio, smoothio;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
+  }, __indexOf = Array.prototype.indexOf || function(item) {
+    for (var i = 0, l = this.length; i < l; i++) {
+      if (this[i] === item) return i;
+    }
+    return -1;
+  };
+  smio = smoothio = global.smoothio;
+  smio.Packs_Core_Controls_Controls = (function() {
+    __extends(Packs_Core_Controls_Controls, smio.Control);
+    Packs_Core_Controls_Controls.prototype.renderTemplate = function() {
+      var an, av, it, item, itemID, items, nocopy, span, _i, _len, _ref, _ref2;
+      nocopy = ['ctltype', 'items', 'id', 'class'];
+      span = {
+        id: ''
+      };
+      if (this.args.items) {
+        if (_.isArray(this.args.items)) {
+          items = {};
+          _ref = this.args.items;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            it = _ref[_i];
+            items[it] = {};
+          }
+        } else {
+          items = this.args.items;
+        }
+        for (itemID in items) {
+          item = items[itemID];
+          while (_.startsWith(itemID, '#')) {
+            itemID = itemID.substr(1);
+          }
+          _ref2 = this.args;
+          for (an in _ref2) {
+            av = _ref2[an];
+            if ((!(__indexOf.call(nocopy, an) >= 0)) && (!(item[an] != null))) {
+              item[an] = _.isFunction(av) ? av(itemID) : av;
+            }
+          }
+          span["" + this.args.ctltype + " #" + itemID] = item;
+        }
+      }
+      return {
+        span: span
+      };
+    };
+    function Packs_Core_Controls_Controls(client, parent, args) {
+      this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_Controls.__super__.constructor.call(this, client, parent, args);
+      this.init();
+    }
+    Packs_Core_Controls_Controls.prototype.className = function() {
+      return "Core_Controls_Controls";
+    };
+    Packs_Core_Controls_Controls.prototype.classNamespace = function() {
+      return "Core_Controls";
+    };
+    return Packs_Core_Controls_Controls;
+  })();
+}).call(this);
+
 /** server/pub/_packs/Core/Controls/_ctl_LinkButton.js **/
 (function() {
   /*
@@ -14463,7 +14532,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     Packs_Core_Controls_SlidePanel.prototype.renderTemplate = function() {
       var item, itemID, ul, _ref;
       ul = {
-        "class": "= smio-slidepanel " + (this.args["class"] || ''),
+        "class": "smio-slidepanel " + (this.args["class"] || ''),
         'li #libefore': {
           html: ['&nbsp;']
         }
@@ -14485,17 +14554,17 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       return {
         div: {
           id: '',
-          "class": "= smio-slidepanel " + this.args["class"],
-          'div #scrollbox .= smio-slidepanel-scrollbox': {
+          "class": "smio-slidepanel " + this.args["class"],
+          'div #scrollbox .smio-slidepanel-scrollbox': {
             'ul #items': ul
           },
-          'div #edgeprev .= smio-slidepanel-edge .= smio-slidepanel-edge-left': {
-            'div .= smio-slidepanel-edge-arr .x9668': {
+          'div #edgeprev .smio-slidepanel-edge .smio-slidepanel-edge-left': {
+            'div .smio-slidepanel-edge-arr .x9668': {
               _: [this.r('slidepanel_prev')]
             }
           },
-          'div #edgenext .= smio-slidepanel-edge .= smio-slidepanel-edge-right': {
-            'div .= smio-slidepanel-edge-arr .x9658': {
+          'div #edgenext .smio-slidepanel-edge .smio-slidepanel-edge-right': {
+            'div .smio-slidepanel-edge-arr .x9658': {
               _: [this.r('slidepanel_next')]
             }
           }
@@ -14530,16 +14599,18 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       return this.scrollTo(this.curItem, true);
     };
     Packs_Core_Controls_SlidePanel.prototype.scrollTo = function(item, force) {
-      var distances, edgeNext, edgePrev, i, it, scrollBox, scrollLefts, tmp, _len, _ref, _ref2;
-      _ref = [this.sub('edgeprev'), this.sub('edgenext'), this.sub('scrollbox')], edgePrev = _ref[0], edgeNext = _ref[1], scrollBox = _ref[2];
+      var bounce, curPos, distances, edgeNext, edgePrev, goalPos, i, it, onDone, rnd, scrollBox, scrollLefts, tmp, _len, _ref, _ref2;
+      _ref = [this.sub('edgeprev'), this.sub('edgenext'), this.sub('scrollbox'), true], edgePrev = _ref[0], edgeNext = _ref[1], scrollBox = _ref[2], bounce = _ref[3];
+      curPos = scrollBox.scrollLeft();
       if (item === null) {
+        bounce = false;
         scrollLefts = [];
         distances = [];
         _ref2 = this.items;
         for (i = 0, _len = _ref2.length; i < _len; i++) {
           it = _ref2[i];
-          scrollLefts.push(tmp = scrollBox.scrollLeft() + this.sub('items_' + it).position().left - edgePrev.width());
-          distances.push(Math.abs(tmp - scrollBox.scrollLeft()));
+          scrollLefts.push(tmp = curPos + this.sub('items_' + it).position().left - edgePrev.width());
+          distances.push(Math.abs(tmp - curPos));
         }
         item = distances.indexOf(Math.min.apply(Math, distances));
       }
@@ -14549,6 +14620,12 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       if (((item < 0) || (item >= this.items.length)) && force) {
         item = 0;
       }
+      onDone = __bind(function() {
+        this.scrolling = false;
+        if (bounce) {
+          return this.scrollTo(null, true);
+        }
+      }, this);
       if ((force || item !== this.curItem) && (item >= 0) && (item < this.items.length)) {
         this.scrolling = true;
         edgePrev.css({
@@ -14558,11 +14635,11 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           display: item === (this.items.length - 1) ? 'none' : 'block'
         });
         this.on('itemSelect', [this.curItem = item, this.items[item]]);
-        return morpheus.tween(250, (__bind(function(pos) {
+        goalPos = curPos + this.sub('items_' + this.items[item]).position().left - edgePrev.width();
+        rnd = smio.Util.Number.randomInt(48) + 48;
+        return morpheus.tween(200, (__bind(function(pos) {
           return scrollBox.scrollLeft(pos);
-        }, this)), (__bind(function() {
-          return this.scrolling = false;
-        }, this)), null, scrollBox.scrollLeft(), scrollBox.scrollLeft() + this.sub('items_' + this.items[item]).position().left - edgePrev.width());
+        }, this)), onDone, null, curPos, (bounce ? (goalPos < curPos ? -rnd : rnd) : 0) + goalPos);
       }
     };
     function Packs_Core_Controls_SlidePanel(client, parent, args) {
@@ -14621,7 +14698,15 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         };
       })(__r);
       __r.o = __r.m;
-      __r.p("<!DOCTYPE html>\n<html lang=\"___smiolang___\">\n\t<head>\n\t\t<meta charset=\"utf-8\" />\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n\t\t<meta name=\"generator\" content=\"smooth.io\"/>\n\t\t<meta name=\"application-name\" content=\"smooth.io\"/>\n\t\t<title>smoothio</title>\n\t\t<script type=\"text/javascript\" language=\"JavaScript\">\n\t\t\tfunction onSmoothioNoCookie() {\n\t\t\t\t$('#smio_offline').hide();\n\t\t\t\t$('#smio_body').css({ \"background-image\": \"none\" }).html('<br/><br/><br/><br/><hr/>Either your session cookie expired or you have disabled browser cookies, and hence this application will not load.<br/><br/>Verify that cookies are enabled in your web browser, then try a complete reload (press CTRL+R).<hr/>Entweder ist Ihr Sitzungscookie abgelaufen oder Ihr Webbrowser unterst&uuml;tzt keine Cookies, und somit wird auch diese Anwendung nicht geladen.<br/><br/>Stellen Sie sicher, da&szlig; Ihr Webbrowser Cookies erlaubt, und versuchen Sie dann ein Komplett-Neuladen (STRG+R).<hr/>');\n\t\t\t}\n\n\t\t\tfunction onSmoothioPageLoad() {\n\t\t\t\t$('#smio_noscript, #smio_prescript, #smio_noscript_content').remove();\n\t\t\t\tif (smio.pageLoadError)\n\t\t\t\t\tdocument.getElementById('smio_body').innerHTML = '<br/><br/><br/><br/><hr/>Required core script <b>' + smio.pageLoadError + '</b> could not be loaded and hence this application will not load.<br/><br/>Try a complete reload (press CTRL+R) as this was probably just a temporary disruption.<hr/>Erforderliches Kernscript <b>' + smio.pageLoadError + '</b> konnte nicht geladen werden und somit wird auch diese Anwendung nicht geladen.<br/><br/>Versuchen Sie ein Komplett-Neuladen (STRG+R), da dies wahrscheinlich nur eine kurzzeitige St&ouml;rung war.<hr/>';\n\t\t\t\telse if (!(smio.client = new smio.Client()).sessionID)\n\t\t\t\t\tonSmoothioNoCookie();\n\t\t\t\telse\n\t\t\t\t\tsmio.client.init();\n\t\t\t}\n\n\t\t\tfunction onSmoothioProgress() {\n\t\t\t}\n\n\t\t\tfunction onSmoothioSleepy(sleepy) {\n\t\t\t\tif (smio.client && smio.client.socket && (sleepy != smio.client.sleepy))\n\t\t\t\t\tsmio.client.socket.onSleepy(smio.client.sleepy = sleepy);\n\t\t\t}\n\n\t\t\tfunction onScriptError(scriptName) {\n\t\t\t\tsmio.pageLoadError = scriptName;\n\t\t\t}\n\t\t</script>\n\t\t<link rel=\"stylesheet\" href=\"/_/file/_merged/_smoothio.css\"/>\n\t\t<link rel=\"shortcut icon\" type=\"image/png\" id=\"smio_favicon\" href=\"/_/file/images/smoothio.png\" />\n\t\t<style type=\"text/css\"> span.smio-noscript { display: none; } </style>\n\t</head>\n\t<body id=\"smio_body\" onload=\"onSmoothioPageLoad();\" onblur=\"onSmoothioSleepy(true);\" onfocus=\"onSmoothioSleepy(false);\">\n\t\t<div id=\"smio_offline\" class=\"smio-blocking-overlay\"><span id=\"smio_offline_msg\"></span><span id=\"smio_offline_blink\">&nbsp;&#x273F;</span></div>\n\t\t<script type=\"text/javascript\" language=\"JavaScript\" id=\"smio_prescript\">\n\t\t\tdocument.getElementById('smio_offline').style.display = 'block';\n\t\t\tvar smioGlobalTest, smio, WEB_SOCKET_SWF_LOCATION = '/_/dynfile/?type=application/x-shockwave-flash&config=sockets.xdomain_swf&true=bin/websockx.swf&false=bin/websock.swf';\n\t\t\ttry {\n\t\t\t\tsmioGlobalTest = global;\n\t\t\t} catch(err) {\n\t\t\t}\n\t\t\tif (!smioGlobalTest)\n\t\t\t\tglobal = {};\n\t\t\tif (!global['smoothio'])\n\t\t\t\tglobal['smoothio'] = {}\n\t\t\tsmio = global.smoothio;\n\t\t\tsmio.pageLoadError = null;\n\t\t\tsmio.iif = function(test, ifTrue, ifFalse) {\n\t\t\t\tif (arguments.length < 3)\n\t\t\t\t\tifFalse = false;\n\t\t\t\tif (arguments.length < 2)\n\t\t\t\t\tifTrue = true;\n\t\t\t\treturn test ? ifTrue : ifFalse;\n\t\t\t};\n\t\t</script>\n\t\t<noscript id=\"smio_noscript\">\n\t\t\t<style type=\"text/css\"> span.smio-noscript { display: block !important; } </style>\n\t\t</noscript>\n\t\t<div id=\"smio_main\" class=\"smio-main\"><span class=\"smio-noscript\" id=\"smio_noscript_content\">___smiopagecontent___</span></div>\n\t\t<script type=\"text/javascript\" language=\"JavaScript\" src=\"/_/dynfile/?config=_res.js\" onerror=\"onScriptError('_res.js');\" defer=\"defer\" async=\"async\"></script>\n\t\t<script type=\"text/javascript\" language=\"JavaScript\" src=\"/_/file/_merged/_smoothio.js\" onerror=\"onScriptError('_smoothio.js');\" defer=\"defer\" async=\"async\"></script>\n\t\t<!--xscript type=\"text/javascript\" language=\"JavaScript\" src=\"/_/file/coffee-script.js\" onerror=\"onScriptError('coffee-script.js');\" defer=\"defer\" async=\"async\"></xscript-->\n\t</body>\n</html>\n\n");
+      __r.p("<!DOCTYPE html>\n<html lang=\"");
+      __r.p(this.renderTag("arg", "lang", null));
+      __r.p("\">\n\t<head>\n\t\t<meta charset=\"utf-8\" />\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n\t\t<meta name=\"generator\" content=\"smooth.io\"/>\n\t\t<meta name=\"application-name\" content=\"");
+      __r.p(this.renderTag("arg", "appname", null));
+      __r.p("\"/>\n\t\t<title>");
+      __r.p(this.renderTag("arg", "title", null));
+      __r.p("</title>\n\t\t<script type=\"text/javascript\" language=\"JavaScript\">\n\t\t\tfunction onSmoothioNoCookie() {\n\t\t\t\t$('#smio_offline').hide();\n\t\t\t\t$('#smio_body').css({ \"background-image\": \"none\" }).html('<br/><br/><br/><br/><hr/>Either your session cookie expired or you have disabled browser cookies, and hence this application will not load.<br/><br/>Verify that cookies are enabled in your web browser, then try a complete reload (press CTRL+R).<hr/>Entweder ist Ihr Sitzungscookie abgelaufen oder Ihr Webbrowser unterst&uuml;tzt keine Cookies, und somit wird auch diese Anwendung nicht geladen.<br/><br/>Stellen Sie sicher, da&szlig; Ihr Webbrowser Cookies erlaubt, und versuchen Sie dann ein Komplett-Neuladen (STRG+R).<hr/>');\n\t\t\t}\n\n\t\t\tfunction onSmoothioPageLoad() {\n\t\t\t\t$('#smio_noscript, #smio_prescript, #smio_noscript_content').remove();\n\t\t\t\tif (smio.pageLoadError)\n\t\t\t\t\tdocument.getElementById('smio_body').innerHTML = '<br/><br/><br/><br/><hr/>Required core script <b>' + smio.pageLoadError + '</b> could not be loaded and hence this application will not load.<br/><br/>Try a complete reload (press CTRL+R) as this was probably just a temporary disruption.<hr/>Erforderliches Kernscript <b>' + smio.pageLoadError + '</b> konnte nicht geladen werden und somit wird auch diese Anwendung nicht geladen.<br/><br/>Versuchen Sie ein Komplett-Neuladen (STRG+R), da dies wahrscheinlich nur eine kurzzeitige St&ouml;rung war.<hr/>';\n\t\t\t\telse if (!(smio.client = new smio.Client()).sessionID)\n\t\t\t\t\tonSmoothioNoCookie();\n\t\t\t\telse\n\t\t\t\t\tsmio.client.init();\n\t\t\t}\n\n\t\t\tfunction onSmoothioProgress() {\n\t\t\t}\n\n\t\t\tfunction onSmoothioSleepy(sleepy) {\n\t\t\t\tif (smio.client && smio.client.socket && (sleepy != smio.client.sleepy))\n\t\t\t\t\tsmio.client.socket.onSleepy(smio.client.sleepy = sleepy);\n\t\t\t}\n\n\t\t\tfunction onScriptError(scriptName) {\n\t\t\t\tsmio.pageLoadError = scriptName;\n\t\t\t}\n\t\t</script>\n\t\t<link rel=\"stylesheet\" href=\"/_/file/_merged/_smoothio.css\"/>\n\t\t<link rel=\"shortcut icon\" type=\"image/png\" id=\"smio_favicon\" href=\"/_/file/images/smoothio.png\" />\n\t\t<style type=\"text/css\"> span.smio-noscript { display: none; } </style>\n\t</head>\n\t<body id=\"smio_body\" onload=\"onSmoothioPageLoad();\" onblur=\"onSmoothioSleepy(true);\" onfocus=\"onSmoothioSleepy(false);\">\n\t\t<div id=\"smio_offline\" class=\"smio-blocking-overlay\"><span id=\"smio_offline_msg\"></span><span id=\"smio_offline_blink\">&nbsp;&#x273F;</span></div>\n\t\t<script type=\"text/javascript\" language=\"JavaScript\" id=\"smio_prescript\">\n\t\t\tdocument.getElementById('smio_offline').style.display = 'block';\n\t\t\tvar smioGlobalTest, smio, WEB_SOCKET_SWF_LOCATION = '/_/dynfile/?type=application/x-shockwave-flash&config=sockets.xdomain_swf&true=bin/websockx.swf&false=bin/websock.swf';\n\t\t\ttry {\n\t\t\t\tsmioGlobalTest = global;\n\t\t\t} catch(err) {\n\t\t\t}\n\t\t\tif (!smioGlobalTest)\n\t\t\t\tglobal = {};\n\t\t\tif (!global['smoothio'])\n\t\t\t\tglobal['smoothio'] = {}\n\t\t\tsmio = global.smoothio;\n\t\t\tsmio.pageLoadError = null;\n\t\t\tsmio.iif = function(test, ifTrue, ifFalse) {\n\t\t\t\tif (arguments.length < 3)\n\t\t\t\t\tifFalse = false;\n\t\t\t\tif (arguments.length < 2)\n\t\t\t\t\tifTrue = true;\n\t\t\t\treturn test ? ifTrue : ifFalse;\n\t\t\t};\n\t\t</script>\n\t\t<noscript id=\"smio_noscript\">\n\t\t\t<style type=\"text/css\"> span.smio-noscript { display: block !important; } </style>\n\t\t</noscript>\n\t\t<div id=\"smio_main\" class=\"smio-main\"><span class=\"smio-noscript\" id=\"smio_noscript_content\">");
+      __r.p(this.renderTag("arg", "htmlContent", null));
+      __r.p("</span></div>\n\t\t<script type=\"text/javascript\" language=\"JavaScript\" src=\"/_/dynfile/?config=_res.js\" onerror=\"onScriptError('_res.js');\" defer=\"defer\" async=\"async\"></script>\n\t\t<script type=\"text/javascript\" language=\"JavaScript\" src=\"/_/file/_merged/_smoothio.js\" onerror=\"onScriptError('_smoothio.js');\" defer=\"defer\" async=\"async\"></script>\n\t\t<!--xscript type=\"text/javascript\" language=\"JavaScript\" src=\"/_/file/coffee-script.js\" onerror=\"onScriptError('coffee-script.js');\" defer=\"defer\" async=\"async\"></xscript-->\n\t</body>\n</html>\n");
       _html = __r.o.join('');
       if ($el) {
         $el.html(_html);
@@ -14725,7 +14810,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       var ret;
       ret = {
         span: {
-          "class": '= smio-textinput',
+          "class": 'smio-textinput',
           id: ''
         }
       };
@@ -14738,7 +14823,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
       ret.span.input = {
         id: 'input',
-        "class": '= smio-textinput',
+        "class": 'smio-textinput',
         type: this.args.type === 'password' ? 'password' : 'text'
       };
       if (this.disabled) {
@@ -14802,17 +14887,17 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       ischk = this.isCheckBox();
       ret = {
         span: {
-          "class": "= smio-toggleinput = smio-toggleinput-" + (ischk ? 'checkbox' : 'radio') + " = smio-toggleinput-" + (this.args.checked ? '' : 'un') + "checked = smio-toggleinput-" + (this.commonCssClass()),
+          "class": "smio-toggleinput smio-toggleinput-" + (ischk ? 'checkbox' : 'radio') + " smio-toggleinput-" + (this.args.checked ? '' : 'un') + "checked smio-toggleinput-" + (this.commonCssClass()),
           id: '',
           span: {
             id: 'btnlabel',
-            "class": "= smio-toggleinput-btnlabel",
+            "class": "smio-toggleinput-btnlabel",
             span: {
               id: 'btn',
-              "class": '= smio-toggleinput-btn',
+              "class": 'smio-toggleinput-btn',
               span: {
                 id: 'btnglyph',
-                "class": '= smio-toggleinput-btnbtn'
+                "class": 'smio-toggleinput-btnbtn'
               }
             }
           }
@@ -14826,12 +14911,12 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         }
       };
       getGSpan()['span #glyph'] = {
-        "class": '= smio-toggleinput-btnglyph'
+        "class": 'smio-toggleinput-btnglyph'
       };
       ret.span.span.span.input = {
         id: 'input',
-        name: this.args.toggleName,
-        "class": '= smio-toggleinput',
+        name: this.args.name,
+        "class": 'smio-toggleinput',
         type: ischk ? 'checkbox' : 'radio'
       };
       if (this.disabled) {
@@ -14844,7 +14929,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       if (this.args.labelText || this.args.labelHtml) {
         ret.span.span.label = {
           id: 'label',
-          "class": '= smio-toggleinput',
+          "class": 'smio-toggleinput',
           "for": this.id('input')
         };
         this.jsonTemplates_Label(ret.span.span.label);
@@ -14852,7 +14937,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       return ret;
     };
     Packs_Core_Controls_Toggle.prototype.commonCssClass = function() {
-      return this.args.toggleName || this.id();
+      return this.args.name || this.id();
     };
     Packs_Core_Controls_Toggle.prototype.coreDisable = function(disable) {
       return this.sub('input').prop('disabled', disable);
@@ -14865,7 +14950,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     };
     Packs_Core_Controls_Toggle.prototype.onCheck = function(passive) {
       var cc, el, nuCls, unCls, _ref;
-      _ref = ['= smio-toggleinput', this.sub('input')], cc = _ref[0], el = _ref[1];
+      _ref = ['smio-toggleinput', this.sub('input')], cc = _ref[0], el = _ref[1];
       if (this.chk !== el.prop('checked')) {
         this.chk = el.prop('checked');
         nuCls = cc + (this.chk ? '-checked' : '-unchecked');
@@ -14873,7 +14958,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         this.el.removeClass(unCls).addClass(nuCls);
         this.sub('glyph').html(!this.chk ? '' : smio[this.classPath()][this.isCheckBox() ? 'checkmark' : 'radiomark']);
         if (this.isRadioBox() && !passive) {
-          return $(".= smio-toggleinput-" + (this.commonCssClass()) + " input.= smio-toggleinput").each(__bind(function(i, e) {
+          return $(".smio-toggleinput-" + (this.commonCssClass()) + " input.smio-toggleinput").each(__bind(function(i, e) {
             var ctl;
             if (e.id !== this.id('input')) {
               $(e).prop('checked', false);
@@ -14895,10 +14980,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         }
       }, this));
       inp.blur(__bind(function() {
-        return this.sub('btnlabel').removeClass('= smio-toggleinput-focused');
+        return this.sub('btnlabel').removeClass('smio-toggleinput-focused');
       }, this));
       inp.focus(__bind(function() {
-        return this.sub('btnlabel').addClass('= smio-toggleinput-focused');
+        return this.sub('btnlabel').addClass('smio-toggleinput-focused');
       }, this));
       this.sub('btn').click(__bind(function() {
         var el;
@@ -15019,20 +15104,32 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                 "#owner": {
                   'div .smio-setup-stepbox-title': [this.r('steptitle_owner')],
                   'div .smio-setup-stepbox-form': {
-                    "TextInput #owner_name": {
-                      autoFocus: true,
-                      labelText: this.r('owner_name'),
-                      nospellcheck: true
-                    },
-                    "TextInput #owner_pass": {
-                      labelText: this.r('owner_pass'),
-                      type: 'password'
+                    "Controls #user": {
+                      ctltype: 'TextInput',
+                      required: true,
+                      nospellcheck: true,
+                      labelText: __bind(function(id) {
+                        return this.r("owner_" + id);
+                      }, this),
+                      placeholder: __bind(function(id) {
+                        return this.r("owner_" + id + "hint");
+                      }, this),
+                      type: __bind(function(id) {
+                        if (id !== 'name') {
+                          return 'password';
+                        } else {
+                          return '';
+                        }
+                      }, this),
+                      items: ['#name', '#pass', '#pass2']
                     },
                     "div .smio-setup-stepbox-form-label": {
                       html: [this.r('owner_choice')]
                     },
-                    "Toggles #owner": {
+                    "Controls #owner": {
+                      ctltype: 'Toggle',
                       disabled: true,
+                      name: this.id('owner_toggle'),
                       items: {
                         "#create": {
                           checked: true,
@@ -15061,12 +15158,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                     },
                     "div .smio-setup-stepbox-form-label": {
                       html: [this.r('hub_hint')]
-                    },
-                    "ul #hubhints": {
-                      "li #hubhint1": [this.r('hubhint1')],
-                      "li #hubhint2": [this.r('hubhint2')],
-                      "li #hubhint3": [this.r('hubhint3')],
-                      "li #hubhint4": [this.r('hubhint4')]
                     }
                   }
                 }

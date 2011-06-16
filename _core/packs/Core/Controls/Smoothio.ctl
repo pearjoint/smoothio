@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="___smiolang___">
+<html lang="<%arg:lang%>">
 	<head>
 		<meta charset="utf-8" />
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="smooth.io"/>
-		<meta name="application-name" content="smooth.io"/>
-		<title>smoothio</title>
+		<meta name="application-name" content="<%arg:appname%>"/>
+		<title><%arg:title%></title>
 		<script type="text/javascript" language="JavaScript">
 			function onSmoothioNoCookie() {
 				$('#smio_offline').hide();
@@ -64,10 +64,9 @@
 		<noscript id="smio_noscript">
 			<style type="text/css"> span.smio-noscript { display: block !important; } </style>
 		</noscript>
-		<div id="smio_main" class="smio-main"><span class="smio-noscript" id="smio_noscript_content">___smiopagecontent___</span></div>
+		<div id="smio_main" class="smio-main"><span class="smio-noscript" id="smio_noscript_content"><%arg:htmlContent%></span></div>
 		<script type="text/javascript" language="JavaScript" src="/_/dynfile/?config=_res.js" onerror="onScriptError('_res.js');" defer="defer" async="async"></script>
 		<script type="text/javascript" language="JavaScript" src="/_/file/_merged/_smoothio.js" onerror="onScriptError('_smoothio.js');" defer="defer" async="async"></script>
 		<!--xscript type="text/javascript" language="JavaScript" src="/_/file/coffee-script.js" onerror="onScriptError('coffee-script.js');" defer="defer" async="async"></xscript-->
 	</body>
 </html>
-

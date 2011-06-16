@@ -18,7 +18,7 @@
       var ret;
       ret = {
         span: {
-          "class": '= smio-textinput',
+          "class": 'smio-textinput',
           id: ''
         }
       };
@@ -31,7 +31,7 @@
       }
       ret.span.input = {
         id: 'input',
-        "class": '= smio-textinput',
+        "class": 'smio-textinput',
         type: this.args.type === 'password' ? 'password' : 'text'
       };
       if (this.disabled) {

@@ -8,7 +8,7 @@ smio = smoothio = global.smoothio
 class smio.Packs_Core_Controls_SlidePanel extends smio.Control
 
 
-#const $CC = smio-slidepanel
+#const $CC smio-slidepanel
 	
 #if client
 	
@@ -54,24 +54,32 @@ class smio.Packs_Core_Controls_SlidePanel extends smio.Control
 		@scrollTo(@curItem, true)
 	
 	scrollTo: (item, force) =>
-		[edgePrev, edgeNext, scrollBox] = [@sub('edgeprev'), @sub('edgenext'), @sub('scrollbox')]
+		[edgePrev, edgeNext, scrollBox, bounce] = [@sub('edgeprev'), @sub('edgenext'), @sub('scrollbox'), true]
+		curPos = scrollBox.scrollLeft()
 		if item is null
+			bounce = false
 			scrollLefts = []
 			distances = []
 			for it, i in @items
-				scrollLefts.push(tmp = (scrollBox.scrollLeft() + @sub('items_' + it).position().left - edgePrev.width()))
-				distances.push(Math.abs(tmp - scrollBox.scrollLeft()))
+				scrollLefts.push(tmp = (curPos + @sub('items_' + it).position().left - edgePrev.width()))
+				distances.push(Math.abs(tmp - curPos))
 			item = distances.indexOf(Math.min(distances...))
 		if _.isString(item)
 			item = @items.indexOf(item)
 		if ((item < 0) or (item >= @items.length)) and force
 			item = 0
+		onDone = =>
+			@scrolling = false
+			if bounce
+				@scrollTo(null, true)
 		if (force or item isnt @curItem) and (item >= 0) and (item < @items.length)
 			@scrolling = true
 			edgePrev.css(display: if (item is 0) then 'none' else 'block')
 			edgeNext.css(display: if (item is (@items.length - 1)) then 'none' else 'block')
 			@on('itemSelect', [@curItem = item, @items[item]])
-			morpheus.tween(250, ((pos) => scrollBox.scrollLeft(pos)), (=> @scrolling = false), null, scrollBox.scrollLeft(), scrollBox.scrollLeft() + @sub('items_' + @items[item]).position().left - edgePrev.width())
+			goalPos = curPos + @sub('items_' + @items[item]).position().left - edgePrev.width()
+			rnd = smio.Util.Number.randomInt(48) + 48
+			morpheus.tween(200, ((pos) => scrollBox.scrollLeft(pos)), onDone, null, curPos, (if bounce then (if (goalPos < curPos) then -rnd else rnd) else 0) + goalPos)
 	
 #endif
 	

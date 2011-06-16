@@ -49,6 +49,7 @@ div.smio-setup {
   font-size: 2em;
   color: #a40;
   text-shadow: 0 0 0.6em #fff;
+  padding-left: 1em;
   letter-spacing: -0.05em;
 }
 .smio-setup-header-detail {
@@ -70,6 +71,7 @@ div.smio-setup:hover .smio-setup-header-detail {
   color: #707070;
   font-size: 1.25em;
   text-shadow: 0 0.074em #fff;
+  padding-left: 4em;
   letter-spacing: -0.05em;
 }
 .smio-setup-stepslide > .smio-setup-stepbox {

@@ -1,4 +1,4 @@
-#const $CC = smio-textinput
+#const $CC smio-textinput
 
 renderTemplate: =>
 	ret =

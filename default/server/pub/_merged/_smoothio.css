@@ -118,17 +118,22 @@ table {
   border-spacing: 0;
 }
 ::selection {
-  background: rgba(0,0,0,0.75) !important;
+  background-color: rgba(0,0,0,0.75) !important;
+  color: #f0f0f0 !important;
+  text-shadow: none !important;
+}
+::-webkit-selection {
+  background-color: rgba(0,0,0,0.75) !important;
   color: #f0f0f0 !important;
   text-shadow: none !important;
 }
 :-moz-selection {
-  background: rgba(0,0,0,0.75) !important;
+  background-color: rgba(0,0,0,0.75) !important;
   color: #f0f0f0 !important;
   text-shadow: none !important;
 }
 ::-moz-selection {
-  background: rgba(0,0,0,0.75) !important;
+  background-color: rgba(0,0,0,0.75) !important;
   color: #f0f0f0 !important;
   text-shadow: none !important;
 }
@@ -439,7 +444,7 @@ input.smio-textinput {
   -webkit-user-drag: auto;
   -ms-user-drag: auto;
   user-drag: auto;
-  width: 12em;
+  width: 17em;
 }
 input.smio-textinput::-webkit-input-placeholder {
   font-weight: normal;
@@ -564,6 +569,7 @@ div.smio-setup {
   font-size: 2em;
   color: #a40;
   text-shadow: 0 0 0.6em #fff;
+  padding-left: 1em;
   letter-spacing: -0.05em;
 }
 .smio-setup-header-detail {
@@ -585,6 +591,7 @@ div.smio-setup:hover .smio-setup-header-detail {
   color: #707070;
   font-size: 1.25em;
   text-shadow: 0 0.074em #fff;
+  padding-left: 4em;
   letter-spacing: -0.05em;
 }
 .smio-setup-stepslide > .smio-setup-stepbox {

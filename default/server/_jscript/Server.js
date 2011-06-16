@@ -104,10 +104,10 @@
     Server.prototype.onRequest = function(request, response) {
       var ctx, pathItem, uri, url;
       if (this.status < 0) {
-        this.httpResponse.writeHead(500, {
+        response.writeHead(500, {
           'Content-Type': 'text/plain'
         });
-        this.httpResponse.end("500 Internal Server Error:\nShutting down.");
+        response.end("500 Internal Server Error:\nShutting down.");
         return this.stop();
       } else {
         this.status = 1;

@@ -30,12 +30,10 @@
     }
     Client.prototype.init = function() {
       this.socket.connect();
-      return setInterval((__bind(function() {
-        return this.pageBody.css({
-          "background-image": "url('/_/file/images/bg" + (smio.Util.Number.randomInt(4)) + ".jpg')",
-          "background-size": "auto auto"
-        });
-      }, this)), 4000);
+      return this.pageBody.css({
+        "background-image": "url('/_/file/images/bg0.jpg')",
+        "background-size": "auto auto"
+      });
     };
     Client.prototype.onWindowResize = function() {
       var ctl, h, id, w, _ref, _ref2, _results;

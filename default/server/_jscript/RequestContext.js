@@ -167,31 +167,30 @@
       }, this));
     };
     RequestContext.prototype.servePage = function(respHeaders) {
-      var fileContent, placeholder1, placeholder2, pos1, pos2, session, _ref;
-      _ref = ['___smiolang___', '___smiopagecontent___'], placeholder1 = _ref[0], placeholder2 = _ref[1];
-      respHeaders['Content-Type'] = 'text/html';
-      this.httpResponse.writeHead(200, respHeaders);
-      if (!smio.RequestContext.htmlContent) {
-        smio.RequestContext.htmlContent = smio.Util.FileSystem.readTextFile("server/pub/smoothio.html");
-      }
-      fileContent = smio.RequestContext.htmlContent;
-      if ((pos1 = fileContent.indexOf(placeholder1))) {
-        this.httpResponse.write(fileContent.substr(0, pos1) + this.userLanguage('en'));
-        fileContent = fileContent.substr(pos1 + placeholder1.length);
-      }
-      if ((pos2 = fileContent.indexOf(placeholder2)) <= 0) {
-        return this.httpResponse.write(fileContent);
-      } else {
-        this.httpResponse.write(fileContent.substr(0, pos2));
-        return (session = smio.Session.getBySessionID(this.server, this.smioCookie['sessid'])).handleFetch(this, {}, __bind(function(data) {
-          var ctl;
+      var session;
+      return (session = smio.Session.getBySessionID(this.server, this.smioCookie['sessid'])).handleFetch(this, {}, __bind(function(data) {
+        var ctl, mainCtl, userlang;
+        try {
           ctl = smio.Control.load(data['c']['']['_'], null, {
             id: 'sm'
           });
-          this.httpResponse.write(ctl.renderHtml());
-          return this.httpResponse.end(fileContent.substr(pos2 + placeholder2.length));
-        }, this));
-      }
+          mainCtl = smio.Control.load('Core_Controls_Smoothio', null, {
+            id: '',
+            htmlContent: ctl.renderHtml(),
+            lang: userlang,
+            title: 'smooth.io',
+            appname: 'smooth.io'
+          });
+          respHeaders['Content-Type'] = 'text/html';
+          respHeaders['Content-Language'] = userlang = this.userLanguage('en');
+          this.httpResponse.writeHead(200, respHeaders);
+          return this.httpResponse.end(mainCtl.renderHtml());
+        } catch (err) {
+          respHeaders['Content-Type'] = 'text/plain';
+          this.httpResponse.writeHead(500, respHeaders);
+          return this.httpResponse.end("500 Internal Server Error:\n" + (this.inst.formatError(err)));
+        }
+      }, this));
     };
     return RequestContext;
   })();

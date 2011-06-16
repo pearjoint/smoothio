@@ -8,7 +8,7 @@ smio = smoothio = global.smoothio
 class smio.Packs_Core_Controls_TextInput extends smio.Control
 
 
-#const $CC = smio-textinput
+#const $CC smio-textinput
 	
 	renderTemplate: =>
 		ret =

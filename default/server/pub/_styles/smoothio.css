@@ -117,17 +117,22 @@ table {
   border-spacing: 0;
 }
 ::selection {
-  background: rgba(0,0,0,0.75) !important;
+  background-color: rgba(0,0,0,0.75) !important;
+  color: #f0f0f0 !important;
+  text-shadow: none !important;
+}
+::-webkit-selection {
+  background-color: rgba(0,0,0,0.75) !important;
   color: #f0f0f0 !important;
   text-shadow: none !important;
 }
 :-moz-selection {
-  background: rgba(0,0,0,0.75) !important;
+  background-color: rgba(0,0,0,0.75) !important;
   color: #f0f0f0 !important;
   text-shadow: none !important;
 }
 ::-moz-selection {
-  background: rgba(0,0,0,0.75) !important;
+  background-color: rgba(0,0,0,0.75) !important;
   color: #f0f0f0 !important;
   text-shadow: none !important;
 }

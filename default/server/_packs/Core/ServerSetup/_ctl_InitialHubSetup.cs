@@ -39,17 +39,20 @@ class smio.Packs_Core_ServerSetup_InitialHubSetup extends smio.Control
 							'div .$CC-stepbox-title':
 								[@r 'steptitle_owner']
 							'div .$CC-stepbox-form':
-								"TextInput #owner_name":
-									autoFocus: true
-									labelText: @r('owner_name')
+								"Controls #user":
+									ctltype: 'TextInput'
+									required: true
 									nospellcheck: true
-								"TextInput #owner_pass":
-									labelText: @r('owner_pass')
-									type: 'password'
+									labelText: (id) => @r("owner_#{id}")
+									placeholder: (id) => @r("owner_#{id}hint")
+									type: (id) => if (id isnt 'name') then 'password' else ''
+									items: ['#name', '#pass', '#pass2']
 								"div .$CC-stepbox-form-label":
 									html: [@r 'owner_choice']
-								"Toggles #owner":
+								"Controls #owner":
+									ctltype: 'Toggle'
 									disabled: true
+									name: @id('owner_toggle')
 									items:
 										"#create":
 											checked: true
@@ -71,11 +74,6 @@ class smio.Packs_Core_ServerSetup_InitialHubSetup extends smio.Control
 									labelText: @r('hub_title')
 								"div .$CC-stepbox-form-label":
 									html: [@r 'hub_hint']
-								"ul #hubhints":
-									"li #hubhint1": [@r 'hubhint1']
-									"li #hubhint2": [@r 'hubhint2']
-									"li #hubhint3": [@r 'hubhint3']
-									"li #hubhint4": [@r 'hubhint4']
 			"TabStrip #steptabs .$CC-outer .$CC-steptabs":
 				"tabClass": '$CC-steptab'
 				"tabs": ['owner', 'template', 'finish']
