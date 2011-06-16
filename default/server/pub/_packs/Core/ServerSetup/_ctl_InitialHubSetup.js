@@ -85,6 +85,32 @@
                     },
                     "div .smio-setup-stepbox-form-label": {
                       html: [this.r('hub_hint')]
+                    },
+                    "Controls #bg": {
+                      ctltype: 'Toggle',
+                      name: this.id('hub_bg'),
+                      checked: __bind(function(id) {
+                        return id === 'bg0';
+                      }, this),
+                      labelHtml: __bind(function(id) {
+                        return '&nbsp;';
+                      }, this),
+                      style: __bind(function(id) {
+                        return {
+                          'background-image': "url('/_/file/images/" + id + ".jpg')"
+                        };
+                      }, this),
+                      onCheck: __bind(function(id) {
+                        return __bind(function(chk) {
+                          if (chk) {
+                            return this.client.pageBody.css({
+                              "background-image": "url('/_/file/images/" + id + ".jpg')",
+                              "background-size": "auto auto"
+                            });
+                          }
+                        }, this);
+                      }, this),
+                      items: ['#bg0', '#bg1', '#bg2', '#bg3', '#bg4']
                     }
                   }
                 }

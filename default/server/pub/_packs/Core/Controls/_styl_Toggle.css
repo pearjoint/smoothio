@@ -11,6 +11,11 @@ span.smio-toggleinput {
   overflow: hidden;
   white-space: nowrap;
 }
+span.smio-toggleinput.smio-enabled label,
+span.smio-toggleinput.smio-enabled input.smio-toggleinput,
+span.smio-toggleinput.smio-enabled .smio-toggleinput-btnlabel {
+  cursor: pointer;
+}
 .smio-toggleinput-btn {
   position: relative;
   display: inline;

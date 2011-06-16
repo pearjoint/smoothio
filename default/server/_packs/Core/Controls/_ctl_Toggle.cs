@@ -37,6 +37,8 @@ class smio.Packs_Core_Controls_Toggle extends smio.Control
 			type: if ischk then 'checkbox' else 'radio'
 		if (@disabled)
 			ret.span.span.span.input.disabled = 'disabled'
+		if @args.style
+			ret.span.style = ("#{n}: #{v}" for n, v of @args.style).join(';')
 		if @args.checked
 			ret.span.span.span.input.checked = 'checked'
 			getGSpan()['span #glyph'].html = [smio[@classPath()][if ischk then 'checkmark' else 'radiomark']]
@@ -74,6 +76,9 @@ class smio.Packs_Core_Controls_Toggle extends smio.Control
 						$(e).prop('checked', false)
 						if (ctl = @client.allControls[e.id.substr(0, e.id.lastIndexOf('_'))])
 							ctl.onCheck(true)
+			if @args.onCheck
+				@args.onCheck(@chk)
+			@on('check', [@chk])
 	
 	onLoad: =>
 		super()
@@ -83,9 +88,11 @@ class smio.Packs_Core_Controls_Toggle extends smio.Control
 				evt.stopPropagation()
 		inp.blur =>
 			@sub('btnlabel').removeClass('$CC-focused')
+			@el.removeClass('$CC-hasfocused')
 		inp.focus =>
 			@sub('btnlabel').addClass('$CC-focused')
-		@sub('btn').click =>
+			@el.addClass('$CC-hasfocused')
+		@sub('btnlabel').click =>
 			el = @sub('input')
 			if not el.prop('disabled')
 				el.prop('checked', @isRadioBox() or not el.prop('checked'))

@@ -64,6 +64,16 @@ renderTemplate: =>
 								labelText: @r('hub_title')
 							"div .$CC-stepbox-form-label":
 								html: [@r 'hub_hint']
+							"Controls #bg":
+								ctltype: 'Toggle'
+								name: @id('hub_bg')
+								checked: (id) => id is 'bg0'
+								labelHtml: (id) => '&nbsp;'
+								style: (id) => 'background-image': "url('/_/file/images/#{id}.jpg')"
+								onCheck: (id) => (chk) =>
+									if chk
+										@client.pageBody.css("background-image": "url('/_/file/images/#{id}.jpg')", "background-size": "auto auto")
+								items: ['#bg0', '#bg1', '#bg2', '#bg3', '#bg4']
 		"TabStrip #steptabs .$CC-outer .$CC-steptabs":
 			"tabClass": '$CC-steptab'
 			"tabs": ['owner', 'template', 'finish']

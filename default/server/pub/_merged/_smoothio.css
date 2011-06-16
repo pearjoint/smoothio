@@ -141,7 +141,9 @@ a {
   text-decoration: none;
   color: inherit;
 }
-img {
+img,
+span,
+div {
   image-rendering: optimizeQuality;
   -ms-interpolation-mode: bicubic;
 }
@@ -327,6 +329,11 @@ span.smio-toggleinput {
   display: inline-block;
   overflow: hidden;
   white-space: nowrap;
+}
+span.smio-toggleinput.smio-enabled label,
+span.smio-toggleinput.smio-enabled input.smio-toggleinput,
+span.smio-toggleinput.smio-enabled .smio-toggleinput-btnlabel {
+  cursor: pointer;
 }
 .smio-toggleinput-btn {
   position: relative;
@@ -627,7 +634,7 @@ div.smio-setup:hover .smio-setup-header-detail {
 li#sm_stepslide_items_finish .smio-setup-stepbox-form-label {
   padding-top: 0;
 }
-.smio-setup-stepbox-form span.smio-toggleinput {
+.smio-setup-stepbox-form #sm_stepslide_owner span.smio-toggleinput {
   display: block;
   padding: 0.8em 0 0 9em;
 }
@@ -637,8 +644,45 @@ ul#sm_stepslide_hubhints {
 .smio-setup-stepbox-form span.smio-toggleinput-unchecked {
   color: #909090;
 }
-.smio-setup-stepbox-form span.smio-textinput input.smio-textinput {
-  xwidth: 100%;
+#sm_stepslide_bg {
+  display: block;
+  padding: 1em 0em;
+}
+#sm_stepslide_bg .smio-toggleinput-btnlabel {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+}
+#sm_stepslide_bg .smio-toggleinput {
+  margin: 0em 0.25em;
+  background-repeat: no-repeat;
+  -moz-transition: opacity 0.5s;
+  -webkit-transition: opacity 0.5s;
+  -o-transition: opacity 0.5s;
+  transition: opacity 0.5s;
+  background-position: 2px 2px;
+  -moz-box-shadow: 0em 0.1em 0.66em #606060;
+  -webkit-box-shadow: 0em 0.1em 0.66em #606060;
+  box-shadow: 0em 0.1em 0.66em #606060;
+}
+#sm_stepslide_bg .smio-toggleinput-hasfocused {
+  -moz-box-shadow: 0em 0.1em 0.66em #a40;
+  -webkit-box-shadow: 0em 0.1em 0.66em #a40;
+  box-shadow: 0em 0.1em 0.66em #a40;
+}
+#sm_stepslide_bg .smio-toggleinput-checked {
+  width: 96px;
+  height: 64px;
+  background-size: 92px 60px;
+}
+#sm_stepslide_bg .smio-toggleinput-unchecked {
+  opacity: 0.5;
+  width: 80px;
+  height: 53px;
+  background-size: 76px 49px;
+}
+#sm_stepslide_bg .smio-toggleinput-unchecked:hover {
+  opacity: 1;
 }
 .smio-setup-stepbox-form span.smio-textinput label {
   display: inline-block;

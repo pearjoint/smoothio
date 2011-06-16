@@ -16,7 +16,7 @@
     Packs_Core_Controls_Toggle.checkmark = '&#x2714;';
     Packs_Core_Controls_Toggle.radiomark = '';
     Packs_Core_Controls_Toggle.prototype.renderTemplate = function() {
-      var getGSpan, ischk, ret;
+      var getGSpan, ischk, n, ret, v;
       ischk = this.isCheckBox();
       ret = {
         span: {
@@ -55,6 +55,18 @@
       if (this.disabled) {
         ret.span.span.span.input.disabled = 'disabled';
       }
+      if (this.args.style) {
+        ret.span.style = ((function() {
+          var _ref, _results;
+          _ref = this.args.style;
+          _results = [];
+          for (n in _ref) {
+            v = _ref[n];
+            _results.push("" + n + ": " + v);
+          }
+          return _results;
+        }).call(this)).join(';');
+      }
       if (this.args.checked) {
         ret.span.span.span.input.checked = 'checked';
         getGSpan()['span #glyph'].html = [smio[this.classPath()][ischk ? 'checkmark' : 'radiomark']];
@@ -91,7 +103,7 @@
         this.el.removeClass(unCls).addClass(nuCls);
         this.sub('glyph').html(!this.chk ? '' : smio[this.classPath()][this.isCheckBox() ? 'checkmark' : 'radiomark']);
         if (this.isRadioBox() && !passive) {
-          return $(".smio-toggleinput-" + (this.commonCssClass()) + " input.smio-toggleinput").each(__bind(function(i, e) {
+          $(".smio-toggleinput-" + (this.commonCssClass()) + " input.smio-toggleinput").each(__bind(function(i, e) {
             var ctl;
             if (e.id !== this.id('input')) {
               $(e).prop('checked', false);
@@ -101,6 +113,10 @@
             }
           }, this));
         }
+        if (this.args.onCheck) {
+          this.args.onCheck(this.chk);
+        }
+        return this.on('check', [this.chk]);
       }
     };
     Packs_Core_Controls_Toggle.prototype.onLoad = function() {
@@ -113,12 +129,14 @@
         }
       }, this));
       inp.blur(__bind(function() {
-        return this.sub('btnlabel').removeClass('smio-toggleinput-focused');
+        this.sub('btnlabel').removeClass('smio-toggleinput-focused');
+        return this.el.removeClass('smio-toggleinput-hasfocused');
       }, this));
       inp.focus(__bind(function() {
-        return this.sub('btnlabel').addClass('smio-toggleinput-focused');
+        this.sub('btnlabel').addClass('smio-toggleinput-focused');
+        return this.el.addClass('smio-toggleinput-hasfocused');
       }, this));
-      this.sub('btn').click(__bind(function() {
+      this.sub('btnlabel').click(__bind(function() {
         var el;
         el = this.sub('input');
         if (!el.prop('disabled')) {

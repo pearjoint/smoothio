@@ -14883,7 +14883,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     Packs_Core_Controls_Toggle.checkmark = '&#x2714;';
     Packs_Core_Controls_Toggle.radiomark = '';
     Packs_Core_Controls_Toggle.prototype.renderTemplate = function() {
-      var getGSpan, ischk, ret;
+      var getGSpan, ischk, n, ret, v;
       ischk = this.isCheckBox();
       ret = {
         span: {
@@ -14922,6 +14922,18 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       if (this.disabled) {
         ret.span.span.span.input.disabled = 'disabled';
       }
+      if (this.args.style) {
+        ret.span.style = ((function() {
+          var _ref, _results;
+          _ref = this.args.style;
+          _results = [];
+          for (n in _ref) {
+            v = _ref[n];
+            _results.push("" + n + ": " + v);
+          }
+          return _results;
+        }).call(this)).join(';');
+      }
       if (this.args.checked) {
         ret.span.span.span.input.checked = 'checked';
         getGSpan()['span #glyph'].html = [smio[this.classPath()][ischk ? 'checkmark' : 'radiomark']];
@@ -14958,7 +14970,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         this.el.removeClass(unCls).addClass(nuCls);
         this.sub('glyph').html(!this.chk ? '' : smio[this.classPath()][this.isCheckBox() ? 'checkmark' : 'radiomark']);
         if (this.isRadioBox() && !passive) {
-          return $(".smio-toggleinput-" + (this.commonCssClass()) + " input.smio-toggleinput").each(__bind(function(i, e) {
+          $(".smio-toggleinput-" + (this.commonCssClass()) + " input.smio-toggleinput").each(__bind(function(i, e) {
             var ctl;
             if (e.id !== this.id('input')) {
               $(e).prop('checked', false);
@@ -14968,6 +14980,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
             }
           }, this));
         }
+        if (this.args.onCheck) {
+          this.args.onCheck(this.chk);
+        }
+        return this.on('check', [this.chk]);
       }
     };
     Packs_Core_Controls_Toggle.prototype.onLoad = function() {
@@ -14980,12 +14996,14 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         }
       }, this));
       inp.blur(__bind(function() {
-        return this.sub('btnlabel').removeClass('smio-toggleinput-focused');
+        this.sub('btnlabel').removeClass('smio-toggleinput-focused');
+        return this.el.removeClass('smio-toggleinput-hasfocused');
       }, this));
       inp.focus(__bind(function() {
-        return this.sub('btnlabel').addClass('smio-toggleinput-focused');
+        this.sub('btnlabel').addClass('smio-toggleinput-focused');
+        return this.el.addClass('smio-toggleinput-hasfocused');
       }, this));
-      this.sub('btn').click(__bind(function() {
+      this.sub('btnlabel').click(__bind(function() {
         var el;
         el = this.sub('input');
         if (!el.prop('disabled')) {
@@ -15012,61 +15030,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       return "Core_Controls";
     };
     return Packs_Core_Controls_Toggle;
-  })();
-}).call(this);
-
-/** server/pub/_packs/Core/Controls/_ctl_Toggles.js **/
-(function() {
-  /*
-  Auto-generated from Core/Controls/Toggles.ctl
-  */  var smio, smoothio;
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
-    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
-    function ctor() { this.constructor = child; }
-    ctor.prototype = parent.prototype;
-    child.prototype = new ctor;
-    child.__super__ = parent.prototype;
-    return child;
-  };
-  smio = smoothio = global.smoothio;
-  smio.Packs_Core_Controls_Toggles = (function() {
-    __extends(Packs_Core_Controls_Toggles, smio.Control);
-    Packs_Core_Controls_Toggles.prototype.renderTemplate = function() {
-      var item, itemID, span, _ref;
-      span = {
-        id: ''
-      };
-      if (this.args.items) {
-        _ref = this.args.items;
-        for (itemID in _ref) {
-          item = _ref[itemID];
-          while (_.startsWith(itemID, '#')) {
-            itemID = itemID.substr(1);
-          }
-          if (!item['toggleName']) {
-            item.toggleName = this.id('toggle');
-          }
-          if (this.args.disabled) {
-            item.disabled = this.args.disabled;
-          }
-          span["Toggle #" + itemID] = item;
-        }
-      }
-      return {
-        span: span
-      };
-    };
-    function Packs_Core_Controls_Toggles(client, parent, args) {
-      this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_Toggles.__super__.constructor.call(this, client, parent, args);
-      this.init();
-    }
-    Packs_Core_Controls_Toggles.prototype.className = function() {
-      return "Core_Controls_Toggles";
-    };
-    Packs_Core_Controls_Toggles.prototype.classNamespace = function() {
-      return "Core_Controls";
-    };
-    return Packs_Core_Controls_Toggles;
   })();
 }).call(this);
 
@@ -15158,6 +15121,32 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                     },
                     "div .smio-setup-stepbox-form-label": {
                       html: [this.r('hub_hint')]
+                    },
+                    "Controls #bg": {
+                      ctltype: 'Toggle',
+                      name: this.id('hub_bg'),
+                      checked: __bind(function(id) {
+                        return id === 'bg0';
+                      }, this),
+                      labelHtml: __bind(function(id) {
+                        return '&nbsp;';
+                      }, this),
+                      style: __bind(function(id) {
+                        return {
+                          'background-image': "url('/_/file/images/" + id + ".jpg')"
+                        };
+                      }, this),
+                      onCheck: __bind(function(id) {
+                        return __bind(function(chk) {
+                          if (chk) {
+                            return this.client.pageBody.css({
+                              "background-image": "url('/_/file/images/" + id + ".jpg')",
+                              "background-size": "auto auto"
+                            });
+                          }
+                        }, this);
+                      }, this),
+                      items: ['#bg0', '#bg1', '#bg2', '#bg3', '#bg4']
                     }
                   }
                 }

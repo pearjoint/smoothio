@@ -17,7 +17,7 @@
 ,	"owner_login"					:	"...ein <i>bestehendes</i> <b>%s</b>-Konto"
 ,	"hub_title"						:	"Hub-Titel:"
 ,	"hub_titlehint"					:	"z.B. „Projekt X“, „Testumgebung“, „Persönlich“ etc..."
-,	"hub_hint"						:	"Diesen Titel Ihres Hubs k&ouml;nnen Sie auch sp&auml;ter noch jederzeit &auml;ndern."
+,	"hub_hint"						:	"Diesen Titel Ihres Hubs k&ouml;nnen Sie auch sp&auml;ter noch jederzeit &auml;ndern.<br/><br/>Anf&auml;ngliches Standard-Hintergrundbild f&uuml;r diesen Hub:"
 ,	"steps_owner"					:	"➊  Eigentümer angeben"
 ,	"steps_template"				:	"➋  Vorlage auswählen"
 ,	"steps_finish"					:	"➌  Setup abschließen"

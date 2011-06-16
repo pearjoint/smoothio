@@ -58,8 +58,8 @@ class smio.Server
 
 	onRequest: (request, response) =>
 		if @status < 0
-			response.writeHead(500, 'Content-Type': 'text/plain')
-			response.end("500 Internal Server Error:\nShutting down.")
+			response.writeHead(200, 'Content-Type': 'text/plain')
+			response.end(JSON.stringify(__foo: 'Shutdown'))
 			@stop()
 		else
 			@status = 1

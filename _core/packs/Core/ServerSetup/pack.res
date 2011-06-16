@@ -17,7 +17,7 @@
 ,	"owner_login"					:	"...an <i>existing</i> <b>%s</b> account"
 ,	"hub_title"						:	"Hub title:"
 ,	"hub_titlehint"					:	"e.g. “Test hub”, “Project X”, “Personal” etc..."
-,	"hub_hint"						:	"You can change the above Hub title at any time."
+,	"hub_hint"						:	"You can change the above Hub title at any time.<br/><br/>Initial default wallpaper for this Hub:"
 ,	"steps_owner"					:	"➊  Specify owner"
 ,	"steps_template"				:	"➋  Select template"
 ,	"steps_finish"					:	"➌  Finish setup"
