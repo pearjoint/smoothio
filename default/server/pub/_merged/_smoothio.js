@@ -13235,8 +13235,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     Client.prototype.init = function() {
       this.socket.connect();
       return this.pageBody.css({
-        "background-image": "url('/_/file/images/bg0.jpg')",
-        "background-size": "auto auto"
+        "background-image": "url('/_/file/images/bg0.jpg')"
       });
     };
     Client.prototype.onWindowResize = function() {
@@ -13563,7 +13562,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio.Control = (function() {
     Control.prototype.coreDisable = function(disable) {};
     Control.prototype.disable = function(disable, isInherit) {
-      var ctl, id, len, _ref;
+      var ctl, len, _i, _len, _ref;
       if (!arguments.length) {
         disable = isInherit = true;
       }
@@ -13582,8 +13581,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.coreDisable(disable);
       len = 0;
       _ref = this.controls;
-      for (id in _ref) {
-        ctl = _ref[id];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        ctl = _ref[_i];
         len++;
         ctl.disable(disable, isInherit);
       }
@@ -13620,11 +13619,11 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
     };
     Control.prototype.onLoad = function() {
-      var ctl, id, _ref, _results;
+      var ctl, _i, _len, _ref, _results;
       this.el = $('#' + this.id());
       if (this.disabled) {
         this.el.removeClass('smio-enabled').addClass('smio-disabled');
-        if (smio.Util.Object.empty(this.controls)) {
+        if (!this.controls.length) {
           this.el.addClass('smio-disabledfaded');
         }
       } else {
@@ -13632,8 +13631,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
       _ref = this.controls;
       _results = [];
-      for (id in _ref) {
-        ctl = _ref[id];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        ctl = _ref[_i];
         _results.push(ctl.onLoad());
       }
       return _results;
@@ -13644,7 +13643,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       ctl = this;
       if ((parts = id.split('/')).length > 1) {
         for (i = 0, _ref = parts.length - 1; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
-          ctl = ctl.controls[parts[i]];
+          ctl = ctl.ctl(parts[i]);
         }
       }
       return $("#" + (ctl.id(parts[parts.length - 1])));
@@ -13665,12 +13664,15 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       },
       "ctl": function(ctl, className, args, emptyIfMissing) {
         var ctor, renderFunc, subCtl;
-        if ((!ctl.controls[args.id]) && ((ctor = smio["Packs_" + (ctl.classNamespace()) + "_" + className]) || (ctor = smio["Packs_" + (ctl.classNamespace()) + "_Controls_" + className]) || (ctor = smio["Packs_Core_Controls_" + className]))) {
-          subCtl = new ctor(ctl.client, ctl, args);
-          ctl.client.allControls[subCtl.id()] = ctl.controls[args.id] = subCtl;
+        subCtl = _.detect(ctl.controls, function(sc) {
+          return sc.ctlID === args.id;
+        });
+        if ((!subCtl) && ((ctor = smio["Packs_" + (ctl.classNamespace()) + "_" + className]) || (ctor = smio["Packs_" + (ctl.classNamespace()) + "_Controls_" + className]) || (ctor = smio["Packs_Core_Controls_" + className]))) {
+          ctl.controls.push(subCtl = new ctor(ctl.client, ctl, args));
+          ctl.client.allControls[subCtl.id()] = subCtl;
         }
-        if (ctl.controls[args.id]) {
-          return ctl.controls[args.id].renderHtml();
+        if (subCtl) {
+          return subCtl.renderHtml();
         } else if ((renderFunc = ctl["renderHtml_" + className])) {
           return renderFunc(className, args);
         } else {
@@ -13722,6 +13724,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.renderHtml = __bind(this.renderHtml, this);
       this.renderJsonTemplate = __bind(this.renderJsonTemplate, this);
       this.jsSelf = __bind(this.jsSelf, this);
+      this.jsonTemplates_Label = __bind(this.jsonTemplates_Label, this);
       this.init = __bind(this.init, this);
       this.id = __bind(this.id, this);
       this.ctl = __bind(this.ctl, this);
@@ -13740,7 +13743,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.coreDisable = __bind(this.coreDisable, this);
       this.disabled = smio.iif(this.args.disabled);
       this.ctlID = this.args.id;
-      this.controls = {};
+      this.controls = [];
       this.el = null;
     }
     Control.prototype.classPath = function() {
@@ -13779,7 +13782,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     };
     Control.prototype.init = function() {};
     Control.prototype.jsonTemplates_Label = function(target) {
-      return target[this.args.labelHtml ? 'html' : '_'] = [this.args.labelHtml ? this.args.labelHtml : this.args.labelText];
+      var label;
+      label = this.args.labelHtml ? this.args.labelHtml : this.args.labelText;
+      return target[this.args.labelHtml ? 'html' : '_'] = [this.r(label)];
     };
     Control.prototype.jsSelf = function() {
       return "smio.client.allControls['" + this.id() + "']";
@@ -13890,9 +13895,13 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       return this.res.apply(this, [name].concat(__slice.call(args)));
     };
     Control.prototype.res = function() {
-      var args, i, name, parts, resSet, resSets, ret, _ref;
+      var args, i, name, parts, resSet, resSets, ret, _ref, _ref2;
       name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       ret = '';
+      if (((!args) || (!args.length)) && _.isArray(name) && (name.length > 1)) {
+        args = name.slice(1);
+        name = name[0];
+      }
       if ((resSets = (this.client ? smio.resources : smio.inst.resourceSets))) {
         parts = this.classNamespace().split('_');
         for (i = _ref = parts.length - 1; _ref <= 0 ? i <= 0 : i >= 0; _ref <= 0 ? i++ : i--) {
@@ -13912,7 +13921,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         }
       } else {
         if (this.parent) {
-          return this.parent.res(name);
+          return (_ref2 = this.parent).res.apply(_ref2, [name].concat(__slice.call(args)));
         } else {
           return "!!RES::" + name + "!!";
         }
@@ -14751,7 +14760,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         tab = _ref[_i];
         ret.div["LinkButton #" + tab + " ." + this.args.tabClass + " ." + (this.args.tabClass + (is1st ? '-active' : '-inactive'))] = {
-          labelText: [this.r(this.args.resPrefix + tab)],
+          labelText: this.args.resPrefix + tab,
           onClick: makeOnClick(tab)
         };
         is1st = false;
@@ -14836,7 +14845,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         ret.span.input.required = 'required';
       }
       if (this.args.placeholder) {
-        ret.span.input.placeholder = this.args.placeholder;
+        ret.span.input.placeholder = this.r(this.args.placeholder);
       }
       if (this.args.value) {
         ret.span.input.value = this.args.value;
@@ -14849,7 +14858,14 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     Packs_Core_Controls_TextInput.prototype.coreDisable = function(disable) {
       return this.sub('input').prop('readonly', disable);
     };
+    Packs_Core_Controls_TextInput.prototype.onLoad = function() {
+      return this.sub('input').change(__bind(function() {
+        var x;
+        return x = this.sub('input').val();
+      }, this));
+    };
     function Packs_Core_Controls_TextInput(client, parent, args) {
+      this.onLoad = __bind(this.onLoad, this);
       this.coreDisable = __bind(this.coreDisable, this);
       this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_TextInput.__super__.constructor.call(this, client, parent, args);
       this.init();
@@ -14974,7 +14990,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
             var ctl;
             if (e.id !== this.id('input')) {
               $(e).prop('checked', false);
-              if ((ctl = this.client.allControls[e.id.substr(0, e.id.lastIndexOf('_'))])) {
+              if ((ctl = this.ctl(e.id.substr(0, e.id.lastIndexOf('_'))))) {
                 return ctl.onCheck(true);
               }
             }
@@ -15072,10 +15088,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                       required: true,
                       nospellcheck: true,
                       labelText: __bind(function(id) {
-                        return this.r("owner_" + id);
+                        return "owner_" + id;
                       }, this),
                       placeholder: __bind(function(id) {
-                        return this.r("owner_" + id + "hint");
+                        return "owner_" + id + "hint";
                       }, this),
                       type: __bind(function(id) {
                         if (id !== 'name') {
@@ -15096,10 +15112,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                       items: {
                         "#create": {
                           checked: true,
-                          labelHtml: this.r('owner_create', 'localhost')
+                          labelHtml: ['owner_create', 'localhost']
                         },
                         "#login": {
-                          labelHtml: this.r('owner_login', 'localhost')
+                          labelHtml: ['owner_login', 'localhost']
                         }
                       }
                     }
@@ -15116,8 +15132,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                   "div .smio-setup-stepbox-form": {
                     "TextInput #hub_title": {
                       required: true,
-                      placeholder: this.r('hub_titlehint'),
-                      labelText: this.r('hub_title')
+                      placeholder: 'hub_titlehint',
+                      labelText: 'hub_title'
                     },
                     "div .smio-setup-stepbox-form-label": {
                       html: [this.r('hub_hint')]
@@ -15129,7 +15145,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                         return id === 'bg0';
                       }, this),
                       labelHtml: __bind(function(id) {
-                        return '&nbsp;';
+                        return 'nbsp';
                       }, this),
                       style: __bind(function(id) {
                         return {
@@ -15147,6 +15163,12 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                         }, this);
                       }, this),
                       items: ['#bg0', '#bg1', '#bg2', '#bg3', '#bg4']
+                    },
+                    "div .smio-setup-createbtn": {
+                      "LinkButton #hub_create .smio-bigbutton": {
+                        disabled: true,
+                        labelText: 'hub_create'
+                      }
                     }
                   }
                 }
@@ -15179,10 +15201,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }, this));
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.onSlide = function(index, itemID) {
-      return this.controls.steptabs.selectTab(itemID);
+      return this.ctl('steptabs').selectTab(itemID);
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.onTabSelect = function(tabID) {
-      return this.controls.stepslide.scrollTo(tabID);
+      return this.ctl('stepslide').scrollTo(tabID);
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.urlSeg = function() {
       var urlseg;

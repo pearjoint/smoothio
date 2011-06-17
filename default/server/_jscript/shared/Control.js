@@ -192,12 +192,15 @@
       },
       "ctl": function(ctl, className, args, emptyIfMissing) {
         var ctor, renderFunc, subCtl;
-        if ((!ctl.controls[args.id]) && ((ctor = smio["Packs_" + (ctl.classNamespace()) + "_" + className]) || (ctor = smio["Packs_" + (ctl.classNamespace()) + "_Controls_" + className]) || (ctor = smio["Packs_Core_Controls_" + className]))) {
-          subCtl = new ctor(ctl.client, ctl, args);
-          ctl.client.allControls[subCtl.id()] = ctl.controls[args.id] = subCtl;
+        subCtl = _.detect(ctl.controls, function(sc) {
+          return sc.ctlID === args.id;
+        });
+        if ((!subCtl) && ((ctor = smio["Packs_" + (ctl.classNamespace()) + "_" + className]) || (ctor = smio["Packs_" + (ctl.classNamespace()) + "_Controls_" + className]) || (ctor = smio["Packs_Core_Controls_" + className]))) {
+          ctl.controls.push(subCtl = new ctor(ctl.client, ctl, args));
+          ctl.client.allControls[subCtl.id()] = subCtl;
         }
-        if (ctl.controls[args.id]) {
-          return ctl.controls[args.id].renderHtml();
+        if (subCtl) {
+          return subCtl.renderHtml();
         } else if ((renderFunc = ctl["renderHtml_" + className])) {
           return renderFunc(className, args);
         } else {
@@ -249,6 +252,7 @@
       this.renderHtml = __bind(this.renderHtml, this);
       this.renderJsonTemplate = __bind(this.renderJsonTemplate, this);
       this.jsSelf = __bind(this.jsSelf, this);
+      this.jsonTemplates_Label = __bind(this.jsonTemplates_Label, this);
       this.init = __bind(this.init, this);
       this.id = __bind(this.id, this);
       this.ctl = __bind(this.ctl, this);
@@ -260,7 +264,7 @@
       this.Control = __bind(this.Control, this);
       this.disabled = smio.iif(this.args.disabled);
       this.ctlID = this.args.id;
-      this.controls = {};
+      this.controls = [];
       this.el = null;
     }
     Control.prototype.classPath = function() {
@@ -299,7 +303,9 @@
     };
     Control.prototype.init = function() {};
     Control.prototype.jsonTemplates_Label = function(target) {
-      return target[this.args.labelHtml ? 'html' : '_'] = [this.args.labelHtml ? this.args.labelHtml : this.args.labelText];
+      var label;
+      label = this.args.labelHtml ? this.args.labelHtml : this.args.labelText;
+      return target[this.args.labelHtml ? 'html' : '_'] = [this.r(label)];
     };
     Control.prototype.jsSelf = function() {
       return "smio.client.allControls['" + this.id() + "']";
@@ -410,9 +416,13 @@
       return this.res.apply(this, [name].concat(__slice.call(args)));
     };
     Control.prototype.res = function() {
-      var args, i, name, parts, resSet, resSets, ret, _ref;
+      var args, i, name, parts, resSet, resSets, ret, _ref, _ref2;
       name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       ret = '';
+      if (((!args) || (!args.length)) && _.isArray(name) && (name.length > 1)) {
+        args = name.slice(1);
+        name = name[0];
+      }
       if ((resSets = (this.client ? smio.resources : smio.inst.resourceSets))) {
         parts = this.classNamespace().split('_');
         for (i = _ref = parts.length - 1; _ref <= 0 ? i <= 0 : i >= 0; _ref <= 0 ? i++ : i--) {
@@ -432,7 +442,7 @@
         }
       } else {
         if (this.parent) {
-          return this.parent.res(name);
+          return (_ref2 = this.parent).res.apply(_ref2, [name].concat(__slice.call(args)));
         } else {
           return "!!RES::" + name + "!!";
         }

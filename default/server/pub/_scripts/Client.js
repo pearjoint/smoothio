@@ -31,8 +31,7 @@
     Client.prototype.init = function() {
       this.socket.connect();
       return this.pageBody.css({
-        "background-image": "url('/_/file/images/bg0.jpg')",
-        "background-size": "auto auto"
+        "background-image": "url('/_/file/images/bg0.jpg')"
       });
     };
     Client.prototype.onWindowResize = function() {

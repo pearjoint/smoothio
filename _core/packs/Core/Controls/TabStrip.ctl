@@ -10,7 +10,7 @@ renderTemplate: =>
 	is1st = true
 	for tab in @args.tabs
 		ret.div["LinkButton ##{tab} .#{@args.tabClass} .#{@args.tabClass + (if is1st then '-active' else '-inactive')}"] =
-			labelText: [@r(@args.resPrefix + tab)]
+			labelText: @args.resPrefix + tab
 			onClick: makeOnClick(tab)
 		is1st = false
 	ret

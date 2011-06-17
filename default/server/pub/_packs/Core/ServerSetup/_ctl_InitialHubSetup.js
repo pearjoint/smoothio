@@ -36,10 +36,10 @@
                       required: true,
                       nospellcheck: true,
                       labelText: __bind(function(id) {
-                        return this.r("owner_" + id);
+                        return "owner_" + id;
                       }, this),
                       placeholder: __bind(function(id) {
-                        return this.r("owner_" + id + "hint");
+                        return "owner_" + id + "hint";
                       }, this),
                       type: __bind(function(id) {
                         if (id !== 'name') {
@@ -60,10 +60,10 @@
                       items: {
                         "#create": {
                           checked: true,
-                          labelHtml: this.r('owner_create', 'localhost')
+                          labelHtml: ['owner_create', 'localhost']
                         },
                         "#login": {
-                          labelHtml: this.r('owner_login', 'localhost')
+                          labelHtml: ['owner_login', 'localhost']
                         }
                       }
                     }
@@ -80,8 +80,8 @@
                   "div .smio-setup-stepbox-form": {
                     "TextInput #hub_title": {
                       required: true,
-                      placeholder: this.r('hub_titlehint'),
-                      labelText: this.r('hub_title')
+                      placeholder: 'hub_titlehint',
+                      labelText: 'hub_title'
                     },
                     "div .smio-setup-stepbox-form-label": {
                       html: [this.r('hub_hint')]
@@ -93,7 +93,7 @@
                         return id === 'bg0';
                       }, this),
                       labelHtml: __bind(function(id) {
-                        return '&nbsp;';
+                        return 'nbsp';
                       }, this),
                       style: __bind(function(id) {
                         return {
@@ -111,6 +111,12 @@
                         }, this);
                       }, this),
                       items: ['#bg0', '#bg1', '#bg2', '#bg3', '#bg4']
+                    },
+                    "div .smio-setup-createbtn": {
+                      "LinkButton #hub_create .smio-bigbutton": {
+                        disabled: true,
+                        labelText: 'hub_create'
+                      }
                     }
                   }
                 }
@@ -143,10 +149,10 @@
       }, this));
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.onSlide = function(index, itemID) {
-      return this.controls.steptabs.selectTab(itemID);
+      return this.ctl('steptabs').selectTab(itemID);
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.onTabSelect = function(tabID) {
-      return this.controls.stepslide.scrollTo(tabID);
+      return this.ctl('stepslide').scrollTo(tabID);
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.urlSeg = function() {
       var urlseg;

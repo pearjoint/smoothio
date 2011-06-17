@@ -108,7 +108,7 @@
             var ctl;
             if (e.id !== this.id('input')) {
               $(e).prop('checked', false);
-              if ((ctl = this.client.allControls[e.id.substr(0, e.id.lastIndexOf('_'))])) {
+              if ((ctl = this.ctl(e.id.substr(0, e.id.lastIndexOf('_'))))) {
                 return ctl.onCheck(true);
               }
             }

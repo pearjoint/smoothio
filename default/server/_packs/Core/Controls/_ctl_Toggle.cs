@@ -74,7 +74,7 @@ class smio.Packs_Core_Controls_Toggle extends smio.Control
 				$(".$CC-#{@commonCssClass()} input.$CC").each (i, e) =>
 					if e.id isnt @id('input')
 						$(e).prop('checked', false)
-						if (ctl = @client.allControls[e.id.substr(0, e.id.lastIndexOf('_'))])
+						if (ctl = @ctl(e.id.substr(0, e.id.lastIndexOf('_'))))
 							ctl.onCheck(true)
 			if @args.onCheck
 				@args.onCheck(@chk)

@@ -21,7 +21,7 @@ renderTemplate: =>
 	if @args.required
 		ret.span.input.required = 'required'
 	if @args.placeholder
-		ret.span.input.placeholder = @args.placeholder
+		ret.span.input.placeholder = @r(@args.placeholder)
 	if @args.value
 		ret.span.input.value = @args.value
 	if @args.nospellcheck
@@ -30,4 +30,7 @@ renderTemplate: =>
 
 coreDisable: (disable) =>
 	@sub('input').prop('readonly', disable)
+
+onLoad: =>
+	@sub('input').change => x = @sub('input').val()
 

@@ -136,6 +136,56 @@ table {
   color: #f0f0f0 !important;
   text-shadow: none !important;
 }
+.smio-bigbutton2 {
+  display: inline-block;
+  padding: 0.33em 1em;
+  font-size: 1.2em;
+  font-weight: bold;
+  background: rgba(0,0,0,0.05);
+  color: #707070;
+  text-shadow: 0 1px #fff;
+  border: 1px solid rgba(0,0,0,0.25);
+  -webkit-border-radius: 0.25em;
+  -moz-border-radius: 0.25em;
+  border-radius: 0.25em;
+  -moz-box-shadow: 0 4px 4px rgba(255,255,255,0.6) inset, 0px -9px 10px -4px rgba(255,255,255,0.9) inset, 0 -20px 1px -6px rgba(0,0,0,0.125) inset;
+  -webkit-box-shadow: 0 4px 4px rgba(255,255,255,0.6) inset, 0px -9px 10px -4px rgba(255,255,255,0.9) inset, 0 -20px 1px -6px rgba(0,0,0,0.125) inset;
+  box-shadow: 0 4px 4px rgba(255,255,255,0.6) inset, 0px -9px 10px -4px rgba(255,255,255,0.9) inset, 0 -20px 1px -6px rgba(0,0,0,0.125) inset;
+}
+.smio-bigbutton {
+  display: inline-block;
+  padding: 0.4em 1em;
+  font-size: 1.15em;
+  font-weight: bold;
+  color: #707070;
+  text-shadow: 0 1px #f0f0f0;
+  border: 0.094em outset rgba(255,255,255,0.5);
+  letter-spacing: -0.05em;
+  -webkit-border-radius: 0.25em 0.25em 0.25em 0.25em;
+  -moz-border-radius: 0.25em 0.25em 0.25em 0.25em;
+  border-radius: 0.25em 0.25em 0.25em 0.25em;
+  -moz-box-shadow: 0 1px 5px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.15);
+  -webkit-box-shadow: 0 1px 5px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.15);
+  box-shadow: 0 1px 5px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.15);
+}
+.smio-disabled, .smio-disabled * {
+	cursor: not-allowed;
+}
+.smio-bigbutton.smio-enabled:hover,
+.smio-bigbutton.smio-enabled:focus {
+  background-color: rgba(0,0,0,0.01);
+  color: #606060;
+  -moz-box-shadow: 0 1px 5px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.35);
+  -webkit-box-shadow: 0 1px 5px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.35);
+  box-shadow: 0 1px 5px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.35);
+}
+.smio-bigbutton.smio-enabled:active {
+  color: #505050;
+  background-color: rgba(0,0,0,0.01);
+  -moz-box-shadow: 0 0 7px rgba(0,0,0,0.5), inset 0 15px 30px rgba(0,0,0,0.25), inset 0 -10px 20px rgba(255,255,255,0.1), inset 0 -10px rgba(255,255,255,0.05), inset 0 -1px rgba(255,255,255,0.15);
+  -webkit-box-shadow: 0 0 7px rgba(0,0,0,0.5), inset 0 15px 30px rgba(0,0,0,0.25), inset 0 -10px 20px rgba(255,255,255,0.1), inset 0 -10px rgba(255,255,255,0.05), inset 0 -1px rgba(255,255,255,0.15);
+  box-shadow: 0 0 7px rgba(0,0,0,0.5), inset 0 15px 30px rgba(0,0,0,0.25), inset 0 -10px 20px rgba(255,255,255,0.1), inset 0 -10px rgba(255,255,255,0.05), inset 0 -1px rgba(255,255,255,0.15);
+}
 a {
   text-decoration: none;
   color: inherit;
@@ -161,15 +211,10 @@ body {
   -webkit-user-drag: none;
   -ms-user-drag: none;
   user-drag: none;
-  background: -webkit-linear-gradient(0, rgba(255,255,255,0.07) 50%, transparent 50%), -webkit-linear-gradient(0, rgba(255,255,255,0.13) 50%, transparent 50%), -webkit-linear-gradient(0, transparent 50%, rgba(255,255,255,0.17) 50%), -webkit-linear-gradient(0, transparent 50%, rgba(255,255,255,0.19) 50%);
-  background: -ms-linear-gradient(0, rgba(255,255,255,0.07) 50%, transparent 50%), -ms-linear-gradient(0, rgba(255,255,255,0.13) 50%, transparent 50%), -ms-linear-gradient(0, transparent 50%, rgba(255,255,255,0.17) 50%), -ms-linear-gradient(0, transparent 50%, rgba(255,255,255,0.19) 50%);
-  background: -o-linear-gradient(0, rgba(255,255,255,0.07) 50%, transparent 50%), -o-linear-gradient(0, rgba(255,255,255,0.13) 50%, transparent 50%), -o-linear-gradient(0, transparent 50%, rgba(255,255,255,0.17) 50%), -o-linear-gradient(0, transparent 50%, rgba(255,255,255,0.19) 50%);
-  background: -moz-linear-gradient(0, rgba(255,255,255,0.07) 50%, transparent 50%), -moz-linear-gradient(0, rgba(255,255,255,0.13) 50%, transparent 50%), -moz-linear-gradient(0, transparent 50%, rgba(255,255,255,0.17) 50%), -moz-linear-gradient(0, transparent 50%, rgba(255,255,255,0.19) 50%);
   background-color: #d0c8b8;
-  background-size: 1.3em, 2.9em, 3.7em, 5.3em;
 }
 .smio-disabledfaded {
-  opacity: 0.65;
+  opacity: 0.5;
 }
 .smio-blocking-overlay {
   display: none;

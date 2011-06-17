@@ -157,7 +157,7 @@ class smio.Packs_#{className} extends smio.Control
 				@el.removeClass('smio-disabled').addClass('smio-enabled')
 		@coreDisable(disable)
 		len = 0
-		for id, ctl of @controls
+		for ctl in @controls
 			len++
 			ctl.disable(disable, isInherit)
 		if len is 0
@@ -184,11 +184,11 @@ class smio.Packs_#{className} extends smio.Control
 		@el = $('#' + @id())
 		if @disabled
 			@el.removeClass('smio-enabled').addClass('smio-disabled')
-			if smio.Util.Object.empty(@controls)
+			if not @controls.length
 				@el.addClass('smio-disabledfaded')
 		else
 			@el.removeClass('smio-disabled').addClass('smio-enabled')
-		for id, ctl of @controls
+		for ctl in @controls
 			ctl.onLoad()
 
 	onWindowResize: (width, height) =>
@@ -197,7 +197,7 @@ class smio.Packs_#{className} extends smio.Control
 		ctl = @
 		if (parts = id.split('/')).length > 1
 			for i in [0...parts.length - 1]
-				ctl = ctl.controls[parts[i]]
+				ctl = ctl.ctl(parts[i])
 		$("##{ctl.id(parts[parts.length - 1])}")
 
 	syncUpdate: (ctlDesc) =>
@@ -213,11 +213,12 @@ class smio.Packs_#{className} extends smio.Control
 		"arg": (ctl, name) ->
 			ctl.args[name]
 		"ctl": (ctl, className, args, emptyIfMissing) ->
-			if (not ctl.controls[args.id]) and ((ctor = smio["Packs_#{ctl.classNamespace()}_#{className}"]) or (ctor = smio["Packs_#{ctl.classNamespace()}_Controls_#{className}"]) or (ctor = smio["Packs_Core_Controls_#{className}"] ))
-				subCtl = new ctor(ctl.client, ctl, args)
-				ctl.client.allControls[subCtl.id()] = ctl.controls[args.id] = subCtl
-			if ctl.controls[args.id]
-				ctl.controls[args.id].renderHtml()
+			subCtl = _.detect(ctl.controls, (sc) -> sc.ctlID is args.id)
+			if (not subCtl) and ((ctor = smio["Packs_#{ctl.classNamespace()}_#{className}"]) or (ctor = smio["Packs_#{ctl.classNamespace()}_Controls_#{className}"]) or (ctor = smio["Packs_Core_Controls_#{className}"] ))
+				ctl.controls.push(subCtl = new ctor(ctl.client, ctl, args))
+				ctl.client.allControls[subCtl.id()] = subCtl
+			if subCtl
+				subCtl.renderHtml()
 			else if (renderFunc = ctl["renderHtml_#{className}"])
 				renderFunc(className, args)
 			else
@@ -242,7 +243,7 @@ class smio.Packs_#{className} extends smio.Control
 	constructor: (@client, @parent, @args) ->
 		@disabled = smio.iif(@args.disabled)
 		@ctlID = @args.id
-		@controls = {}
+		@controls = []
 		@el = null
 
 	classPath: =>
@@ -272,8 +273,9 @@ class smio.Packs_#{className} extends smio.Control
 
 	init: =>
 
-	jsonTemplates_Label: (target) ->
-		target[if @args.labelHtml then 'html' else '_'] = [if @args.labelHtml then @args.labelHtml else @args.labelText]
+	jsonTemplates_Label: (target) =>
+		label = if @args.labelHtml then @args.labelHtml else @args.labelText
+		target[if @args.labelHtml then 'html' else '_'] = [@r(label)]
 
 	jsSelf: =>
 		"smio.client.allControls['" + @id() + "']"
@@ -354,6 +356,9 @@ class smio.Packs_#{className} extends smio.Control
 
 	res: (name, args...) =>
 		ret = ''
+		if ((not args) or (not args.length)) and _.isArray(name) and (name.length > 1)
+			args = name[1..]
+			name = name[0]
 		if (resSets = (if @client then smio.resources else smio.inst.resourceSets))
 			parts = @classNamespace().split('_')
 			for i in [(parts.length - 1)..0]
@@ -361,5 +366,5 @@ class smio.Packs_#{className} extends smio.Control
 					break
 			if not ret
 				ret = if @client then resSets.smoothio[name] else resSets.smoothio['en'][name]
-		if ret then (if args.length then (_.sprintf.apply _, [ret, args...]) else ret) else (if @parent then (@parent.res name) else "!!RES::#{name}!!")
+		if ret then (if args.length then _.sprintf(ret, args...) else ret) else (if @parent then @parent.res(name, args...) else "!!RES::#{name}!!")
 

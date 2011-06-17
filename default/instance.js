@@ -214,7 +214,7 @@ function compileClientResources(srcPaths, outDirPath, minify, watch) {
 function compileStylusSheets(dirPath, outDirPath) {
 	var files = node_fs.readdirSync(dirPath), fileContent, filePath;
 	for (var i = 0; i < files.length; i++) {
-		if (node_fs.statSync(filePath = node_path.join(dirPath, files[i])).isFile() && (fileContent = node_fs.readFileSync(filePath, 'utf-8'))) {
+		if ((!_.startsWith(files[i], '_')) && node_fs.statSync(filePath = node_path.join(dirPath, files[i])).isFile() && (fileContent = node_fs.readFileSync(filePath, 'utf-8'))) {
 			watchFile(filePath);
 			stylus(fileContent).set('filename', filePath).render((function(index, fp) {
 				return function(err, css) {

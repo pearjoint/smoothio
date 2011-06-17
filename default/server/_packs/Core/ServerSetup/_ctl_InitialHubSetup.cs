@@ -43,8 +43,8 @@ class smio.Packs_Core_ServerSetup_InitialHubSetup extends smio.Control
 									ctltype: 'TextInput'
 									required: true
 									nospellcheck: true
-									labelText: (id) => @r("owner_#{id}")
-									placeholder: (id) => @r("owner_#{id}hint")
+									labelText: (id) => "owner_#{id}"
+									placeholder: (id) => "owner_#{id}hint"
 									type: (id) => if (id isnt 'name') then 'password' else ''
 									items: ['#name', '#pass', '#pass2']
 								"div .$CC-stepbox-form-label":
@@ -56,9 +56,9 @@ class smio.Packs_Core_ServerSetup_InitialHubSetup extends smio.Control
 									items:
 										"#create":
 											checked: true
-											labelHtml: @r('owner_create', 'localhost')
+											labelHtml: ['owner_create', 'localhost']
 										"#login":
-											labelHtml: @r('owner_login', 'localhost')
+											labelHtml: ['owner_login', 'localhost']
 						"#template":
 							"div .$CC-stepbox-title":
 								[@r 'steptitle_template']
@@ -70,20 +70,24 @@ class smio.Packs_Core_ServerSetup_InitialHubSetup extends smio.Control
 							"div .$CC-stepbox-form":
 								"TextInput #hub_title":
 									required: true
-									placeholder: @r('hub_titlehint')
-									labelText: @r('hub_title')
+									placeholder: 'hub_titlehint'
+									labelText: 'hub_title'
 								"div .$CC-stepbox-form-label":
 									html: [@r 'hub_hint']
 								"Controls #bg":
 									ctltype: 'Toggle'
 									name: @id('hub_bg')
 									checked: (id) => id is 'bg0'
-									labelHtml: (id) => '&nbsp;'
+									labelHtml: (id) => 'nbsp'
 									style: (id) => 'background-image': "url('/_/file/images/#{id}.jpg')"
 									onCheck: (id) => (chk) =>
 										if chk
 											@client.pageBody.css("background-image": "url('/_/file/images/#{id}.jpg')", "background-size": "auto auto")
 									items: ['#bg0', '#bg1', '#bg2', '#bg3', '#bg4']
+								"div .$CC-createbtn":
+									"LinkButton #hub_create .smio-bigbutton":
+										disabled: true
+										labelText: 'hub_create'
 			"TabStrip #steptabs .$CC-outer .$CC-steptabs":
 				"tabClass": '$CC-steptab'
 				"tabs": ['owner', 'template', 'finish']
@@ -101,10 +105,10 @@ class smio.Packs_Core_ServerSetup_InitialHubSetup extends smio.Control
 				location.replace(_.trim(nurl))
 	
 	onSlide: (index, itemID) =>
-		@controls.steptabs.selectTab(itemID)
+		@ctl('steptabs').selectTab(itemID)
 	
 	onTabSelect: (tabID) =>
-		@controls.stepslide.scrollTo(tabID)
+		@ctl('stepslide').scrollTo(tabID)
 	
 	urlSeg: =>
 		if (urlseg = _.trim(@client.pageUrl.attr('path'), '/')) then "/#{urlseg}/" else '/'

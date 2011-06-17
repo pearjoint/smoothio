@@ -43,7 +43,7 @@
         ret.span.input.required = 'required';
       }
       if (this.args.placeholder) {
-        ret.span.input.placeholder = this.args.placeholder;
+        ret.span.input.placeholder = this.r(this.args.placeholder);
       }
       if (this.args.value) {
         ret.span.input.value = this.args.value;
@@ -56,7 +56,14 @@
     Packs_Core_Controls_TextInput.prototype.coreDisable = function(disable) {
       return this.sub('input').prop('readonly', disable);
     };
+    Packs_Core_Controls_TextInput.prototype.onLoad = function() {
+      return this.sub('input').change(__bind(function() {
+        var x;
+        return x = this.sub('input').val();
+      }, this));
+    };
     function Packs_Core_Controls_TextInput(client, parent, args) {
+      this.onLoad = __bind(this.onLoad, this);
       this.coreDisable = __bind(this.coreDisable, this);
       this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_TextInput.__super__.constructor.call(this, client, parent, args);
       this.init();

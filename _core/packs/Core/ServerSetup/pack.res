@@ -1,8 +1,9 @@
 {
 	"___resource_file_intro"		:	"This formatting ensures no JSON-required commas or colons are ever missed. To add new resources, copy&paste the next line."
 ,	"x"								:	"y"
+, 	"nbsp"							:	"&nbsp;"
 ,	"title"							:	"Setting up your first Hub <a class='%s' href='%s'>at &#x279C; %s</a>"
-,	"desc"							:	"This server does not contain any Hubs yet. Create one below:"
+,	"desc"							:	"This server does not contain any Hubs yet. Create one now:"
 ,	"url_hint"						:	"A Hub can have any URL address you like. The URL of your new Hub will be:\n\n%s://%s%s➜"
 ,	"nojs_title"					:	"No Hub created yet"
 ,	"nojs_desc"						:	"This server does not contain any Hubs yet."
@@ -18,6 +19,7 @@
 ,	"hub_title"						:	"Hub title:"
 ,	"hub_titlehint"					:	"e.g. “Test hub”, “Project X”, “Personal” etc..."
 ,	"hub_hint"						:	"You can change the above Hub title at any time.<br/><br/>Initial default wallpaper for this Hub:"
+,	"hub_create"					:	"➜ Create Hub Now"
 ,	"steps_owner"					:	"➊  Specify owner"
 ,	"steps_template"				:	"➋  Select template"
 ,	"steps_finish"					:	"➌  Finish setup"

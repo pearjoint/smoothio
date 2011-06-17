@@ -70,7 +70,7 @@
             outDirPathServer = node_path.join("server/_packs/" + this.packName, relPath.substr(0, relPath.lastIndexOf('/')));
             if (_.endsWith(fname, '.styl') && (stylContent = smio.Util.FileSystem.readTextFile(fpath))) {
               lastFilePath = fpath;
-              mixinPath = node_path.resolve('../_core/stylus/include/mixin');
+              mixinPath = node_path.resolve('../_core/stylus/_mixin');
               return stylus("@import '" + mixinPath + "'\n" + stylContent).set('filename', fpath).render(__bind(function(err, css) {
                 if (err) {
                   err['ml_error_filepath'] = fpath;
