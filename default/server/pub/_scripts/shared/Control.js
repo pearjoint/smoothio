@@ -34,7 +34,7 @@
         len++;
         ctl.disable(disable, isInherit);
       }
-      if (len === 0) {
+      if (this.el && (len === 0)) {
         return this.el[disable ? 'addClass' : 'removeClass']('smio-disabledfaded');
       }
     };

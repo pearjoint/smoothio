@@ -13586,7 +13586,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         len++;
         ctl.disable(disable, isInherit);
       }
-      if (len === 0) {
+      if (this.el && (len === 0)) {
         return this.el[disable ? 'addClass' : 'removeClass']('smio-disabledfaded');
       }
     };
@@ -15166,7 +15166,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                     },
                     "div .smio-setup-createbtn": {
                       "LinkButton #hub_create .smio-bigbutton": {
-                        disabled: true,
+                        xdisabled: true,
                         labelText: 'hub_create'
                       }
                     }

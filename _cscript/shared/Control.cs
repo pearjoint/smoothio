@@ -160,7 +160,7 @@ class smio.Packs_#{className} extends smio.Control
 		for ctl in @controls
 			len++
 			ctl.disable(disable, isInherit)
-		if len is 0
+		if @el and (len is 0)
 			@el[if disable then 'addClass' else 'removeClass']('smio-disabledfaded')
 
 	enable: =>

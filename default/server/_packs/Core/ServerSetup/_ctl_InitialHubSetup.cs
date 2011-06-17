@@ -86,7 +86,7 @@ class smio.Packs_Core_ServerSetup_InitialHubSetup extends smio.Control
 									items: ['#bg0', '#bg1', '#bg2', '#bg3', '#bg4']
 								"div .$CC-createbtn":
 									"LinkButton #hub_create .smio-bigbutton":
-										disabled: true
+										xdisabled: true
 										labelText: 'hub_create'
 			"TabStrip #steptabs .$CC-outer .$CC-steptabs":
 				"tabClass": '$CC-steptab'

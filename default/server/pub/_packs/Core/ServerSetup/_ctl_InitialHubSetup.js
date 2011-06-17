@@ -114,7 +114,7 @@
                     },
                     "div .smio-setup-createbtn": {
                       "LinkButton #hub_create .smio-bigbutton": {
-                        disabled: true,
+                        xdisabled: true,
                         labelText: 'hub_create'
                       }
                     }
