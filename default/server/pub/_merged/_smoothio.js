@@ -15107,7 +15107,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                     },
                     "Controls #owner": {
                       ctltype: 'Toggle',
-                      disabled: true,
+                      xdisabled: true,
                       name: this.id('owner_toggle'),
                       items: {
                         "#create": {

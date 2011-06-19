@@ -60,7 +60,7 @@ class smio.Instance
 	haveAllStopped: =>
 		for server in @servers
 			if server.status isnt -1
-				smio.logit "IS:#{server.status}"
+				server.stop()
 				return false
 		if (@mongoIsLocal and @mongos['admin']) then @mongoHasShutDown else true
 

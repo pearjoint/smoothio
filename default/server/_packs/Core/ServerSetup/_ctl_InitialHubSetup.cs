@@ -51,7 +51,7 @@ class smio.Packs_Core_ServerSetup_InitialHubSetup extends smio.Control
 									html: [@r 'owner_choice']
 								"Controls #owner":
 									ctltype: 'Toggle'
-									disabled: true
+									xdisabled: true
 									name: @id('owner_toggle')
 									items:
 										"#create":

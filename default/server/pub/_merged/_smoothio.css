@@ -155,10 +155,10 @@ table {
 }
 .smio-bigbutton {
   display: inline-block;
-  padding: 0.4em 1em;
+  padding: 0.3em 1em;
   font-size: 1.15em;
   font-weight: bold;
-  color: #707070;
+  color: #505050;
   text-shadow: 0 1px #f0f0f0;
   border: 0.094em outset rgba(255,255,255,0.5);
   letter-spacing: -0.05em;
@@ -169,20 +169,18 @@ table {
   -webkit-box-shadow: 0 1px 5px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.15);
   box-shadow: 0 1px 5px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.15);
 }
-.smio-disabled, .smio-disabled * {
+.smio-disabledfaded, .smio-disabledfaded label, .smio-disabledfaded input, .smio-disabledfaded a {
 	cursor: not-allowed;
 }
 .smio-bigbutton.smio-enabled:hover,
 .smio-bigbutton.smio-enabled:focus {
-  background-color: rgba(0,0,0,0.01);
-  color: #606060;
+  background-color: rgba(0,0,255,0.1);
   -moz-box-shadow: 0 1px 5px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.35);
   -webkit-box-shadow: 0 1px 5px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.35);
   box-shadow: 0 1px 5px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.35);
 }
 .smio-bigbutton.smio-enabled:active {
-  color: #505050;
-  background-color: rgba(0,0,0,0.01);
+  background-color: rgba(0,0,255,0.1);
   -moz-box-shadow: 0 0 7px rgba(0,0,0,0.5), inset 0 15px 30px rgba(0,0,0,0.25), inset 0 -10px 20px rgba(255,255,255,0.1), inset 0 -10px rgba(255,255,255,0.05), inset 0 -1px rgba(255,255,255,0.15);
   -webkit-box-shadow: 0 0 7px rgba(0,0,0,0.5), inset 0 15px 30px rgba(0,0,0,0.25), inset 0 -10px 20px rgba(255,255,255,0.1), inset 0 -10px rgba(255,255,255,0.05), inset 0 -1px rgba(255,255,255,0.15);
   box-shadow: 0 0 7px rgba(0,0,0,0.5), inset 0 15px 30px rgba(0,0,0,0.25), inset 0 -10px 20px rgba(255,255,255,0.1), inset 0 -10px rgba(255,255,255,0.05), inset 0 -1px rgba(255,255,255,0.15);
@@ -418,7 +416,7 @@ span.smio-toggleinput.smio-enabled .smio-toggleinput-btnlabel {
 }
 .smio-toggleinput-btnglyph {
   font-size: 1.25em;
-  color: #30a060;
+  color: #3060a0;
   position: absolute;
   top: -0.15em;
   left: -0.02em;
@@ -432,9 +430,9 @@ span.smio-toggleinput.smio-enabled .smio-toggleinput-btnlabel {
   -webkit-border-radius: 1em;
   -moz-border-radius: 1em;
   border-radius: 1em;
-  background: #206040;
-  background: -webkit-gradient(radial, 3 3, 4, 3 3, 1, from(#206040), to(#70b090));
-  background: -moz-radial-gradient(40% 40% 0deg, circle closest-side, #70b090, #206040);
+  background: #204060;
+  background: -webkit-gradient(radial, 3 3, 4, 3 3, 1, from(#204060), to(#7090b0));
+  background: -moz-radial-gradient(40% 40% 0deg, circle closest-side, #7090b0, #204060);
 }
 .smio-toggleinput-btnlabel {
   padding-right: 0.4em;

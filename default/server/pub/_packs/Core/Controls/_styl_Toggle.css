@@ -54,7 +54,7 @@ span.smio-toggleinput.smio-enabled .smio-toggleinput-btnlabel {
 }
 .smio-toggleinput-btnglyph {
   font-size: 1.25em;
-  color: #30a060;
+  color: #3060a0;
   position: absolute;
   top: -0.15em;
   left: -0.02em;
@@ -68,9 +68,9 @@ span.smio-toggleinput.smio-enabled .smio-toggleinput-btnlabel {
   -webkit-border-radius: 1em;
   -moz-border-radius: 1em;
   border-radius: 1em;
-  background: #206040;
-  background: -webkit-gradient(radial, 3 3, 4, 3 3, 1, from(#206040), to(#70b090));
-  background: -moz-radial-gradient(40% 40% 0deg, circle closest-side, #70b090, #206040);
+  background: #204060;
+  background: -webkit-gradient(radial, 3 3, 4, 3 3, 1, from(#204060), to(#7090b0));
+  background: -moz-radial-gradient(40% 40% 0deg, circle closest-side, #7090b0, #204060);
 }
 .smio-toggleinput-btnlabel {
   padding-right: 0.4em;

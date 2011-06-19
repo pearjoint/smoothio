@@ -55,7 +55,7 @@
                     },
                     "Controls #owner": {
                       ctltype: 'Toggle',
-                      disabled: true,
+                      xdisabled: true,
                       name: this.id('owner_toggle'),
                       items: {
                         "#create": {

@@ -82,7 +82,7 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         server = _ref[_i];
         if (server.status !== -1) {
-          smio.logit("IS:" + server.status);
+          server.stop();
           return false;
         }
       }

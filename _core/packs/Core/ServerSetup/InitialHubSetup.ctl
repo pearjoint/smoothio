@@ -41,7 +41,7 @@ renderTemplate: =>
 								html: [@r 'owner_choice']
 							"Controls #owner":
 								ctltype: 'Toggle'
-								disabled: true
+								xdisabled: true
 								name: @id('owner_toggle')
 								items:
 									"#create":
