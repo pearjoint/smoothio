@@ -1,6 +1,7 @@
-$smcol = #d0c8b8
 $coldark = #303030
 $collite = #f0f0f0
+$colhilite = rgb(128, 208, 255)
+$colhilita = rgba($colhilite, 0.25)
 
 $hairline = 0.094em
 $-hairline = -0.094em
@@ -99,8 +100,8 @@ smio-background-ogradient(col1, pc1, col2, pc2, size)
 
 smio-background-rgradient(col1, col2)
 	background col1
-	background -webkit-gradient(radial, 3 3, 4, 3 3, 1, from(col1), to(col2))
-	background -moz-radial-gradient(40% 40% 0deg, circle closest-side, col2, col1)
+	background -webkit-gradient(radial, 3.5 3, 2.5, 3.5 3, 0.25, from(col1), to(col2))
+	background -moz-radial-gradient(45% 35% 0deg, circle closest-side, col2, col1)
 
 smio-background-vgradient(col1, col2)
 	background -ms-linear-gradient(col1, col2)

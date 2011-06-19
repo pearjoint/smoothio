@@ -139,9 +139,9 @@ ul#sm_stepslide_hubhints {
   box-shadow: 0em 0.1em 0.66em #606060;
 }
 #sm_stepslide_bg .smio-toggleinput-hasfocused {
-  -moz-box-shadow: 0em 0.1em 0.66em #a40;
-  -webkit-box-shadow: 0em 0.1em 0.66em #a40;
-  box-shadow: 0em 0.1em 0.66em #a40;
+  -moz-box-shadow: 0em 0.1em 0.75em #4068a0;
+  -webkit-box-shadow: 0em 0.1em 0.75em #4068a0;
+  box-shadow: 0em 0.1em 0.75em #4068a0;
 }
 #sm_stepslide_bg .smio-toggleinput-checked {
   opacity: 1;
