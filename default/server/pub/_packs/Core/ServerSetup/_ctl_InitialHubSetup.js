@@ -84,7 +84,8 @@
                     "TextInput #hub_title": {
                       required: true,
                       placeholder: 'hub_titlehint',
-                      labelText: 'hub_title'
+                      labelText: 'hub_title',
+                      onChange: this.verifyInputs
                     },
                     "div .smio-setup-stepbox-form-label": {
                       html: [this.r('hub_hint')]
@@ -165,8 +166,15 @@
       }
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.verifyInputs = function($input) {
-      var userVal;
-      return userVal = _.trim('' + this.sub('stepslide/user/user').val());
+      var $p1, $p2, $t, $u, tmp, _ref;
+      _ref = [this.sub('stepslide/user/name/input'), this.sub('stepslide/user/pass/input'), this.sub('stepslide/user/pass2/input'), this.sub('stepslide/hub_title/input')], $u = _ref[0], $p1 = _ref[1], $p2 = _ref[2], $t = _ref[3];
+      if ($u.val() !== (tmp = smio.Util.String.urlify(_.trim($u.val()), ''))) {
+        $u.val(tmp);
+      }
+      if ($t.val() !== (tmp = _.trim($t.val()))) {
+        $t.val(tmp);
+      }
+      return this.ctl('stepslide/hub_create').disable(!($u.val() && $p1.val() && $p2.val() && ($p1.val() === $p2.val()) && $t.val()));
     };
     function Packs_Core_ServerSetup_InitialHubSetup(client, parent, args) {
       this.verifyInputs = __bind(this.verifyInputs, this);

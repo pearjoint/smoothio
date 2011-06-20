@@ -73,6 +73,7 @@ class smio.Packs_Core_ServerSetup_InitialHubSetup extends smio.Control
 									required: true
 									placeholder: 'hub_titlehint'
 									labelText: 'hub_title'
+									onChange: @verifyInputs
 								"div .$CC-stepbox-form-label":
 									html: [@r 'hub_hint']
 								"Controls #bg":
@@ -115,7 +116,12 @@ class smio.Packs_Core_ServerSetup_InitialHubSetup extends smio.Control
 		if (urlseg = _.trim(@client.pageUrl.attr('path'), '/')) then "/#{urlseg}/" else '/'
 	
 	verifyInputs: ($input) =>
-		userVal = _.trim('' + @sub('stepslide/user/user').val())
+		[$u, $p1, $p2, $t] = [@sub('stepslide/user/name/input'), @sub('stepslide/user/pass/input'), @sub('stepslide/user/pass2/input'), @sub('stepslide/hub_title/input')]
+		if ($u.val() isnt (tmp = smio.Util.String.urlify(_.trim($u.val()), '')))
+			$u.val(tmp)
+		if ($t.val() isnt (tmp = _.trim($t.val())))
+			$t.val(tmp)
+		@ctl('stepslide/hub_create').disable(not($u.val() and $p1.val() and $p2.val() and ($p1.val() is $p2.val()) and $t.val()))
 	
 #endif
 	

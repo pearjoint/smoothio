@@ -13783,12 +13783,21 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       return a.join('-');
     };
     Control.prototype.ctl = function(ctlID) {
-      var c;
+      var c, cid, cids, ctl, _i, _len, _ref;
+      _ref = [this, ctlID.split('/')], ctl = _ref[0], cids = _ref[1];
       if ((c = this.client.allControls[ctlID])) {
-        return c;
+        ctl = c;
       } else {
-        return this.client.allControls[this.id(ctlID)];
+        for (_i = 0, _len = cids.length; _i < _len; _i++) {
+          cid = cids[_i];
+          if ((c = this.client.allControls[ctl.id(cid)])) {
+            ctl = c;
+          } else {
+            break;
+          }
+        }
       }
+      return ctl;
     };
     Control.prototype.id = function(subID) {
       return (this.parent ? "" + (this.parent.id()) + "_" + this.ctlID : this.ctlID) + (subID ? '_' + subID : '');
@@ -14301,22 +14310,27 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         }
         return a.join('');
       },
-      urlify: function(str) {
-        var abc, c, i, l, o, r, _len, _ref;
+      urlify: function(str, esc) {
+        var abc, c, l, o, r, tc, _i, _len, _ref;
+        if (esc == null) {
+          esc = '-';
+        }
         _ref = [
-          '', '', ['0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'], {
-            'äÄ': 'ae',
-            'öÖ': 'oe',
-            'üÜ': 'ue',
+          '', '', '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', {
+            'ä': 'ae',
+            'ö': 'oe',
+            'ü': 'ue',
             'ß': 'ss'
           }
         ], l = _ref[0], o = _ref[1], abc = _ref[2], r = _ref[3];
-        for (i = 0, _len = str.length; i < _len; i++) {
-          c = str[i];
+        for (_i = 0, _len = str.length; _i < _len; _i++) {
+          c = str[_i];
           if (__indexOf.call(abc, c) >= 0) {
-            o += c;
-          } else {
-            o += '-';
+            o += (l = c);
+          } else if ((tc = r[c.toLowerCase()])) {
+            o += (l = tc);
+          } else if (l !== esc) {
+            o += (l = esc);
           }
         }
         return o;
@@ -14869,44 +14883,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   })();
 }).call(this);
 
-/** server/pub/_packs/Core/Controls/_ctl_Test.js **/
-(function() {
-  /*
-  Auto-generated from Core/Controls/Test.ctl
-  */  var smio, smoothio;
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
-    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
-    function ctor() { this.constructor = child; }
-    ctor.prototype = parent.prototype;
-    child.prototype = new ctor;
-    child.__super__ = parent.prototype;
-    return child;
-  };
-  smio = smoothio = global.smoothio;
-  smio.Packs_Core_Controls_Test = (function() {
-    __extends(Packs_Core_Controls_Test, smio.Control);
-    Packs_Core_Controls_Test.prototype.test = function(xyz) {
-      var arr, x;
-      arr = [1, 'a', 3];
-      x = 'a';
-      if (arr.indexOf(x) >= 0) {
-        return alert(345);
-      }
-    };
-    function Packs_Core_Controls_Test(client, parent, args) {
-      this.test = __bind(this.test, this);      Packs_Core_Controls_Test.__super__.constructor.call(this, client, parent, args);
-      this.init();
-    }
-    Packs_Core_Controls_Test.prototype.className = function() {
-      return "Core_Controls_Test";
-    };
-    Packs_Core_Controls_Test.prototype.classNamespace = function() {
-      return "Core_Controls";
-    };
-    return Packs_Core_Controls_Test;
-  })();
-}).call(this);
-
 /** server/pub/_packs/Core/Controls/_ctl_TextInput.js **/
 (function() {
   /*
@@ -15245,7 +15221,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                     "TextInput #hub_title": {
                       required: true,
                       placeholder: 'hub_titlehint',
-                      labelText: 'hub_title'
+                      labelText: 'hub_title',
+                      onChange: this.verifyInputs
                     },
                     "div .smio-setup-stepbox-form-label": {
                       html: [this.r('hub_hint')]
@@ -15326,8 +15303,15 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.verifyInputs = function($input) {
-      var userVal;
-      return userVal = _.trim('' + this.sub('stepslide/user/user').val());
+      var $p1, $p2, $t, $u, tmp, _ref;
+      _ref = [this.sub('stepslide/user/name/input'), this.sub('stepslide/user/pass/input'), this.sub('stepslide/user/pass2/input'), this.sub('stepslide/hub_title/input')], $u = _ref[0], $p1 = _ref[1], $p2 = _ref[2], $t = _ref[3];
+      if ($u.val() !== (tmp = smio.Util.String.urlify(_.trim($u.val()), ''))) {
+        $u.val(tmp);
+      }
+      if ($t.val() !== (tmp = _.trim($t.val()))) {
+        $t.val(tmp);
+      }
+      return this.ctl('stepslide/hub_create').disable(!($u.val() && $p1.val() && $p2.val() && ($p1.val() === $p2.val()) && $t.val()));
     };
     function Packs_Core_ServerSetup_InitialHubSetup(client, parent, args) {
       this.verifyInputs = __bind(this.verifyInputs, this);

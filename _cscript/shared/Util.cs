@@ -127,13 +127,15 @@ class smio.Util
 			for x in [0...times]
 				a[x] = str
 			a.join('')
-		urlify: (str) ->
-			[l, o, abc, r] = ['', '', ['0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'], 'äÄ': 'ae', 'öÖ': 'oe', 'üÜ': 'ue', 'ß': 'ss']
-			for c, i in str
+		urlify: (str, esc = '-') ->
+			[l, o, abc, r] = ['', '', '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', 'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss']
+			for c in str
 				if c in abc
-					o += c
-				else
-					o += '-'
+					o += (l = c)
+				else if (tc = r[c.toLowerCase()])
+					o += (l = tc)
+				else if l isnt esc
+					o += (l = esc)
 			o
 
 #if server

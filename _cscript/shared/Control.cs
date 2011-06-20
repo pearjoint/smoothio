@@ -265,7 +265,16 @@ class smio.Packs_#{className} extends smio.Control
 		a.join('-')
 
 	ctl: (ctlID) =>
-		if (c = @client.allControls[ctlID]) then c else @client.allControls[@id(ctlID)]
+		[ctl, cids] = [@, ctlID.split('/')]
+		if (c = @client.allControls[ctlID])
+			ctl = c
+		else
+			for cid in cids
+				if (c = @client.allControls[ctl.id(cid)])
+					ctl = c
+				else
+					break
+		ctl
 
 	id: (subID) =>
 		# (if @idStack.length then ((@idStack.join '_') + '_') else '')

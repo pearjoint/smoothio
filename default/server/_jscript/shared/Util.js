@@ -213,22 +213,27 @@
         }
         return a.join('');
       },
-      urlify: function(str) {
-        var abc, c, i, l, o, r, _len, _ref;
+      urlify: function(str, esc) {
+        var abc, c, l, o, r, tc, _i, _len, _ref;
+        if (esc == null) {
+          esc = '-';
+        }
         _ref = [
-          '', '', ['0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'], {
-            'äÄ': 'ae',
-            'öÖ': 'oe',
-            'üÜ': 'ue',
+          '', '', '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', {
+            'ä': 'ae',
+            'ö': 'oe',
+            'ü': 'ue',
             'ß': 'ss'
           }
         ], l = _ref[0], o = _ref[1], abc = _ref[2], r = _ref[3];
-        for (i = 0, _len = str.length; i < _len; i++) {
-          c = str[i];
+        for (_i = 0, _len = str.length; _i < _len; _i++) {
+          c = str[_i];
           if (__indexOf.call(abc, c) >= 0) {
-            o += c;
-          } else {
-            o += '-';
+            o += (l = c);
+          } else if ((tc = r[c.toLowerCase()])) {
+            o += (l = tc);
+          } else if (l !== esc) {
+            o += (l = esc);
           }
         }
         return o;

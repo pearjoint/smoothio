@@ -65,7 +65,7 @@ smio.compileCoffeeScripts = function(dirOrFilePath, srvOutDirPath, cltOutDirPath
 						ignore = true;
 					else if (lines[j] == '#endif')
 						ignore = false;
-					else if ((!ignore) && (lines[j].indexOf('#const ') != 0))
+					else if ((!ignore) && (lines[j].indexOf('#const ') != 0) && (lines[j] != '#if server'))
 						fileContentServer += (lines[j] + '\n');
 			}
 			if (doClient && cltOutDirPath) {
@@ -75,7 +75,7 @@ smio.compileCoffeeScripts = function(dirOrFilePath, srvOutDirPath, cltOutDirPath
 						ignore = true;
 					else if (lines[j] == '#endif')
 						ignore = false;
-					else if ((!ignore) && (lines[j].indexOf('#const ') != 0))
+					else if ((!ignore) && (lines[j].indexOf('#const ') != 0) && (lines[j] != '#if client'))
 						fileContentClient += (lines[j] + '\n');
 			}
 			if (srvOutDirPath && fileContentServer && (fileContentServer = _.trim(fileContentServer)) && (javaScript = coffee.compile(fileContentServer)))

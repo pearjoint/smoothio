@@ -219,12 +219,21 @@
       return a.join('-');
     };
     Control.prototype.ctl = function(ctlID) {
-      var c;
+      var c, cid, cids, ctl, _i, _len, _ref;
+      _ref = [this, ctlID.split('/')], ctl = _ref[0], cids = _ref[1];
       if ((c = this.client.allControls[ctlID])) {
-        return c;
+        ctl = c;
       } else {
-        return this.client.allControls[this.id(ctlID)];
+        for (_i = 0, _len = cids.length; _i < _len; _i++) {
+          cid = cids[_i];
+          if ((c = this.client.allControls[ctl.id(cid)])) {
+            ctl = c;
+          } else {
+            break;
+          }
+        }
       }
+      return ctl;
     };
     Control.prototype.id = function(subID) {
       return (this.parent ? "" + (this.parent.id()) + "_" + this.ctlID : this.ctlID) + (subID ? '_' + subID : '');
