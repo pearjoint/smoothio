@@ -78,8 +78,10 @@ class smio.Util
 	@Number:
 		randomInt: (max) ->
 			Math.floor(Math.random() * (max + 1))
-		tryParseInt: (val, def) ->
+		tryParseInt: (val, def, validate) ->
 			num = parseInt("#{val}")
+			if validate and not validate(num)
+				num = def
 			if _.isNumber(num) then num else def
 
 	@Object:
@@ -125,6 +127,14 @@ class smio.Util
 			for x in [0...times]
 				a[x] = str
 			a.join('')
+		urlify: (str) ->
+			[l, o, abc, r] = ['', '', ['0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'], 'äÄ': 'ae', 'öÖ': 'oe', 'üÜ': 'ue', 'ß': 'ss']
+			for c, i in str
+				if c in abc
+					o += c
+				else
+					o += '-'
+			o
 
 #if server
 	@FileSystem:

@@ -29,10 +29,7 @@
       }, this)), 300));
     }
     Client.prototype.init = function() {
-      this.socket.connect();
-      return this.pageBody.css({
-        "background-image": "url('/_/file/images/bg0.jpg')"
-      });
+      return this.socket.connect();
     };
     Client.prototype.onWindowResize = function() {
       var ctl, h, id, w, _ref, _ref2, _results;

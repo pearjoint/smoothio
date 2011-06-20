@@ -46,11 +46,11 @@
         hub = new smio.Hub(this, freq.url(), rc);
         if (freq.settings()) {
           fresp.settings({
-            interval_heartbeat: 4500,
-            interval_fetch: 16000
+            i_h: 4500,
+            i_f: 16000
           });
         }
-        return hub.getControlUpdates(freq.ticks(), function(err, ctl) {
+        return hub.getControlUpdates(freq.ticks(), freq, fresp, function(err, ctl) {
           if (err) {
             fresp.errors(err);
           }

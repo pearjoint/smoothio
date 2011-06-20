@@ -173,6 +173,7 @@
       this.renderJsonTemplate = __bind(this.renderJsonTemplate, this);
       this.jsSelf = __bind(this.jsSelf, this);
       this.jsonTemplates_Label = __bind(this.jsonTemplates_Label, this);
+      this.jsonTemplates_HasLabel = __bind(this.jsonTemplates_HasLabel, this);
       this.init = __bind(this.init, this);
       this.id = __bind(this.id, this);
       this.ctl = __bind(this.ctl, this);
@@ -229,10 +230,18 @@
       return (this.parent ? "" + (this.parent.id()) + "_" + this.ctlID : this.ctlID) + (subID ? '_' + subID : '');
     };
     Control.prototype.init = function() {};
+    Control.prototype.jsonTemplates_HasLabel = function(target) {
+      return this.args.labelText || this.args.labelHtml || this.args.labelRawText || this.args.labelRawHtml;
+    };
     Control.prototype.jsonTemplates_Label = function(target) {
-      var label;
+      var label, rawLabel;
+      rawLabel = this.args.labelRawHtml ? this.args.labelRawHtml : this.args.labelRawText;
       label = this.args.labelHtml ? this.args.labelHtml : this.args.labelText;
-      return target[this.args.labelHtml ? 'html' : '_'] = [this.r(label)];
+      if (rawLabel) {
+        return target[this.args.labelRawHtml ? 'html' : '_'] = [rawLabel];
+      } else if (label) {
+        return target[this.args.labelHtml ? 'html' : '_'] = [this.r(label)];
+      }
     };
     Control.prototype.jsSelf = function() {
       return "smio.client.allControls['" + this.id() + "']";

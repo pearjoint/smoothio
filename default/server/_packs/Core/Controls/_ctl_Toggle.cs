@@ -42,7 +42,7 @@ class smio.Packs_Core_Controls_Toggle extends smio.Control
 		if @args.checked
 			ret.span.span.span.input.checked = 'checked'
 			getGSpan()['span #glyph'].html = [smio[@classPath()][if ischk then 'checkmark' else 'radiomark']]
-		if @args.labelText or @args.labelHtml
+		if @jsonTemplates_HasLabel()
 			ret.span.span.label =
 				id: 'label'
 				class: '$CC'

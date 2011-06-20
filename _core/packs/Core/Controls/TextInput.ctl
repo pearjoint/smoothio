@@ -32,5 +32,6 @@ coreDisable: (disable) =>
 	@sub('input').prop('readonly', disable)
 
 onLoad: =>
-	@sub('input').change => x = @sub('input').val()
+	if @args.onChange
+		@sub('input').change => @args.onChange(@sub('input'))
 

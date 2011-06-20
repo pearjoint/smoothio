@@ -59,7 +59,7 @@
         }, this));
       }
     };
-    Hub.prototype.getControlUpdates = function(sinceTicks, cb) {
+    Hub.prototype.getControlUpdates = function(sinceTicks, freq, fresp, cb) {
       var ct;
       if (sinceTicks) {
         return cb(null, {});
@@ -67,6 +67,11 @@
         ct = "Core_Controls_MainFrame";
         return this.checkExists(function(err, serverHasHubs) {
           if (!serverHasHubs) {
+            if (fresp && freq && freq.settings()) {
+              fresp.settings({
+                bg: '/_/file/images/bg0.jpg'
+              });
+            }
             ct = "Core_ServerSetup_InitialHubSetup";
           }
           return cb(err, {

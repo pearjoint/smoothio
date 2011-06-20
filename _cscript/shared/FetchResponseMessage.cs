@@ -6,12 +6,12 @@ smio = global.smoothio
 
 class smio.FetchResponseMessage extends smio.FetchMessageBase
 
-	controls: (ctls) ->
+	controls: (ctls) =>
 		if ctls
 			@msg.c = ctls
 		@msg.c
 
-	errors: (errs) ->
+	errors: (errs) =>
 		if errs and errs.length
 			if not @msg.e
 				@msg.e = []

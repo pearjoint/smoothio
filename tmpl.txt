@@ -1,4 +1,20 @@
 
+
+19 Jun 20:58:45 - [default.servers.server1] ERROR starting SERVER 'server1':
+	stack: Error: Not running
+    at Server.close (net.js:1133:42)
+    at Server.<anonymous> (/home/roxor/smoothio/default/server/_jscript/Server.js:183:32)
+    at Server.stop (/home/roxor/smoothio/default/server/_jscript/Server.js:3:63)
+    at Server.<anonymous> (/home/roxor/smoothio/default/server/_jscript/Server.js:113:21)
+    at Server.onRequest (/home/roxor/smoothio/default/server/_jscript/Server.js:3:63)
+    at Server.<anonymous> (/home/roxor/smoothio/default/server/_jscript/Server.js:47:21)
+    at Server.<anonymous> (/home/roxor/smoothio/default/server/_jscript/Server.js:3:63)
+    at Server.<anonymous> (/home/roxor/smoothio/node_modules/socket.io/lib/socket.io/listener.js:35:20)
+    at Server.emit (events.js:67:17)
+    at HTTPParser.onIncoming (http.js:1109:12)
+	name: Error
+
+
 indexOf!
 substrs!
 => in methods

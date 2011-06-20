@@ -36,13 +36,15 @@ class smio.Hub
 						col.find().nextObject (err, doc) =>
 							cb_err_hasHubs(err, smio.iif(doc))
 
-	getControlUpdates: (sinceTicks, cb) ->
+	getControlUpdates: (sinceTicks, freq, fresp, cb) ->
 		if sinceTicks
 			cb(null, {})
 		else
 			ct = "Core_Controls_MainFrame"
 			@checkExists (err, serverHasHubs) ->
 				if not serverHasHubs
+					if fresp and freq and freq.settings()
+						fresp.settings(bg: '/_/file/images/bg0.jpg')
 					ct = "Core_ServerSetup_InitialHubSetup"
 				cb(err, '': '_': ct)
 

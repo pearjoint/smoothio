@@ -58,10 +58,11 @@
       return this.sub('input').prop('readonly', disable);
     };
     Packs_Core_Controls_TextInput.prototype.onLoad = function() {
-      return this.sub('input').change(__bind(function() {
-        var x;
-        return x = this.sub('input').val();
-      }, this));
+      if (this.args.onChange) {
+        return this.sub('input').change(__bind(function() {
+          return this.args.onChange(this.sub('input'));
+        }, this));
+      }
     };
     function Packs_Core_Controls_TextInput(client, parent, args) {
       this.onLoad = __bind(this.onLoad, this);

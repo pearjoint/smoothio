@@ -1,6 +1,11 @@
 (function() {
   var smio;
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __indexOf = Array.prototype.indexOf || function(item) {
+    for (var i = 0, l = this.length; i < l; i++) {
+      if (this[i] === item) return i;
+    }
+    return -1;
+  };
   smio = global.smoothio;
   smio.FetchMessageBase = (function() {
     function FetchMessageBase(msg, funcs) {
@@ -27,10 +32,28 @@
       return _results;
     };
     FetchMessageBase.prototype.settings = function(cfg) {
-      if (cfg) {
-        this.msg.s = cfg;
+      var v, _i, _len, _ref;
+      if (cfg && !_.isString(cfg)) {
+        if (!this.msg.s) {
+          this.msg.s = cfg;
+        } else if (!_.isArray(cfg)) {
+          this.msg.s = smio.Util.Object.mergeDefaults(this.msg.s, cfg);
+        } else if (_.isArray(this.msg.s)) {
+          for (_i = 0, _len = cfg.length; _i < _len; _i++) {
+            v = cfg[_i];
+            if (!(__indexOf.call(this.msg.s, v) >= 0)) {
+              this.msg.s.push(v);
+            }
+          }
+        } else {
+          this.msg.s = cfg;
+        }
       }
-      return this.msg.s;
+      if (_.isString(cfg)) {
+        return (_ref = this.msg.s) != null ? _ref[cfg] : void 0;
+      } else {
+        return this.msg.s;
+      }
     };
     FetchMessageBase.prototype.ticks = function(ticks) {
       if (ticks != null) {

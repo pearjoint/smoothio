@@ -71,7 +71,7 @@
         ret.span.span.span.input.checked = 'checked';
         getGSpan()['span #glyph'].html = [smio[this.classPath()][ischk ? 'checkmark' : 'radiomark']];
       }
-      if (this.args.labelText || this.args.labelHtml) {
+      if (this.jsonTemplates_HasLabel()) {
         ret.span.span.label = {
           id: 'label',
           "class": 'smio-toggleinput',

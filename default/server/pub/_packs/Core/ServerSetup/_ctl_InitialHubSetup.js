@@ -33,6 +33,9 @@
                   'div .smio-setup-stepbox-form': {
                     "Controls #user": {
                       ctltype: 'TextInput',
+                      onChange: __bind(function() {
+                        return this.verifyInputs;
+                      }, this),
                       required: true,
                       nospellcheck: true,
                       labelText: __bind(function(id) {
@@ -55,7 +58,7 @@
                     },
                     "Controls #owner": {
                       ctltype: 'Toggle',
-                      xdisabled: true,
+                      disabled: true,
                       name: this.id('owner_toggle'),
                       items: {
                         "#create": {
@@ -104,8 +107,7 @@
                         return __bind(function(chk) {
                           if (chk) {
                             return this.client.pageBody.css({
-                              "background-image": "url('/_/file/images/" + id + ".jpg')",
-                              "background-size": "auto auto"
+                              "background-image": "url('/_/file/images/" + id + ".jpg')"
                             });
                           }
                         }, this);
@@ -114,7 +116,7 @@
                     },
                     "div .smio-setup-createbtn": {
                       "LinkButton #hub_create .smio-bigbutton": {
-                        xdisabled: true,
+                        disabled: true,
                         labelText: 'hub_create'
                       }
                     }
@@ -162,7 +164,12 @@
         return '/';
       }
     };
+    Packs_Core_ServerSetup_InitialHubSetup.prototype.verifyInputs = function($input) {
+      var userVal;
+      return userVal = _.trim('' + this.sub('stepslide/user/user').val());
+    };
     function Packs_Core_ServerSetup_InitialHubSetup(client, parent, args) {
+      this.verifyInputs = __bind(this.verifyInputs, this);
       this.urlSeg = __bind(this.urlSeg, this);
       this.onTabSelect = __bind(this.onTabSelect, this);
       this.onSlide = __bind(this.onSlide, this);

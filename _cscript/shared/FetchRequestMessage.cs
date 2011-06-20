@@ -6,7 +6,7 @@ smio = global.smoothio
 
 class smio.FetchRequestMessage extends smio.FetchMessageBase
 
-	url: (url) ->
+	url: (url) =>
 		if url?
 			@msg.u = url
 		@msg.u

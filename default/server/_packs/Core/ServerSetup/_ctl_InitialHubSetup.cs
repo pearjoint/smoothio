@@ -41,6 +41,7 @@ class smio.Packs_Core_ServerSetup_InitialHubSetup extends smio.Control
 							'div .$CC-stepbox-form':
 								"Controls #user":
 									ctltype: 'TextInput'
+									onChange: => @verifyInputs
 									required: true
 									nospellcheck: true
 									labelText: (id) => "owner_#{id}"
@@ -51,7 +52,7 @@ class smio.Packs_Core_ServerSetup_InitialHubSetup extends smio.Control
 									html: [@r 'owner_choice']
 								"Controls #owner":
 									ctltype: 'Toggle'
-									xdisabled: true
+									disabled: true
 									name: @id('owner_toggle')
 									items:
 										"#create":
@@ -82,11 +83,11 @@ class smio.Packs_Core_ServerSetup_InitialHubSetup extends smio.Control
 									style: (id) => 'background-image': "url('/_/file/images/#{id}.jpg')"
 									onCheck: (id) => (chk) =>
 										if chk
-											@client.pageBody.css("background-image": "url('/_/file/images/#{id}.jpg')", "background-size": "auto auto")
+											@client.pageBody.css("background-image": "url('/_/file/images/#{id}.jpg')")
 									items: ['#bg0', '#bg1', '#bg2', '#bg3', '#bg4']
 								"div .$CC-createbtn":
 									"LinkButton #hub_create .smio-bigbutton":
-										xdisabled: true
+										disabled: true
 										labelText: 'hub_create'
 			"TabStrip #steptabs .$CC-outer .$CC-steptabs":
 				"tabClass": '$CC-steptab'
@@ -112,6 +113,9 @@ class smio.Packs_Core_ServerSetup_InitialHubSetup extends smio.Control
 	
 	urlSeg: =>
 		if (urlseg = _.trim(@client.pageUrl.attr('path'), '/')) then "/#{urlseg}/" else '/'
+	
+	verifyInputs: ($input) =>
+		userVal = _.trim('' + @sub('stepslide/user/user').val())
 	
 #endif
 	

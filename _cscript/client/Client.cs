@@ -22,7 +22,6 @@ class smio.Client
 
 	init: =>
 		@socket.connect()
-		@pageBody.css("background-image": "url('/_/file/images/bg0.jpg')")
 
 	onWindowResize: () =>
 		[w, h] = [@pageWindow.width(), @pageWindow.height()]

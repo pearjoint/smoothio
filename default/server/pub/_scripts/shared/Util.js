@@ -124,9 +124,12 @@
       randomInt: function(max) {
         return Math.floor(Math.random() * (max + 1));
       },
-      tryParseInt: function(val, def) {
+      tryParseInt: function(val, def, validate) {
         var num;
         num = parseInt("" + val);
+        if (validate && !validate(num)) {
+          num = def;
+        }
         if (_.isNumber(num)) {
           return num;
         } else {
@@ -204,6 +207,26 @@
           a[x] = str;
         }
         return a.join('');
+      },
+      urlify: function(str) {
+        var abc, c, i, l, o, r, _len, _ref;
+        _ref = [
+          '', '', ['0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'], {
+            'äÄ': 'ae',
+            'öÖ': 'oe',
+            'üÜ': 'ue',
+            'ß': 'ss'
+          }
+        ], l = _ref[0], o = _ref[1], abc = _ref[2], r = _ref[3];
+        for (i = 0, _len = str.length; i < _len; i++) {
+          c = str[i];
+          if (__indexOf.call(abc, c) >= 0) {
+            o += c;
+          } else {
+            o += '-';
+          }
+        }
+        return o;
       }
     };
     return Util;

@@ -42,7 +42,9 @@ class smio.Socket
 							freq = @poll.msg.next
 							@poll.msg.next = @newFetchRequest()
 							unless @poll.intervals.heartbeat.val or @poll.intervals.fetch.val
-								freq.settings(["interval_heartbeat", "interval_fetch"])
+								freq.settings(['i_h', 'i_f'])
+							if @client.pageBody.css('background-image') is 'none'
+								freq.settings(['bg'])
 							freq.ticks(@poll.lastFetchTime)
 							@poll.msg.last = freq
 						$.post("/_/poll/#{if heartbeat then 'p' else 'f'}/?t=#{smio.Util.DateTime.ticks()}", JSON.stringify(freq.msg), ((m, t, x) => @onMessage(m, t, x)), 'text').error (x, t, e) => @onError(x, t, e)
@@ -117,10 +119,15 @@ class smio.Socket
 			if (ctls = fresp.controls())
 				@client.syncControls(ctls)
 			if (cfg = fresp.settings())
-				if @poll
-					@poll.intervals.heartbeat.val = cfg.interval_heartbeat
-					@poll.intervals.fetch.val = cfg.interval_fetch
+				if @poll and (cfg.i_h? or cfg.i_f?)
+					isValid = (iv) -> (iv > 100) and (iv < 12000000)
+					if cfg.i_h?
+						@poll.intervals.heartbeat.val = smio.Util.Number.tryParseInt(cfg.i_h, 4500, isValid)
+					if cfg.i_f?
+						@poll.intervals.fetch.val = smio.Util.Number.tryParseInt(cfg.i_f, 16000, isValid)
 					@setTimers()
+				if cfg.bg
+					@client.pageBody.css('background-image': "url('#{cfg.bg}')")
 			if @poll
 				@poll.lastFetchTime = fresp.ticks()
 		if @poll

@@ -33,8 +33,8 @@ class smio.Session
 			freq = new smio.FetchRequestMessage(fr)
 			hub = new smio.Hub(@, freq.url(), rc)
 			if freq.settings()
-				fresp.settings(interval_heartbeat: 4500, interval_fetch: 16000)
-			hub.getControlUpdates freq.ticks(), (err, ctl) ->
+				fresp.settings(i_h: 4500, i_f: 16000)
+			hub.getControlUpdates freq.ticks(), freq, fresp, (err, ctl) ->
 				if err
 					fresp.errors(err)
 				if ctl

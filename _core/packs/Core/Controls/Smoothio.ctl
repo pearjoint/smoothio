@@ -5,6 +5,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="smooth.io"/>
 		<meta name="application-name" content="<%arg:appname%>"/>
+		<meta http-equiv="X-UA-Compatible" content="chrome=1"/>
 		<title><%arg:title%></title>
 		<script type="text/javascript" language="JavaScript">
 			function onSmoothioNoCookie() {

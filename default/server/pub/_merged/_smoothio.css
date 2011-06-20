@@ -166,6 +166,7 @@ body {
   -ms-user-drag: none;
   user-drag: none;
   background-color: #d0c8b8;
+  background-size: cover;
 }
 .smio-disabledfaded {
   opacity: 0.5;
@@ -328,9 +329,12 @@ span.smio-toggleinput {
   overflow: hidden;
   white-space: nowrap;
 }
-span.smio-toggleinput.smio-enabled label,
-span.smio-toggleinput.smio-enabled input.smio-toggleinput,
-span.smio-toggleinput.smio-enabled .smio-toggleinput-btnlabel {
+span.smio-toggleinput.smio-toggleinput-checkbox.smio-enabled label,
+span.smio-toggleinput.smio-toggleinput-checkbox.smio-enabled input.smio-toggleinput,
+span.smio-toggleinput.smio-toggleinput-checkbox.smio-enabled .smio-toggleinput-btnlabel,
+span.smio-toggleinput.smio-toggleinput-radio.smio-toggleinput-unchecked.smio-enabled label,
+span.smio-toggleinput.smio-toggleinput-radio.smio-toggleinput-unchecked.smio-enabled input.smio-toggleinput,
+span.smio-toggleinput.smio-toggleinput-radio.smio-toggleinput-unchecked.smio-enabled .smio-toggleinput-btnlabel {
   cursor: pointer;
 }
 .smio-toggleinput-btn {

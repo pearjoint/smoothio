@@ -1,6 +1,6 @@
 (function() {
   var smio;
-  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
     ctor.prototype = parent.prototype;
@@ -13,6 +13,8 @@
   smio.FetchResponseMessage = (function() {
     __extends(FetchResponseMessage, smio.FetchMessageBase);
     function FetchResponseMessage() {
+      this.errors = __bind(this.errors, this);
+      this.controls = __bind(this.controls, this);
       FetchResponseMessage.__super__.constructor.apply(this, arguments);
     }
     FetchResponseMessage.prototype.controls = function(ctls) {

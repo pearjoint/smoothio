@@ -32,7 +32,7 @@ renderTemplate: =>
 	if @args.checked
 		ret.span.span.span.input.checked = 'checked'
 		getGSpan()['span #glyph'].html = [@@[if ischk then 'checkmark' else 'radiomark']]
-	if @args.labelText or @args.labelHtml
+	if @jsonTemplates_HasLabel()
 		ret.span.span.label =
 			id: 'label'
 			class: '$CC'

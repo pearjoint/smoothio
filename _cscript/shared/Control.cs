@@ -273,9 +273,16 @@ class smio.Packs_#{className} extends smio.Control
 
 	init: =>
 
+	jsonTemplates_HasLabel: (target) =>
+		@args.labelText or @args.labelHtml or @args.labelRawText or @args.labelRawHtml
+
 	jsonTemplates_Label: (target) =>
+		rawLabel = if @args.labelRawHtml then @args.labelRawHtml else @args.labelRawText
 		label = if @args.labelHtml then @args.labelHtml else @args.labelText
-		target[if @args.labelHtml then 'html' else '_'] = [@r(label)]
+		if rawLabel
+			target[if @args.labelRawHtml then 'html' else '_'] = [rawLabel]
+		else if label
+			target[if @args.labelHtml then 'html' else '_'] = [@r(label)]
 
 	jsSelf: =>
 		"smio.client.allControls['" + @id() + "']"

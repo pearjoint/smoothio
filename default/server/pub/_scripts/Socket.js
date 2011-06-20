@@ -95,7 +95,10 @@
                 freq = this.poll.msg.next;
                 this.poll.msg.next = this.newFetchRequest();
                 if (!(this.poll.intervals.heartbeat.val || this.poll.intervals.fetch.val)) {
-                  freq.settings(["interval_heartbeat", "interval_fetch"]);
+                  freq.settings(['i_h', 'i_f']);
+                }
+                if (this.client.pageBody.css('background-image') === 'none') {
+                  freq.settings(['bg']);
                 }
                 freq.ticks(this.poll.lastFetchTime);
                 this.poll.msg.last = freq;
@@ -171,7 +174,7 @@
       }
     };
     Socket.prototype.onMessage = function(msg, textStatus, xhr) {
-      var cfg, ctls, data, err, fresp;
+      var cfg, ctls, data, err, fresp, isValid;
       this.onOnline();
       data = null;
       if (msg === 'smoonocookie') {
@@ -205,10 +208,22 @@
           this.client.syncControls(ctls);
         }
         if ((cfg = fresp.settings())) {
-          if (this.poll) {
-            this.poll.intervals.heartbeat.val = cfg.interval_heartbeat;
-            this.poll.intervals.fetch.val = cfg.interval_fetch;
+          if (this.poll && ((cfg.i_h != null) || (cfg.i_f != null))) {
+            isValid = function(iv) {
+              return (iv > 100) && (iv < 12000000);
+            };
+            if (cfg.i_h != null) {
+              this.poll.intervals.heartbeat.val = smio.Util.Number.tryParseInt(cfg.i_h, 4500, isValid);
+            }
+            if (cfg.i_f != null) {
+              this.poll.intervals.fetch.val = smio.Util.Number.tryParseInt(cfg.i_f, 16000, isValid);
+            }
             this.setTimers();
+          }
+          if (cfg.bg) {
+            this.client.pageBody.css({
+              'background-image': "url('" + cfg.bg + "')"
+            });
           }
         }
         if (this.poll) {
