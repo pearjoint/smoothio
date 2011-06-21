@@ -80,21 +80,32 @@ renderTemplate: =>
 								"LinkButton #hub_create .smio-bigbutton":
 									disabled: true
 									labelText: 'hub_create'
+									onClick: @createHub
 		"TabStrip #steptabs .$CC-outer .$CC-steptabs":
 			"tabClass": '$CC-steptab'
 			"tabs": ['owner', 'template', 'finish']
 			"resPrefix": 'steps_'
 			"onTabSelect": (tabID) => @onTabSelect(tabID)
 
+createHub: =>
+	@ctl('stepslide/hub_create').invoke({"Hub.create": {}}, true)
+
 onLoad: =>
 	super()
-	$('.$CC-header-detail').click =>
+	$('.$CC-header-d   etail').click =>
 		port = if ("#{@client.pageUrl.attr 'port'}" is '80') then '' else ":#{@client.pageUrl.attr 'port'}"
 		nurl = prompt(@r('url_hint', @client.pageUrl.attr('protocol'), @client.pageUrl.attr('host'), port), urlseg = @urlSeg())
 		if nurl? and (nurl isnt null) and (nurl isnt urlseg)
 			if not _.startsWith(nurl, '/')
 				nurl = "/#{nurl}"
 			location.replace(_.trim(nurl))
+	[$u, $p1, $p2, $t] = [@sub('stepslide/user/name/input'), @sub('stepslide/user/pass/input'), @sub('stepslide/user/pass2/input'), @sub('stepslide/hub_title/input')]
+	$u.val('test')
+	$p1.val('test')
+	$p2.val('test')
+	$t.val('test')
+	@verifyInputs()
+	setTimeout((=> @onTabSelect('finish')), 250)
 
 onSlide: (index, itemID) =>
 	@ctl('steptabs').selectTab(itemID)
@@ -105,7 +116,7 @@ onTabSelect: (tabID) =>
 urlSeg: =>
 	if (urlseg = _.trim(@client.pageUrl.attr('path'), '/')) then "/#{urlseg}/" else '/'
 
-verifyInputs: ($input) =>
+verifyInputs: () =>
 	[$u, $p1, $p2, $t] = [@sub('stepslide/user/name/input'), @sub('stepslide/user/pass/input'), @sub('stepslide/user/pass2/input'), @sub('stepslide/hub_title/input')]
 	if ($u.val() isnt (tmp = smio.Util.String.urlify(_.trim($u.val()), '')))
 		$u.val(tmp)

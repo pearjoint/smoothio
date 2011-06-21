@@ -166,6 +166,22 @@ class smio.Packs_#{className} extends smio.Control
 	enable: =>
 		@disable(false, true)
 
+	invoke: (cmd, args, now) =>
+		@disable(true)
+		@el.addClass('smio-invoking')
+		@onInvoking(cmd)
+		msg = @client.socket.message(args, cmd: [cmd], cid: [@id()])
+		alert JSON.stringify msg
+		@client.socket.send(msg)
+
+	labelHtml: (html) =>
+		if not @el
+			''
+		else
+			if (html)
+				@el.html(html)
+			@el.html()
+
 	on: (eventName, handler) =>
 		if eventName
 			ehs = @['eventHandlers']
@@ -179,6 +195,16 @@ class smio.Packs_#{className} extends smio.Control
 			else if ehs and ehs[eventName]
 				for eh in ehs[eventName]
 					eh.apply(@, handler)
+
+	onInvoking: (msg) =>
+		if (lh = @labelHtml())
+			@lh = lh
+			@labelHtml(@r('invoking'))
+
+	onInvokeResult: () =>
+		if @['lh']?
+			@labelHtml(@lh)
+			delete @['lh']
 
 	onLoad: () =>
 		@el = $('#' + @id())

@@ -20,7 +20,7 @@ class smio.Hub
 		@url = @url.toLowerCase()
 		@uri = node_url.parse(@url)
 
-	checkExists: (cb_err_hasHubs) ->
+	checkExists: (cb_err_hasHubs) =>
 		if @doc
 			cb_err_hasHubs(null, true)
 		else
@@ -36,7 +36,14 @@ class smio.Hub
 						col.find().nextObject (err, doc) =>
 							cb_err_hasHubs(err, smio.iif(doc))
 
-	getControlUpdates: (sinceTicks, freq, fresp, cb) ->
+	create: (args, cb) =>
+		null
+
+	invoke: (name, args, cb) =>
+		smio.logit "CMD:#{name}"
+		cb(null, null)
+
+	getControlUpdates: (sinceTicks, freq, fresp, cb) =>
 		if sinceTicks
 			cb(null, {})
 		else

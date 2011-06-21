@@ -56,6 +56,7 @@ div.smio-setup {
   -moz-transition: opacity 0.5s;
   -webkit-transition: opacity 0.5s;
   -o-transition: opacity 0.5s;
+  -ms-transition: opacity 0.5s;
   transition: opacity 0.5s;
   opacity: 0;
 }
@@ -132,6 +133,7 @@ ul#sm_stepslide_hubhints {
   -moz-transition: opacity 0.5s;
   -webkit-transition: opacity 0.5s;
   -o-transition: opacity 0.5s;
+  -ms-transition: opacity 0.5s;
   transition: opacity 0.5s;
   background-position: 2px 2px;
   -moz-box-shadow: 0em 0.1em 0.66em #606060;

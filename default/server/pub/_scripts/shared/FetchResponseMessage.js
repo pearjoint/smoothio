@@ -18,9 +18,9 @@
     }
     FetchResponseMessage.prototype.controls = function(ctls) {
       if (ctls) {
-        this.msg.c = ctls;
+        this.msg.f = ctls;
       }
-      return this.msg.c;
+      return this.msg.f;
     };
     FetchResponseMessage.prototype.errors = function(errs) {
       var e, _i, _len;

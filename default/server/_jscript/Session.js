@@ -25,10 +25,10 @@
       this.socket = socket;
       this.onInit = __bind(this.onInit, this);
       this.onEnd = __bind(this.onEnd, this);
-      this.handleFetch = __bind(this.handleFetch, this);
+      this.handleInvoke = __bind(this.handleInvoke, this);
     }
-    Session.prototype.handleFetch = function(rc, fr, finish) {
-      var freq, fresp, hub, isSocket;
+    Session.prototype.handleInvoke = function(rc, fr, finish) {
+      var cmdName, freq, fresp, hub, isSocket, prefix, tmp, _ref;
       isSocket = rc === null;
       fresp = new smio.FetchResponseMessage();
       if (!fr) {
@@ -42,26 +42,49 @@
         }
       }
       if (fr && !_.isString(fr)) {
-        freq = new smio.FetchRequestMessage(fr);
-        hub = new smio.Hub(this, freq.url(), rc);
-        if (freq.settings()) {
-          fresp.settings({
-            i_h: 4500,
-            i_f: 16000
-          });
-        }
-        return hub.getControlUpdates(freq.ticks(), freq, fresp, function(err, ctl) {
-          if (err) {
-            fresp.errors(err);
+        smio.logit("REQ:" + (JSON.stringify(fr)));
+        try {
+          freq = new smio.FetchRequestMessage(fr);
+          hub = new smio.Hub(this, freq.url(), rc);
+          switch ((tmp = freq.cmd())) {
+            case 'f':
+              return hub.getControlUpdates(freq.ticks(), freq, fresp, function(err, ctl) {
+                if (err) {
+                  fresp.errors(err);
+                }
+                if (ctl) {
+                  fresp.controls(ctl);
+                }
+                if (!isSocket) {
+                  fresp.ticks(smio.Util.DateTime.utcTicks());
+                }
+                return finish(fresp.msg);
+              });
+            case 's':
+              return fresp.settings({
+                i_h: 4500,
+                i_f: 16000
+              });
+            default:
+              _ref = tmp.split('.'), prefix = _ref[0], cmdName = _ref[1];
+              if (prefix === 'Hub') {
+                return hub.invoke(cn, cmd, function(err, res) {
+                  if (err) {
+                    fresp.errors(err);
+                  }
+                  if (res) {
+                    fresp.msg[tmp] = res;
+                  }
+                  return finish(fresp.msg);
+                });
+              } else {
+                return smio.logit("WOOT");
+              }
           }
-          if (ctl) {
-            fresp.controls(ctl);
-          }
-          if (!isSocket) {
-            fresp.ticks(smio.Util.DateTime.utcTicks());
-          }
+        } catch (err) {
+          fresp.errors(err);
           return finish(fresp.msg);
-        });
+        }
       }
     };
     Session.prototype.onEnd = function() {};

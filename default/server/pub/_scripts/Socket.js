@@ -8,6 +8,7 @@
       this.client = client;
       this.setTimers = __bind(this.setTimers, this);
       this.setTimer = __bind(this.setTimer, this);
+      this.send = __bind(this.send, this);
       this.onSocketReconnecting = __bind(this.onSocketReconnecting, this);
       this.onSocketReconnectFailed = __bind(this.onSocketReconnectFailed, this);
       this.onSocketReconnect = __bind(this.onSocketReconnect, this);
@@ -21,11 +22,13 @@
       this.onOnline = __bind(this.onOnline, this);
       this.onOffline = __bind(this.onOffline, this);
       this.onError = __bind(this.onError, this);
-      this.newFetchRequest = __bind(this.newFetchRequest, this);
+      this.messageFetch = __bind(this.messageFetch, this);
+      this.message = __bind(this.message, this);
       this.connect = __bind(this.connect, this);
       this.clearTimers = __bind(this.clearTimers, this);
       this.offline = 1;
       this.initialFetchDone = false;
+      this.lastFetchTime = 0;
       if (isSocketIO) {
         opts = {
           resource: '/_/sockio/',
@@ -68,11 +71,6 @@
         }, this));
       } else {
         this.poll = {
-          busy: false,
-          msg: {
-            last: null,
-            next: this.newFetchRequest()
-          },
           intervals: {
             heartbeat: {
               val: 0,
@@ -84,31 +82,18 @@
             },
             sleepyFactor: 4
           },
-          lastFetchTime: 0,
-          send: __bind(function(heartbeat, force) {
-            var freq;
-            if (force || !this.poll.busy) {
-              this.poll.busy = true;
-              if (heartbeat) {
-                freq = new smio.FetchRequestMessage();
-              } else {
-                freq = this.poll.msg.next;
-                this.poll.msg.next = this.newFetchRequest();
-                if (!(this.poll.intervals.heartbeat.val || this.poll.intervals.fetch.val)) {
-                  freq.settings(['i_h', 'i_f']);
-                }
-                if (this.client.pageBody.css('background-image') === 'none') {
-                  freq.settings(['bg']);
-                }
-                freq.ticks(this.poll.lastFetchTime);
-                this.poll.msg.last = freq;
-              }
-              return $.post("/_/poll/" + (heartbeat ? 'p' : 'f') + "/?t=" + (smio.Util.DateTime.ticks()), JSON.stringify(freq.msg), (__bind(function(m, t, x) {
-                return this.onMessage(m, t, x);
-              }, this)), 'text').error(__bind(function(x, t, e) {
-                return this.onError(x, t, e);
-              }, this));
+          send: __bind(function(freq) {
+            var heartbeat;
+            if ((heartbeat = !freq)) {
+              freq = new smio.FetchRequestMessage();
+            } else {
+
             }
+            return $.post("/_/poll/" + (heartbeat ? 'p' : 'i') + "/?t=" + (smio.Util.DateTime.ticks()), JSON.stringify(freq.msg), (__bind(function(m, t, x) {
+              return this.onMessage(m, t, x);
+            }, this)), 'text').error(__bind(function(x, t, e) {
+              return this.onError(x, t, e);
+            }, this));
           }, this)
         };
       }
@@ -121,29 +106,34 @@
       if (this.socket) {
         return this.socket.connect();
       } else if (this.poll) {
-        return this.poll.send(false, true);
+        return this.poll.send(this.messageFetch());
       }
     };
-    Socket.prototype.newFetchRequest = function(msg, funcs) {
+    Socket.prototype.message = function(msg, funcs) {
       return new smio.FetchRequestMessage(msg, smio.Util.Object.mergeDefaults(funcs, {
         url: ["/"]
       }));
+    };
+    Socket.prototype.messageFetch = function() {
+      return this.message({}, {
+        cmd: 'f',
+        ticks: this.lastFetchTime
+      });
     };
     Socket.prototype.onError = function(xhr, textStatus, error, url) {
       if (!this.poll) {
         return alert(JSON.stringify(xhr));
       } else {
         if (xhr && (((xhr.status === 0) && (xhr.readyState === 0)) || ((xhr.readyState === 4) && (xhr.status >= 12001) && (xhr.status <= 12156)))) {
-          this.onOffline();
+          return this.onOffline();
         } else {
           this.onOnline();
           if (xhr && xhr.responseText) {
-            alert(xhr.responseText);
+            return alert(xhr.responseText);
           } else {
-            alert("" + textStatus + "\n\n" + (JSON.stringify(error)) + "\n\n" + (JSON.stringify(xhr)));
+            return alert("" + textStatus + "\n\n" + (JSON.stringify(error)) + "\n\n" + (JSON.stringify(xhr)));
           }
         }
-        return this.poll.busy = false;
       }
     };
     Socket.prototype.onOffline = function() {
@@ -169,7 +159,7 @@
           'href': '/_/file/images/smoothio.png'
         });
         if (this.socket) {
-          return this.socket.send(JSON.stringify(this.newFetchRequest().msg));
+          return this.send(this.messageFetch());
         }
       }
     };
@@ -205,6 +195,7 @@
       if (data) {
         fresp = new smio.FetchResponseMessage(data);
         if ((ctls = fresp.controls())) {
+          this.lastFetchTime = fresp.ticks();
           this.client.syncControls(ctls);
         }
         if ((cfg = fresp.settings())) {
@@ -221,17 +212,11 @@
             this.setTimers();
           }
           if (cfg.bg) {
-            this.client.pageBody.css({
+            return this.client.pageBody.css({
               'background-image': "url('" + cfg.bg + "')"
             });
           }
         }
-        if (this.poll) {
-          this.poll.lastFetchTime = fresp.ticks();
-        }
-      }
-      if (this.poll) {
-        return this.poll.busy = false;
       }
     };
     Socket.prototype.onSleepy = function(sleepy) {
@@ -261,6 +246,13 @@
     Socket.prototype.onSocketReconnecting = function() {
       return this.onOffline();
     };
+    Socket.prototype.send = function(freq) {
+      if (this.socket) {
+        return this.socket.send(JSON.stringify(freq.msg));
+      } else if (this.poll) {
+        return this.poll.send(freq);
+      }
+    };
     Socket.prototype.setTimer = function(name, fn) {
       var obj, val;
       obj = this.poll.intervals[name];
@@ -277,10 +269,10 @@
     };
     Socket.prototype.setTimers = function() {
       this.setTimer('heartbeat', __bind(function() {
-        return this.poll.send(true);
+        return this.poll.send();
       }, this));
       return this.setTimer('fetch', __bind(function() {
-        return this.poll.send(false);
+        return this.poll.send(this.messageFetch());
       }, this));
     };
     return Socket;

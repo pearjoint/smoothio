@@ -4,6 +4,7 @@ class smio.Socket
 	constructor: (@client, isSocketIO, host, secure, port) ->
 		@offline = 1
 		@initialFetchDone = false
+		@lastFetchTime = 0
 		if isSocketIO
 			opts = resource: '/_/sockio/', transports: ['websocket'], rememberTransport: false, reconnect: true, connectTimeout: 5000, secure: smio.iif(secure)
 			if port
@@ -20,10 +21,6 @@ class smio.Socket
 			@socket.on 'reconnecting', (delay, attempts) => @onSocketReconnecting(delay, attempts)
 		else
 			@poll =
-				busy: false
-				msg:
-					last: null
-					next: @newFetchRequest()
 				intervals:
 					heartbeat:
 						val: 0
@@ -32,22 +29,16 @@ class smio.Socket
 						val: 0
 						handle: null
 					sleepyFactor: 4
-				lastFetchTime: 0
-				send: (heartbeat, force) =>
-					if force or not @poll.busy
-						@poll.busy = true
-						if heartbeat
-							freq = new smio.FetchRequestMessage()
-						else
-							freq = @poll.msg.next
-							@poll.msg.next = @newFetchRequest()
-							unless @poll.intervals.heartbeat.val or @poll.intervals.fetch.val
-								freq.settings(['i_h', 'i_f'])
-							if @client.pageBody.css('background-image') is 'none'
-								freq.settings(['bg'])
-							freq.ticks(@poll.lastFetchTime)
-							@poll.msg.last = freq
-						$.post("/_/poll/#{if heartbeat then 'p' else 'f'}/?t=#{smio.Util.DateTime.ticks()}", JSON.stringify(freq.msg), ((m, t, x) => @onMessage(m, t, x)), 'text').error (x, t, e) => @onError(x, t, e)
+				send: (freq) =>
+					if (heartbeat = (not freq))
+						freq = new smio.FetchRequestMessage()
+					else
+						#unless @poll.intervals.heartbeat.val or @poll.intervals.fetch.val
+						#	freq.settings(['i_h', 'i_f'])
+						#if @client.pageBody.css('background-image') is 'none'
+						#	freq.settings(['bg'])
+						#freq.ticks(@lastFetchTime)
+					$.post("/_/poll/#{if heartbeat then 'p' else 'i'}/?t=#{smio.Util.DateTime.ticks()}", JSON.stringify(freq.msg), ((m, t, x) => @onMessage(m, t, x)), 'text').error (x, t, e) => @onError(x, t, e)
 
 	clearTimers: () =>
 		@setTimer('heartbeat')
@@ -57,10 +48,13 @@ class smio.Socket
 		if @socket
 			@socket.connect()
 		else if @poll
-			@poll.send(false, true)
+			@poll.send(@messageFetch())
 
-	newFetchRequest: (msg, funcs) =>
+	message: (msg, funcs) =>
 		new smio.FetchRequestMessage(msg, smio.Util.Object.mergeDefaults(funcs, url: ["/"]))
+
+	messageFetch: () =>
+		@message({}, cmd: 'f', ticks: @lastFetchTime)
 
 	onError: (xhr, textStatus, error, url) =>
 		if not @poll
@@ -74,7 +68,6 @@ class smio.Socket
 					alert(xhr.responseText)
 				else
 					alert("#{textStatus}\n\n#{JSON.stringify error}\n\n#{JSON.stringify xhr}")
-			@poll.busy = false
 
 	onOffline: =>
 		@offline++
@@ -92,7 +85,7 @@ class smio.Socket
 			$('#smio_offline').hide()
 			$('#smio_favicon').attr('href': '/_/file/images/smoothio.png')
 			if @socket
-				@socket.send(JSON.stringify(@newFetchRequest().msg))
+				@send(@messageFetch())
 
 	onMessage: (msg, textStatus, xhr) =>
 		@onOnline()
@@ -117,6 +110,7 @@ class smio.Socket
 		if data
 			fresp = new smio.FetchResponseMessage(data)
 			if (ctls = fresp.controls())
+				@lastFetchTime = fresp.ticks()
 				@client.syncControls(ctls)
 			if (cfg = fresp.settings())
 				if @poll and (cfg.i_h? or cfg.i_f?)
@@ -128,10 +122,6 @@ class smio.Socket
 					@setTimers()
 				if cfg.bg
 					@client.pageBody.css('background-image': "url('#{cfg.bg}')")
-			if @poll
-				@poll.lastFetchTime = fresp.ticks()
-		if @poll
-			@poll.busy = false
 
 	onSleepy: (sleepy) =>
 		if @poll
@@ -160,6 +150,12 @@ class smio.Socket
 	onSocketReconnecting: =>
 		@onOffline()
 
+	send: (freq) =>
+		if @socket
+			@socket.send(JSON.stringify(freq.msg))
+		else if @poll
+			@poll.send(freq)
+
 	setTimer: (name, fn) =>
 		obj = @poll.intervals[name]
 		if name is 'fetch' and not obj.val
@@ -171,6 +167,6 @@ class smio.Socket
 			obj.handle = setInterval(fn, val)
 
 	setTimers: =>
-		@setTimer('heartbeat', => @poll.send(true))
-		@setTimer('fetch', => @poll.send(false))
+		@setTimer('heartbeat', => @poll.send())
+		@setTimer('fetch', => @poll.send(@messageFetch()))
 

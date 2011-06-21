@@ -40,7 +40,7 @@
 		<style type="text/css"> span.smio-noscript { display: none; } </style>
 	</head>
 	<body id="smio_body" onload="onSmoothioPageLoad();" onblur="onSmoothioSleepy(true);" onfocus="onSmoothioSleepy(false);">
-		<div id="smio_offline" class="smio-blocking-overlay"><span id="smio_offline_msg"></span><span id="smio_offline_blink">&nbsp;&#x273F;</span></div>
+		<div id="smio_offline" class="smio-blocking-overlay"><span id="smio_offline_msg"></span>&nbsp;<span class="smio-blink">&#x273F;</span></div>
 		<script type="text/javascript" language="JavaScript" id="smio_prescript">
 			document.getElementById('smio_offline').style.display = 'block';
 			var smioGlobalTest, smio, WEB_SOCKET_SWF_LOCATION = '/_/dynfile/?type=application/x-shockwave-flash&config=sockets.xdomain_swf&true=bin/websockx.swf&false=bin/websock.swf';

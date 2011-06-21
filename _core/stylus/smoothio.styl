@@ -24,6 +24,9 @@ smio-selection()
 }
 }
 
+.smio-invoking, .smio-invoking label, .smio-invoking a, .smio-invoking input
+	cursor wait !important
+
 a
 	text-decoration none
 	color inherit
@@ -62,17 +65,33 @@ body
 	smio-narrow()
 	smio-background-ogradient rgba(0, 0, 0, 0.5), 25%, rgba(0, 0, 0, 0.7), 75%, 0.3em
 
-@keyframes offblink
+@keyframes animspin
+	0%
+		smio-transform rotate(0deg)
+	50%
+		smio-transform rotate(180deg)
+	100%
+		smio-transform rotate(359deg)
+
+@keyframes animblink
 	0%
 		opacity 0
 	100%
 		opacity 1
 
-#smio_offline_blink
-	-webkit-animation-name offblink
+.smio-blink
+	-webkit-animation-name animblink
 	-webkit-animation-duration 0.33s
-	-webkit-animation-iteration-count infinite
 	-webkit-animation-direction alternate
+	-webkit-animation-iteration-count infinite
 	-webkit-animation-timing-function linear
-	text-decoration blink
+
+.smio-spin
+	display inline-block
+	color #204A60
+	font-weight bold
+	-webkit-animation-name animspin
+	-webkit-animation-duration 2s
+	-webkit-animation-iteration-count infinite
+	-webkit-animation-timing-function linear
 

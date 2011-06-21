@@ -79,8 +79,8 @@
                 this.httpResponse.writeHead(200, respHeaders);
                 return this.httpResponse.end(JSON.stringify(data));
               }, this);
-              if (this.uri.pathItems[2] === 'f') {
-                smio.Session.getBySessionID(this.server, this.smioCookie['sessid']).handleFetch(this, null, finish);
+              if (this.uri.pathItems[2] === 'i') {
+                smio.Session.getBySessionID(this.server, this.smioCookie['sessid']).handleInvoke(this, null, finish);
               } else {
                 finish({});
               }
@@ -168,10 +168,13 @@
     };
     RequestContext.prototype.servePage = function(respHeaders) {
       var session;
-      return (session = smio.Session.getBySessionID(this.server, this.smioCookie['sessid'])).handleFetch(this, {}, __bind(function(data) {
+      return (session = smio.Session.getBySessionID(this.server, this.smioCookie['sessid'])).handleInvoke(this, {
+        c: 'f',
+        t: 0
+      }, __bind(function(data) {
         var ctl, mainCtl, userlang;
         try {
-          ctl = smio.Control.load(data['c']['']['_'], null, {
+          ctl = smio.Control.load(data['f']['']['_'], null, {
             id: 'sm'
           });
           mainCtl = smio.Control.load('Core_Controls_Smoothio', null, {

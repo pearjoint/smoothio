@@ -19,7 +19,7 @@ class smio.Session
 
 	constructor: (@server, @sessionID, @socket) ->
 
-	handleFetch: (rc, fr, finish) =>
+	handleInvoke: (rc, fr, finish) =>
 		isSocket = rc is null
 		fresp = new smio.FetchResponseMessage()
 		if not fr
@@ -30,17 +30,35 @@ class smio.Session
 			catch err
 				fresp.errors(err)
 		if fr and not _.isString(fr)
-			freq = new smio.FetchRequestMessage(fr)
-			hub = new smio.Hub(@, freq.url(), rc)
-			if freq.settings()
-				fresp.settings(i_h: 4500, i_f: 16000)
-			hub.getControlUpdates freq.ticks(), freq, fresp, (err, ctl) ->
-				if err
-					fresp.errors(err)
-				if ctl
-					fresp.controls(ctl)
-				if not isSocket
-					fresp.ticks(smio.Util.DateTime.utcTicks())
+			smio.logit "REQ:#{JSON.stringify fr}"
+			try
+				freq = new smio.FetchRequestMessage(fr)
+				hub = new smio.Hub(@, freq.url(), rc)
+				switch (tmp = freq.cmd())
+					when 'f'
+						hub.getControlUpdates freq.ticks(), freq, fresp, (err, ctl) ->
+							if err
+								fresp.errors(err)
+							if ctl
+								fresp.controls(ctl)
+							if not isSocket
+								fresp.ticks(smio.Util.DateTime.utcTicks())
+							finish(fresp.msg)
+					when 's'
+						fresp.settings(i_h: 4500, i_f: 16000)
+					else
+						[prefix, cmdName] = tmp.split('.')
+						if prefix is 'Hub'
+							hub.invoke cn, cmd, (err, res) ->
+								if err
+									fresp.errors(err)
+								if res
+									fresp.msg[tmp] = res
+								finish(fresp.msg)
+						else
+							smio.logit "WOOT"
+			catch err
+				fresp.errors(err)
 				finish(fresp.msg)
 
 	onEnd: =>

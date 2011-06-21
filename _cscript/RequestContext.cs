@@ -50,8 +50,8 @@ class smio.RequestContext
 						finish = (data) =>
 							@httpResponse.writeHead 200, respHeaders
 							@httpResponse.end(JSON.stringify(data))
-						if @uri.pathItems[2] is 'f'
-							smio.Session.getBySessionID(@server, @smioCookie['sessid']).handleFetch(@, null, finish)
+						if @uri.pathItems[2] is 'i'
+							smio.Session.getBySessionID(@server, @smioCookie['sessid']).handleInvoke(@, null, finish)
 						else
 							finish {}
 					when "dynfile"
@@ -114,9 +114,9 @@ class smio.RequestContext
 					@httpResponse.end("404 File Not Found: #{node_path.join(@server.fileServer.root, filePath)}")
 
 	servePage: (respHeaders) =>
-		(session = smio.Session.getBySessionID(@server, @smioCookie['sessid'])).handleFetch @, {}, (data) =>
+		(session = smio.Session.getBySessionID(@server, @smioCookie['sessid'])).handleInvoke @, {c: 'f', t: 0}, (data) =>
 			try
-				ctl = smio.Control.load(data['c']['']['_'], null, id: 'sm')
+				ctl = smio.Control.load(data['f']['']['_'], null, id: 'sm')
 				mainCtl = smio.Control.load('Core_Controls_Smoothio', null, id: '', htmlContent: ctl.renderHtml(), lang: userlang, title: 'smooth.io', appname: 'smooth.io')
 				respHeaders['Content-Type'] = 'text/html'
 				respHeaders['Content-Language'] = userlang = @userLanguage('en')

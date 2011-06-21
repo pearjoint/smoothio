@@ -8,8 +8,8 @@ class smio.FetchResponseMessage extends smio.FetchMessageBase
 
 	controls: (ctls) =>
 		if ctls
-			@msg.c = ctls
-		@msg.c
+			@msg.f = ctls
+		@msg.f
 
 	errors: (errs) =>
 		if errs and errs.length

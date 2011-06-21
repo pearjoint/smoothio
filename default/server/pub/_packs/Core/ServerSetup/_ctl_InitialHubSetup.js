@@ -118,7 +118,8 @@
                     "div .smio-setup-createbtn": {
                       "LinkButton #hub_create .smio-bigbutton": {
                         disabled: true,
-                        labelText: 'hub_create'
+                        labelText: 'hub_create',
+                        onClick: this.createHub
                       }
                     }
                   }
@@ -137,9 +138,15 @@
         }
       };
     };
+    Packs_Core_ServerSetup_InitialHubSetup.prototype.createHub = function() {
+      return this.ctl('stepslide/hub_create').invoke({
+        "Hub.create": {}
+      }, true);
+    };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.onLoad = function() {
+      var $p1, $p2, $t, $u, _ref;
       Packs_Core_ServerSetup_InitialHubSetup.__super__.onLoad.call(this);
-      return $('.smio-setup-header-detail').click(__bind(function() {
+      $('.smio-setup-header-d   etail').click(__bind(function() {
         var nurl, port, urlseg;
         port = ("" + (this.client.pageUrl.attr('port'))) === '80' ? '' : ":" + (this.client.pageUrl.attr('port'));
         nurl = prompt(this.r('url_hint', this.client.pageUrl.attr('protocol'), this.client.pageUrl.attr('host'), port), urlseg = this.urlSeg());
@@ -150,6 +157,15 @@
           return location.replace(_.trim(nurl));
         }
       }, this));
+      _ref = [this.sub('stepslide/user/name/input'), this.sub('stepslide/user/pass/input'), this.sub('stepslide/user/pass2/input'), this.sub('stepslide/hub_title/input')], $u = _ref[0], $p1 = _ref[1], $p2 = _ref[2], $t = _ref[3];
+      $u.val('test');
+      $p1.val('test');
+      $p2.val('test');
+      $t.val('test');
+      this.verifyInputs();
+      return setTimeout((__bind(function() {
+        return this.onTabSelect('finish');
+      }, this)), 250);
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.onSlide = function(index, itemID) {
       return this.ctl('steptabs').selectTab(itemID);
@@ -165,7 +181,7 @@
         return '/';
       }
     };
-    Packs_Core_ServerSetup_InitialHubSetup.prototype.verifyInputs = function($input) {
+    Packs_Core_ServerSetup_InitialHubSetup.prototype.verifyInputs = function() {
       var $p1, $p2, $t, $u, tmp, _ref;
       _ref = [this.sub('stepslide/user/name/input'), this.sub('stepslide/user/pass/input'), this.sub('stepslide/user/pass2/input'), this.sub('stepslide/hub_title/input')], $u = _ref[0], $p1 = _ref[1], $p2 = _ref[2], $t = _ref[3];
       if ($u.val() !== (tmp = smio.Util.String.urlify(_.trim($u.val()), ''))) {
@@ -182,6 +198,7 @@
       this.onTabSelect = __bind(this.onTabSelect, this);
       this.onSlide = __bind(this.onSlide, this);
       this.onLoad = __bind(this.onLoad, this);
+      this.createHub = __bind(this.createHub, this);
       this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_ServerSetup_InitialHubSetup.__super__.constructor.call(this, client, parent, args);
       this.init();
     }

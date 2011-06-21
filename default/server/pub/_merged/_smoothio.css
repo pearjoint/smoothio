@@ -140,6 +140,12 @@ table {
 .smio-disabledfaded, .smio-disabledfaded label, .smio-disabledfaded input, .smio-disabledfaded a {
 	cursor: not-allowed;
 }
+.smio-invoking,
+.smio-invoking label,
+.smio-invoking a,
+.smio-invoking input {
+  cursor: wait !important;
+}
 a {
   text-decoration: none;
   color: inherit;
@@ -194,7 +200,32 @@ body {
   background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(0,0,0,0.5)), to(rgba(0,0,0,0.7)));
   background-size: 0.3em;
 }
-@-webkit-keyframes offblink {
+@-webkit-keyframes animspin {
+  0% {
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+
+  50% {
+    -moz-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotate(180deg);
+  }
+
+  100% {
+    -moz-transform: rotate(359deg);
+    -webkit-transform: rotate(359deg);
+    -o-transform: rotate(359deg);
+    -ms-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}
+@-webkit-keyframes animblink {
   0% {
     opacity: 0;
   }
@@ -203,13 +234,21 @@ body {
     opacity: 1;
   }
 }
-#smio_offline_blink {
-  -webkit-animation-name: offblink;
+.smio-blink {
+  -webkit-animation-name: animblink;
   -webkit-animation-duration: 0.33s;
-  -webkit-animation-iteration-count: infinite;
   -webkit-animation-direction: alternate;
+  -webkit-animation-iteration-count: infinite;
   -webkit-animation-timing-function: linear;
-  text-decoration: blink;
+}
+.smio-spin {
+  display: inline-block;
+  color: #204a60;
+  font-weight: bold;
+  -webkit-animation-name: animspin;
+  -webkit-animation-duration: 2s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
 }
 
 /** server/pub/_packs/Core/Controls/_styl_SlidePanel.css **/
@@ -259,6 +298,7 @@ div.smio-slidepanel-edge {
   -moz-transition: opacity 0.5s;
   -webkit-transition: opacity 0.5s;
   -o-transition: opacity 0.5s;
+  -ms-transition: opacity 0.5s;
   transition: opacity 0.5s;
   overflow: hidden;
   white-space: nowrap;
@@ -634,6 +674,7 @@ div.smio-setup {
   -moz-transition: opacity 0.5s;
   -webkit-transition: opacity 0.5s;
   -o-transition: opacity 0.5s;
+  -ms-transition: opacity 0.5s;
   transition: opacity 0.5s;
   opacity: 0;
 }
@@ -710,6 +751,7 @@ ul#sm_stepslide_hubhints {
   -moz-transition: opacity 0.5s;
   -webkit-transition: opacity 0.5s;
   -o-transition: opacity 0.5s;
+  -ms-transition: opacity 0.5s;
   transition: opacity 0.5s;
   background-position: 2px 2px;
   -moz-box-shadow: 0em 0.1em 0.66em #606060;

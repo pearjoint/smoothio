@@ -41,6 +41,28 @@
     Control.prototype.enable = function() {
       return this.disable(false, true);
     };
+    Control.prototype.invoke = function(cmd, args, now) {
+      var msg;
+      this.disable(true);
+      this.el.addClass('smio-invoking');
+      this.onInvoking(cmd);
+      msg = this.client.socket.message(args, {
+        cmd: [cmd],
+        cid: [this.id()]
+      });
+      alert(JSON.stringify(msg));
+      return this.client.socket.send(msg);
+    };
+    Control.prototype.labelHtml = function(html) {
+      if (!this.el) {
+        return '';
+      } else {
+        if (html) {
+          this.el.html(html);
+        }
+        return this.el.html();
+      }
+    };
     Control.prototype.on = function(eventName, handler) {
       var eh, ehs, _i, _len, _ref, _results;
       if (eventName) {
@@ -64,6 +86,19 @@
           }
           return _results;
         }
+      }
+    };
+    Control.prototype.onInvoking = function(msg) {
+      var lh;
+      if ((lh = this.labelHtml())) {
+        this.lh = lh;
+        return this.labelHtml(this.r('invoking'));
+      }
+    };
+    Control.prototype.onInvokeResult = function() {
+      if (this['lh'] != null) {
+        this.labelHtml(this.lh);
+        return delete this['lh'];
       }
     };
     Control.prototype.onLoad = function() {
@@ -186,7 +221,11 @@
       this.sub = __bind(this.sub, this);
       this.onWindowResize = __bind(this.onWindowResize, this);
       this.onLoad = __bind(this.onLoad, this);
+      this.onInvokeResult = __bind(this.onInvokeResult, this);
+      this.onInvoking = __bind(this.onInvoking, this);
       this.on = __bind(this.on, this);
+      this.labelHtml = __bind(this.labelHtml, this);
+      this.invoke = __bind(this.invoke, this);
       this.enable = __bind(this.enable, this);
       this.disable = __bind(this.disable, this);
       this.coreDisable = __bind(this.coreDisable, this);

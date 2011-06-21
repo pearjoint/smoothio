@@ -12,6 +12,10 @@
       this.session = session;
       this.url = url;
       this.rc = rc;
+      this.getControlUpdates = __bind(this.getControlUpdates, this);
+      this.invoke = __bind(this.invoke, this);
+      this.create = __bind(this.create, this);
+      this.checkExists = __bind(this.checkExists, this);
       this.doc = null;
       server = this.session.server;
       inst = server.inst;
@@ -58,6 +62,13 @@
           }, this));
         }, this));
       }
+    };
+    Hub.prototype.create = function(args, cb) {
+      return null;
+    };
+    Hub.prototype.invoke = function(name, args, cb) {
+      smio.logit("CMD:" + name);
+      return cb(null, null);
     };
     Hub.prototype.getControlUpdates = function(sinceTicks, freq, fresp, cb) {
       var ct;
