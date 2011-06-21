@@ -88,7 +88,7 @@ renderTemplate: =>
 			"onTabSelect": (tabID) => @onTabSelect(tabID)
 
 createHub: =>
-	@ctl('stepslide/hub_create').invoke({"Hub.create": {}}, true)
+	@ctl('stepslide/hub_create').invoke('Hub.create', {})
 
 onLoad: =>
 	super()

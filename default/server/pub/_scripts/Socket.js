@@ -124,7 +124,7 @@
       if (!this.poll) {
         return alert(JSON.stringify(xhr));
       } else {
-        if (xhr && (((xhr.status === 0) && (xhr.readyState === 0)) || ((xhr.readyState === 4) && (xhr.status >= 12001) && (xhr.status <= 12156)))) {
+        if ((textStatus === 'timeout') || (error === 'timeout') || (xhr && (((xhr.status === 0) && (xhr.readyState === 0)) || ((xhr.readyState === 4) && (xhr.status >= 12001) && (xhr.status <= 12156))))) {
           return this.onOffline();
         } else {
           this.onOnline();

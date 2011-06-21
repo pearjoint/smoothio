@@ -30,7 +30,6 @@ class smio.Session
 			catch err
 				fresp.errors(err)
 		if fr and not _.isString(fr)
-			smio.logit "REQ:#{JSON.stringify fr}"
 			try
 				freq = new smio.FetchRequestMessage(fr)
 				hub = new smio.Hub(@, freq.url(), rc)
@@ -49,7 +48,7 @@ class smio.Session
 					else
 						[prefix, cmdName] = tmp.split('.')
 						if prefix is 'Hub'
-							hub.invoke cn, cmd, (err, res) ->
+							hub.invoke cmdName, freq, fresp, (err, res) ->
 								if err
 									fresp.errors(err)
 								if res

@@ -166,12 +166,11 @@ class smio.Packs_#{className} extends smio.Control
 	enable: =>
 		@disable(false, true)
 
-	invoke: (cmd, args, now) =>
+	invoke: (cmd, args) =>
 		@disable(true)
 		@el.addClass('smio-invoking')
-		@onInvoking(cmd)
-		msg = @client.socket.message(args, cmd: [cmd], cid: [@id()])
-		alert JSON.stringify msg
+		@onInvoking(cmd, args)
+		msg = @client.socket.message(args, cmd: [cmd], ctlID: [@id()])
 		@client.socket.send(msg)
 
 	labelHtml: (html) =>
@@ -196,7 +195,7 @@ class smio.Packs_#{className} extends smio.Control
 				for eh in ehs[eventName]
 					eh.apply(@, handler)
 
-	onInvoking: (msg) =>
+	onInvoking: (msg, args) =>
 		if (lh = @labelHtml())
 			@lh = lh
 			@labelHtml(@r('invoking'))

@@ -21,6 +21,7 @@ class smio.Client
 		@pageWindow.resize(_.debounce((=> @onWindowResize()), 300))
 
 	init: =>
+		$.ajaxSetup(timeout: 4000)
 		@socket.connect()
 
 	onWindowResize: () =>

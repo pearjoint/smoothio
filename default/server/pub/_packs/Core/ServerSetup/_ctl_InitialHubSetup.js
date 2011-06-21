@@ -139,9 +139,7 @@
       };
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.createHub = function() {
-      return this.ctl('stepslide/hub_create').invoke({
-        "Hub.create": {}
-      }, true);
+      return this.ctl('stepslide/hub_create').invoke('Hub.create', {});
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.onLoad = function() {
       var $p1, $p2, $t, $u, _ref;

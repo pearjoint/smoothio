@@ -29,6 +29,9 @@
       }, this)), 300));
     }
     Client.prototype.init = function() {
+      $.ajaxSetup({
+        timeout: 4000
+      });
       return this.socket.connect();
     };
     Client.prototype.onWindowResize = function() {

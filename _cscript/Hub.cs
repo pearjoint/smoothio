@@ -39,9 +39,8 @@ class smio.Hub
 	create: (args, cb) =>
 		null
 
-	invoke: (name, args, cb) =>
-		smio.logit "CMD:#{name}"
-		cb(null, null)
+	invoke: (cmd, freq, fresp, cb) =>
+		setTimeout((-> cb(null, null)), 99999999)
 
 	getControlUpdates: (sinceTicks, freq, fresp, cb) =>
 		if sinceTicks

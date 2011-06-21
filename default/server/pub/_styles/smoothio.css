@@ -224,6 +224,31 @@ body {
     transform: rotate(359deg);
   }
 }
+@-moz-keyframes animspin {
+  0% {
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+
+  50% {
+    -moz-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotate(180deg);
+  }
+
+  100% {
+    -moz-transform: rotate(359deg);
+    -webkit-transform: rotate(359deg);
+    -o-transform: rotate(359deg);
+    -ms-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}
 @-webkit-keyframes animblink {
   0% {
     opacity: 0;
@@ -233,19 +258,29 @@ body {
     opacity: 1;
   }
 }
+@-moz-keyframes animblink {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
 .smio-blink {
-  -webkit-animation-name: animblink;
-  -webkit-animation-duration: 0.33s;
-  -webkit-animation-direction: alternate;
-  -webkit-animation-iteration-count: infinite;
-  -webkit-animation-timing-function: linear;
+  -webkit-animation: animblink 0.33s linear infinite alternate;
+  -moz-animation: animblink 0.33s linear infinite alternate;
+  -o-animation: animblink 0.33s linear infinite alternate;
+  -ms-animation: animblink 0.33s linear infinite alternate;
+  animation: animblink 0.33s linear infinite alternate;
 }
 .smio-spin {
   display: inline-block;
   color: #204a60;
   font-weight: bold;
-  -webkit-animation-name: animspin;
-  -webkit-animation-duration: 2s;
-  -webkit-animation-iteration-count: infinite;
-  -webkit-animation-timing-function: linear;
+  -webkit-animation: animspin 2s linear infinite;
+  -moz-animation: animspin 2s linear infinite;
+  -o-animation: animspin 2s linear infinite;
+  -ms-animation: animspin 2s linear infinite;
+  animation: animspin 2s linear infinite;
 }

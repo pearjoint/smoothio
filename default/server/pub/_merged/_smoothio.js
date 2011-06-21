@@ -13233,6 +13233,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }, this)), 300));
     }
     Client.prototype.init = function() {
+      $.ajaxSetup({
+        timeout: 4000
+      });
       return this.socket.connect();
     };
     Client.prototype.onWindowResize = function() {
@@ -13398,7 +13401,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       if (!this.poll) {
         return alert(JSON.stringify(xhr));
       } else {
-        if (xhr && (((xhr.status === 0) && (xhr.readyState === 0)) || ((xhr.readyState === 4) && (xhr.status >= 12001) && (xhr.status <= 12156)))) {
+        if ((textStatus === 'timeout') || (error === 'timeout') || (xhr && (((xhr.status === 0) && (xhr.readyState === 0)) || ((xhr.readyState === 4) && (xhr.status >= 12001) && (xhr.status <= 12156))))) {
           return this.onOffline();
         } else {
           this.onOnline();
@@ -13597,16 +13600,15 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     Control.prototype.enable = function() {
       return this.disable(false, true);
     };
-    Control.prototype.invoke = function(cmd, args, now) {
+    Control.prototype.invoke = function(cmd, args) {
       var msg;
       this.disable(true);
       this.el.addClass('smio-invoking');
-      this.onInvoking(cmd);
+      this.onInvoking(cmd, args);
       msg = this.client.socket.message(args, {
         cmd: [cmd],
-        cid: [this.id()]
+        ctlID: [this.id()]
       });
-      alert(JSON.stringify(msg));
       return this.client.socket.send(msg);
     };
     Control.prototype.labelHtml = function(html) {
@@ -13644,7 +13646,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         }
       }
     };
-    Control.prototype.onInvoking = function(msg) {
+    Control.prototype.onInvoking = function(msg, args) {
       var lh;
       if ((lh = this.labelHtml())) {
         this.lh = lh;
@@ -15339,9 +15341,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       };
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.createHub = function() {
-      return this.ctl('stepslide/hub_create').invoke({
-        "Hub.create": {}
-      }, true);
+      return this.ctl('stepslide/hub_create').invoke('Hub.create', {});
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.onLoad = function() {
       var $p1, $p2, $t, $u, _ref;

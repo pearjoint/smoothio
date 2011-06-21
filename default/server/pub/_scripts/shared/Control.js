@@ -41,16 +41,15 @@
     Control.prototype.enable = function() {
       return this.disable(false, true);
     };
-    Control.prototype.invoke = function(cmd, args, now) {
+    Control.prototype.invoke = function(cmd, args) {
       var msg;
       this.disable(true);
       this.el.addClass('smio-invoking');
-      this.onInvoking(cmd);
+      this.onInvoking(cmd, args);
       msg = this.client.socket.message(args, {
         cmd: [cmd],
-        cid: [this.id()]
+        ctlID: [this.id()]
       });
-      alert(JSON.stringify(msg));
       return this.client.socket.send(msg);
     };
     Control.prototype.labelHtml = function(html) {
@@ -88,7 +87,7 @@
         }
       }
     };
-    Control.prototype.onInvoking = function(msg) {
+    Control.prototype.onInvoking = function(msg, args) {
       var lh;
       if ((lh = this.labelHtml())) {
         this.lh = lh;

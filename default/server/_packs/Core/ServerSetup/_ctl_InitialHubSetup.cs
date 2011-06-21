@@ -98,7 +98,7 @@ class smio.Packs_Core_ServerSetup_InitialHubSetup extends smio.Control
 				"onTabSelect": (tabID) => @onTabSelect(tabID)
 	
 	createHub: =>
-		@ctl('stepslide/hub_create').invoke({"Hub.create": {}}, true)
+		@ctl('stepslide/hub_create').invoke('Hub.create', {})
 	
 	onLoad: =>
 		super()

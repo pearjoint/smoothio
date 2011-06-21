@@ -66,9 +66,10 @@
     Hub.prototype.create = function(args, cb) {
       return null;
     };
-    Hub.prototype.invoke = function(name, args, cb) {
-      smio.logit("CMD:" + name);
-      return cb(null, null);
+    Hub.prototype.invoke = function(cmd, freq, fresp, cb) {
+      return setTimeout((function() {
+        return cb(null, null);
+      }), 99999999);
     };
     Hub.prototype.getControlUpdates = function(sinceTicks, freq, fresp, cb) {
       var ct;

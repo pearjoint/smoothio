@@ -60,7 +60,7 @@ class smio.Socket
 		if not @poll
 			alert(JSON.stringify(xhr))
 		else
-			if xhr and (((xhr.status is 0) and (xhr.readyState is 0)) or ((xhr.readyState is 4) and (xhr.status >= 12001) and (xhr.status <= 12156)))
+			if (textStatus is 'timeout') or (error is 'timeout') or (xhr and (((xhr.status is 0) and (xhr.readyState is 0)) or ((xhr.readyState is 4) and (xhr.status >= 12001) and (xhr.status <= 12156))))
 				@onOffline()
 			else
 				@onOnline()

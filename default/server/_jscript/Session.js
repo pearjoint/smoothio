@@ -42,7 +42,6 @@
         }
       }
       if (fr && !_.isString(fr)) {
-        smio.logit("REQ:" + (JSON.stringify(fr)));
         try {
           freq = new smio.FetchRequestMessage(fr);
           hub = new smio.Hub(this, freq.url(), rc);
@@ -68,7 +67,7 @@
             default:
               _ref = tmp.split('.'), prefix = _ref[0], cmdName = _ref[1];
               if (prefix === 'Hub') {
-                return hub.invoke(cn, cmd, function(err, res) {
+                return hub.invoke(cmdName, freq, fresp, function(err, res) {
                   if (err) {
                     fresp.errors(err);
                   }
