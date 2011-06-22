@@ -195,6 +195,9 @@
         }
         return ret;
       },
+      idify: function(str) {
+        return smio.Util.String.urlify(str, '', '', true);
+      },
       replace: function(str, replace) {
         var pos, repl, val;
         for (val in replace) {
@@ -213,30 +216,41 @@
         }
         return a.join('');
       },
-      urlify: function(str, esc) {
-        var abc, c, l, o, r, tc, _i, _len, _ref;
-        if (esc == null) {
-          esc = '-';
+      urlify: function(s, e, al, noLower) {
+        var a, c, l, o, r, tc, tmp, _i, _len, _ref;
+        if (e == null) {
+          e = '-';
+        }
+        if (al == null) {
+          al = '/';
         }
         _ref = [
-          '', '', '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', {
+          '', '', '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' + al, {
             'ä': 'ae',
             'ö': 'oe',
             'ü': 'ue',
+            'Ä': 'Ae',
+            'Ö': 'Oe',
+            'Ü': 'Ue',
             'ß': 'ss'
           }
-        ], l = _ref[0], o = _ref[1], abc = _ref[2], r = _ref[3];
-        for (_i = 0, _len = str.length; _i < _len; _i++) {
-          c = str[_i];
-          if (__indexOf.call(abc, c) >= 0) {
+        ], l = _ref[0], o = _ref[1], a = _ref[2], r = _ref[3];
+        for (_i = 0, _len = s.length; _i < _len; _i++) {
+          c = s[_i];
+          if (__indexOf.call(a, c) >= 0) {
             o += (l = c);
-          } else if ((tc = r[c.toLowerCase()])) {
+          } else if ((tc = r[c])) {
             o += (l = tc);
-          } else if (l !== esc) {
-            o += (l = esc);
+          } else if (e && (l !== e)) {
+            o += (l = e);
           }
         }
-        return o;
+        tmp = _.trim(o, "/" + e);
+        if (noLower) {
+          return tmp;
+        } else {
+          return tmp.toLowerCase();
+        }
       }
     };
     Util.FileSystem = {

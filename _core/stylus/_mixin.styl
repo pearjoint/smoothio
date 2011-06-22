@@ -1,10 +1,16 @@
 $coldark = #303030
 $collite = #f0f0f0
+$colhidark = rgb(16, 32, 64)
 $colhilite = rgb(128, 208, 255)
 $colhilita = rgba($colhilite, 0.25)
 
 $hairline = 0.094em
 $-hairline = -0.094em
+
+smio-selection()
+	background-color rgba($colhidark, 0.75) !important
+	color $collite !important
+	text-shadow none !important
 
 smio-select()
 	-o-user-select arguments
@@ -107,7 +113,7 @@ smio-transition()
 smio-background-ogradient(col1, pc1, col2, pc2, size)
 	background col2
 	background -ms-linear-gradient(col1 pc1, col2 pc2);
-	background -xmoz-linear-gradient(col1 pc1, col2 pc2);
+	background -moz-linear-gradient(col1 pc1, col2 pc2);
 	background -o-linear-gradient(col1 pc1, col2 pc2);
 	background -webkit-linear-gradient(col1 pc1, col2 pc2);
 	background -webkit-gradient(linear, 0% 0%, 0% 100%, from(col1), to(col2))

@@ -79,11 +79,7 @@
                 this.httpResponse.writeHead(200, respHeaders);
                 return this.httpResponse.end(JSON.stringify(data));
               }, this);
-              if (this.uri.pathItems[2] === 'i') {
-                smio.Session.getBySessionID(this.server, this.smioCookie['sessid']).handleInvoke(this, null, finish);
-              } else {
-                finish({});
-              }
+              smio.Session.getBySessionID(this.server, this.smioCookie['sessid']).handleInvoke(this, null, finish);
               break;
             case "dynfile":
               if ((cfgKey = this.uri.query['config'])) {
@@ -144,8 +140,12 @@
           }
         }
       }
-      ret = smio.iif(this.userLangs.length, this.userLangs[0], '');
-      return smio.iif(ret, ret, def || '');
+      ret = this.userLangs.length ? this.userLangs[0] : '';
+      if (ret) {
+        return ret;
+      } else {
+        return def || '';
+      }
     };
     RequestContext.prototype.serveFile = function(filePath, respHeaders) {
       return node_fs.stat(node_path.join(this.server.fileServer.root, filePath), __bind(function(err, stat) {
@@ -174,18 +174,18 @@
       }, __bind(function(data) {
         var ctl, mainCtl, userlang;
         try {
-          ctl = smio.Control.load(data['f']['']['_'], null, {
-            id: 'sm'
-          });
           mainCtl = smio.Control.load('Core_Controls_Smoothio', null, {
             id: '',
-            htmlContent: ctl.renderHtml(),
-            lang: userlang,
+            lang: (userlang = this.userLanguage('en')),
             title: 'smooth.io',
             appname: 'smooth.io'
           });
+          ctl = smio.Control.load(data['f']['']['_'], mainCtl, {
+            id: 'sm'
+          });
+          mainCtl.args.htmlContent = ctl.renderHtml();
           respHeaders['Content-Type'] = 'text/html';
-          respHeaders['Content-Language'] = userlang = this.userLanguage('en');
+          respHeaders['Content-Language'] = userlang;
           this.httpResponse.writeHead(200, respHeaders);
           return this.httpResponse.end(mainCtl.renderHtml());
         } catch (err) {

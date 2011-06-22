@@ -60,10 +60,11 @@
                 return finish(fresp.msg);
               });
             case 's':
-              return fresp.settings({
-                i_h: 4500,
-                i_f: 16000
+              fresp.settings({
+                fi: 15000,
+                bg: '/_/file/images/bg0.jpg'
               });
+              return finish(fresp.msg);
             default:
               _ref = tmp.split('.'), prefix = _ref[0], cmdName = _ref[1];
               if (prefix === 'Hub') {

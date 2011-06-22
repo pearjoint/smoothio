@@ -15,24 +15,26 @@
 
 			function onSmoothioPageLoad() {
 				$('#smio_noscript, #smio_prescript, #smio_noscript_content').remove();
-				if (smio.pageLoadError)
-					document.getElementById('smio_body').innerHTML = '<br/><br/><br/><br/><hr/>Required core script <b>' + smio.pageLoadError + '</b> could not be loaded and hence this application will not load.<br/><br/>Try a complete reload (press CTRL+R) as this was probably just a temporary disruption.<hr/>Erforderliches Kernscript <b>' + smio.pageLoadError + '</b> konnte nicht geladen werden und somit wird auch diese Anwendung nicht geladen.<br/><br/>Versuchen Sie ein Komplett-Neuladen (STRG+R), da dies wahrscheinlich nur eine kurzzeitige St&ouml;rung war.<hr/>';
-				else if (!(smio.client = new smio.Client()).sessionID)
-					onSmoothioNoCookie();
-				else
-					smio.client.init();
+				if (smio)
+					if (smio.pageLoadError)
+						document.getElementById('smio_body').innerHTML = '<br/><br/><br/><br/><hr/>Required core script <b>' + smio.pageLoadError + '</b> could not be loaded and hence this application will not load.<br/><br/>Try a complete reload (press CTRL+R) as this was probably just a temporary disruption.<hr/>Erforderliches Kernscript <b>' + smio.pageLoadError + '</b> konnte nicht geladen werden und somit wird auch diese Anwendung nicht geladen.<br/><br/>Versuchen Sie ein Komplett-Neuladen (STRG+R), da dies wahrscheinlich nur eine kurzzeitige St&ouml;rung war.<hr/>';
+					else if (!(smio.client = new smio.Client()).sessionID)
+						onSmoothioNoCookie();
+					else
+						smio.client.init();
 			}
 
 			function onSmoothioProgress() {
 			}
 
 			function onSmoothioSleepy(sleepy) {
-				if (smio.client && smio.client.socket && (sleepy != smio.client.sleepy))
+				if (smio && smio.client && smio.client.socket && (sleepy != smio.client.sleepy))
 					smio.client.socket.onSleepy(smio.client.sleepy = sleepy);
 			}
 
 			function onScriptError(scriptName) {
-				smio.pageLoadError = scriptName;
+				if (smio)
+					smio.pageLoadError = scriptName;
 			}
 		</script>
 		<link rel="stylesheet" href="/_/file/_merged/_smoothio.css"/>
@@ -40,7 +42,7 @@
 		<style type="text/css"> span.smio-noscript { display: none; } </style>
 	</head>
 	<body id="smio_body" onload="onSmoothioPageLoad();" onblur="onSmoothioSleepy(true);" onfocus="onSmoothioSleepy(false);">
-		<div id="smio_offline" class="smio-blocking-overlay"><span id="smio_offline_msg"></span>&nbsp;<span class="smio-blink">&#x273F;</span></div>
+		<div id="smio_offline" class="smio-offline"><span id="smio_offline_msg"><%r:maintemplate_loading%></span>&nbsp;<span class="smio-blink">&#x273F;</span></div>
 		<script type="text/javascript" language="JavaScript" id="smio_prescript">
 			document.getElementById('smio_offline').style.display = 'block';
 			var smioGlobalTest, smio, WEB_SOCKET_SWF_LOCATION = '/_/dynfile/?type=application/x-shockwave-flash&config=sockets.xdomain_swf&true=bin/websockx.swf&false=bin/websock.swf';

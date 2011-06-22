@@ -11,7 +11,6 @@
       this.allControls = {};
       this.pageWindow = $(window);
       this.pageBody = $('#smio_body');
-      $('#smio_offline_msg').text(smio.resources.smoothio.connect);
       cookie = $.cookie('smoo');
       this.pageUrl = $.url();
       try {
@@ -32,6 +31,7 @@
       $.ajaxSetup({
         timeout: 4000
       });
+      $('#smio_offline_msg').text(smio.resources.smoothio.connecting);
       return this.socket.connect();
     };
     Client.prototype.onWindowResize = function() {

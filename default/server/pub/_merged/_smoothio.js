@@ -13215,7 +13215,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.allControls = {};
       this.pageWindow = $(window);
       this.pageBody = $('#smio_body');
-      $('#smio_offline_msg').text(smio.resources.smoothio.connect);
       cookie = $.cookie('smoo');
       this.pageUrl = $.url();
       try {
@@ -13236,6 +13235,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       $.ajaxSetup({
         timeout: 4000
       });
+      $('#smio_offline_msg').text(smio.resources.smoothio.connecting);
       return this.socket.connect();
     };
     Client.prototype.onWindowResize = function() {
@@ -13283,7 +13283,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     function Socket(client, isSocketIO, host, secure, port) {
       var opts;
       this.client = client;
-      this.setTimers = __bind(this.setTimers, this);
       this.setTimer = __bind(this.setTimer, this);
       this.send = __bind(this.send, this);
       this.onSocketReconnecting = __bind(this.onSocketReconnecting, this);
@@ -13302,7 +13301,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.messageFetch = __bind(this.messageFetch, this);
       this.message = __bind(this.message, this);
       this.connect = __bind(this.connect, this);
-      this.clearTimers = __bind(this.clearTimers, this);
+      this.ready = false;
       this.offline = 1;
       this.initialFetchDone = false;
       this.lastFetchTime = 0;
@@ -13348,25 +13347,13 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         }, this));
       } else {
         this.poll = {
-          intervals: {
-            heartbeat: {
-              val: 0,
-              handle: null
-            },
-            fetch: {
-              val: 0,
-              handle: null
-            },
+          interval: {
+            val: 0,
+            handle: null,
             sleepyFactor: 4
           },
           send: __bind(function(freq) {
-            var heartbeat;
-            if ((heartbeat = !freq)) {
-              freq = new smio.FetchRequestMessage();
-            } else {
-
-            }
-            return $.post("/_/poll/" + (heartbeat ? 'p' : 'i') + "/?t=" + (smio.Util.DateTime.ticks()), JSON.stringify(freq.msg), (__bind(function(m, t, x) {
+            return $.post("/_/poll/?t=" + (smio.Util.DateTime.ticks()), JSON.stringify(freq.msg), (__bind(function(m, t, x) {
               return this.onMessage(m, t, x);
             }, this)), 'text').error(__bind(function(x, t, e) {
               return this.onError(x, t, e);
@@ -13375,14 +13362,16 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         };
       }
     }
-    Socket.prototype.clearTimers = function() {
-      this.setTimer('heartbeat');
-      return this.setTimer('fetch');
-    };
     Socket.prototype.connect = function() {
+      this.ready = true;
+      $('#smio_offline').attr('title', smio.resources.smoothio.connecting_hint);
       if (this.socket) {
         return this.socket.connect();
       } else if (this.poll) {
+        this.poll.send(this.message({}, {
+          cmd: 's',
+          settings: [['fi', 'bg']]
+        }));
         return this.poll.send(this.messageFetch());
       }
     };
@@ -13402,7 +13391,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         return alert(JSON.stringify(xhr));
       } else {
         if ((textStatus === 'timeout') || (error === 'timeout') || (xhr && (((xhr.status === 0) && (xhr.readyState === 0)) || ((xhr.readyState === 4) && (xhr.status >= 12001) && (xhr.status <= 12156))))) {
-          return this.onOffline();
+          return this.onOffline(true);
         } else {
           this.onOnline();
           if (xhr && xhr.responseText) {
@@ -13415,33 +13404,27 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     };
     Socket.prototype.onOffline = function() {
       this.offline++;
-      if (this.offline === 2) {
+      if (this.offline === (this.poll ? 1 : 2)) {
         $('#smio_favicon').attr({
           'href': '/_/file/images/bg.png'
         });
-        $('#smio_offline').show();
-        if (this.client.allControls['']) {
-          return this.client.allControls[''].disable();
-        }
+        return $('#smio_offline').show();
       }
     };
     Socket.prototype.onOnline = function() {
       if (this.offline) {
         this.offline = 0;
-        if (this.client.allControls['']) {
-          this.client.allControls[''].enable();
-        }
-        $('#smio_offline').hide();
         $('#smio_favicon').attr({
           'href': '/_/file/images/smoothio.png'
         });
+        $('#smio_offline').hide();
         if (this.socket) {
           return this.send(this.messageFetch());
         }
       }
     };
     Socket.prototype.onMessage = function(msg, textStatus, xhr) {
-      var cfg, ctls, data, err, fresp, isValid;
+      var cfg, ctls, data, err, fresp;
       this.onOnline();
       data = null;
       if (msg === 'smoonocookie') {
@@ -13476,17 +13459,11 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           this.client.syncControls(ctls);
         }
         if ((cfg = fresp.settings())) {
-          if (this.poll && ((cfg.i_h != null) || (cfg.i_f != null))) {
-            isValid = function(iv) {
+          if (this.poll && cfg.fi) {
+            this.poll.interval.val = smio.Util.Number.tryParseInt(cfg.fi, 16000, function(iv) {
               return (iv > 100) && (iv < 12000000);
-            };
-            if (cfg.i_h != null) {
-              this.poll.intervals.heartbeat.val = smio.Util.Number.tryParseInt(cfg.i_h, 4500, isValid);
-            }
-            if (cfg.i_f != null) {
-              this.poll.intervals.fetch.val = smio.Util.Number.tryParseInt(cfg.i_f, 16000, isValid);
-            }
-            this.setTimers();
+            });
+            this.setTimer();
           }
           if (cfg.bg) {
             return this.client.pageBody.css({
@@ -13497,8 +13474,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
     };
     Socket.prototype.onSleepy = function(sleepy) {
-      if (this.poll) {
-        return this.setTimers();
+      if (this.ready && this.poll) {
+        return this.setTimer();
       }
     };
     Socket.prototype.onSocketClose = function() {};
@@ -13530,27 +13507,24 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         return this.poll.send(freq);
       }
     };
-    Socket.prototype.setTimer = function(name, fn) {
-      var obj, val;
-      obj = this.poll.intervals[name];
-      if (name === 'fetch' && !obj.val) {
-        obj.val = 5000;
+    Socket.prototype.setTimer = function(fn) {
+      var pi, val;
+      pi = this.poll.interval;
+      if (!fn) {
+        fn = __bind(function() {
+          return this.poll.send(this.messageFetch());
+        }, this);
       }
-      val = this.client.sleepy ? obj.val * this.poll.intervals.sleepyFactor : obj.val;
-      if (obj['handle']) {
-        clearInterval(obj.handle);
+      if (!pi.val) {
+        pi.val = 5000;
+      }
+      val = this.client.sleepy ? pi.val * pi.sleepyFactor : pi.val;
+      if (pi['handle']) {
+        clearInterval(pi.handle);
       }
       if (fn && val) {
-        return obj.handle = setInterval(fn, val);
+        return pi.handle = setInterval(fn, val);
       }
-    };
-    Socket.prototype.setTimers = function() {
-      this.setTimer('heartbeat', __bind(function() {
-        return this.poll.send();
-      }, this));
-      return this.setTimer('fetch', __bind(function() {
-        return this.poll.send(this.messageFetch());
-      }, this));
     };
     return Socket;
   })();
@@ -13700,10 +13674,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       jsVoid: 'javascript:void(0);'
     };
     Control.tagRenderers = {
-      "arg": function(ctl, name) {
+      'arg': function(ctl, name) {
         return ctl.args[name];
       },
-      "ctl": function(ctl, className, args, emptyIfMissing) {
+      'ctl': function(ctl, className, args, emptyIfMissing) {
         var ctor, renderFunc, subCtl;
         subCtl = _.detect(ctl.controls, function(sc) {
           return sc.ctlID === args.id;
@@ -13724,7 +13698,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           }
         }
       },
-      "inner": function(ctl, name, args) {
+      'inner': function(ctl, name, args) {
         var a, ao, o, _i, _len, _ref;
         o = [];
         a = args ? args : ctl.args;
@@ -13741,24 +13715,17 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         }
         return o.join('');
       },
-      "r": function() {
+      'r': function() {
         var args, ctl, name;
         ctl = arguments[0], name = arguments[1], args = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
         return ctl.res.apply(ctl, [name].concat(__slice.call(args)));
-      },
-      "tojs": function(ctl, name, args) {
-        var pn, pv;
-        for (pn in args) {
-          pv = args[pn];
-          name = name.replace(pn, pv);
-        }
-        return CoffeeScript.compile(name).split('\n').join('');
       }
     };
     function Control(client, parent, args) {
       this.client = client;
       this.parent = parent;
       this.args = args;
+      this.root = __bind(this.root, this);
       this.res = __bind(this.res, this);
       this.r = __bind(this.r, this);
       this.renderTag = __bind(this.renderTag, this);
@@ -13958,22 +13925,22 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       return this.res.apply(this, [name].concat(__slice.call(args)));
     };
     Control.prototype.res = function() {
-      var args, i, name, parts, resSet, resSets, ret, _ref, _ref2;
+      var args, i, lang, name, parts, resSet, resSets, ret, _ref, _ref2, _ref3;
       name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-      ret = '';
+      _ref = [this.root().args['lang'] || 'en', ''], lang = _ref[0], ret = _ref[1];
       if (((!args) || (!args.length)) && _.isArray(name) && (name.length > 1)) {
         args = name.slice(1);
         name = name[0];
       }
       if ((resSets = (this.client ? smio.resources : smio.inst.resourceSets))) {
         parts = this.classNamespace().split('_');
-        for (i = _ref = parts.length - 1; _ref <= 0 ? i <= 0 : i >= 0; _ref <= 0 ? i++ : i--) {
-          if ((resSet = resSets[parts.slice(0, (i + 1) || 9e9).join('_')]) && (ret = (this.client ? resSet[name] : resSet['en'][name]))) {
+        for (i = _ref2 = parts.length - 1; _ref2 <= 0 ? i <= 0 : i >= 0; _ref2 <= 0 ? i++ : i--) {
+          if ((resSet = resSets[parts.slice(0, (i + 1) || 9e9).join('_')]) && (ret = (this.client ? resSet[name] : resSet[lang][name]))) {
             break;
           }
         }
         if (!ret) {
-          ret = this.client ? resSets.smoothio[name] : resSets.smoothio['en'][name];
+          ret = this.client ? resSets.smoothio[name] : resSets.smoothio[lang][name];
         }
       }
       if (ret) {
@@ -13984,10 +13951,17 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         }
       } else {
         if (this.parent) {
-          return (_ref2 = this.parent).res.apply(_ref2, [name].concat(__slice.call(args)));
+          return (_ref3 = this.parent).res.apply(_ref3, [name].concat(__slice.call(args)));
         } else {
           return "!!RES::" + name + "!!";
         }
+      }
+    };
+    Control.prototype.root = function() {
+      if (this.parent) {
+        return this.parent.root();
+      } else {
+        return this;
       }
     };
     return Control;
@@ -14357,6 +14331,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         }
         return ret;
       },
+      idify: function(str) {
+        return smio.Util.String.urlify(str, '', '', true);
+      },
       replace: function(str, replace) {
         var pos, repl, val;
         for (val in replace) {
@@ -14375,30 +14352,41 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         }
         return a.join('');
       },
-      urlify: function(str, esc) {
-        var abc, c, l, o, r, tc, _i, _len, _ref;
-        if (esc == null) {
-          esc = '-';
+      urlify: function(s, e, al, noLower) {
+        var a, c, l, o, r, tc, tmp, _i, _len, _ref;
+        if (e == null) {
+          e = '-';
+        }
+        if (al == null) {
+          al = '/';
         }
         _ref = [
-          '', '', '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', {
+          '', '', '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' + al, {
             'ä': 'ae',
             'ö': 'oe',
             'ü': 'ue',
+            'Ä': 'Ae',
+            'Ö': 'Oe',
+            'Ü': 'Ue',
             'ß': 'ss'
           }
-        ], l = _ref[0], o = _ref[1], abc = _ref[2], r = _ref[3];
-        for (_i = 0, _len = str.length; _i < _len; _i++) {
-          c = str[_i];
-          if (__indexOf.call(abc, c) >= 0) {
+        ], l = _ref[0], o = _ref[1], a = _ref[2], r = _ref[3];
+        for (_i = 0, _len = s.length; _i < _len; _i++) {
+          c = s[_i];
+          if (__indexOf.call(a, c) >= 0) {
             o += (l = c);
-          } else if ((tc = r[c.toLowerCase()])) {
+          } else if ((tc = r[c])) {
             o += (l = tc);
-          } else if (l !== esc) {
-            o += (l = esc);
+          } else if (e && (l !== e)) {
+            o += (l = e);
           }
         }
-        return o;
+        tmp = _.trim(o, "/" + e);
+        if (noLower) {
+          return tmp;
+        } else {
+          return tmp.toLowerCase();
+        }
       }
     };
     return Util;
@@ -14862,7 +14850,9 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       __r.p(this.renderTag("arg", "appname", null));
       __r.p("\"/>\n\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"chrome=1\"/>\n\t\t<title>");
       __r.p(this.renderTag("arg", "title", null));
-      __r.p("</title>\n\t\t<script type=\"text/javascript\" language=\"JavaScript\">\n\t\t\tfunction onSmoothioNoCookie() {\n\t\t\t\t$('#smio_offline').hide();\n\t\t\t\t$('#smio_body').css({ \"background-image\": \"none\" }).html('<br/><br/><br/><br/><hr/>Either your session cookie expired or you have disabled browser cookies, and hence this application will not load.<br/><br/>Verify that cookies are enabled in your web browser, then try a complete reload (press CTRL+R).<hr/>Entweder ist Ihr Sitzungscookie abgelaufen oder Ihr Webbrowser unterst&uuml;tzt keine Cookies, und somit wird auch diese Anwendung nicht geladen.<br/><br/>Stellen Sie sicher, da&szlig; Ihr Webbrowser Cookies erlaubt, und versuchen Sie dann ein Komplett-Neuladen (STRG+R).<hr/>');\n\t\t\t}\n\n\t\t\tfunction onSmoothioPageLoad() {\n\t\t\t\t$('#smio_noscript, #smio_prescript, #smio_noscript_content').remove();\n\t\t\t\tif (smio.pageLoadError)\n\t\t\t\t\tdocument.getElementById('smio_body').innerHTML = '<br/><br/><br/><br/><hr/>Required core script <b>' + smio.pageLoadError + '</b> could not be loaded and hence this application will not load.<br/><br/>Try a complete reload (press CTRL+R) as this was probably just a temporary disruption.<hr/>Erforderliches Kernscript <b>' + smio.pageLoadError + '</b> konnte nicht geladen werden und somit wird auch diese Anwendung nicht geladen.<br/><br/>Versuchen Sie ein Komplett-Neuladen (STRG+R), da dies wahrscheinlich nur eine kurzzeitige St&ouml;rung war.<hr/>';\n\t\t\t\telse if (!(smio.client = new smio.Client()).sessionID)\n\t\t\t\t\tonSmoothioNoCookie();\n\t\t\t\telse\n\t\t\t\t\tsmio.client.init();\n\t\t\t}\n\n\t\t\tfunction onSmoothioProgress() {\n\t\t\t}\n\n\t\t\tfunction onSmoothioSleepy(sleepy) {\n\t\t\t\tif (smio.client && smio.client.socket && (sleepy != smio.client.sleepy))\n\t\t\t\t\tsmio.client.socket.onSleepy(smio.client.sleepy = sleepy);\n\t\t\t}\n\n\t\t\tfunction onScriptError(scriptName) {\n\t\t\t\tsmio.pageLoadError = scriptName;\n\t\t\t}\n\t\t</script>\n\t\t<link rel=\"stylesheet\" href=\"/_/file/_merged/_smoothio.css\"/>\n\t\t<link rel=\"shortcut icon\" type=\"image/png\" id=\"smio_favicon\" href=\"/_/file/images/smoothio.png\" />\n\t\t<style type=\"text/css\"> span.smio-noscript { display: none; } </style>\n\t</head>\n\t<body id=\"smio_body\" onload=\"onSmoothioPageLoad();\" onblur=\"onSmoothioSleepy(true);\" onfocus=\"onSmoothioSleepy(false);\">\n\t\t<div id=\"smio_offline\" class=\"smio-blocking-overlay\"><span id=\"smio_offline_msg\"></span>&nbsp;<span class=\"smio-blink\">&#x273F;</span></div>\n\t\t<script type=\"text/javascript\" language=\"JavaScript\" id=\"smio_prescript\">\n\t\t\tdocument.getElementById('smio_offline').style.display = 'block';\n\t\t\tvar smioGlobalTest, smio, WEB_SOCKET_SWF_LOCATION = '/_/dynfile/?type=application/x-shockwave-flash&config=sockets.xdomain_swf&true=bin/websockx.swf&false=bin/websock.swf';\n\t\t\ttry {\n\t\t\t\tsmioGlobalTest = global;\n\t\t\t} catch(err) {\n\t\t\t}\n\t\t\tif (!smioGlobalTest)\n\t\t\t\tglobal = {};\n\t\t\tif (!global['smoothio'])\n\t\t\t\tglobal['smoothio'] = {}\n\t\t\tsmio = global.smoothio;\n\t\t\tsmio.pageLoadError = null;\n\t\t\tsmio.iif = function(test, ifTrue, ifFalse) {\n\t\t\t\tif (arguments.length < 3)\n\t\t\t\t\tifFalse = false;\n\t\t\t\tif (arguments.length < 2)\n\t\t\t\t\tifTrue = true;\n\t\t\t\treturn test ? ifTrue : ifFalse;\n\t\t\t};\n\t\t</script>\n\t\t<noscript id=\"smio_noscript\">\n\t\t\t<style type=\"text/css\"> span.smio-noscript { display: block !important; } </style>\n\t\t</noscript>\n\t\t<div id=\"smio_main\" class=\"smio-main\"><span class=\"smio-noscript\" id=\"smio_noscript_content\">");
+      __r.p("</title>\n\t\t<script type=\"text/javascript\" language=\"JavaScript\">\n\t\t\tfunction onSmoothioNoCookie() {\n\t\t\t\t$('#smio_offline').hide();\n\t\t\t\t$('#smio_body').css({ \"background-image\": \"none\" }).html('<br/><br/><br/><br/><hr/>Either your session cookie expired or you have disabled browser cookies, and hence this application will not load.<br/><br/>Verify that cookies are enabled in your web browser, then try a complete reload (press CTRL+R).<hr/>Entweder ist Ihr Sitzungscookie abgelaufen oder Ihr Webbrowser unterst&uuml;tzt keine Cookies, und somit wird auch diese Anwendung nicht geladen.<br/><br/>Stellen Sie sicher, da&szlig; Ihr Webbrowser Cookies erlaubt, und versuchen Sie dann ein Komplett-Neuladen (STRG+R).<hr/>');\n\t\t\t}\n\n\t\t\tfunction onSmoothioPageLoad() {\n\t\t\t\t$('#smio_noscript, #smio_prescript, #smio_noscript_content').remove();\n\t\t\t\tif (smio)\n\t\t\t\t\tif (smio.pageLoadError)\n\t\t\t\t\t\tdocument.getElementById('smio_body').innerHTML = '<br/><br/><br/><br/><hr/>Required core script <b>' + smio.pageLoadError + '</b> could not be loaded and hence this application will not load.<br/><br/>Try a complete reload (press CTRL+R) as this was probably just a temporary disruption.<hr/>Erforderliches Kernscript <b>' + smio.pageLoadError + '</b> konnte nicht geladen werden und somit wird auch diese Anwendung nicht geladen.<br/><br/>Versuchen Sie ein Komplett-Neuladen (STRG+R), da dies wahrscheinlich nur eine kurzzeitige St&ouml;rung war.<hr/>';\n\t\t\t\t\telse if (!(smio.client = new smio.Client()).sessionID)\n\t\t\t\t\t\tonSmoothioNoCookie();\n\t\t\t\t\telse\n\t\t\t\t\t\tsmio.client.init();\n\t\t\t}\n\n\t\t\tfunction onSmoothioProgress() {\n\t\t\t}\n\n\t\t\tfunction onSmoothioSleepy(sleepy) {\n\t\t\t\tif (smio && smio.client && smio.client.socket && (sleepy != smio.client.sleepy))\n\t\t\t\t\tsmio.client.socket.onSleepy(smio.client.sleepy = sleepy);\n\t\t\t}\n\n\t\t\tfunction onScriptError(scriptName) {\n\t\t\t\tif (smio)\n\t\t\t\t\tsmio.pageLoadError = scriptName;\n\t\t\t}\n\t\t</script>\n\t\t<link rel=\"stylesheet\" href=\"/_/file/_merged/_smoothio.css\"/>\n\t\t<link rel=\"shortcut icon\" type=\"image/png\" id=\"smio_favicon\" href=\"/_/file/images/smoothio.png\" />\n\t\t<style type=\"text/css\"> span.smio-noscript { display: none; } </style>\n\t</head>\n\t<body id=\"smio_body\" onload=\"onSmoothioPageLoad();\" onblur=\"onSmoothioSleepy(true);\" onfocus=\"onSmoothioSleepy(false);\">\n\t\t<div id=\"smio_offline\" class=\"smio-offline\"><span id=\"smio_offline_msg\">");
+      __r.p(this.renderTag("r", "maintemplate_loading", null));
+      __r.p("</span>&nbsp;<span class=\"smio-blink\">&#x273F;</span></div>\n\t\t<script type=\"text/javascript\" language=\"JavaScript\" id=\"smio_prescript\">\n\t\t\tdocument.getElementById('smio_offline').style.display = 'block';\n\t\t\tvar smioGlobalTest, smio, WEB_SOCKET_SWF_LOCATION = '/_/dynfile/?type=application/x-shockwave-flash&config=sockets.xdomain_swf&true=bin/websockx.swf&false=bin/websock.swf';\n\t\t\ttry {\n\t\t\t\tsmioGlobalTest = global;\n\t\t\t} catch(err) {\n\t\t\t}\n\t\t\tif (!smioGlobalTest)\n\t\t\t\tglobal = {};\n\t\t\tif (!global['smoothio'])\n\t\t\t\tglobal['smoothio'] = {}\n\t\t\tsmio = global.smoothio;\n\t\t\tsmio.pageLoadError = null;\n\t\t\tsmio.iif = function(test, ifTrue, ifFalse) {\n\t\t\t\tif (arguments.length < 3)\n\t\t\t\t\tifFalse = false;\n\t\t\t\tif (arguments.length < 2)\n\t\t\t\t\tifTrue = true;\n\t\t\t\treturn test ? ifTrue : ifFalse;\n\t\t\t};\n\t\t</script>\n\t\t<noscript id=\"smio_noscript\">\n\t\t\t<style type=\"text/css\"> span.smio-noscript { display: block !important; } </style>\n\t\t</noscript>\n\t\t<div id=\"smio_main\" class=\"smio-main\"><span class=\"smio-noscript\" id=\"smio_noscript_content\">");
       __r.p(this.renderTag("arg", "htmlContent", null));
       __r.p("</span></div>\n\t\t<script type=\"text/javascript\" language=\"JavaScript\" src=\"/_/dynfile/?config=_res.js\" onerror=\"onScriptError('_res.js');\" defer=\"defer\" async=\"async\"></script>\n\t\t<script type=\"text/javascript\" language=\"JavaScript\" src=\"/_/file/_merged/_smoothio.js\" onerror=\"onScriptError('_smoothio.js');\" defer=\"defer\" async=\"async\"></script>\n\t\t<!--xscript type=\"text/javascript\" language=\"JavaScript\" src=\"/_/file/coffee-script.js\" onerror=\"onScriptError('coffee-script.js');\" defer=\"defer\" async=\"async\"></xscript-->\n\t</body>\n</html>\n");
       _html = __r.o.join('');
@@ -15346,15 +15336,15 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     Packs_Core_ServerSetup_InitialHubSetup.prototype.onLoad = function() {
       var $p1, $p2, $t, $u, _ref;
       Packs_Core_ServerSetup_InitialHubSetup.__super__.onLoad.call(this);
-      $('.smio-setup-header-d   etail').click(__bind(function() {
+      $('.smio-setup-header-detail').click(__bind(function() {
         var nurl, port, urlseg;
         port = ("" + (this.client.pageUrl.attr('port'))) === '80' ? '' : ":" + (this.client.pageUrl.attr('port'));
         nurl = prompt(this.r('url_hint', this.client.pageUrl.attr('protocol'), this.client.pageUrl.attr('host'), port), urlseg = this.urlSeg());
-        if ((nurl != null) && (nurl !== null) && (nurl !== urlseg)) {
-          if (!_.startsWith(nurl, '/')) {
-            nurl = "/" + nurl;
+        if ((nurl != null) && (nurl !== null) && ((nurl = smio.Util.String.urlify(_.trim(nurl))) !== urlseg)) {
+          if ((!_.startsWith(nurl, '/')) || (!_.endsWith(nurl, '/'))) {
+            nurl = "/" + (_.trim(nurl, '/')) + "/";
           }
-          return location.replace(_.trim(nurl));
+          return location.replace(nurl);
         }
       }, this));
       _ref = [this.sub('stepslide/user/name/input'), this.sub('stepslide/user/pass/input'), this.sub('stepslide/user/pass2/input'), this.sub('stepslide/hub_title/input')], $u = _ref[0], $p1 = _ref[1], $p2 = _ref[2], $t = _ref[3];
@@ -15384,7 +15374,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     Packs_Core_ServerSetup_InitialHubSetup.prototype.verifyInputs = function() {
       var $p1, $p2, $t, $u, tmp, _ref;
       _ref = [this.sub('stepslide/user/name/input'), this.sub('stepslide/user/pass/input'), this.sub('stepslide/user/pass2/input'), this.sub('stepslide/hub_title/input')], $u = _ref[0], $p1 = _ref[1], $p2 = _ref[2], $t = _ref[3];
-      if ($u.val() !== (tmp = smio.Util.String.urlify(_.trim($u.val()), ''))) {
+      if ($u.val() !== (tmp = smio.Util.String.idify(_.trim($u.val())))) {
         $u.val(tmp);
       }
       if ($t.val() !== (tmp = _.trim($t.val()))) {

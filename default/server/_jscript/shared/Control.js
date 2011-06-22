@@ -183,14 +183,21 @@
       require('../../_packs/' + parts.slice(0, parts.length - 1).join('/') + '/_ctl_' + _.last(parts));
       return new smio['Packs_' + className](null, parent, args);
     };
+    Control.prototype.rc = function() {
+      if (this.parent) {
+        return this.parent.rc();
+      } else {
+        return this['requestContext'] || null;
+      }
+    };
     Control.util = {
       jsVoid: 'javascript:void(0);'
     };
     Control.tagRenderers = {
-      "arg": function(ctl, name) {
+      'arg': function(ctl, name) {
         return ctl.args[name];
       },
-      "ctl": function(ctl, className, args, emptyIfMissing) {
+      'ctl': function(ctl, className, args, emptyIfMissing) {
         var ctor, renderFunc, subCtl;
         subCtl = _.detect(ctl.controls, function(sc) {
           return sc.ctlID === args.id;
@@ -211,7 +218,7 @@
           }
         }
       },
-      "inner": function(ctl, name, args) {
+      'inner': function(ctl, name, args) {
         var a, ao, o, _i, _len, _ref;
         o = [];
         a = args ? args : ctl.args;
@@ -228,24 +235,17 @@
         }
         return o.join('');
       },
-      "r": function() {
+      'r': function() {
         var args, ctl, name;
         ctl = arguments[0], name = arguments[1], args = 3 <= arguments.length ? __slice.call(arguments, 2) : [];
         return ctl.res.apply(ctl, [name].concat(__slice.call(args)));
-      },
-      "tojs": function(ctl, name, args) {
-        var pn, pv;
-        for (pn in args) {
-          pv = args[pn];
-          name = name.replace(pn, pv);
-        }
-        return CoffeeScript.compile(name).split('\n').join('');
       }
     };
     function Control(client, parent, args) {
       this.client = client;
       this.parent = parent;
       this.args = args;
+      this.root = __bind(this.root, this);
       this.res = __bind(this.res, this);
       this.r = __bind(this.r, this);
       this.renderTag = __bind(this.renderTag, this);
@@ -261,6 +261,7 @@
       this.cssBaseClass = __bind(this.cssBaseClass, this);
       this.cls = __bind(this.cls, this);
       this.classPath = __bind(this.classPath, this);
+      this.rc = __bind(this.rc, this);
       this.Control = __bind(this.Control, this);
       this.Control = __bind(this.Control, this);
       this.disabled = smio.iif(this.args.disabled);
@@ -434,22 +435,22 @@
       return this.res.apply(this, [name].concat(__slice.call(args)));
     };
     Control.prototype.res = function() {
-      var args, i, name, parts, resSet, resSets, ret, _ref, _ref2;
+      var args, i, lang, name, parts, resSet, resSets, ret, _ref, _ref2, _ref3;
       name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-      ret = '';
+      _ref = [this.root().args['lang'] || 'en', ''], lang = _ref[0], ret = _ref[1];
       if (((!args) || (!args.length)) && _.isArray(name) && (name.length > 1)) {
         args = name.slice(1);
         name = name[0];
       }
       if ((resSets = (this.client ? smio.resources : smio.inst.resourceSets))) {
         parts = this.classNamespace().split('_');
-        for (i = _ref = parts.length - 1; _ref <= 0 ? i <= 0 : i >= 0; _ref <= 0 ? i++ : i--) {
-          if ((resSet = resSets[parts.slice(0, (i + 1) || 9e9).join('_')]) && (ret = (this.client ? resSet[name] : resSet['en'][name]))) {
+        for (i = _ref2 = parts.length - 1; _ref2 <= 0 ? i <= 0 : i >= 0; _ref2 <= 0 ? i++ : i--) {
+          if ((resSet = resSets[parts.slice(0, (i + 1) || 9e9).join('_')]) && (ret = (this.client ? resSet[name] : resSet[lang][name]))) {
             break;
           }
         }
         if (!ret) {
-          ret = this.client ? resSets.smoothio[name] : resSets.smoothio['en'][name];
+          ret = this.client ? resSets.smoothio[name] : resSets.smoothio[lang][name];
         }
       }
       if (ret) {
@@ -460,10 +461,17 @@
         }
       } else {
         if (this.parent) {
-          return (_ref2 = this.parent).res.apply(_ref2, [name].concat(__slice.call(args)));
+          return (_ref3 = this.parent).res.apply(_ref3, [name].concat(__slice.call(args)));
         } else {
           return "!!RES::" + name + "!!";
         }
+      }
+    };
+    Control.prototype.root = function() {
+      if (this.parent) {
+        return this.parent.root();
+      } else {
+        return this;
       }
     };
     return Control;

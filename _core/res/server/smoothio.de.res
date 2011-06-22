@@ -1,6 +1,9 @@
 {
 	"___resource_file_intro"		:	"Mit dieser Formatierung werden von JSON erforderte Kommata oder Doppelpunkte nie mehr vergessen. Für neue Ressourcen, copy&paste folgende Zeile."
 ,	"x"								:	"y"
+,	"maintemplate_loading"			:	"Wird geladen"
+,	"maintemplate_nohub_title"		:	"Noch kein Hub eingerichtet"
+,	"maintemplate_nohub_desc"		:	"Dieser Server enthält noch keine Hubs."
 ,	"log_mongo_dbconnected"			:	"Verbunden mit {0}-Datenbank."
 ,	"log_mongo_error_dbnoconnect"	:	"FEHLER beim Verbinden mit {0}-Datenbank:\n{1}"
 ,	"log_mongo_error_start"			:	"FEHLER beim Starten von MongoDB:\n{0}"

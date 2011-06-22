@@ -19,8 +19,8 @@
         "div .smio-setup": {
           "id": '',
           "div .smio-setup-outer .smio-setup-outer-top": {
-            "div .smio-setup-header": [this.r('nojs_title')],
-            "div .smio-setup-header-desc": [this.r('nojs_desc')]
+            "div .smio-setup-header": [this.r('maintemplate_nohub_title')],
+            "div .smio-setup-header-desc": [this.r('maintemplate_nohub_desc')]
           }
         }
       };

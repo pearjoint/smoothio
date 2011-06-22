@@ -144,15 +144,15 @@
     Packs_Core_ServerSetup_InitialHubSetup.prototype.onLoad = function() {
       var $p1, $p2, $t, $u, _ref;
       Packs_Core_ServerSetup_InitialHubSetup.__super__.onLoad.call(this);
-      $('.smio-setup-header-d   etail').click(__bind(function() {
+      $('.smio-setup-header-detail').click(__bind(function() {
         var nurl, port, urlseg;
         port = ("" + (this.client.pageUrl.attr('port'))) === '80' ? '' : ":" + (this.client.pageUrl.attr('port'));
         nurl = prompt(this.r('url_hint', this.client.pageUrl.attr('protocol'), this.client.pageUrl.attr('host'), port), urlseg = this.urlSeg());
-        if ((nurl != null) && (nurl !== null) && (nurl !== urlseg)) {
-          if (!_.startsWith(nurl, '/')) {
-            nurl = "/" + nurl;
+        if ((nurl != null) && (nurl !== null) && ((nurl = smio.Util.String.urlify(_.trim(nurl))) !== urlseg)) {
+          if ((!_.startsWith(nurl, '/')) || (!_.endsWith(nurl, '/'))) {
+            nurl = "/" + (_.trim(nurl, '/')) + "/";
           }
-          return location.replace(_.trim(nurl));
+          return location.replace(nurl);
         }
       }, this));
       _ref = [this.sub('stepslide/user/name/input'), this.sub('stepslide/user/pass/input'), this.sub('stepslide/user/pass2/input'), this.sub('stepslide/hub_title/input')], $u = _ref[0], $p1 = _ref[1], $p2 = _ref[2], $t = _ref[3];
@@ -182,7 +182,7 @@
     Packs_Core_ServerSetup_InitialHubSetup.prototype.verifyInputs = function() {
       var $p1, $p2, $t, $u, tmp, _ref;
       _ref = [this.sub('stepslide/user/name/input'), this.sub('stepslide/user/pass/input'), this.sub('stepslide/user/pass2/input'), this.sub('stepslide/hub_title/input')], $u = _ref[0], $p1 = _ref[1], $p2 = _ref[2], $t = _ref[3];
-      if ($u.val() !== (tmp = smio.Util.String.urlify(_.trim($u.val()), ''))) {
+      if ($u.val() !== (tmp = smio.Util.String.idify(_.trim($u.val())))) {
         $u.val(tmp);
       }
       if ($t.val() !== (tmp = _.trim($t.val()))) {

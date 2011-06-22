@@ -6,8 +6,8 @@ renderTemplate: =>
 	"div .$CC":
 		"id": ''
 		"div .$CC-outer .$CC-outer-top":
-			"div .$CC-header": [@r 'nojs_title']
-			"div .$CC-header-desc": [@r 'nojs_desc']
+			"div .$CC-header": [@r 'maintemplate_nohub_title']
+			"div .$CC-header-desc": [@r 'maintemplate_nohub_desc']
 
 #endif
 
@@ -92,13 +92,13 @@ createHub: =>
 
 onLoad: =>
 	super()
-	$('.$CC-header-d   etail').click =>
+	$('.$CC-header-detail').click =>
 		port = if ("#{@client.pageUrl.attr 'port'}" is '80') then '' else ":#{@client.pageUrl.attr 'port'}"
 		nurl = prompt(@r('url_hint', @client.pageUrl.attr('protocol'), @client.pageUrl.attr('host'), port), urlseg = @urlSeg())
-		if nurl? and (nurl isnt null) and (nurl isnt urlseg)
-			if not _.startsWith(nurl, '/')
-				nurl = "/#{nurl}"
-			location.replace(_.trim(nurl))
+		if nurl? and (nurl isnt null) and ((nurl = smio.Util.String.urlify(_.trim(nurl))) isnt urlseg)
+			if (not _.startsWith(nurl, '/')) or (not _.endsWith(nurl, '/'))
+				nurl = "/#{_.trim(nurl, '/')}/"
+			location.replace(nurl)
 	[$u, $p1, $p2, $t] = [@sub('stepslide/user/name/input'), @sub('stepslide/user/pass/input'), @sub('stepslide/user/pass2/input'), @sub('stepslide/hub_title/input')]
 	$u.val('test')
 	$p1.val('test')
@@ -118,7 +118,7 @@ urlSeg: =>
 
 verifyInputs: () =>
 	[$u, $p1, $p2, $t] = [@sub('stepslide/user/name/input'), @sub('stepslide/user/pass/input'), @sub('stepslide/user/pass2/input'), @sub('stepslide/hub_title/input')]
-	if ($u.val() isnt (tmp = smio.Util.String.urlify(_.trim($u.val()), '')))
+	if ($u.val() isnt (tmp = smio.Util.String.idify(_.trim($u.val()))))
 		$u.val(tmp)
 	if ($t.val() isnt (tmp = _.trim($t.val())))
 		$t.val(tmp)

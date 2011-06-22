@@ -117,87 +117,24 @@ table {
   border-spacing: 0;
 }
 ::selection {
-  background-color: rgba(0,0,0,0.75) !important;
+  background-color: rgba(16,32,64,0.75) !important;
   color: #f0f0f0 !important;
   text-shadow: none !important;
 }
 ::-webkit-selection {
-  background-color: rgba(0,0,0,0.75) !important;
+  background-color: rgba(16,32,64,0.75) !important;
   color: #f0f0f0 !important;
   text-shadow: none !important;
 }
 :-moz-selection {
-  background-color: rgba(0,0,0,0.75) !important;
+  background-color: rgba(16,32,64,0.75) !important;
   color: #f0f0f0 !important;
   text-shadow: none !important;
 }
 ::-moz-selection {
-  background-color: rgba(0,0,0,0.75) !important;
+  background-color: rgba(16,32,64,0.75) !important;
   color: #f0f0f0 !important;
   text-shadow: none !important;
-}
-.smio-disabledfaded, .smio-disabledfaded label, .smio-disabledfaded input, .smio-disabledfaded a {
-	cursor: not-allowed;
-}
-.smio-invoking,
-.smio-invoking label,
-.smio-invoking a,
-.smio-invoking input {
-  cursor: wait !important;
-}
-a {
-  text-decoration: none;
-  color: inherit;
-}
-img,
-span,
-div {
-  image-rendering: optimizeQuality;
-  -ms-interpolation-mode: bicubic;
-}
-body {
-  cursor: default;
-  color: #303030;
-  margin: 0;
-  font-family: Arial, Helvetica, Helvetica Neue, Sans-Serif;
-  -o-user-select: none;
-  -ms-user-select: none;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  user-select: none;
-  -o-user-drag: none;
-  -moz-user-drag: none;
-  -webkit-user-drag: none;
-  -ms-user-drag: none;
-  user-drag: none;
-  background-color: #d0c8b8;
-  background-size: cover;
-}
-.smio-disabledfaded {
-  opacity: 0.5;
-}
-.smio-blocking-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2147483640;
-  text-align: center;
-  padding: 18% 8% 8% 8%;
-  line-height: 1.3em;
-  font-size: 1.7em;
-  color: #f0f0f0;
-  text-shadow: 0 0 0.6em #000;
-  letter-spacing: -0.05em;
-  background: rgba(0,0,0,0.7);
-  background: -ms-linear-gradient(rgba(0,0,0,0.5) 25%, rgba(0,0,0,0.7) 75%);
-  background: -xmoz-linear-gradient(rgba(0,0,0,0.5) 25%, rgba(0,0,0,0.7) 75%);
-  background: -o-linear-gradient(rgba(0,0,0,0.5) 25%, rgba(0,0,0,0.7) 75%);
-  background: -webkit-linear-gradient(rgba(0,0,0,0.5) 25%, rgba(0,0,0,0.7) 75%);
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(0,0,0,0.5)), to(rgba(0,0,0,0.7)));
-  background-size: 0.3em;
 }
 @-webkit-keyframes animspin {
   0% {
@@ -283,4 +220,71 @@ body {
   -o-animation: animspin 2s linear infinite;
   -ms-animation: animspin 2s linear infinite;
   animation: animspin 2s linear infinite;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+img,
+span,
+div {
+  image-rendering: optimizeQuality;
+  -ms-interpolation-mode: bicubic;
+}
+body {
+  cursor: default;
+  color: #303030;
+  margin: 0;
+  font-family: Arial, Helvetica, Helvetica Neue, Sans-Serif;
+  -o-user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -o-user-drag: none;
+  -moz-user-drag: none;
+  -webkit-user-drag: none;
+  -ms-user-drag: none;
+  user-drag: none;
+  background-color: #d0c8b8;
+  background-position: left top;
+}
+.smio-disabledfaded {
+  opacity: 0.5;
+}
+.smio-disabledfaded, .smio-disabledfaded label, .smio-disabledfaded input, .smio-disabledfaded a {
+	cursor: not-allowed;
+}
+.smio-offline,
+.smio-invoking,
+.smio-invoking label,
+.smio-invoking a,
+.smio-invoking input {
+  cursor: wait !important;
+}
+.smio-offline {
+  display: none;
+  text-align: center;
+  color: #f0f0f0;
+  text-shadow: 0 0 0.6em #f0f0f0;
+  padding: 0.3em 0 0.4em 0;
+  font-size: 1.3em;
+  position: relative;
+  z-index: 2147483640;
+  width: 8em;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid rgba(16,32,64,0.4);
+  border-top: 0px none #f00;
+  letter-spacing: -0.05em;
+  background: rgba(16,32,64,0.7);
+  background: -ms-linear-gradient(rgba(16,32,64,0.6) 1px, rgba(16,32,64,0.7) 3px);
+  background: -moz-linear-gradient(rgba(16,32,64,0.6) 1px, rgba(16,32,64,0.7) 3px);
+  background: -o-linear-gradient(rgba(16,32,64,0.6) 1px, rgba(16,32,64,0.7) 3px);
+  background: -webkit-linear-gradient(rgba(16,32,64,0.6) 1px, rgba(16,32,64,0.7) 3px);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(16,32,64,0.6)), to(rgba(16,32,64,0.7)));
+  background-size: 18px;
+  -webkit-border-radius: 0 0 0.66em 0.66em;
+  -moz-border-radius: 0 0 0.66em 0.66em;
+  border-radius: 0 0 0.66em 0.66em;
 }

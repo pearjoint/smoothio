@@ -7,7 +7,6 @@ class smio.Client
 		@allControls = {}
 		@pageWindow = $(window)
 		@pageBody = $('#smio_body')
-		$('#smio_offline_msg').text(smio.resources.smoothio.connect)
 		cookie = $.cookie('smoo')
 		@pageUrl = $.url()
 		try
@@ -22,6 +21,7 @@ class smio.Client
 
 	init: =>
 		$.ajaxSetup(timeout: 4000)
+		$('#smio_offline_msg').text(smio.resources.smoothio.connecting)
 		@socket.connect()
 
 	onWindowResize: () =>

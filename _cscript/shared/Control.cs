@@ -138,6 +138,8 @@ class smio.Packs_#{className} extends smio.Control
 		require('../../_packs/' + parts[0...parts.length - 1].join('/') + '/_ctl_' + _.last(parts))
 		new (smio['Packs_' + className])(null, parent, args)
 
+	rc: () =>
+		if @parent then @parent.rc() else (@['requestContext'] or null)
 #endif
 
 #if client
@@ -235,9 +237,9 @@ class smio.Packs_#{className} extends smio.Control
 	@util:
 		jsVoid: 'javascript:void(0);'
 	@tagRenderers:
-		"arg": (ctl, name) ->
+		'arg': (ctl, name) ->
 			ctl.args[name]
-		"ctl": (ctl, className, args, emptyIfMissing) ->
+		'ctl': (ctl, className, args, emptyIfMissing) ->
 			subCtl = _.detect(ctl.controls, (sc) -> sc.ctlID is args.id)
 			if (not subCtl) and ((ctor = smio["Packs_#{ctl.classNamespace()}_#{className}"]) or (ctor = smio["Packs_#{ctl.classNamespace()}_Controls_#{className}"]) or (ctor = smio["Packs_Core_Controls_#{className}"] ))
 				ctl.controls.push(subCtl = new ctor(ctl.client, ctl, args))
@@ -248,7 +250,7 @@ class smio.Packs_#{className} extends smio.Control
 				renderFunc(className, args)
 			else
 				if emptyIfMissing then '' else "!!CONTROL_NOT_FOUND::#{className}!!"
-		"inner": (ctl, name, args) ->
+		'inner': (ctl, name, args) ->
 			o = []
 			a = if args then args else ctl.args
 			if (a['__o'] and a.__o['length'])
@@ -258,12 +260,8 @@ class smio.Packs_#{className} extends smio.Control
 					else
 						o.push(ctl.renderTag(ao.t, ao.s, ao.a))
 			o.join('')
-		"r": (ctl, name, args...) ->
+		'r': (ctl, name, args...) ->
 			ctl.res name, args...
-		"tojs": (ctl, name, args) ->
-			for pn, pv of args
-				name = name.replace(pn, pv)
-			CoffeeScript.compile(name).split('\n').join('')
 
 	constructor: (@client, @parent, @args) ->
 		@disabled = smio.iif(@args.disabled)
@@ -396,16 +394,19 @@ class smio.Packs_#{className} extends smio.Control
 		@res(name, args...)
 
 	res: (name, args...) =>
-		ret = ''
+		[lang, ret] = [@root().args['lang'] or 'en', '']
 		if ((not args) or (not args.length)) and _.isArray(name) and (name.length > 1)
 			args = name[1..]
 			name = name[0]
 		if (resSets = (if @client then smio.resources else smio.inst.resourceSets))
 			parts = @classNamespace().split('_')
 			for i in [(parts.length - 1)..0]
-				if (resSet = resSets[parts[0..i].join('_')]) and (ret = (if @client then resSet[name] else resSet['en'][name]))
+				if (resSet = resSets[parts[0..i].join('_')]) and (ret = (if @client then resSet[name] else resSet[lang][name]))
 					break
 			if not ret
-				ret = if @client then resSets.smoothio[name] else resSets.smoothio['en'][name]
+				ret = if @client then resSets.smoothio[name] else resSets.smoothio[lang][name]
 		if ret then (if args.length then _.sprintf(ret, args...) else ret) else (if @parent then @parent.res(name, args...) else "!!RES::#{name}!!")
+
+	root: () =>
+		if @parent then @parent.root() else @
 

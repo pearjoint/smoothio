@@ -1,7 +1,8 @@
 {
 	"___resource_file_intro"		:	"This formatting ensures no JSON-required commas or colons are ever missed. To add new resources, copy&paste the next line."
 ,	"x"								:	"y"
-,	"connect"						:	"Connecting"
+,	"connecting"					:	"Connecting"
+,	"connecting_hint"				:	"Either your network connection or our server is down. You will be reconnected shortly."
 ,	"invoking"						:	"Please wait <span class=\"smio-spin\">&#x273F;</span>"
 }
 

@@ -2,6 +2,7 @@ smio = global.smoothio
 
 class smio.Socket
 	constructor: (@client, isSocketIO, host, secure, port) ->
+		@ready = false
 		@offline = 1
 		@initialFetchDone = false
 		@lastFetchTime = 0
@@ -21,33 +22,20 @@ class smio.Socket
 			@socket.on 'reconnecting', (delay, attempts) => @onSocketReconnecting(delay, attempts)
 		else
 			@poll =
-				intervals:
-					heartbeat:
-						val: 0
-						handle: null
-					fetch:
-						val: 0
-						handle: null
+				interval:
+					val: 0
+					handle: null
 					sleepyFactor: 4
 				send: (freq) =>
-					if (heartbeat = (not freq))
-						freq = new smio.FetchRequestMessage()
-					else
-						#unless @poll.intervals.heartbeat.val or @poll.intervals.fetch.val
-						#	freq.settings(['i_h', 'i_f'])
-						#if @client.pageBody.css('background-image') is 'none'
-						#	freq.settings(['bg'])
-						#freq.ticks(@lastFetchTime)
-					$.post("/_/poll/#{if heartbeat then 'p' else 'i'}/?t=#{smio.Util.DateTime.ticks()}", JSON.stringify(freq.msg), ((m, t, x) => @onMessage(m, t, x)), 'text').error (x, t, e) => @onError(x, t, e)
-
-	clearTimers: () =>
-		@setTimer('heartbeat')
-		@setTimer('fetch')
+					$.post("/_/poll/?t=#{smio.Util.DateTime.ticks()}", JSON.stringify(freq.msg), ((m, t, x) => @onMessage(m, t, x)), 'text').error (x, t, e) => @onError(x, t, e)
 
 	connect: =>
+		@ready = true
+		$('#smio_offline').attr('title', smio.resources.smoothio.connecting_hint)
 		if @socket
 			@socket.connect()
 		else if @poll
+			@poll.send(@message({}, cmd: 's', settings: [['fi', 'bg']]))
 			@poll.send(@messageFetch())
 
 	message: (msg, funcs) =>
@@ -61,7 +49,7 @@ class smio.Socket
 			alert(JSON.stringify(xhr))
 		else
 			if (textStatus is 'timeout') or (error is 'timeout') or (xhr and (((xhr.status is 0) and (xhr.readyState is 0)) or ((xhr.readyState is 4) and (xhr.status >= 12001) and (xhr.status <= 12156))))
-				@onOffline()
+				@onOffline(true)
 			else
 				@onOnline()
 				if xhr and xhr.responseText
@@ -71,19 +59,15 @@ class smio.Socket
 
 	onOffline: =>
 		@offline++
-		if @offline is 2
+		if @offline is (if @poll then 1 else 2)
 			$('#smio_favicon').attr('href': '/_/file/images/bg.png')
 			$('#smio_offline').show()
-			if @client.allControls['']
-				@client.allControls[''].disable()
 
 	onOnline: =>
 		if @offline
 			@offline = 0
-			if @client.allControls['']
-				@client.allControls[''].enable()
-			$('#smio_offline').hide()
 			$('#smio_favicon').attr('href': '/_/file/images/smoothio.png')
+			$('#smio_offline').hide()
 			if @socket
 				@send(@messageFetch())
 
@@ -113,19 +97,15 @@ class smio.Socket
 				@lastFetchTime = fresp.ticks()
 				@client.syncControls(ctls)
 			if (cfg = fresp.settings())
-				if @poll and (cfg.i_h? or cfg.i_f?)
-					isValid = (iv) -> (iv > 100) and (iv < 12000000)
-					if cfg.i_h?
-						@poll.intervals.heartbeat.val = smio.Util.Number.tryParseInt(cfg.i_h, 4500, isValid)
-					if cfg.i_f?
-						@poll.intervals.fetch.val = smio.Util.Number.tryParseInt(cfg.i_f, 16000, isValid)
-					@setTimers()
+				if @poll and cfg.fi
+					@poll.interval.val = smio.Util.Number.tryParseInt(cfg.fi, 16000, (iv) -> (iv > 100) and (iv < 12000000))
+					@setTimer()
 				if cfg.bg
 					@client.pageBody.css('background-image': "url('#{cfg.bg}')")
 
 	onSleepy: (sleepy) =>
-		if @poll
-			@setTimers()
+		if @ready and @poll
+			@setTimer()
 
 	onSocketClose: =>
 
@@ -156,17 +136,15 @@ class smio.Socket
 		else if @poll
 			@poll.send(freq)
 
-	setTimer: (name, fn) =>
-		obj = @poll.intervals[name]
-		if name is 'fetch' and not obj.val
-			obj.val = 5000
-		val = if @client.sleepy then (obj.val * @poll.intervals.sleepyFactor) else obj.val
-		if obj['handle']
-			clearInterval(obj.handle)
+	setTimer: (fn) =>
+		pi = @poll.interval
+		if not fn
+			fn = => @poll.send(@messageFetch())
+		if not pi.val
+			pi.val = 5000
+		val = if @client.sleepy then (pi.val * pi.sleepyFactor) else pi.val
+		if pi['handle']
+			clearInterval(pi.handle)
 		if fn and val
-			obj.handle = setInterval(fn, val)
-
-	setTimers: =>
-		@setTimer('heartbeat', => @poll.send())
-		@setTimer('fetch', => @poll.send(@messageFetch()))
+			pi.handle = setInterval(fn, val)
 

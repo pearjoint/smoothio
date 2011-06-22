@@ -5,8 +5,6 @@
 ,	"title"							:	"Setting up your first Hub <a class='%s' href='%s'>at &#x279C; %s</a>"
 ,	"desc"							:	"This server does not contain any Hubs yet. Create one now:"
 ,	"url_hint"						:	"A Hub can have any URL address you like. The URL of your new Hub will be:\n\n%s://%s%s➜"
-,	"nojs_title"					:	"No Hub created yet"
-,	"nojs_desc"						:	"This server does not contain any Hubs yet."
 ,	"owner_name"					:	"User name:"
 ,	"owner_namehint"				:	"eg. “JoeBloggs” or “admin” etc..."
 ,	"owner_pass"					:	"Password:"

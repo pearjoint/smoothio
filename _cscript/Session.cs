@@ -44,7 +44,8 @@ class smio.Session
 								fresp.ticks(smio.Util.DateTime.utcTicks())
 							finish(fresp.msg)
 					when 's'
-						fresp.settings(i_h: 4500, i_f: 16000)
+						fresp.settings(fi: 15000, bg: '/_/file/images/bg0.jpg')
+						finish(fresp.msg)
 					else
 						[prefix, cmdName] = tmp.split('.')
 						if prefix is 'Hub'

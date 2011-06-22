@@ -50,10 +50,7 @@ class smio.RequestContext
 						finish = (data) =>
 							@httpResponse.writeHead 200, respHeaders
 							@httpResponse.end(JSON.stringify(data))
-						if @uri.pathItems[2] is 'i'
-							smio.Session.getBySessionID(@server, @smioCookie['sessid']).handleInvoke(@, null, finish)
-						else
-							finish {}
+						smio.Session.getBySessionID(@server, @smioCookie['sessid']).handleInvoke(@, null, finish)
 					when "dynfile"
 						if (cfgKey = @uri.query['config'])
 							if cfgKey is '_res.js'
@@ -95,8 +92,8 @@ class smio.RequestContext
 					lq = lq.substr(0, pos)
 				if not (lq in @userLangs)
 					@userLangs.push(lq)
-		ret = smio.iif(@userLangs.length, @userLangs[0], '')
-		smio.iif(ret, ret, def or '')
+		ret = if @userLangs.length then @userLangs[0] else ''
+		if ret then ret else (def or '')
 
 	serveFile: (filePath, respHeaders) =>
 		node_fs.stat node_path.join(@server.fileServer.root, filePath), (err, stat) =>
@@ -116,10 +113,11 @@ class smio.RequestContext
 	servePage: (respHeaders) =>
 		(session = smio.Session.getBySessionID(@server, @smioCookie['sessid'])).handleInvoke @, {c: 'f', t: 0}, (data) =>
 			try
-				ctl = smio.Control.load(data['f']['']['_'], null, id: 'sm')
-				mainCtl = smio.Control.load('Core_Controls_Smoothio', null, id: '', htmlContent: ctl.renderHtml(), lang: userlang, title: 'smooth.io', appname: 'smooth.io')
+				mainCtl = smio.Control.load('Core_Controls_Smoothio', null, id: '', lang: (userlang = @userLanguage('en')), title: 'smooth.io', appname: 'smooth.io')
+				ctl = smio.Control.load(data['f']['']['_'], mainCtl, id: 'sm')
+				mainCtl.args.htmlContent = ctl.renderHtml()
 				respHeaders['Content-Type'] = 'text/html'
-				respHeaders['Content-Language'] = userlang = @userLanguage('en')
+				respHeaders['Content-Language'] = userlang
 				@httpResponse.writeHead(200, respHeaders)
 				@httpResponse.end(mainCtl.renderHtml())
 			catch err

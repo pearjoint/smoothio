@@ -117,6 +117,8 @@ class smio.Util
 				else
 					ret += c
 			ret
+		idify: (str) ->
+			smio.Util.String.urlify(str, '', '', true)
 		replace: (str, replace) ->
 			for val, repl of replace
 				while (pos = str.indexOf(val)) >= 0
@@ -127,16 +129,17 @@ class smio.Util
 			for x in [0...times]
 				a[x] = str
 			a.join('')
-		urlify: (str, esc = '-') ->
-			[l, o, abc, r] = ['', '', '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', 'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss']
-			for c in str
-				if c in abc
+		urlify: (s, e = '-', al = '/', noLower) ->
+			[l, o, a, r] = ['', '', '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' + al, 'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'Ä': 'Ae', 'Ö': 'Oe', 'Ü': 'Ue', 'ß': 'ss']
+			for c in s
+				if c in a
 					o += (l = c)
-				else if (tc = r[c.toLowerCase()])
+				else if (tc = r[c])
 					o += (l = tc)
-				else if l isnt esc
-					o += (l = esc)
-			o
+				else if e and (l isnt e)
+					o += (l = e)
+			tmp = _.trim(o, "/#{e}")
+			if noLower then tmp else tmp.toLowerCase()
 
 #if server
 	@FileSystem:

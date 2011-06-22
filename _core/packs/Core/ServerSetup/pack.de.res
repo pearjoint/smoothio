@@ -4,8 +4,6 @@
 ,	"title"							:	"Einrichten Ihres ersten Hubs <a class='%s' href='%s'>unter &#x279C; %s</a>"
 ,	"desc"							:	"Dieser Server enthält noch keine Hubs. Erstellen Sie jetzt einen:"
 ,	"url_hint"						:	"Ein Hub kann eine beliebige URL-Adresse Ihrer Wahl erhalten. Die URL Ihres neuen Hubs wird:\n\n%s://%s%s➜"
-,	"nojs_title"					:	"Noch kein Hub eingerichtet"
-,	"nojs_desc"						:	"Dieser Server enthält noch keine Hubs."
 ,	"owner_name"					:	"Benutzername:"
 ,	"owner_namehint"				:	"z.B. „MusterMax“ oder „admin“ etc..."
 ,	"owner_pass"					:	"Kennwort:"
