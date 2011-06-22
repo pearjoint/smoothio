@@ -13356,7 +13356,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
             return $.post("/_/poll/?t=" + (smio.Util.DateTime.ticks()), JSON.stringify(freq.msg), (__bind(function(m, t, x) {
               return this.onMessage(m, t, x);
             }, this)), 'text').error(__bind(function(x, t, e) {
-              return this.onError(x, t, e);
+              return this.onError(x, t, e, freq);
             }, this));
           }, this)
         };
@@ -13386,7 +13386,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         ticks: this.lastFetchTime
       });
     };
-    Socket.prototype.onError = function(xhr, textStatus, error, url) {
+    Socket.prototype.onError = function(xhr, textStatus, error, freq) {
+      alert("x:\n" + (JSON.stringify(xhr)) + "\n\nt:\n" + (JSON.stringify(textStatus)) + "\n\ne:\n" + (JSON.stringify(error)) + "\n\nf:\n" + (JSON.stringify(freq)) + "\n\n");
       if (!this.poll) {
         return alert(JSON.stringify(xhr));
       } else {

@@ -27,7 +27,7 @@ class smio.Socket
 					handle: null
 					sleepyFactor: 4
 				send: (freq) =>
-					$.post("/_/poll/?t=#{smio.Util.DateTime.ticks()}", JSON.stringify(freq.msg), ((m, t, x) => @onMessage(m, t, x)), 'text').error (x, t, e) => @onError(x, t, e)
+					$.post("/_/poll/?t=#{smio.Util.DateTime.ticks()}", JSON.stringify(freq.msg), ((m, t, x) => @onMessage(m, t, x)), 'text').error (x, t, e) => @onError(x, t, e, freq)
 
 	connect: =>
 		@ready = true
@@ -44,7 +44,7 @@ class smio.Socket
 	messageFetch: () =>
 		@message({}, cmd: 'f', ticks: @lastFetchTime)
 
-	onError: (xhr, textStatus, error, url) =>
+	onError: (xhr, textStatus, error, freq) =>
 		if not @poll
 			alert(JSON.stringify(xhr))
 		else
