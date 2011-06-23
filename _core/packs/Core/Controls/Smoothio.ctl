@@ -8,6 +8,8 @@
 		<meta http-equiv="X-UA-Compatible" content="chrome=1"/>
 		<title><%arg:title%></title>
 		<script type="text/javascript" language="JavaScript">
+			var smio;
+
 			function onSmoothioNoCookie() {
 				$('#smio_offline').hide();
 				$('#smio_body').css({ "background-image": "none" }).html('<br/><br/><br/><br/><hr/>Either your session cookie expired or you have disabled browser cookies, and hence this application will not load.<br/><br/>Verify that cookies are enabled in your web browser, then try a complete reload (press CTRL+R).<hr/>Entweder ist Ihr Sitzungscookie abgelaufen oder Ihr Webbrowser unterst&uuml;tzt keine Cookies, und somit wird auch diese Anwendung nicht geladen.<br/><br/>Stellen Sie sicher, da&szlig; Ihr Webbrowser Cookies erlaubt, und versuchen Sie dann ein Komplett-Neuladen (STRG+R).<hr/>');
@@ -22,9 +24,6 @@
 						onSmoothioNoCookie();
 					else
 						smio.client.init();
-			}
-
-			function onSmoothioProgress() {
 			}
 
 			function onSmoothioSleepy(sleepy) {
@@ -45,7 +44,7 @@
 		<div id="smio_offline" class="smio-offline"><span id="smio_offline_msg"><%r:maintemplate_loading%></span>&nbsp;<span class="smio-blink">&#x273F;</span></div>
 		<script type="text/javascript" language="JavaScript" id="smio_prescript">
 			document.getElementById('smio_offline').style.display = 'block';
-			var smioGlobalTest, smio, WEB_SOCKET_SWF_LOCATION = '/_/dynfile/?type=application/x-shockwave-flash&config=sockets.xdomain_swf&true=bin/websockx.swf&false=bin/websock.swf';
+			var smioGlobalTest;
 			try {
 				smioGlobalTest = global;
 			} catch(err) {
@@ -56,12 +55,10 @@
 				global['smoothio'] = {}
 			smio = global.smoothio;
 			smio.pageLoadError = null;
-			smio.iif = function(test, ifTrue, ifFalse) {
-				if (arguments.length < 3)
-					ifFalse = false;
-				if (arguments.length < 2)
-					ifTrue = true;
-				return test ? ifTrue : ifFalse;
+			smio.iif = function(c, t, f) {
+				if (arguments.length < 3) f = false;
+				if (arguments.length < 2) t = true;
+				return c ? t : f;
 			};
 		</script>
 		<noscript id="smio_noscript">

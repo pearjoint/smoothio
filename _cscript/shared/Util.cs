@@ -33,6 +33,8 @@ class smio.Util
 					arr[i] = arr[i - 1]
 				arr[pos] = val
 			arr
+		in: (val, arr) ->
+			val in arr
 		removeLast: (arr) ->
 			arr[0...(arr.length - 1)]
 		toObject: (arr, keyGen) ->
@@ -119,6 +121,8 @@ class smio.Util
 			ret
 		idify: (str) ->
 			smio.Util.String.urlify(str, '', '', true)
+		in: (c, s) ->
+			c in s
 		replace: (str, replace) ->
 			for val, repl of replace
 				while (pos = str.indexOf(val)) >= 0

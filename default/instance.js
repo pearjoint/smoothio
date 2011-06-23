@@ -231,7 +231,8 @@ function compileStylusSheets(dirPath, outDirPath) {
 
 function mergeFiles(ext, outFilePath, dirPaths, minify, sorted) {
 	var outc = '', allPaths = {}, fn = function(filePath) {
-		outc += ('/** ' + filePath + ' **/\n' + node_fs.readFileSync(filePath, 'utf-8') + '\n');
+		if (filePath.indexOf('_ctl_Smoothio') < 0)
+			outc += ('/** ' + filePath + ' **/\n' + node_fs.readFileSync(filePath, 'utf-8') + '\n');
 	};
 	if (!dirPaths)
 		dirPaths = ['server/pub'];

@@ -110,7 +110,6 @@
       });
     };
     Socket.prototype.onError = function(xhr, textStatus, error, freq) {
-      alert("x:\n" + (JSON.stringify(xhr)) + "\n\nt:\n" + (JSON.stringify(textStatus)) + "\n\ne:\n" + (JSON.stringify(error)) + "\n\nf:\n" + (JSON.stringify(freq)) + "\n\n");
       if (!this.poll) {
         return alert(JSON.stringify(xhr));
       } else {

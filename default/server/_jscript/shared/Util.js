@@ -54,6 +54,9 @@
         }
         return arr;
       },
+      "in": function(val, arr) {
+        return __indexOf.call(arr, val) >= 0;
+      },
       removeLast: function(arr) {
         return arr.slice(0, arr.length - 1);
       },
@@ -197,6 +200,9 @@
       },
       idify: function(str) {
         return smio.Util.String.urlify(str, '', '', true);
+      },
+      "in": function(c, s) {
+        return __indexOf.call(s, c) >= 0;
       },
       replace: function(str, replace) {
         var pos, repl, val;

@@ -1,5 +1,5 @@
 (function() {
-  var node_http, node_multi, node_os, node_static, node_url, node_util, smio, socketio;
+  var node_http, node_multi, node_os, node_static, node_url, node_util, smio;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   require('./RequestContext');
   require('./Session');
@@ -9,7 +9,6 @@
   node_static = require('node-static');
   node_url = require('url');
   node_util = require('util');
-  socketio = require('socket.io');
   smio = global.smoothio;
   smio.Server = (function() {
     Server.sockSessions = {};
@@ -72,20 +71,18 @@
       } else {
         sockLogger = function() {};
       }
-      this.socket = socketio.listen(this.httpServer, {
-        resource: '/_/sockio/',
-        flashPolicyServer: false,
-        log: sockLogger
-      });
-      this.socket.on('clientConnect', __bind(function(client) {
-        return this.onSocketConnect(client);
-      }, this));
-      this.socket.on('clientDisconnect', __bind(function(client) {
-        return this.onSocketDisconnect(client);
-      }, this));
-      this.socket.on('clientMessage', __bind(function(msg, client) {
-        return this.onSocketMessage(msg, client);
-      }, this));
+      this.socket = null;
+      if (this.socket) {
+        this.socket.on('clientConnect', __bind(function(client) {
+          return this.onSocketConnect(client);
+        }, this));
+        this.socket.on('clientDisconnect', __bind(function(client) {
+          return this.onSocketDisconnect(client);
+        }, this));
+        this.socket.on('clientMessage', __bind(function(msg, client) {
+          return this.onSocketMessage(msg, client);
+        }, this));
+      }
     }
     Server.prototype.getSocketSessionID = function(client) {
       var _ref, _ref2;

@@ -162,41 +162,7 @@ table {
     transform: rotate(359deg);
   }
 }
-@-moz-keyframes animspin {
-  0% {
-    -moz-transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
-    -o-transform: rotate(0deg);
-    -ms-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-
-  50% {
-    -moz-transform: rotate(180deg);
-    -webkit-transform: rotate(180deg);
-    -o-transform: rotate(180deg);
-    -ms-transform: rotate(180deg);
-    transform: rotate(180deg);
-  }
-
-  100% {
-    -moz-transform: rotate(359deg);
-    -webkit-transform: rotate(359deg);
-    -o-transform: rotate(359deg);
-    -ms-transform: rotate(359deg);
-    transform: rotate(359deg);
-  }
-}
 @-webkit-keyframes animblink {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-@-moz-keyframes animblink {
   0% {
     opacity: 0;
   }
