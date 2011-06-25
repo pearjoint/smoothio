@@ -198,14 +198,17 @@ class smio.Packs_#{className} extends smio.Control
 					eh.apply(@, handler)
 
 	onInvoking: (msg, args) =>
-		if (lh = @labelHtml())
+		if (sub = @sub('inv')) and (lh = sub.html())
 			@lh = lh
-			@labelHtml(@r('invoking'))
+			sub.html(smio.Control.util.florette).addClass('smio-spin')
 
-	onInvokeResult: () =>
-		if @['lh']?
-			@labelHtml(@lh)
+	onInvokeResult: (errs, res, fresp) =>
+		if (lh = @['lh'])? and (sub = @sub('inv'))
+			sub.html(lh + '').removeClass('smio-spin')
+			@lh = undefined
 			delete @['lh']
+		if res and @args?['invoke']?['onResult']
+			@args.invoke.onResult(errs, res, fresp)
 
 	onLoad: () =>
 		@el = $('#' + @id())
@@ -235,6 +238,7 @@ class smio.Packs_#{className} extends smio.Control
 #endif
 
 	@util:
+		florette: '&#x273F;'
 		jsVoid: 'javascript:void(0);'
 	@tagRenderers:
 		'arg': (ctl, name) ->

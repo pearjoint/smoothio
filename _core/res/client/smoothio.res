@@ -3,6 +3,5 @@
 ,	"x"								:	"y"
 ,	"connecting"					:	"Connecting"
 ,	"connecting_hint"				:	"Either your network connection or our server is down. You will be reconnected shortly."
-,	"invoking"						:	"Please wait <span class=\"smio-spin\">&#x273F;</span>"
 }
 

@@ -22,11 +22,18 @@
           href: this.args.href || smio.Control.util.jsVoid
         }
       };
+      if (this.args.invoke) {
+        ret.a['span #inv .smio-inv'] = {
+          html: [this.args.invoke.html + '']
+        };
+        ret.a['span .smio'] = {
+          html: ['&nbsp;']
+        };
+      }
+      ret.a.span = {};
+      this.jsonTemplates_Label(ret.a.span);
       if (this.disabled) {
         ret.a.disabled = 'disabled';
-      }
-      if (this.args.labelText || this.args.labelHtml) {
-        this.jsonTemplates_Label(ret.a);
       }
       return ret;
     };
@@ -36,8 +43,20 @@
     Packs_Core_Controls_LinkButton.prototype.onLoad = function() {
       Packs_Core_Controls_LinkButton.__super__.onLoad.call(this);
       return this.el.click(__bind(function() {
-        if (this.args.onClick && !(this.disabled || this.el.prop('disabled'))) {
-          return this.args.onClick();
+        var n, v, _ref, _results;
+        if (!(this.disabled || this.el.prop('disabled'))) {
+          if (this.args.onClick) {
+            this.args.onClick();
+          }
+          if (this.args.invoke) {
+            _ref = this.args.invoke;
+            _results = [];
+            for (n in _ref) {
+              v = _ref[n];
+              _results.push((n !== 'html') && (n !== 'onResult') ? this.invoke(n, _.isFunction(v) ? v() : v) : void 0);
+            }
+            return _results;
+          }
         }
       }, this));
     };

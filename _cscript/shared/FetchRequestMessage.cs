@@ -8,6 +8,6 @@ class smio.FetchRequestMessage extends smio.FetchMessageBase
 
 	url: (url) =>
 		if url?
-			@msg.u = url
-		@msg.u
+			@msg._u = url
+		@msg._u
 

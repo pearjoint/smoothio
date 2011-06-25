@@ -81,7 +81,7 @@
                 "#finish": {
                   "div .smio-setup-stepbox-title": [this.r('steptitle_finish')],
                   "div .smio-setup-stepbox-form": {
-                    "TextInput #hub_title": {
+                    "TextInput #hubtitle": {
                       required: true,
                       placeholder: 'hub_titlehint',
                       labelText: 'hub_title',
@@ -119,7 +119,17 @@
                       "LinkButton #hub_create .smio-bigbutton": {
                         disabled: true,
                         labelText: 'hub_create',
-                        onClick: this.createHub
+                        invoke: {
+                          html: '&#x279C;',
+                          'Hub.create': __bind(function() {
+                            return {
+                              u: this.input('user/name').val(),
+                              p: this.input('user/pass').val(),
+                              t: this.input('hubtitle').val()
+                            };
+                          }, this),
+                          onResult: this.onCreateHubResult
+                        }
                       }
                     }
                   }
@@ -138,8 +148,17 @@
         }
       };
     };
-    Packs_Core_ServerSetup_InitialHubSetup.prototype.createHub = function() {
-      return this.ctl('stepslide/hub_create').invoke('Hub.create', {});
+    Packs_Core_ServerSetup_InitialHubSetup.prototype.input = function(sp) {
+      return this.sub("stepslide/" + sp + "/input");
+    };
+    Packs_Core_ServerSetup_InitialHubSetup.prototype.onCreateHubResult = function(errs, result, fresp) {
+      if (errs) {
+        return alert('prob');
+      } else if (result) {
+        return alert('no prob');
+      } else {
+        return alert('noooo');
+      }
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.onLoad = function() {
       var $p1, $p2, $t, $u, _ref;
@@ -155,7 +174,7 @@
           return location.replace(nurl);
         }
       }, this));
-      _ref = [this.sub('stepslide/user/name/input'), this.sub('stepslide/user/pass/input'), this.sub('stepslide/user/pass2/input'), this.sub('stepslide/hub_title/input')], $u = _ref[0], $p1 = _ref[1], $p2 = _ref[2], $t = _ref[3];
+      _ref = [this.input('user/name'), this.input('user/pass'), this.input('user/pass2'), this.input('hubtitle')], $u = _ref[0], $p1 = _ref[1], $p2 = _ref[2], $t = _ref[3];
       $u.val('test');
       $p1.val('test');
       $p2.val('test');
@@ -181,7 +200,7 @@
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.verifyInputs = function() {
       var $p1, $p2, $t, $u, tmp, _ref;
-      _ref = [this.sub('stepslide/user/name/input'), this.sub('stepslide/user/pass/input'), this.sub('stepslide/user/pass2/input'), this.sub('stepslide/hub_title/input')], $u = _ref[0], $p1 = _ref[1], $p2 = _ref[2], $t = _ref[3];
+      _ref = [this.input('user/name'), this.input('user/pass'), this.input('user/pass2'), this.input('hubtitle')], $u = _ref[0], $p1 = _ref[1], $p2 = _ref[2], $t = _ref[3];
       if ($u.val() !== (tmp = smio.Util.String.idify(_.trim($u.val())))) {
         $u.val(tmp);
       }
@@ -196,7 +215,8 @@
       this.onTabSelect = __bind(this.onTabSelect, this);
       this.onSlide = __bind(this.onSlide, this);
       this.onLoad = __bind(this.onLoad, this);
-      this.createHub = __bind(this.createHub, this);
+      this.onCreateHubResult = __bind(this.onCreateHubResult, this);
+      this.input = __bind(this.input, this);
       this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_ServerSetup_InitialHubSetup.__super__.constructor.call(this, client, parent, args);
       this.init();
     }

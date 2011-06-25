@@ -110,17 +110,29 @@
       });
     };
     Socket.prototype.onError = function(xhr, textStatus, error, freq) {
+      var cid, ctl;
       if (!this.poll) {
         return alert(JSON.stringify(xhr));
       } else {
+        if (freq && (cid = freq.ctlID()) && (ctl = this.client.allControls[cid])) {
+          ctl.onInvokeResult([
+            {
+              xhr: xhr,
+              textStatus: textStatus,
+              error: error
+            }
+          ]);
+        }
         if ((textStatus === 'timeout') || (error === 'timeout') || (xhr && (((xhr.status === 0) && (xhr.readyState === 0)) || ((xhr.readyState === 4) && (xhr.status >= 12001) && (xhr.status <= 12156))))) {
           return this.onOffline(true);
         } else {
           this.onOnline();
-          if (xhr && xhr.responseText) {
-            return alert(xhr.responseText);
-          } else {
-            return alert("" + textStatus + "\n\n" + (JSON.stringify(error)) + "\n\n" + (JSON.stringify(xhr)));
+          if (!ctl) {
+            if (xhr && xhr.responseText) {
+              return alert(xhr.responseText);
+            } else {
+              return alert("" + textStatus + "\n\n" + (JSON.stringify(error)) + "\n\n" + (JSON.stringify(xhr)));
+            }
           }
         }
       }
@@ -147,7 +159,7 @@
       }
     };
     Socket.prototype.onMessage = function(msg, textStatus, xhr) {
-      var cfg, ctls, data, err, fresp;
+      var cfg, cid, ctl, ctls, data, err, fresp;
       this.onOnline();
       data = null;
       if (msg === 'smoonocookie') {
@@ -189,10 +201,13 @@
             this.setTimer();
           }
           if (cfg.bg) {
-            return this.client.pageBody.css({
+            this.client.pageBody.css({
               'background-image': "url('" + cfg.bg + "')"
             });
           }
+        }
+        if ((cid = fresp.ctlID()) && (ctl = this.client.allControls[cid])) {
+          return ctl.onInvokeResult(fresp.errors(), fresp.msg, fresp);
         }
       }
     };

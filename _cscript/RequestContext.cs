@@ -111,10 +111,10 @@ class smio.RequestContext
 					@httpResponse.end("404 File Not Found: #{node_path.join(@server.fileServer.root, filePath)}")
 
 	servePage: (respHeaders) =>
-		(session = smio.Session.getBySessionID(@server, @smioCookie['sessid'])).handleInvoke @, {c: 'f', t: 0}, (data) =>
+		(session = smio.Session.getBySessionID(@server, @smioCookie['sessid'])).handleInvoke @, {_c: 'f', _t: 0}, (data) =>
 			try
 				mainCtl = smio.Control.load('Core_Controls_Smoothio', null, id: '', lang: (userlang = @userLanguage('en')), title: 'smooth.io', appname: 'smooth.io')
-				ctl = smio.Control.load(data['f']['']['_'], mainCtl, id: 'sm')
+				ctl = smio.Control.load(data['_f']['']['_'], mainCtl, id: 'sm')
 				mainCtl.args.htmlContent = ctl.renderHtml()
 				respHeaders['Content-Type'] = 'text/html'
 				respHeaders['Content-Language'] = userlang

@@ -66,6 +66,7 @@
               });
               return finish(fresp.msg);
             default:
+              fresp.ctlID(freq.ctlID());
               _ref = tmp.split('.'), prefix = _ref[0], cmdName = _ref[1];
               if (prefix === 'Hub') {
                 return hub.invoke(cmdName, freq, fresp, function(err, res) {

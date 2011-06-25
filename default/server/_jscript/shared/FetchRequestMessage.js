@@ -18,9 +18,9 @@
     }
     FetchRequestMessage.prototype.url = function(url) {
       if (url != null) {
-        this.msg.u = url;
+        this.msg._u = url;
       }
-      return this.msg.u;
+      return this.msg._u;
     };
     return FetchRequestMessage;
   })();

@@ -1,4 +1,5 @@
 #if server
+_ = require 'underscore'
 require './FetchMessageBase'
 #endif
 
@@ -8,14 +9,14 @@ class smio.FetchResponseMessage extends smio.FetchMessageBase
 
 	controls: (ctls) =>
 		if ctls
-			@msg.f = ctls
-		@msg.f
+			@msg._f = ctls
+		@msg._f
 
-	errors: (errs) =>
-		if errs and errs.length
-			if not @msg.e
-				@msg.e = []
-			for e in errs
-				@msg.e.push(e)
-		@msg.e
+	errors: (errs...) =>
+		if errs
+			if not @msg._e
+				@msg._e = []
+			for e in _.flatten(errs)
+				@msg._e.push(e)
+		@msg._e
 

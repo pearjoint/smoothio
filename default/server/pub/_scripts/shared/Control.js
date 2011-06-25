@@ -88,16 +88,21 @@
       }
     };
     Control.prototype.onInvoking = function(msg, args) {
-      var lh;
-      if ((lh = this.labelHtml())) {
+      var lh, sub;
+      if ((sub = this.sub('inv')) && (lh = sub.html())) {
         this.lh = lh;
-        return this.labelHtml(this.r('invoking'));
+        return sub.html(smio.Control.util.florette).addClass('smio-spin');
       }
     };
-    Control.prototype.onInvokeResult = function() {
-      if (this['lh'] != null) {
-        this.labelHtml(this.lh);
-        return delete this['lh'];
+    Control.prototype.onInvokeResult = function(errs, res, fresp) {
+      var lh, sub, _ref, _ref2;
+      if (((lh = this['lh']) != null) && (sub = this.sub('inv'))) {
+        sub.html(lh + '').removeClass('smio-spin');
+        this.lh = void 0;
+        delete this['lh'];
+      }
+      if (res && ((_ref = this.args) != null ? (_ref2 = _ref['invoke']) != null ? _ref2['onResult'] : void 0 : void 0)) {
+        return this.args.invoke.onResult(errs, res, fresp);
       }
     };
     Control.prototype.onLoad = function() {
@@ -138,6 +143,7 @@
       }
     };
     Control.util = {
+      florette: '&#x273F;',
       jsVoid: 'javascript:void(0);'
     };
     Control.tagRenderers = {

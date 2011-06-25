@@ -47,6 +47,7 @@ class smio.Session
 						fresp.settings(fi: 15000, bg: '/_/file/images/bg0.jpg')
 						finish(fresp.msg)
 					else
+						fresp.ctlID(freq.ctlID())
 						[prefix, cmdName] = tmp.split('.')
 						if prefix is 'Hub'
 							hub.invoke cmdName, freq, fresp, (err, res) ->

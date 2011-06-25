@@ -59,7 +59,7 @@ renderTemplate: =>
 						"div .$CC-stepbox-title":
 							[@r 'steptitle_finish']
 						"div .$CC-stepbox-form":
-							"TextInput #hub_title":
+							"TextInput #hubtitle":
 								required: true
 								placeholder: 'hub_titlehint'
 								labelText: 'hub_title'
@@ -80,15 +80,26 @@ renderTemplate: =>
 								"LinkButton #hub_create .smio-bigbutton":
 									disabled: true
 									labelText: 'hub_create'
-									onClick: @createHub
+									invoke:
+										html: '&#x279C;'
+										'Hub.create': => u: @input('user/name').val(), p: @input('user/pass').val(), t: @input('hubtitle').val()
+										onResult: @onCreateHubResult
 		"TabStrip #steptabs .$CC-outer .$CC-steptabs":
 			"tabClass": '$CC-steptab'
 			"tabs": ['owner', 'template', 'finish']
 			"resPrefix": 'steps_'
 			"onTabSelect": (tabID) => @onTabSelect(tabID)
 
-createHub: =>
-	@ctl('stepslide/hub_create').invoke('Hub.create', {})
+input: (sp) =>
+	@sub("stepslide/#{sp}/input")
+
+onCreateHubResult: (errs, result, fresp) =>
+	if errs
+		alert 'prob'
+	else if result
+		alert 'no prob'
+	else
+		alert 'noooo'
 
 onLoad: =>
 	super()
@@ -99,7 +110,7 @@ onLoad: =>
 			if (not _.startsWith(nurl, '/')) or (not _.endsWith(nurl, '/'))
 				nurl = "/#{_.trim(nurl, '/')}/"
 			location.replace(nurl)
-	[$u, $p1, $p2, $t] = [@sub('stepslide/user/name/input'), @sub('stepslide/user/pass/input'), @sub('stepslide/user/pass2/input'), @sub('stepslide/hub_title/input')]
+	[$u, $p1, $p2, $t] = [@input('user/name'), @input('user/pass'), @input('user/pass2'), @input('hubtitle')]
 	$u.val('test')
 	$p1.val('test')
 	$p2.val('test')
@@ -117,7 +128,7 @@ urlSeg: =>
 	if (urlseg = _.trim(@client.pageUrl.attr('path'), '/')) then "/#{urlseg}/" else '/'
 
 verifyInputs: () =>
-	[$u, $p1, $p2, $t] = [@sub('stepslide/user/name/input'), @sub('stepslide/user/pass/input'), @sub('stepslide/user/pass2/input'), @sub('stepslide/hub_title/input')]
+	[$u, $p1, $p2, $t] = [@input('user/name'), @input('user/pass'), @input('user/pass2'), @input('hubtitle')]
 	if ($u.val() isnt (tmp = smio.Util.String.idify(_.trim($u.val()))))
 		$u.val(tmp)
 	if ($t.val() isnt (tmp = _.trim($t.val())))

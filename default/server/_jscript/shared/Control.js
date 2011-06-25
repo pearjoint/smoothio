@@ -191,6 +191,7 @@
       }
     };
     Control.util = {
+      florette: '&#x273F;',
       jsVoid: 'javascript:void(0);'
     };
     Control.tagRenderers = {

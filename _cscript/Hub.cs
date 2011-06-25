@@ -40,6 +40,10 @@ class smio.Hub
 		null
 
 	invoke: (cmd, freq, fresp, cb) =>
+		smio.logit "INVOKE cmd: #{JSON.stringify cmd}"
+		smio.logit "INVOKE freq: #{JSON.stringify freq}"
+		throw new Error('test error')
+		smio.logit "WOOMOO"
 		setTimeout((-> cb(null, null)), 99999999)
 
 	getControlUpdates: (sinceTicks, freq, fresp, cb) =>

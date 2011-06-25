@@ -11156,17 +11156,29 @@ if (!JSON) {
       });
     };
     Socket.prototype.onError = function(xhr, textStatus, error, freq) {
+      var cid, ctl;
       if (!this.poll) {
         return alert(JSON.stringify(xhr));
       } else {
+        if (freq && (cid = freq.ctlID()) && (ctl = this.client.allControls[cid])) {
+          ctl.onInvokeResult([
+            {
+              xhr: xhr,
+              textStatus: textStatus,
+              error: error
+            }
+          ]);
+        }
         if ((textStatus === 'timeout') || (error === 'timeout') || (xhr && (((xhr.status === 0) && (xhr.readyState === 0)) || ((xhr.readyState === 4) && (xhr.status >= 12001) && (xhr.status <= 12156))))) {
           return this.onOffline(true);
         } else {
           this.onOnline();
-          if (xhr && xhr.responseText) {
-            return alert(xhr.responseText);
-          } else {
-            return alert("" + textStatus + "\n\n" + (JSON.stringify(error)) + "\n\n" + (JSON.stringify(xhr)));
+          if (!ctl) {
+            if (xhr && xhr.responseText) {
+              return alert(xhr.responseText);
+            } else {
+              return alert("" + textStatus + "\n\n" + (JSON.stringify(error)) + "\n\n" + (JSON.stringify(xhr)));
+            }
           }
         }
       }
@@ -11193,7 +11205,7 @@ if (!JSON) {
       }
     };
     Socket.prototype.onMessage = function(msg, textStatus, xhr) {
-      var cfg, ctls, data, err, fresp;
+      var cfg, cid, ctl, ctls, data, err, fresp;
       this.onOnline();
       data = null;
       if (msg === 'smoonocookie') {
@@ -11235,10 +11247,13 @@ if (!JSON) {
             this.setTimer();
           }
           if (cfg.bg) {
-            return this.client.pageBody.css({
+            this.client.pageBody.css({
               'background-image': "url('" + cfg.bg + "')"
             });
           }
+        }
+        if ((cid = fresp.ctlID()) && (ctl = this.client.allControls[cid])) {
+          return ctl.onInvokeResult(fresp.errors(), fresp.msg, fresp);
         }
       }
     };
@@ -11390,16 +11405,21 @@ if (!JSON) {
       }
     };
     Control.prototype.onInvoking = function(msg, args) {
-      var lh;
-      if ((lh = this.labelHtml())) {
+      var lh, sub;
+      if ((sub = this.sub('inv')) && (lh = sub.html())) {
         this.lh = lh;
-        return this.labelHtml(this.r('invoking'));
+        return sub.html(smio.Control.util.florette).addClass('smio-spin');
       }
     };
-    Control.prototype.onInvokeResult = function() {
-      if (this['lh'] != null) {
-        this.labelHtml(this.lh);
-        return delete this['lh'];
+    Control.prototype.onInvokeResult = function(errs, res, fresp) {
+      var lh, sub, _ref, _ref2;
+      if (((lh = this['lh']) != null) && (sub = this.sub('inv'))) {
+        sub.html(lh + '').removeClass('smio-spin');
+        this.lh = void 0;
+        delete this['lh'];
+      }
+      if (res && ((_ref = this.args) != null ? (_ref2 = _ref['invoke']) != null ? _ref2['onResult'] : void 0 : void 0)) {
+        return this.args.invoke.onResult(errs, res, fresp);
       }
     };
     Control.prototype.onLoad = function() {
@@ -11440,6 +11460,7 @@ if (!JSON) {
       }
     };
     Control.util = {
+      florette: '&#x273F;',
       jsVoid: 'javascript:void(0);'
     };
     Control.tagRenderers = {
@@ -11804,15 +11825,15 @@ if (!JSON) {
     };
     FetchMessageBase.prototype.cmd = function(cmdName) {
       if (cmdName) {
-        this.msg.c = cmdName;
+        this.msg._c = cmdName;
       }
-      return this.msg.c;
+      return this.msg._c;
     };
     FetchMessageBase.prototype.ctlID = function(ctlID) {
       if (ctlID) {
-        this.msg.cid = ctlID;
+        this.msg._i = ctlID;
       }
-      return this.msg.cid;
+      return this.msg._i;
     };
     FetchMessageBase.prototype.merge = function(fm) {
       var k, v, _ref, _results;
@@ -11825,13 +11846,13 @@ if (!JSON) {
       return _results;
     };
     FetchMessageBase.prototype.settings = function(cfg) {
-      return this._named('s', cfg);
+      return this._named('_s', cfg);
     };
     FetchMessageBase.prototype.ticks = function(ticks) {
       if (ticks != null) {
-        this.msg.t = ticks;
+        this.msg._t = ticks;
       }
-      return this.msg.t;
+      return this.msg._t;
     };
     return FetchMessageBase;
   })();
@@ -11857,9 +11878,9 @@ if (!JSON) {
     }
     FetchRequestMessage.prototype.url = function(url) {
       if (url != null) {
-        this.msg.u = url;
+        this.msg._u = url;
       }
-      return this.msg.u;
+      return this.msg._u;
     };
     return FetchRequestMessage;
   })();
@@ -11875,7 +11896,7 @@ if (!JSON) {
     child.prototype = new ctor;
     child.__super__ = parent.prototype;
     return child;
-  };
+  }, __slice = Array.prototype.slice;
   smio = global.smoothio;
   smio.FetchResponseMessage = (function() {
     __extends(FetchResponseMessage, smio.FetchMessageBase);
@@ -11886,22 +11907,24 @@ if (!JSON) {
     }
     FetchResponseMessage.prototype.controls = function(ctls) {
       if (ctls) {
-        this.msg.f = ctls;
+        this.msg._f = ctls;
       }
-      return this.msg.f;
+      return this.msg._f;
     };
-    FetchResponseMessage.prototype.errors = function(errs) {
-      var e, _i, _len;
-      if (errs && errs.length) {
-        if (!this.msg.e) {
-          this.msg.e = [];
+    FetchResponseMessage.prototype.errors = function() {
+      var e, errs, _i, _len, _ref;
+      errs = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      if (errs) {
+        if (!this.msg._e) {
+          this.msg._e = [];
         }
-        for (_i = 0, _len = errs.length; _i < _len; _i++) {
-          e = errs[_i];
-          this.msg.e.push(e);
+        _ref = _.flatten(errs);
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          e = _ref[_i];
+          this.msg._e.push(e);
         }
       }
-      return this.msg.e;
+      return this.msg._e;
     };
     return FetchResponseMessage;
   })();
@@ -12333,11 +12356,18 @@ if (!JSON) {
           href: this.args.href || smio.Control.util.jsVoid
         }
       };
+      if (this.args.invoke) {
+        ret.a['span #inv .smio-inv'] = {
+          html: [this.args.invoke.html + '']
+        };
+        ret.a['span .smio'] = {
+          html: ['&nbsp;']
+        };
+      }
+      ret.a.span = {};
+      this.jsonTemplates_Label(ret.a.span);
       if (this.disabled) {
         ret.a.disabled = 'disabled';
-      }
-      if (this.args.labelText || this.args.labelHtml) {
-        this.jsonTemplates_Label(ret.a);
       }
       return ret;
     };
@@ -12347,8 +12377,20 @@ if (!JSON) {
     Packs_Core_Controls_LinkButton.prototype.onLoad = function() {
       Packs_Core_Controls_LinkButton.__super__.onLoad.call(this);
       return this.el.click(__bind(function() {
-        if (this.args.onClick && !(this.disabled || this.el.prop('disabled'))) {
-          return this.args.onClick();
+        var n, v, _ref, _results;
+        if (!(this.disabled || this.el.prop('disabled'))) {
+          if (this.args.onClick) {
+            this.args.onClick();
+          }
+          if (this.args.invoke) {
+            _ref = this.args.invoke;
+            _results = [];
+            for (n in _ref) {
+              v = _ref[n];
+              _results.push((n !== 'html') && (n !== 'onResult') ? this.invoke(n, _.isFunction(v) ? v() : v) : void 0);
+            }
+            return _results;
+          }
         }
       }, this));
     };
@@ -12989,7 +13031,7 @@ if (!JSON) {
                 "#finish": {
                   "div .smio-setup-stepbox-title": [this.r('steptitle_finish')],
                   "div .smio-setup-stepbox-form": {
-                    "TextInput #hub_title": {
+                    "TextInput #hubtitle": {
                       required: true,
                       placeholder: 'hub_titlehint',
                       labelText: 'hub_title',
@@ -13027,7 +13069,17 @@ if (!JSON) {
                       "LinkButton #hub_create .smio-bigbutton": {
                         disabled: true,
                         labelText: 'hub_create',
-                        onClick: this.createHub
+                        invoke: {
+                          html: '&#x279C;',
+                          'Hub.create': __bind(function() {
+                            return {
+                              u: this.input('user/name').val(),
+                              p: this.input('user/pass').val(),
+                              t: this.input('hubtitle').val()
+                            };
+                          }, this),
+                          onResult: this.onCreateHubResult
+                        }
                       }
                     }
                   }
@@ -13046,8 +13098,17 @@ if (!JSON) {
         }
       };
     };
-    Packs_Core_ServerSetup_InitialHubSetup.prototype.createHub = function() {
-      return this.ctl('stepslide/hub_create').invoke('Hub.create', {});
+    Packs_Core_ServerSetup_InitialHubSetup.prototype.input = function(sp) {
+      return this.sub("stepslide/" + sp + "/input");
+    };
+    Packs_Core_ServerSetup_InitialHubSetup.prototype.onCreateHubResult = function(errs, result, fresp) {
+      if (errs) {
+        return alert('prob');
+      } else if (result) {
+        return alert('no prob');
+      } else {
+        return alert('noooo');
+      }
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.onLoad = function() {
       var $p1, $p2, $t, $u, _ref;
@@ -13063,7 +13124,7 @@ if (!JSON) {
           return location.replace(nurl);
         }
       }, this));
-      _ref = [this.sub('stepslide/user/name/input'), this.sub('stepslide/user/pass/input'), this.sub('stepslide/user/pass2/input'), this.sub('stepslide/hub_title/input')], $u = _ref[0], $p1 = _ref[1], $p2 = _ref[2], $t = _ref[3];
+      _ref = [this.input('user/name'), this.input('user/pass'), this.input('user/pass2'), this.input('hubtitle')], $u = _ref[0], $p1 = _ref[1], $p2 = _ref[2], $t = _ref[3];
       $u.val('test');
       $p1.val('test');
       $p2.val('test');
@@ -13089,7 +13150,7 @@ if (!JSON) {
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.verifyInputs = function() {
       var $p1, $p2, $t, $u, tmp, _ref;
-      _ref = [this.sub('stepslide/user/name/input'), this.sub('stepslide/user/pass/input'), this.sub('stepslide/user/pass2/input'), this.sub('stepslide/hub_title/input')], $u = _ref[0], $p1 = _ref[1], $p2 = _ref[2], $t = _ref[3];
+      _ref = [this.input('user/name'), this.input('user/pass'), this.input('user/pass2'), this.input('hubtitle')], $u = _ref[0], $p1 = _ref[1], $p2 = _ref[2], $t = _ref[3];
       if ($u.val() !== (tmp = smio.Util.String.idify(_.trim($u.val())))) {
         $u.val(tmp);
       }
@@ -13104,7 +13165,8 @@ if (!JSON) {
       this.onTabSelect = __bind(this.onTabSelect, this);
       this.onSlide = __bind(this.onSlide, this);
       this.onLoad = __bind(this.onLoad, this);
-      this.createHub = __bind(this.createHub, this);
+      this.onCreateHubResult = __bind(this.onCreateHubResult, this);
+      this.input = __bind(this.input, this);
       this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_ServerSetup_InitialHubSetup.__super__.constructor.call(this, client, parent, args);
       this.init();
     }

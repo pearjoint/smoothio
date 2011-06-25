@@ -17,7 +17,7 @@
 ,	"hub_title"						:	"Hub title:"
 ,	"hub_titlehint"					:	"e.g. “Test hub”, “Project X”, “Personal” etc..."
 ,	"hub_hint"						:	"You can change the above Hub title at any time.<br/><br/>Initial default wallpaper for this Hub:"
-,	"hub_create"					:	"➜ Create Hub"
+,	"hub_create"					:	"Create Hub"
 ,	"steps_owner"					:	"➊  Specify owner"
 ,	"steps_template"				:	"➋  Select template"
 ,	"steps_finish"					:	"➌  Finish setup"

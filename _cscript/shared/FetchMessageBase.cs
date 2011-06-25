@@ -36,23 +36,23 @@ class smio.FetchMessageBase
 
 	cmd: (cmdName) =>
 		if cmdName
-			@msg.c = cmdName
-		@msg.c
+			@msg._c = cmdName
+		@msg._c
 
 	ctlID: (ctlID) =>
 		if ctlID
-			@msg.cid = ctlID
-		@msg.cid
+			@msg._i = ctlID
+		@msg._i
 
 	merge: (fm) =>
 		for k, v of fm.msg
 			@msg[k] = v
 
 	settings: (cfg) =>
-		@_named('s', cfg)
+		@_named('_s', cfg)
 
 	ticks: (ticks) =>
 		if ticks?
-			@msg.t = ticks
-		@msg.t
+			@msg._t = ticks
+		@msg._t
 

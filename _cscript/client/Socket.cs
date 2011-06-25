@@ -48,14 +48,17 @@ class smio.Socket
 		if not @poll
 			alert(JSON.stringify(xhr))
 		else
+			if freq and (cid = freq.ctlID()) and (ctl = @client.allControls[cid])
+				ctl.onInvokeResult([{ xhr: xhr, textStatus: textStatus, error: error }])
 			if (textStatus is 'timeout') or (error is 'timeout') or (xhr and (((xhr.status is 0) and (xhr.readyState is 0)) or ((xhr.readyState is 4) and (xhr.status >= 12001) and (xhr.status <= 12156))))
 				@onOffline(true)
 			else
 				@onOnline()
-				if xhr and xhr.responseText
-					alert(xhr.responseText)
-				else
-					alert("#{textStatus}\n\n#{JSON.stringify error}\n\n#{JSON.stringify xhr}")
+				if not ctl
+					if xhr and xhr.responseText
+						alert(xhr.responseText)
+					else
+						alert("#{textStatus}\n\n#{JSON.stringify error}\n\n#{JSON.stringify xhr}")
 
 	onOffline: =>
 		@offline++
@@ -102,6 +105,8 @@ class smio.Socket
 					@setTimer()
 				if cfg.bg
 					@client.pageBody.css('background-image': "url('#{cfg.bg}')")
+			if (cid = fresp.ctlID()) and (ctl = @client.allControls[cid])
+				ctl.onInvokeResult(fresp.errors(), fresp.msg, fresp)
 
 	onSleepy: (sleepy) =>
 		if @ready and @poll

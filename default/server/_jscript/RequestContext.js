@@ -169,8 +169,8 @@
     RequestContext.prototype.servePage = function(respHeaders) {
       var session;
       return (session = smio.Session.getBySessionID(this.server, this.smioCookie['sessid'])).handleInvoke(this, {
-        c: 'f',
-        t: 0
+        _c: 'f',
+        _t: 0
       }, __bind(function(data) {
         var ctl, mainCtl, userlang;
         try {
@@ -180,7 +180,7 @@
             title: 'smooth.io',
             appname: 'smooth.io'
           });
-          ctl = smio.Control.load(data['f']['']['_'], mainCtl, {
+          ctl = smio.Control.load(data['_f']['']['_'], mainCtl, {
             id: 'sm'
           });
           mainCtl.args.htmlContent = ctl.renderHtml();

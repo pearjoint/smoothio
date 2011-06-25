@@ -66,15 +66,15 @@
     };
     FetchMessageBase.prototype.cmd = function(cmdName) {
       if (cmdName) {
-        this.msg.c = cmdName;
+        this.msg._c = cmdName;
       }
-      return this.msg.c;
+      return this.msg._c;
     };
     FetchMessageBase.prototype.ctlID = function(ctlID) {
       if (ctlID) {
-        this.msg.cid = ctlID;
+        this.msg._i = ctlID;
       }
-      return this.msg.cid;
+      return this.msg._i;
     };
     FetchMessageBase.prototype.merge = function(fm) {
       var k, v, _ref, _results;
@@ -87,13 +87,13 @@
       return _results;
     };
     FetchMessageBase.prototype.settings = function(cfg) {
-      return this._named('s', cfg);
+      return this._named('_s', cfg);
     };
     FetchMessageBase.prototype.ticks = function(ticks) {
       if (ticks != null) {
-        this.msg.t = ticks;
+        this.msg._t = ticks;
       }
-      return this.msg.t;
+      return this.msg._t;
     };
     return FetchMessageBase;
   })();
