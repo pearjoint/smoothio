@@ -22,13 +22,14 @@ class smio.Session
 	handleInvoke: (rc, fr, finish) =>
 		isSocket = rc is null
 		fresp = new smio.FetchResponseMessage()
+		recErr = (err) => fresp.errors(@server.inst.jsonError(err))
 		if not fr
 			fr = rc.postData
 		if _.isString(fr)
 			try
 				fr = JSON.parse(fr)
 			catch err
-				fresp.errors(err)
+				recErr(err)
 		if fr and not _.isString(fr)
 			try
 				freq = new smio.FetchRequestMessage(fr)
@@ -37,7 +38,7 @@ class smio.Session
 					when 'f'
 						hub.getControlUpdates freq.ticks(), freq, fresp, (err, ctl) ->
 							if err
-								fresp.errors(err)
+								recErr(err)
 							if ctl
 								fresp.controls(ctl)
 							if not isSocket
@@ -52,14 +53,14 @@ class smio.Session
 						if prefix is 'Hub'
 							hub.invoke cmdName, freq, fresp, (err, res) ->
 								if err
-									fresp.errors(err)
+									recErr(err)
 								if res
 									fresp.msg[tmp] = res
 								finish(fresp.msg)
 						else
 							smio.logit "WOOT"
 			catch err
-				fresp.errors(err)
+				recErr(err)
 				finish(fresp.msg)
 
 	onEnd: =>

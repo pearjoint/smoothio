@@ -146,12 +146,26 @@
       }
     };
     Util.Object = {
+      cloneFiltered: function(obj, fn) {
+        var k, noFunc, o, v, _ref;
+        _ref = [!_.isFunction(fn), {}], noFunc = _ref[0], o = _ref[1];
+        for (k in obj) {
+          v = obj[k];
+          if (noFunc || fn(k, v)) {
+            o[k] = v;
+          }
+        }
+        return o;
+      },
       empty: function(obj) {
         var p;
         for (p in obj) {
           return false;
         }
         return true;
+      },
+      isObject: function(o, checkArr) {
+        return (typeof o === 'object') && ((!checkArr) || !_.isArray(o));
       },
       mergeDefaults: function(cfg, defs) {
         var defKey, defVal;

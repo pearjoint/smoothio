@@ -48,6 +48,13 @@ class smio.Instance
 	formatError: (err) =>
 		smio.Util.Server.formatError(err, @config.smoothio.logging.details, @config.smoothio.logging.stack)
 
+	jsonError: (err) =>
+		[d, s] = [@config.smoothio.logging.details, @config.smoothio.logging.stack]
+		if not d
+			if s and err.stack then err.stack else err.message
+		else
+			if s then err else smio.Util.Object.cloneFiltered(err, (k) -> k isnt 'stack')
+
 	getDb: (dbServer, name, title, interval) =>
 		new smio.Database(@, dbServer, name, (if title then title else name), interval)
 

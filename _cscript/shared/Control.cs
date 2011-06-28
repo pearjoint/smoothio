@@ -143,6 +143,9 @@ class smio.Packs_#{className} extends smio.Control
 #endif
 
 #if client
+	@load: (className, parent, args) ->
+		smio.Control.tagRenderers.ctl(parent, className, args, undefined, true)
+
 	coreDisable: (disable) =>
 
 	disable: (disable, isInherit) =>
@@ -169,11 +172,16 @@ class smio.Packs_#{className} extends smio.Control
 		@disable(false, true)
 
 	invoke: (cmd, args) =>
-		@disable(true)
-		@el.addClass('smio-invoking')
+		@disable(true, true)
+		@el.addClass('smio-invoking').removeClass('smio-invwarn')
+		if (ctl = @client.allControls[@id('invdet')])
+			@root().removeControl(ctl)
+		if (sub = @sub('inv')) and (lh = sub.html())
+			@lh = lh
+			sub.html(smio.Control.util.florette).addClass('smio-spin')
 		@onInvoking(cmd, args)
 		msg = @client.socket.message(args, cmd: [cmd], ctlID: [@id()])
-		@client.socket.send(msg)
+		setTimeout((=> @client.socket.send(msg)), 5000)
 
 	labelHtml: (html) =>
 		if not @el
@@ -198,15 +206,26 @@ class smio.Packs_#{className} extends smio.Control
 					eh.apply(@, handler)
 
 	onInvoking: (msg, args) =>
-		if (sub = @sub('inv')) and (lh = sub.html())
-			@lh = lh
-			sub.html(smio.Control.util.florette).addClass('smio-spin')
 
 	onInvokeResult: (errs, res, fresp) =>
+		root = @root()
+		@el.removeClass('smio-invoking')
+		@disable(false, true)
 		if (lh = @['lh'])? and (sub = @sub('inv'))
 			sub.html(lh + '').removeClass('smio-spin')
 			@lh = undefined
 			delete @['lh']
+			if errs and errs.length
+				@lh = lh
+				sub.html('<b>&#x26A0;</b>')
+		if errs and errs.length
+			@el.addClass('smio-invwarn')
+			if not (ctl = @client.allControls[cid = @id('invdet')])
+				ctl = root.addControl('InvokeWarningPopup', id: cid)
+		else
+			if (ctl = @client.allControls[@id('invdet')])
+				@root().removeControl(ctl)
+			@el.removeClass('smio-invwarn')
 		if res and @args?['invoke']?['onResult']
 			@args.invoke.onResult(errs, res, fresp)
 
@@ -243,12 +262,14 @@ class smio.Packs_#{className} extends smio.Control
 	@tagRenderers:
 		'arg': (ctl, name) ->
 			ctl.args[name]
-		'ctl': (ctl, className, args, emptyIfMissing) ->
+		'ctl': (ctl, className, args, emptyIfMissing, retCtl) ->
 			subCtl = _.detect(ctl.controls, (sc) -> sc.ctlID is args.id)
 			if (not subCtl) and ((ctor = smio["Packs_#{ctl.classNamespace()}_#{className}"]) or (ctor = smio["Packs_#{ctl.classNamespace()}_Controls_#{className}"]) or (ctor = smio["Packs_Core_Controls_#{className}"] ))
 				ctl.controls.push(subCtl = new ctor(ctl.client, ctl, args))
 				ctl.client.allControls[subCtl.id()] = subCtl
-			if subCtl
+			if retCtl
+				subCtl
+			else if subCtl
 				subCtl.renderHtml()
 			else if (renderFunc = ctl["renderHtml_#{className}"])
 				renderFunc(className, args)
@@ -272,6 +293,13 @@ class smio.Packs_#{className} extends smio.Control
 		@ctlID = @args.id
 		@controls = []
 		@el = null
+
+	addControl: (ctlSpec, args) =>
+		if _.isString(ctlSpec)
+			ctlSpec = smio.Control.load(ctlSpec, @, args)
+		@el.append(ctlSpec.renderHtml())
+		ctlSpec.onLoad()
+		ctlSpec
 
 	classPath: =>
 		"Packs_#{@className()}"
@@ -322,6 +350,16 @@ class smio.Packs_#{className} extends smio.Control
 
 	jsSelf: =>
 		"smio.client.allControls['" + @id() + "']"
+
+	removeControl: (ctl) =>
+		if @parent and not ctl?
+			@parent.removeControl(@)
+		else if ctl?
+			@controls = _.reject(@controls, (c) -> c is ctl)
+			if ctl.el
+				ctl.el.remove()
+			@client.allControls[ctl.id()] = undefined
+			delete @client.allControls[ctl.id()]
 
 	renderJsonTemplate: (tagKey, objTree, level) =>
 		buf = ''

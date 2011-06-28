@@ -105,7 +105,7 @@ class smio.Packs_Core_ServerSetup_InitialHubSetup extends smio.Control
 	
 	onCreateHubResult: (errs, result, fresp) =>
 		if errs
-			alert 'prob'
+			alert JSON.stringify errs
 		else if result
 			alert 'no prob'
 		else

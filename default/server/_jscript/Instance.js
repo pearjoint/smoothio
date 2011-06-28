@@ -25,6 +25,7 @@
       this.getUptime = __bind(this.getUptime, this);
       this.getDbServer = __bind(this.getDbServer, this);
       this.getDb = __bind(this.getDb, this);
+      this.jsonError = __bind(this.jsonError, this);
       this.formatError = __bind(this.formatError, this);
       this.finalizeStart = __bind(this.finalizeStart, this);      var resErrs;
       this.logFile = null;
@@ -63,6 +64,25 @@
     };
     Instance.prototype.formatError = function(err) {
       return smio.Util.Server.formatError(err, this.config.smoothio.logging.details, this.config.smoothio.logging.stack);
+    };
+    Instance.prototype.jsonError = function(err) {
+      var d, s, _ref;
+      _ref = [this.config.smoothio.logging.details, this.config.smoothio.logging.stack], d = _ref[0], s = _ref[1];
+      if (!d) {
+        if (s && err.stack) {
+          return err.stack;
+        } else {
+          return err.message;
+        }
+      } else {
+        if (s) {
+          return err;
+        } else {
+          return smio.Util.Object.cloneFiltered(err, function(k) {
+            return k !== 'stack';
+          });
+        }
+      }
     };
     Instance.prototype.getDb = function(dbServer, name, title, interval) {
       return new smio.Database(this, dbServer, name, (title ? title : name), interval);

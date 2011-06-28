@@ -153,7 +153,7 @@
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.onCreateHubResult = function(errs, result, fresp) {
       if (errs) {
-        return alert('prob');
+        return alert(JSON.stringify(errs));
       } else if (result) {
         return alert('no prob');
       } else {

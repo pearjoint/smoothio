@@ -198,7 +198,7 @@
       'arg': function(ctl, name) {
         return ctl.args[name];
       },
-      'ctl': function(ctl, className, args, emptyIfMissing) {
+      'ctl': function(ctl, className, args, emptyIfMissing, retCtl) {
         var ctor, renderFunc, subCtl;
         subCtl = _.detect(ctl.controls, function(sc) {
           return sc.ctlID === args.id;
@@ -207,7 +207,9 @@
           ctl.controls.push(subCtl = new ctor(ctl.client, ctl, args));
           ctl.client.allControls[subCtl.id()] = subCtl;
         }
-        if (subCtl) {
+        if (retCtl) {
+          return subCtl;
+        } else if (subCtl) {
           return subCtl.renderHtml();
         } else if ((renderFunc = ctl["renderHtml_" + className])) {
           return renderFunc(className, args);
@@ -252,6 +254,7 @@
       this.renderTag = __bind(this.renderTag, this);
       this.renderHtml = __bind(this.renderHtml, this);
       this.renderJsonTemplate = __bind(this.renderJsonTemplate, this);
+      this.removeControl = __bind(this.removeControl, this);
       this.jsSelf = __bind(this.jsSelf, this);
       this.jsonTemplates_Label = __bind(this.jsonTemplates_Label, this);
       this.jsonTemplates_HasLabel = __bind(this.jsonTemplates_HasLabel, this);
@@ -262,6 +265,7 @@
       this.cssBaseClass = __bind(this.cssBaseClass, this);
       this.cls = __bind(this.cls, this);
       this.classPath = __bind(this.classPath, this);
+      this.addControl = __bind(this.addControl, this);
       this.rc = __bind(this.rc, this);
       this.Control = __bind(this.Control, this);
       this.Control = __bind(this.Control, this);
@@ -270,6 +274,14 @@
       this.controls = [];
       this.el = null;
     }
+    Control.prototype.addControl = function(ctlSpec, args) {
+      if (_.isString(ctlSpec)) {
+        ctlSpec = smio.Control.load(ctlSpec, this, args);
+      }
+      this.el.append(ctlSpec.renderHtml());
+      ctlSpec.onLoad();
+      return ctlSpec;
+    };
     Control.prototype.classPath = function() {
       return "Packs_" + (this.className());
     };
@@ -329,6 +341,20 @@
     };
     Control.prototype.jsSelf = function() {
       return "smio.client.allControls['" + this.id() + "']";
+    };
+    Control.prototype.removeControl = function(ctl) {
+      if (this.parent && !(ctl != null)) {
+        return this.parent.removeControl(this);
+      } else if (ctl != null) {
+        this.controls = _.reject(this.controls, function(c) {
+          return c === ctl;
+        });
+        if (ctl.el) {
+          ctl.el.remove();
+        }
+        this.client.allControls[ctl.id()] = void 0;
+        return delete this.client.allControls[ctl.id()];
+      }
     };
     Control.prototype.renderJsonTemplate = function(tagKey, objTree, level) {
       var an, atts, attstr, av, buf, hasc, haso, kc, kt, name, pos, result, toAtt, toHtml, val;

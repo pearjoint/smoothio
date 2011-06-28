@@ -87,10 +87,18 @@ class smio.Util
 			if _.isNumber(num) then num else def
 
 	@Object:
+		cloneFiltered: (obj, fn) ->
+			[noFunc, o] = [not _.isFunction(fn), {}]
+			for k, v of obj
+				if noFunc or fn(k, v)
+					o[k] = v
+			o
 		empty: (obj) ->
 			for p of obj
 				return false
 			true
+		isObject: (o, checkArr) ->
+			(typeof(o) is 'object') and ((not checkArr) or not _.isArray(o))
 		mergeDefaults: (cfg, defs) ->
 			if not cfg
 				cfg = {}

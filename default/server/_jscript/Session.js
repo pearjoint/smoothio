@@ -28,9 +28,12 @@
       this.handleInvoke = __bind(this.handleInvoke, this);
     }
     Session.prototype.handleInvoke = function(rc, fr, finish) {
-      var cmdName, freq, fresp, hub, isSocket, prefix, tmp, _ref;
+      var cmdName, freq, fresp, hub, isSocket, prefix, recErr, tmp, _ref;
       isSocket = rc === null;
       fresp = new smio.FetchResponseMessage();
+      recErr = __bind(function(err) {
+        return fresp.errors(this.server.inst.jsonError(err));
+      }, this);
       if (!fr) {
         fr = rc.postData;
       }
@@ -38,7 +41,7 @@
         try {
           fr = JSON.parse(fr);
         } catch (err) {
-          fresp.errors(err);
+          recErr(err);
         }
       }
       if (fr && !_.isString(fr)) {
@@ -49,7 +52,7 @@
             case 'f':
               return hub.getControlUpdates(freq.ticks(), freq, fresp, function(err, ctl) {
                 if (err) {
-                  fresp.errors(err);
+                  recErr(err);
                 }
                 if (ctl) {
                   fresp.controls(ctl);
@@ -71,7 +74,7 @@
               if (prefix === 'Hub') {
                 return hub.invoke(cmdName, freq, fresp, function(err, res) {
                   if (err) {
-                    fresp.errors(err);
+                    recErr(err);
                   }
                   if (res) {
                     fresp.msg[tmp] = res;
@@ -83,7 +86,7 @@
               }
           }
         } catch (err) {
-          fresp.errors(err);
+          recErr(err);
           return finish(fresp.msg);
         }
       }

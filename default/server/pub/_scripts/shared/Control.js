@@ -8,6 +8,9 @@
   }, __slice = Array.prototype.slice;
   smio = global.smoothio;
   smio.Control = (function() {
+    Control.load = function(className, parent, args) {
+      return smio.Control.tagRenderers.ctl(parent, className, args, void 0, true);
+    };
     Control.prototype.coreDisable = function(disable) {};
     Control.prototype.disable = function(disable, isInherit) {
       var ctl, len, _i, _len, _ref;
@@ -42,15 +45,24 @@
       return this.disable(false, true);
     };
     Control.prototype.invoke = function(cmd, args) {
-      var msg;
-      this.disable(true);
-      this.el.addClass('smio-invoking');
+      var ctl, lh, msg, sub;
+      this.disable(true, true);
+      this.el.addClass('smio-invoking').removeClass('smio-invwarn');
+      if ((ctl = this.client.allControls[this.id('invdet')])) {
+        this.root().removeControl(ctl);
+      }
+      if ((sub = this.sub('inv')) && (lh = sub.html())) {
+        this.lh = lh;
+        sub.html(smio.Control.util.florette).addClass('smio-spin');
+      }
       this.onInvoking(cmd, args);
       msg = this.client.socket.message(args, {
         cmd: [cmd],
         ctlID: [this.id()]
       });
-      return this.client.socket.send(msg);
+      return setTimeout((__bind(function() {
+        return this.client.socket.send(msg);
+      }, this)), 5000);
     };
     Control.prototype.labelHtml = function(html) {
       if (!this.el) {
@@ -87,19 +99,33 @@
         }
       }
     };
-    Control.prototype.onInvoking = function(msg, args) {
-      var lh, sub;
-      if ((sub = this.sub('inv')) && (lh = sub.html())) {
-        this.lh = lh;
-        return sub.html(smio.Control.util.florette).addClass('smio-spin');
-      }
-    };
+    Control.prototype.onInvoking = function(msg, args) {};
     Control.prototype.onInvokeResult = function(errs, res, fresp) {
-      var lh, sub, _ref, _ref2;
+      var cid, ctl, lh, root, sub, _ref, _ref2;
+      root = this.root();
+      this.el.removeClass('smio-invoking');
+      this.disable(false, true);
       if (((lh = this['lh']) != null) && (sub = this.sub('inv'))) {
         sub.html(lh + '').removeClass('smio-spin');
         this.lh = void 0;
         delete this['lh'];
+        if (errs && errs.length) {
+          this.lh = lh;
+          sub.html('<b>&#x26A0;</b>');
+        }
+      }
+      if (errs && errs.length) {
+        this.el.addClass('smio-invwarn');
+        if (!(ctl = this.client.allControls[cid = this.id('invdet')])) {
+          ctl = root.addControl('InvokeWarningPopup', {
+            id: cid
+          });
+        }
+      } else {
+        if ((ctl = this.client.allControls[this.id('invdet')])) {
+          this.root().removeControl(ctl);
+        }
+        this.el.removeClass('smio-invwarn');
       }
       if (res && ((_ref = this.args) != null ? (_ref2 = _ref['invoke']) != null ? _ref2['onResult'] : void 0 : void 0)) {
         return this.args.invoke.onResult(errs, res, fresp);
@@ -150,7 +176,7 @@
       'arg': function(ctl, name) {
         return ctl.args[name];
       },
-      'ctl': function(ctl, className, args, emptyIfMissing) {
+      'ctl': function(ctl, className, args, emptyIfMissing, retCtl) {
         var ctor, renderFunc, subCtl;
         subCtl = _.detect(ctl.controls, function(sc) {
           return sc.ctlID === args.id;
@@ -159,7 +185,9 @@
           ctl.controls.push(subCtl = new ctor(ctl.client, ctl, args));
           ctl.client.allControls[subCtl.id()] = subCtl;
         }
-        if (subCtl) {
+        if (retCtl) {
+          return subCtl;
+        } else if (subCtl) {
           return subCtl.renderHtml();
         } else if ((renderFunc = ctl["renderHtml_" + className])) {
           return renderFunc(className, args);
@@ -204,6 +232,7 @@
       this.renderTag = __bind(this.renderTag, this);
       this.renderHtml = __bind(this.renderHtml, this);
       this.renderJsonTemplate = __bind(this.renderJsonTemplate, this);
+      this.removeControl = __bind(this.removeControl, this);
       this.jsSelf = __bind(this.jsSelf, this);
       this.jsonTemplates_Label = __bind(this.jsonTemplates_Label, this);
       this.jsonTemplates_HasLabel = __bind(this.jsonTemplates_HasLabel, this);
@@ -214,6 +243,7 @@
       this.cssBaseClass = __bind(this.cssBaseClass, this);
       this.cls = __bind(this.cls, this);
       this.classPath = __bind(this.classPath, this);
+      this.addControl = __bind(this.addControl, this);
       this.un = __bind(this.un, this);
       this.syncUpdate = __bind(this.syncUpdate, this);
       this.sub = __bind(this.sub, this);
@@ -232,6 +262,14 @@
       this.controls = [];
       this.el = null;
     }
+    Control.prototype.addControl = function(ctlSpec, args) {
+      if (_.isString(ctlSpec)) {
+        ctlSpec = smio.Control.load(ctlSpec, this, args);
+      }
+      this.el.append(ctlSpec.renderHtml());
+      ctlSpec.onLoad();
+      return ctlSpec;
+    };
     Control.prototype.classPath = function() {
       return "Packs_" + (this.className());
     };
@@ -291,6 +329,20 @@
     };
     Control.prototype.jsSelf = function() {
       return "smio.client.allControls['" + this.id() + "']";
+    };
+    Control.prototype.removeControl = function(ctl) {
+      if (this.parent && !(ctl != null)) {
+        return this.parent.removeControl(this);
+      } else if (ctl != null) {
+        this.controls = _.reject(this.controls, function(c) {
+          return c === ctl;
+        });
+        if (ctl.el) {
+          ctl.el.remove();
+        }
+        this.client.allControls[ctl.id()] = void 0;
+        return delete this.client.allControls[ctl.id()];
+      }
     };
     Control.prototype.renderJsonTemplate = function(tagKey, objTree, level) {
       var an, atts, attstr, av, buf, hasc, haso, kc, kt, name, pos, result, toAtt, toHtml, val;

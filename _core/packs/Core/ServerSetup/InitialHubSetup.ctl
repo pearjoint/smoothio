@@ -95,7 +95,7 @@ input: (sp) =>
 
 onCreateHubResult: (errs, result, fresp) =>
 	if errs
-		alert 'prob'
+		alert JSON.stringify errs
 	else if result
 		alert 'no prob'
 	else
