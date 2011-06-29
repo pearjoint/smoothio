@@ -215,26 +215,10 @@ body {
   user-drag: none;
   background-color: #d0c8b8;
   background-position: left top;
+  overflow-x: hidden;
 }
 .smio-disabledfaded {
   opacity: 0.5;
-}
-.smio-invwarndetails {
-  display: inline-block;
-  padding: 0.5em;
-  background-color: #ffa000;
-  z-index: 2147483640;
-  position: absolute;
-  top: 1em;
-  left: 1em;
-  width: auto;
-  height: auto;
-  max-width: 4em;
-  white-space: normal;
-  font-size: 0.9em;
-  -webkit-border-radius: 0.33em;
-  -moz-border-radius: 0.33em;
-  border-radius: 0.33em;
 }
 .smio-disabledfaded, .smio-disabledfaded label, .smio-disabledfaded input, .smio-disabledfaded a {
 	cursor: not-allowed;
@@ -638,6 +622,65 @@ input.smio-textinput[readonly]:focus {
   -moz-box-shadow: 0 0 7px rgba(0,0,0,0.5), inset 0 15px 30px rgba(0,0,0,0.25), inset 0 -10px 20px rgba(255,255,255,0.1), inset 0 -10px rgba(255,255,255,0.05), inset 0 -1px rgba(255,255,255,0.15);
   -webkit-box-shadow: 0 0 7px rgba(0,0,0,0.5), inset 0 15px 30px rgba(0,0,0,0.25), inset 0 -10px 20px rgba(255,255,255,0.1), inset 0 -10px rgba(255,255,255,0.05), inset 0 -1px rgba(255,255,255,0.15);
   box-shadow: 0 0 7px rgba(0,0,0,0.5), inset 0 15px 30px rgba(0,0,0,0.25), inset 0 -10px 20px rgba(255,255,255,0.1), inset 0 -10px rgba(255,255,255,0.05), inset 0 -1px rgba(255,255,255,0.15);
+}
+
+/** server/pub/_packs/Core/Controls/_styl_InvokeWarningPopup.css **/
+.smio-invwarndetails {
+  display: inline-block;
+  z-index: 2147483640;
+  position: absolute;
+  width: auto;
+  height: auto;
+  white-space: normal;
+  margin-top: -1em;
+  margin-left: -20px;
+  -webkit-border-radius: 0.33em;
+  -moz-border-radius: 0.33em;
+  border-radius: 0.33em;
+  -moz-transition: all 0.33s;
+  -webkit-transition: all 0.33s;
+  -o-transition: all 0.33s;
+  -ms-transition: all 0.33s;
+  transition: all 0.33s;
+}
+.smio-invwarndetails-edge {
+  text-align: center;
+  line-height: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.smio-invwarndetails-arr {
+  background-color: #fe9;
+  display: inline-block;
+  max-width: 1.65em;
+  max-height: 1.65em;
+  position: relative;
+  top: 1em;
+  width: 1.65em;
+  height: 1.65em;
+  -moz-transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+  overflow: hidden;
+  white-space: nowrap;
+  -moz-box-shadow: 0em 0.1em 0.75em #a0a0a0;
+  -webkit-box-shadow: 0em 0.1em 0.75em #a0a0a0;
+  box-shadow: 0em 0.1em 0.75em #a0a0a0;
+}
+.smio-invwarndetails-box {
+  background-color: #fe9;
+  -moz-box-shadow: 0em 0.1em 0.75em #a0a0a0;
+  -webkit-box-shadow: 0em 0.1em 0.75em #a0a0a0;
+  box-shadow: 0em 0.1em 0.75em #a0a0a0;
+  -webkit-border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  border-radius: 0.5em;
+}
+.smio-invwarndetails-inner {
+  font-size: 0.8em;
+  padding: 0.66em;
 }
 
 /** server/pub/_packs/Core/ServerSetup/_styl_InitialHubSetup.css **/

@@ -1,0 +1,39 @@
+$col = #fe9
+$siz = 1.65em
+
+.smio-invwarndetails
+	display inline-block
+	z-index 2147483640
+	position absolute
+	width auto
+	height auto
+	white-space normal
+	margin-top -1em
+	margin-left -20px
+	smio-border-radius 0.33em
+	smio-transition all 0.33s
+
+.smio-invwarndetails-edge
+	text-align center
+	line-height 0
+	smio-nowrapflow()
+
+.smio-invwarndetails-arr
+	background-color $col
+	display inline-block
+	max-width $siz
+	max-height $siz
+	smio-posrel-twh(1em, $siz)
+	smio-transform rotate(45deg)
+	smio-nowrapflow()
+	smio-box-shadow 0em 0.1em 0.75em #a0a0a0
+
+.smio-invwarndetails-box
+	background-color $col
+	smio-box-shadow 0em 0.1em 0.75em #a0a0a0
+	smio-border-radius 0.5em
+
+.smio-invwarndetails-inner
+	font-size 0.8em
+	padding 0.66em
+

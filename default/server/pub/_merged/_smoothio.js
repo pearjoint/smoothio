@@ -9034,6 +9034,40 @@ jQuery.cookie = function(name, value, options) {
     }
 };
 
+/** ../_core/scripts/jquery.positionAncestor.js **/
+/**
+ * Get the current coordinates of the first element in the set of matched
+ * elements, relative to the closest positioned ancestor element that
+ * matches the selector.
+ * @param {Object} selector
+ */
+jQuery.fn.positionAncestor = function(selector) {
+    var left = 0;
+    var top = 0;
+    this.each(function(index, element) {
+        // check if current element has an ancestor matching a selector
+        // and that ancestor is positioned
+        var $ancestor = $(this).closest(selector);
+        if ($ancestor.length && $ancestor.css("position") !== "static") {
+            var $child = $(this);
+            var childMarginEdgeLeft = $child.offset().left - parseInt($child.css("marginLeft"), 10);
+            var childMarginEdgeTop = $child.offset().top - parseInt($child.css("marginTop"), 10);
+            var ancestorPaddingEdgeLeft = $ancestor.offset().left + parseInt($ancestor.css("borderLeftWidth"), 10);
+            var ancestorPaddingEdgeTop = $ancestor.offset().top + parseInt($ancestor.css("borderTopWidth"), 10);
+            left = childMarginEdgeLeft - ancestorPaddingEdgeLeft;
+            top = childMarginEdgeTop - ancestorPaddingEdgeTop;
+            // we have found the ancestor and computed the position
+            // stop iterating
+            return false;
+        }
+    });
+    return {
+        left:    left,
+        top:    top
+    }
+};
+
+
 /** ../_core/scripts/jquery.url.js **/
 // JQuery URL Parser plugin - https://github.com/allmarkedup/jQuery-URL-Parser
 // Written by Mark Perkins, mark@allmarkedup.com
@@ -10979,9 +11013,11 @@ if (!JSON) {
     function Client() {
       this.syncControls = __bind(this.syncControls, this);
       this.onWindowResize = __bind(this.onWindowResize, this);
+      this.onEverySecond = __bind(this.onEverySecond, this);
       this.init = __bind(this.init, this);      var cookie;
       this.sleepy = false;
       this.allControls = {};
+      this.controlClings = {};
       this.pageWindow = $(window);
       this.pageBody = $('#smio_body');
       cookie = $.cookie('smoo');
@@ -10999,13 +11035,43 @@ if (!JSON) {
       this.pageWindow.resize(_.debounce((__bind(function() {
         return this.onWindowResize();
       }, this)), 300));
+      this.recalcing = false;
     }
     Client.prototype.init = function() {
       $.ajaxSetup({
-        timeout: 4000
+        timeout: 10000
       });
       $('#smio_offline_msg').text(smio.resources.smoothio.connecting);
-      return this.socket.connect();
+      this.socket.connect();
+      return setInterval(this.onEverySecond, 500);
+    };
+    Client.prototype.onEverySecond = function() {
+      var clingee, clinger, clingerID, gpos, gw, spos, sw, tpos, _ref;
+      if (!this.recalcing) {
+        this.recalcing = true;
+        _ref = this.controlClings;
+        for (clingerID in _ref) {
+          clingee = _ref[clingerID];
+          clinger = this.allControls[clingerID];
+          if (clinger && clingee && clinger.el && clingee.el && (tpos = clingee.el.offset()) && (spos = clinger.el.offset())) {
+            gpos = {
+              top: tpos.top + clingee.el.outerHeight(),
+              left: tpos.left
+            };
+            gw = clingee.el.outerWidth() + 40;
+            sw = clinger.el.outerWidth();
+            if ((gpos.left !== spos.left) || (gpos.top !== spos.top) || (gw !== sw)) {
+              clinger.el.css({
+                top: gpos.top,
+                left: gpos.left,
+                width: gw + 'px',
+                'max-width': gw + 'px'
+              });
+            }
+          }
+        }
+        return this.recalcing = false;
+      }
     };
     Client.prototype.onWindowResize = function() {
       var ctl, h, id, w, _ref, _ref2, _results;
@@ -11328,7 +11394,35 @@ if (!JSON) {
     Control.load = function(className, parent, args) {
       return smio.Control.tagRenderers.ctl(parent, className, args, void 0, true);
     };
+    Control.prototype.clingTo = function(ctl) {
+      var cid;
+      cid = this.id();
+      if ((!ctl) && this.client.controlClings[cid]) {
+        this.client.controlClings[cid] = void 0;
+        delete this.client.controlClings[cid];
+      } else {
+        this.client.controlClings[cid] = ctl;
+      }
+      return this.client.onEverySecond();
+    };
     Control.prototype.coreDisable = function(disable) {};
+    Control.prototype.ctl = function(ctlID) {
+      var c, cid, cids, ctl, _i, _len, _ref;
+      _ref = [this, ctlID.split('/')], ctl = _ref[0], cids = _ref[1];
+      if ((c = this.client.allControls[ctlID])) {
+        ctl = c;
+      } else {
+        for (_i = 0, _len = cids.length; _i < _len; _i++) {
+          cid = cids[_i];
+          if ((c = this.client.allControls[ctl.id(cid)])) {
+            ctl = c;
+          } else {
+            break;
+          }
+        }
+      }
+      return ctl;
+    };
     Control.prototype.disable = function(disable, isInherit) {
       var ctl, len, _i, _len, _ref;
       if (!arguments.length) {
@@ -11379,7 +11473,10 @@ if (!JSON) {
       });
       return setTimeout((__bind(function() {
         return this.client.socket.send(msg);
-      }, this)), 5000);
+      }, this)), 50);
+    };
+    Control.prototype.jsSelf = function() {
+      return "smio.client.allControls['" + this.id() + "']";
     };
     Control.prototype.labelHtml = function(html) {
       if (!this.el) {
@@ -11437,10 +11534,11 @@ if (!JSON) {
           ctl = root.addControl('InvokeWarningPopup', {
             id: cid
           });
+          ctl.clingTo(this);
         }
       } else {
         if ((ctl = this.client.allControls[this.id('invdet')])) {
-          this.root().removeControl(ctl);
+          root.removeControl(ctl);
         }
         this.el.removeClass('smio-invwarn');
       }
@@ -11500,7 +11598,9 @@ if (!JSON) {
         });
         if ((!subCtl) && ((ctor = smio["Packs_" + (ctl.classNamespace()) + "_" + className]) || (ctor = smio["Packs_" + (ctl.classNamespace()) + "_Controls_" + className]) || (ctor = smio["Packs_Core_Controls_" + className]))) {
           ctl.controls.push(subCtl = new ctor(ctl.client, ctl, args));
-          ctl.client.allControls[subCtl.id()] = subCtl;
+          if (ctl.client) {
+            ctl.client.allControls[subCtl.id()] = subCtl;
+          }
         }
         if (retCtl) {
           return subCtl;
@@ -11550,12 +11650,10 @@ if (!JSON) {
       this.renderHtml = __bind(this.renderHtml, this);
       this.renderJsonTemplate = __bind(this.renderJsonTemplate, this);
       this.removeControl = __bind(this.removeControl, this);
-      this.jsSelf = __bind(this.jsSelf, this);
       this.jsonTemplates_Label = __bind(this.jsonTemplates_Label, this);
       this.jsonTemplates_HasLabel = __bind(this.jsonTemplates_HasLabel, this);
       this.init = __bind(this.init, this);
       this.id = __bind(this.id, this);
-      this.ctl = __bind(this.ctl, this);
       this.cssClass = __bind(this.cssClass, this);
       this.cssBaseClass = __bind(this.cssBaseClass, this);
       this.cls = __bind(this.cls, this);
@@ -11570,10 +11668,13 @@ if (!JSON) {
       this.onInvoking = __bind(this.onInvoking, this);
       this.on = __bind(this.on, this);
       this.labelHtml = __bind(this.labelHtml, this);
+      this.jsSelf = __bind(this.jsSelf, this);
       this.invoke = __bind(this.invoke, this);
       this.enable = __bind(this.enable, this);
       this.disable = __bind(this.disable, this);
+      this.ctl = __bind(this.ctl, this);
       this.coreDisable = __bind(this.coreDisable, this);
+      this.clingTo = __bind(this.clingTo, this);
       this.disabled = smio.iif(this.args.disabled);
       this.ctlID = this.args.id;
       this.controls = [];
@@ -11610,23 +11711,6 @@ if (!JSON) {
       }
       return a.join('-');
     };
-    Control.prototype.ctl = function(ctlID) {
-      var c, cid, cids, ctl, _i, _len, _ref;
-      _ref = [this, ctlID.split('/')], ctl = _ref[0], cids = _ref[1];
-      if ((c = this.client.allControls[ctlID])) {
-        ctl = c;
-      } else {
-        for (_i = 0, _len = cids.length; _i < _len; _i++) {
-          cid = cids[_i];
-          if ((c = this.client.allControls[ctl.id(cid)])) {
-            ctl = c;
-          } else {
-            break;
-          }
-        }
-      }
-      return ctl;
-    };
     Control.prototype.id = function(subID) {
       return (this.parent ? "" + (this.parent.id()) + "_" + this.ctlID : this.ctlID) + (subID ? '_' + subID : '');
     };
@@ -11644,21 +11728,44 @@ if (!JSON) {
         return target[this.args.labelHtml ? 'html' : '_'] = [this.r(label)];
       }
     };
-    Control.prototype.jsSelf = function() {
-      return "smio.client.allControls['" + this.id() + "']";
-    };
-    Control.prototype.removeControl = function(ctl) {
+    Control.prototype.removeControl = function(ctl, auto) {
+      var c, c1, c2, cid, delClings, delID, _i, _j, _len, _len2, _ref, _ref2, _results;
       if (this.parent && !(ctl != null)) {
         return this.parent.removeControl(this);
       } else if (ctl != null) {
-        this.controls = _.reject(this.controls, function(c) {
-          return c === ctl;
-        });
-        if (ctl.el) {
-          ctl.el.remove();
+        _ref = this.controls;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          c = _ref[_i];
+          this.removeControl(c, true);
         }
-        this.client.allControls[ctl.id()] = void 0;
-        return delete this.client.allControls[ctl.id()];
+        if (!auto) {
+          this.controls = _.reject(this.controls, function(c) {
+            return c === ctl;
+          });
+          if (ctl.el) {
+            ctl.el.remove();
+          }
+        }
+        if (this.client) {
+          if (this.client.allControls[cid = ctl.id()]) {
+            this.client.allControls[cid] = void 0;
+            delete this.client.allControls[cid];
+          }
+          delClings = [cid];
+          _ref2 = this.client.controlClings;
+          for (c1 in _ref2) {
+            c2 = _ref2[c1];
+            if (c2 === ctl) {
+              delClings.push(c1);
+            }
+          }
+          _results = [];
+          for (_j = 0, _len2 = delClings.length; _j < _len2; _j++) {
+            delID = delClings[_j];
+            _results.push(this.client.controlClings[delID] ? (this.client.controlClings[delID] = void 0, delete this.client.controlClings[delID]) : void 0);
+          }
+          return _results;
+        }
       }
     };
     Control.prototype.renderJsonTemplate = function(tagKey, objTree, level) {
@@ -12415,8 +12522,18 @@ if (!JSON) {
     __extends(Packs_Core_Controls_InvokeWarningPopup, smio.Control);
     Packs_Core_Controls_InvokeWarningPopup.prototype.renderTemplate = function() {
       return {
-        "div .smio-invwarndetails": {
-          html: ['here are some error details for ya']
+        'div .smio-invwarndetails': {
+          id: '',
+          'div .smio-invwarndetails-edge': {
+            'div .smio-invwarndetails-arr': {
+              html: ['&nbsp;']
+            }
+          },
+          'div .smio-invwarndetails-box': {
+            'div .smio-invwarndetails-inner': {
+              html: ['here are some error details for ya...<br/>foo whoar?<br/>foo whoar?<br/>foo whoar?<br/>foo whoar?']
+            }
+          }
         }
       };
     };
@@ -13068,135 +13185,137 @@ if (!JSON) {
     __extends(Packs_Core_ServerSetup_InitialHubSetup, smio.Control);
     Packs_Core_ServerSetup_InitialHubSetup.prototype.renderTemplate = function() {
       return {
-        "div .smio-setup": {
+        "div .smio-box": {
           "id": '',
-          "div .smio-setup-outer .smio-setup-outer-top": {
-            "div .smio-setup-header": {
-              html: [this.r('title', 'smio-setup-header-detail', smio.Control.util.jsVoid, this.urlSeg())]
+          "div .smio-setup": {
+            "div .smio-setup-outer .smio-setup-outer-top": {
+              "div .smio-setup-header": {
+                html: [this.r('title', 'smio-setup-header-detail', smio.Control.util.jsVoid, this.urlSeg())]
+              },
+              "div .smio-setup-header-desc": [this.r('desc')]
             },
-            "div .smio-setup-header-desc": [this.r('desc')]
-          },
-          "div .smio-setup-inner": {
-            "SlidePanel #stepslide .smio-setup-stepslide": {
-              itemClass: 'smio-setup-stepbox',
-              onItemSelect: this.onSlide,
-              items: {
-                "#owner": {
-                  'div .smio-setup-stepbox-title': [this.r('steptitle_owner')],
-                  'div .smio-setup-stepbox-form': {
-                    "Controls #user": {
-                      ctltype: 'TextInput',
-                      onChange: __bind(function() {
-                        return this.verifyInputs;
-                      }, this),
-                      required: true,
-                      nospellcheck: true,
-                      labelText: __bind(function(id) {
-                        return "owner_" + id;
-                      }, this),
-                      placeholder: __bind(function(id) {
-                        return "owner_" + id + "hint";
-                      }, this),
-                      type: __bind(function(id) {
-                        if (id !== 'name') {
-                          return 'password';
-                        } else {
-                          return '';
-                        }
-                      }, this),
-                      items: ['#name', '#pass', '#pass2']
-                    },
-                    "div .smio-setup-stepbox-form-label": {
-                      html: [this.r('owner_choice')]
-                    },
-                    "Controls #owner": {
-                      ctltype: 'Toggle',
-                      disabled: true,
-                      name: this.id('owner_toggle'),
-                      items: {
-                        "#create": {
-                          checked: true,
-                          labelHtml: ['owner_create', 'localhost']
-                        },
-                        "#login": {
-                          labelHtml: ['owner_login', 'localhost']
+            "div .smio-setup-inner": {
+              "SlidePanel #stepslide .smio-setup-stepslide": {
+                itemClass: 'smio-setup-stepbox',
+                onItemSelect: this.onSlide,
+                items: {
+                  "#owner": {
+                    'div .smio-setup-stepbox-title': [this.r('steptitle_owner')],
+                    'div .smio-setup-stepbox-form': {
+                      "Controls #user": {
+                        ctltype: 'TextInput',
+                        onChange: __bind(function() {
+                          return this.verifyInputs;
+                        }, this),
+                        required: true,
+                        nospellcheck: true,
+                        labelText: __bind(function(id) {
+                          return "owner_" + id;
+                        }, this),
+                        placeholder: __bind(function(id) {
+                          return "owner_" + id + "hint";
+                        }, this),
+                        type: __bind(function(id) {
+                          if (id !== 'name') {
+                            return 'password';
+                          } else {
+                            return '';
+                          }
+                        }, this),
+                        items: ['#name', '#pass', '#pass2']
+                      },
+                      "div .smio-setup-stepbox-form-label": {
+                        html: [this.r('owner_choice')]
+                      },
+                      "Controls #owner": {
+                        ctltype: 'Toggle',
+                        disabled: true,
+                        name: this.id('owner_toggle'),
+                        items: {
+                          "#create": {
+                            checked: true,
+                            labelHtml: ['owner_create', 'localhost']
+                          },
+                          "#login": {
+                            labelHtml: ['owner_login', 'localhost']
+                          }
                         }
                       }
                     }
-                  }
-                },
-                "#template": {
-                  "div .smio-setup-stepbox-title": [this.r('steptitle_template')],
-                  "div .smio-setup-stepbox-form": {
-                    text: ['Hub templates are not yet available.']
-                  }
-                },
-                "#finish": {
-                  "div .smio-setup-stepbox-title": [this.r('steptitle_finish')],
-                  "div .smio-setup-stepbox-form": {
-                    "TextInput #hubtitle": {
-                      required: true,
-                      placeholder: 'hub_titlehint',
-                      labelText: 'hub_title',
-                      onChange: this.verifyInputs
-                    },
-                    "div .smio-setup-stepbox-form-label": {
-                      html: [this.r('hub_hint')]
-                    },
-                    "Controls #bg": {
-                      ctltype: 'Toggle',
-                      name: this.id('hub_bg'),
-                      checked: __bind(function(id) {
-                        return id === 'bg0';
-                      }, this),
-                      labelHtml: __bind(function(id) {
-                        return 'nbsp';
-                      }, this),
-                      style: __bind(function(id) {
-                        return {
-                          'background-image': "url('/_/file/images/" + id + ".jpg')"
-                        };
-                      }, this),
-                      onCheck: __bind(function(id) {
-                        return __bind(function(chk) {
-                          if (chk) {
-                            return this.client.pageBody.css({
-                              "background-image": "url('/_/file/images/" + id + ".jpg')"
-                            });
+                  },
+                  "#template": {
+                    "div .smio-setup-stepbox-title": [this.r('steptitle_template')],
+                    "div .smio-setup-stepbox-form": {
+                      text: ['Hub templates are not yet available.']
+                    }
+                  },
+                  "#finish": {
+                    "div .smio-setup-stepbox-title": [this.r('steptitle_finish')],
+                    "div .smio-setup-stepbox-form": {
+                      "TextInput #hubtitle": {
+                        required: true,
+                        placeholder: 'hub_titlehint',
+                        labelText: 'hub_title',
+                        onChange: this.verifyInputs
+                      },
+                      "div .smio-setup-stepbox-form-label": {
+                        html: [this.r('hub_hint')]
+                      },
+                      "Controls #bg": {
+                        ctltype: 'Toggle',
+                        name: this.id('hub_bg'),
+                        checked: __bind(function(id) {
+                          return id === 'bg0';
+                        }, this),
+                        labelHtml: __bind(function(id) {
+                          return 'nbsp';
+                        }, this),
+                        style: __bind(function(id) {
+                          return {
+                            'background-image': "url('/_/file/images/" + id + ".jpg')"
+                          };
+                        }, this),
+                        onCheck: __bind(function(id) {
+                          return __bind(function(chk) {
+                            if (chk) {
+                              return this.client.pageBody.css({
+                                "background-image": "url('/_/file/images/" + id + ".jpg')"
+                              });
+                            }
+                          }, this);
+                        }, this),
+                        items: ['#bg0', '#bg1', '#bg2', '#bg3', '#bg4']
+                      },
+                      "div .smio-setup-createbtn": {
+                        "LinkButton #hub_create .smio-bigbutton": {
+                          disabled: true,
+                          labelText: 'hub_create',
+                          invoke: {
+                            html: '&#x279C;',
+                            'Hub.create': __bind(function() {
+                              return {
+                                u: this.input('user/name').val(),
+                                p: this.input('user/pass').val(),
+                                t: this.input('hubtitle').val()
+                              };
+                            }, this),
+                            onResult: this.onCreateHubResult
                           }
-                        }, this);
-                      }, this),
-                      items: ['#bg0', '#bg1', '#bg2', '#bg3', '#bg4']
-                    },
-                    "div .smio-setup-createbtn": {
-                      "LinkButton #hub_create .smio-bigbutton": {
-                        disabled: true,
-                        labelText: 'hub_create',
-                        invoke: {
-                          html: '&#x279C;',
-                          'Hub.create': __bind(function() {
-                            return {
-                              u: this.input('user/name').val(),
-                              p: this.input('user/pass').val(),
-                              t: this.input('hubtitle').val()
-                            };
-                          }, this),
-                          onResult: this.onCreateHubResult
                         }
                       }
                     }
                   }
                 }
               }
+            },
+            "TabStrip #steptabs .smio-setup-outer .smio-setup-steptabs": {
+              "tabClass": 'smio-setup-steptab',
+              "tabs": ['owner', 'template', 'finish'],
+              "resPrefix": 'steps_',
+              "onTabSelect": __bind(function(tabID) {
+                return this.onTabSelect(tabID);
+              }, this)
             }
-          },
-          "TabStrip #steptabs .smio-setup-outer .smio-setup-steptabs": {
-            "tabClass": 'smio-setup-steptab',
-            "tabs": ['owner', 'template', 'finish'],
-            "resPrefix": 'steps_',
-            "onTabSelect": __bind(function(tabID) {
-              return this.onTabSelect(tabID);
-            }, this)
           }
         }
       };

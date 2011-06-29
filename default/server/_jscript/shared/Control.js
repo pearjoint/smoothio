@@ -205,7 +205,9 @@
         });
         if ((!subCtl) && ((ctor = smio["Packs_" + (ctl.classNamespace()) + "_" + className]) || (ctor = smio["Packs_" + (ctl.classNamespace()) + "_Controls_" + className]) || (ctor = smio["Packs_Core_Controls_" + className]))) {
           ctl.controls.push(subCtl = new ctor(ctl.client, ctl, args));
-          ctl.client.allControls[subCtl.id()] = subCtl;
+          if (ctl.client) {
+            ctl.client.allControls[subCtl.id()] = subCtl;
+          }
         }
         if (retCtl) {
           return subCtl;
@@ -255,12 +257,10 @@
       this.renderHtml = __bind(this.renderHtml, this);
       this.renderJsonTemplate = __bind(this.renderJsonTemplate, this);
       this.removeControl = __bind(this.removeControl, this);
-      this.jsSelf = __bind(this.jsSelf, this);
       this.jsonTemplates_Label = __bind(this.jsonTemplates_Label, this);
       this.jsonTemplates_HasLabel = __bind(this.jsonTemplates_HasLabel, this);
       this.init = __bind(this.init, this);
       this.id = __bind(this.id, this);
-      this.ctl = __bind(this.ctl, this);
       this.cssClass = __bind(this.cssClass, this);
       this.cssBaseClass = __bind(this.cssBaseClass, this);
       this.cls = __bind(this.cls, this);
@@ -305,23 +305,6 @@
       }
       return a.join('-');
     };
-    Control.prototype.ctl = function(ctlID) {
-      var c, cid, cids, ctl, _i, _len, _ref;
-      _ref = [this, ctlID.split('/')], ctl = _ref[0], cids = _ref[1];
-      if ((c = this.client.allControls[ctlID])) {
-        ctl = c;
-      } else {
-        for (_i = 0, _len = cids.length; _i < _len; _i++) {
-          cid = cids[_i];
-          if ((c = this.client.allControls[ctl.id(cid)])) {
-            ctl = c;
-          } else {
-            break;
-          }
-        }
-      }
-      return ctl;
-    };
     Control.prototype.id = function(subID) {
       return (this.parent ? "" + (this.parent.id()) + "_" + this.ctlID : this.ctlID) + (subID ? '_' + subID : '');
     };
@@ -339,21 +322,44 @@
         return target[this.args.labelHtml ? 'html' : '_'] = [this.r(label)];
       }
     };
-    Control.prototype.jsSelf = function() {
-      return "smio.client.allControls['" + this.id() + "']";
-    };
-    Control.prototype.removeControl = function(ctl) {
+    Control.prototype.removeControl = function(ctl, auto) {
+      var c, c1, c2, cid, delClings, delID, _i, _j, _len, _len2, _ref, _ref2, _results;
       if (this.parent && !(ctl != null)) {
         return this.parent.removeControl(this);
       } else if (ctl != null) {
-        this.controls = _.reject(this.controls, function(c) {
-          return c === ctl;
-        });
-        if (ctl.el) {
-          ctl.el.remove();
+        _ref = this.controls;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          c = _ref[_i];
+          this.removeControl(c, true);
         }
-        this.client.allControls[ctl.id()] = void 0;
-        return delete this.client.allControls[ctl.id()];
+        if (!auto) {
+          this.controls = _.reject(this.controls, function(c) {
+            return c === ctl;
+          });
+          if (ctl.el) {
+            ctl.el.remove();
+          }
+        }
+        if (this.client) {
+          if (this.client.allControls[cid = ctl.id()]) {
+            this.client.allControls[cid] = void 0;
+            delete this.client.allControls[cid];
+          }
+          delClings = [cid];
+          _ref2 = this.client.controlClings;
+          for (c1 in _ref2) {
+            c2 = _ref2[c1];
+            if (c2 === ctl) {
+              delClings.push(c1);
+            }
+          }
+          _results = [];
+          for (_j = 0, _len2 = delClings.length; _j < _len2; _j++) {
+            delID = delClings[_j];
+            _results.push(this.client.controlClings[delID] ? (this.client.controlClings[delID] = void 0, delete this.client.controlClings[delID]) : void 0);
+          }
+          return _results;
+        }
       }
     };
     Control.prototype.renderJsonTemplate = function(tagKey, objTree, level) {

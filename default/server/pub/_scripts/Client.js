@@ -6,9 +6,11 @@
     function Client() {
       this.syncControls = __bind(this.syncControls, this);
       this.onWindowResize = __bind(this.onWindowResize, this);
+      this.onEverySecond = __bind(this.onEverySecond, this);
       this.init = __bind(this.init, this);      var cookie;
       this.sleepy = false;
       this.allControls = {};
+      this.controlClings = {};
       this.pageWindow = $(window);
       this.pageBody = $('#smio_body');
       cookie = $.cookie('smoo');
@@ -26,13 +28,43 @@
       this.pageWindow.resize(_.debounce((__bind(function() {
         return this.onWindowResize();
       }, this)), 300));
+      this.recalcing = false;
     }
     Client.prototype.init = function() {
       $.ajaxSetup({
-        timeout: 4000
+        timeout: 10000
       });
       $('#smio_offline_msg').text(smio.resources.smoothio.connecting);
-      return this.socket.connect();
+      this.socket.connect();
+      return setInterval(this.onEverySecond, 500);
+    };
+    Client.prototype.onEverySecond = function() {
+      var clingee, clinger, clingerID, gpos, gw, spos, sw, tpos, _ref;
+      if (!this.recalcing) {
+        this.recalcing = true;
+        _ref = this.controlClings;
+        for (clingerID in _ref) {
+          clingee = _ref[clingerID];
+          clinger = this.allControls[clingerID];
+          if (clinger && clingee && clinger.el && clingee.el && (tpos = clingee.el.offset()) && (spos = clinger.el.offset())) {
+            gpos = {
+              top: tpos.top + clingee.el.outerHeight(),
+              left: tpos.left
+            };
+            gw = clingee.el.outerWidth() + 40;
+            sw = clinger.el.outerWidth();
+            if ((gpos.left !== spos.left) || (gpos.top !== spos.top) || (gw !== sw)) {
+              clinger.el.css({
+                top: gpos.top,
+                left: gpos.left,
+                width: gw + 'px',
+                'max-width': gw + 'px'
+              });
+            }
+          }
+        }
+        return this.recalcing = false;
+      }
     };
     Client.prototype.onWindowResize = function() {
       var ctl, h, id, w, _ref, _ref2, _results;

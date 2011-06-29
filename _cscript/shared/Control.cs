@@ -146,7 +146,28 @@ class smio.Packs_#{className} extends smio.Control
 	@load: (className, parent, args) ->
 		smio.Control.tagRenderers.ctl(parent, className, args, undefined, true)
 
+	clingTo: (ctl) =>
+		cid = @id()
+		if (not ctl) and @client.controlClings[cid]
+			@client.controlClings[cid] = undefined
+			delete @client.controlClings[cid]
+		else
+			@client.controlClings[cid] = ctl
+		@client.onEverySecond()
+
 	coreDisable: (disable) =>
+
+	ctl: (ctlID) =>
+		[ctl, cids] = [@, ctlID.split('/')]
+		if (c = @client.allControls[ctlID])
+			ctl = c
+		else
+			for cid in cids
+				if (c = @client.allControls[ctl.id(cid)])
+					ctl = c
+				else
+					break
+		ctl
 
 	disable: (disable, isInherit) =>
 		if not arguments.length
@@ -181,7 +202,10 @@ class smio.Packs_#{className} extends smio.Control
 			sub.html(smio.Control.util.florette).addClass('smio-spin')
 		@onInvoking(cmd, args)
 		msg = @client.socket.message(args, cmd: [cmd], ctlID: [@id()])
-		setTimeout((=> @client.socket.send(msg)), 5000)
+		setTimeout((=> @client.socket.send(msg)), 50)
+
+	jsSelf: =>
+		"smio.client.allControls['" + @id() + "']"
 
 	labelHtml: (html) =>
 		if not @el
@@ -222,9 +246,10 @@ class smio.Packs_#{className} extends smio.Control
 			@el.addClass('smio-invwarn')
 			if not (ctl = @client.allControls[cid = @id('invdet')])
 				ctl = root.addControl('InvokeWarningPopup', id: cid)
+				ctl.clingTo(@)
 		else
 			if (ctl = @client.allControls[@id('invdet')])
-				@root().removeControl(ctl)
+				root.removeControl(ctl)
 			@el.removeClass('smio-invwarn')
 		if res and @args?['invoke']?['onResult']
 			@args.invoke.onResult(errs, res, fresp)
@@ -266,7 +291,8 @@ class smio.Packs_#{className} extends smio.Control
 			subCtl = _.detect(ctl.controls, (sc) -> sc.ctlID is args.id)
 			if (not subCtl) and ((ctor = smio["Packs_#{ctl.classNamespace()}_#{className}"]) or (ctor = smio["Packs_#{ctl.classNamespace()}_Controls_#{className}"]) or (ctor = smio["Packs_Core_Controls_#{className}"] ))
 				ctl.controls.push(subCtl = new ctor(ctl.client, ctl, args))
-				ctl.client.allControls[subCtl.id()] = subCtl
+				if ctl.client
+					ctl.client.allControls[subCtl.id()] = subCtl
 			if retCtl
 				subCtl
 			else if subCtl
@@ -319,18 +345,6 @@ class smio.Packs_#{className} extends smio.Control
 				a.push(sub)
 		a.join('-')
 
-	ctl: (ctlID) =>
-		[ctl, cids] = [@, ctlID.split('/')]
-		if (c = @client.allControls[ctlID])
-			ctl = c
-		else
-			for cid in cids
-				if (c = @client.allControls[ctl.id(cid)])
-					ctl = c
-				else
-					break
-		ctl
-
 	id: (subID) =>
 		# (if @idStack.length then ((@idStack.join '_') + '_') else '')
 		(if @parent then "#{@parent.id()}_#{@ctlID}" else @ctlID) + (if subID then ('_' + subID) else '')
@@ -348,18 +362,28 @@ class smio.Packs_#{className} extends smio.Control
 		else if label
 			target[if @args.labelHtml then 'html' else '_'] = [@r(label)]
 
-	jsSelf: =>
-		"smio.client.allControls['" + @id() + "']"
-
-	removeControl: (ctl) =>
+	removeControl: (ctl, auto) =>
 		if @parent and not ctl?
 			@parent.removeControl(@)
 		else if ctl?
-			@controls = _.reject(@controls, (c) -> c is ctl)
-			if ctl.el
-				ctl.el.remove()
-			@client.allControls[ctl.id()] = undefined
-			delete @client.allControls[ctl.id()]
+			for c in @controls
+				@removeControl(c, true)
+			if not auto
+				@controls = _.reject(@controls, (c) -> c is ctl)
+				if ctl.el
+					ctl.el.remove()
+			if @client
+				if @client.allControls[cid = ctl.id()]
+					@client.allControls[cid] = undefined
+					delete @client.allControls[cid]
+				delClings = [cid]
+				for c1, c2 of @client.controlClings
+					if c2 is ctl
+						delClings.push(c1)
+				for delID in delClings
+					if @client.controlClings[delID]
+						@client.controlClings[delID] = undefined
+						delete @client.controlClings[delID]
 
 	renderJsonTemplate: (tagKey, objTree, level) =>
 		buf = ''
