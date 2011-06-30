@@ -15,7 +15,7 @@
     __extends(Packs_Core_Controls_InvokeWarningPopup, smio.Control);
     Packs_Core_Controls_InvokeWarningPopup.prototype.renderTemplate = function() {
       return {
-        'div .smio-invwarndetails': {
+        'div .smio-invwarndetails .smio-fade': {
           id: '',
           'div .smio-invwarndetails-edge': {
             'div .smio-invwarndetails-arr': {
@@ -24,7 +24,7 @@
           },
           'div .smio-invwarndetails-box': {
             'div .smio-invwarndetails-inner': {
-              html: ['here are some error details for ya...<br/>foo whoar?<br/>foo whoar?<br/>foo whoar?<br/>foo whoar?']
+              html: ['Last attempted <i>5 minutes ago</i>:<br/><br/><b>This server already contains a Hub. Try a complete reload (CTRL+R).</b><br/><br/>Retry or Cancel']
             }
           }
         }

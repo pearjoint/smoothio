@@ -11043,7 +11043,7 @@ if (!JSON) {
       });
       $('#smio_offline_msg').text(smio.resources.smoothio.connecting);
       this.socket.connect();
-      return setInterval(this.onEverySecond, 500);
+      return setInterval(this.onEverySecond, 750);
     };
     Client.prototype.onEverySecond = function() {
       var clingee, clinger, clingerID, gpos, gw, spos, sw, tpos, _ref;
@@ -11055,7 +11055,7 @@ if (!JSON) {
           clinger = this.allControls[clingerID];
           if (clinger && clingee && clinger.el && clingee.el && (tpos = clingee.el.offset()) && (spos = clinger.el.offset())) {
             gpos = {
-              top: tpos.top + clingee.el.outerHeight(),
+              top: tpos.top + clingee.el.outerHeight() - 6,
               left: tpos.left
             };
             gw = clingee.el.outerWidth() + 40;
@@ -11456,11 +11456,12 @@ if (!JSON) {
       return this.disable(false, true);
     };
     Control.prototype.invoke = function(cmd, args) {
-      var ctl, lh, msg, sub;
+      var ctl, lh, msg, root, sub;
+      root = this.root();
       this.disable(true, true);
       this.el.addClass('smio-invoking').removeClass('smio-invwarn');
-      if ((ctl = this.client.allControls[this.id('invdet')])) {
-        this.root().removeControl(ctl);
+      if ((ctl = this.client.allControls[root.id(this.id('invdet'))])) {
+        root.removeControl(ctl);
       }
       if ((sub = this.sub('inv')) && (lh = sub.html())) {
         this.lh = lh;
@@ -11473,7 +11474,7 @@ if (!JSON) {
       });
       return setTimeout((__bind(function() {
         return this.client.socket.send(msg);
-      }, this)), 50);
+      }, this)), 2000);
     };
     Control.prototype.jsSelf = function() {
       return "smio.client.allControls['" + this.id() + "']";
@@ -11530,14 +11531,14 @@ if (!JSON) {
       }
       if (errs && errs.length) {
         this.el.addClass('smio-invwarn');
-        if (!(ctl = this.client.allControls[cid = this.id('invdet')])) {
+        if (!(ctl = this.client.allControls[root.id(cid = this.id('invdet'))])) {
           ctl = root.addControl('InvokeWarningPopup', {
             id: cid
           });
           ctl.clingTo(this);
         }
       } else {
-        if ((ctl = this.client.allControls[this.id('invdet')])) {
+        if ((ctl = this.client.allControls[root.id(this.id('invdet'))])) {
           root.removeControl(ctl);
         }
         this.el.removeClass('smio-invwarn');
@@ -11733,17 +11734,26 @@ if (!JSON) {
       if (this.parent && !(ctl != null)) {
         return this.parent.removeControl(this);
       } else if (ctl != null) {
-        _ref = this.controls;
+        _ref = ctl.controls;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           c = _ref[_i];
-          this.removeControl(c, true);
+          ctl.removeControl(c, true);
         }
         if (!auto) {
           this.controls = _.reject(this.controls, function(c) {
             return c === ctl;
           });
           if (ctl.el) {
-            ctl.el.remove();
+            if (ctl.el.hasClass('smio-fade')) {
+              ctl.el.css({
+                opacity: 0.05
+              });
+              setTimeout((function() {
+                return ctl.el.remove();
+              }), 500);
+            } else {
+              ctl.el.remove();
+            }
           }
         }
         if (this.client) {
@@ -12522,7 +12532,7 @@ if (!JSON) {
     __extends(Packs_Core_Controls_InvokeWarningPopup, smio.Control);
     Packs_Core_Controls_InvokeWarningPopup.prototype.renderTemplate = function() {
       return {
-        'div .smio-invwarndetails': {
+        'div .smio-invwarndetails .smio-fade': {
           id: '',
           'div .smio-invwarndetails-edge': {
             'div .smio-invwarndetails-arr': {
@@ -12531,7 +12541,7 @@ if (!JSON) {
           },
           'div .smio-invwarndetails-box': {
             'div .smio-invwarndetails-inner': {
-              html: ['here are some error details for ya...<br/>foo whoar?<br/>foo whoar?<br/>foo whoar?<br/>foo whoar?']
+              html: ['Last attempted <i>5 minutes ago</i>:<br/><br/><b>This server already contains a Hub. Try a complete reload (CTRL+R).</b><br/><br/>Retry or Cancel']
             }
           }
         }

@@ -193,16 +193,17 @@ class smio.Packs_#{className} extends smio.Control
 		@disable(false, true)
 
 	invoke: (cmd, args) =>
+		root = @root()
 		@disable(true, true)
 		@el.addClass('smio-invoking').removeClass('smio-invwarn')
-		if (ctl = @client.allControls[@id('invdet')])
-			@root().removeControl(ctl)
+		if (ctl = @client.allControls[root.id(@id('invdet'))])
+			root.removeControl(ctl)
 		if (sub = @sub('inv')) and (lh = sub.html())
 			@lh = lh
 			sub.html(smio.Control.util.florette).addClass('smio-spin')
 		@onInvoking(cmd, args)
 		msg = @client.socket.message(args, cmd: [cmd], ctlID: [@id()])
-		setTimeout((=> @client.socket.send(msg)), 50)
+		setTimeout((=> @client.socket.send(msg)), 2000)
 
 	jsSelf: =>
 		"smio.client.allControls['" + @id() + "']"
@@ -244,11 +245,11 @@ class smio.Packs_#{className} extends smio.Control
 				sub.html('<b>&#x26A0;</b>')
 		if errs and errs.length
 			@el.addClass('smio-invwarn')
-			if not (ctl = @client.allControls[cid = @id('invdet')])
+			if not (ctl = @client.allControls[root.id(cid = @id('invdet'))])
 				ctl = root.addControl('InvokeWarningPopup', id: cid)
 				ctl.clingTo(@)
 		else
-			if (ctl = @client.allControls[@id('invdet')])
+			if (ctl = @client.allControls[root.id(@id('invdet'))])
 				root.removeControl(ctl)
 			@el.removeClass('smio-invwarn')
 		if res and @args?['invoke']?['onResult']
@@ -366,12 +367,16 @@ class smio.Packs_#{className} extends smio.Control
 		if @parent and not ctl?
 			@parent.removeControl(@)
 		else if ctl?
-			for c in @controls
-				@removeControl(c, true)
+			for c in ctl.controls
+				ctl.removeControl(c, true)
 			if not auto
 				@controls = _.reject(@controls, (c) -> c is ctl)
 				if ctl.el
-					ctl.el.remove()
+					if ctl.el.hasClass('smio-fade')
+						ctl.el.css(opacity: 0.05)
+						setTimeout((-> ctl.el.remove()), 500)
+					else
+						ctl.el.remove()
 			if @client
 				if @client.allControls[cid = ctl.id()]
 					@client.allControls[cid] = undefined

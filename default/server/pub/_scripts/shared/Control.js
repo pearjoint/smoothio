@@ -73,11 +73,12 @@
       return this.disable(false, true);
     };
     Control.prototype.invoke = function(cmd, args) {
-      var ctl, lh, msg, sub;
+      var ctl, lh, msg, root, sub;
+      root = this.root();
       this.disable(true, true);
       this.el.addClass('smio-invoking').removeClass('smio-invwarn');
-      if ((ctl = this.client.allControls[this.id('invdet')])) {
-        this.root().removeControl(ctl);
+      if ((ctl = this.client.allControls[root.id(this.id('invdet'))])) {
+        root.removeControl(ctl);
       }
       if ((sub = this.sub('inv')) && (lh = sub.html())) {
         this.lh = lh;
@@ -90,7 +91,7 @@
       });
       return setTimeout((__bind(function() {
         return this.client.socket.send(msg);
-      }, this)), 50);
+      }, this)), 2000);
     };
     Control.prototype.jsSelf = function() {
       return "smio.client.allControls['" + this.id() + "']";
@@ -147,14 +148,14 @@
       }
       if (errs && errs.length) {
         this.el.addClass('smio-invwarn');
-        if (!(ctl = this.client.allControls[cid = this.id('invdet')])) {
+        if (!(ctl = this.client.allControls[root.id(cid = this.id('invdet'))])) {
           ctl = root.addControl('InvokeWarningPopup', {
             id: cid
           });
           ctl.clingTo(this);
         }
       } else {
-        if ((ctl = this.client.allControls[this.id('invdet')])) {
+        if ((ctl = this.client.allControls[root.id(this.id('invdet'))])) {
           root.removeControl(ctl);
         }
         this.el.removeClass('smio-invwarn');
@@ -350,17 +351,26 @@
       if (this.parent && !(ctl != null)) {
         return this.parent.removeControl(this);
       } else if (ctl != null) {
-        _ref = this.controls;
+        _ref = ctl.controls;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           c = _ref[_i];
-          this.removeControl(c, true);
+          ctl.removeControl(c, true);
         }
         if (!auto) {
           this.controls = _.reject(this.controls, function(c) {
             return c === ctl;
           });
           if (ctl.el) {
-            ctl.el.remove();
+            if (ctl.el.hasClass('smio-fade')) {
+              ctl.el.css({
+                opacity: 0.05
+              });
+              setTimeout((function() {
+                return ctl.el.remove();
+              }), 500);
+            } else {
+              ctl.el.remove();
+            }
           }
         }
         if (this.client) {

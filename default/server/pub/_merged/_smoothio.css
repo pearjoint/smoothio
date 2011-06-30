@@ -626,38 +626,39 @@ input.smio-textinput[readonly]:focus {
 
 /** server/pub/_packs/Core/Controls/_styl_InvokeWarningPopup.css **/
 .smio-invwarndetails {
+  opacity: 1;
   display: inline-block;
   z-index: 2147483640;
   position: absolute;
   width: auto;
   height: auto;
   white-space: normal;
-  margin-top: -1em;
   margin-left: -20px;
-  -webkit-border-radius: 0.33em;
-  -moz-border-radius: 0.33em;
-  border-radius: 0.33em;
-  -moz-transition: all 0.33s;
-  -webkit-transition: all 0.33s;
-  -o-transition: all 0.33s;
-  -ms-transition: all 0.33s;
-  transition: all 0.33s;
+  line-height: 0;
+  -moz-transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  -ms-transition: all 0.5s;
+  transition: all 0.5s;
 }
 .smio-invwarndetails-edge {
+  display: inline-block;
+  margin-left: 1em;
+  height: 1em;
+  padding: 0 1em 0 1em;
   text-align: center;
-  line-height: 0;
   overflow: hidden;
   white-space: nowrap;
 }
 .smio-invwarndetails-arr {
   background-color: #fe9;
   display: inline-block;
-  max-width: 1.65em;
-  max-height: 1.65em;
+  max-width: 1.5em;
+  max-height: 1.5em;
   position: relative;
-  top: 1em;
-  width: 1.65em;
-  height: 1.65em;
+  top: 0.5em;
+  width: 1.5em;
+  height: 1.5em;
   -moz-transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
   -o-transform: rotate(45deg);
@@ -670,7 +671,11 @@ input.smio-textinput[readonly]:focus {
   box-shadow: 0em 0.1em 0.75em #a0a0a0;
 }
 .smio-invwarndetails-box {
-  background-color: #fe9;
+  background: -ms-linear-gradient(#fe9, rgba(255,238,153,0.75));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fe9), to(rgba(255,238,153,0.75)));
+  background: -moz-linear-gradient(#fe9, rgba(255,238,153,0.75));
+  background: -webkit-linear-gradient(#fe9, rgba(255,238,153,0.75));
+  background: -o-linear-gradient(#fe9, rgba(255,238,153,0.75));
   -moz-box-shadow: 0em 0.1em 0.75em #a0a0a0;
   -webkit-box-shadow: 0em 0.1em 0.75em #a0a0a0;
   box-shadow: 0em 0.1em 0.75em #a0a0a0;
@@ -679,8 +684,9 @@ input.smio-textinput[readonly]:focus {
   border-radius: 0.5em;
 }
 .smio-invwarndetails-inner {
+  line-height: 1.25;
   font-size: 0.8em;
-  padding: 0.66em;
+  padding: 0.66em 0.66em 2em 0.66em;
 }
 
 /** server/pub/_packs/Core/ServerSetup/_styl_InitialHubSetup.css **/

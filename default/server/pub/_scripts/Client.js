@@ -36,7 +36,7 @@
       });
       $('#smio_offline_msg').text(smio.resources.smoothio.connecting);
       this.socket.connect();
-      return setInterval(this.onEverySecond, 500);
+      return setInterval(this.onEverySecond, 750);
     };
     Client.prototype.onEverySecond = function() {
       var clingee, clinger, clingerID, gpos, gw, spos, sw, tpos, _ref;
@@ -48,7 +48,7 @@
           clinger = this.allControls[clingerID];
           if (clinger && clingee && clinger.el && clingee.el && (tpos = clingee.el.offset()) && (spos = clinger.el.offset())) {
             gpos = {
-              top: tpos.top + clingee.el.outerHeight(),
+              top: tpos.top + clingee.el.outerHeight() - 6,
               left: tpos.left
             };
             gw = clingee.el.outerWidth() + 40;

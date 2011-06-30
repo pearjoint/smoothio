@@ -327,17 +327,26 @@
       if (this.parent && !(ctl != null)) {
         return this.parent.removeControl(this);
       } else if (ctl != null) {
-        _ref = this.controls;
+        _ref = ctl.controls;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           c = _ref[_i];
-          this.removeControl(c, true);
+          ctl.removeControl(c, true);
         }
         if (!auto) {
           this.controls = _.reject(this.controls, function(c) {
             return c === ctl;
           });
           if (ctl.el) {
-            ctl.el.remove();
+            if (ctl.el.hasClass('smio-fade')) {
+              ctl.el.css({
+                opacity: 0.05
+              });
+              setTimeout((function() {
+                return ctl.el.remove();
+              }), 500);
+            } else {
+              ctl.el.remove();
+            }
           }
         }
         if (this.client) {

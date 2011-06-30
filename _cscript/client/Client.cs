@@ -25,7 +25,7 @@ class smio.Client
 		$.ajaxSetup(timeout: 10000)
 		$('#smio_offline_msg').text(smio.resources.smoothio.connecting)
 		@socket.connect()
-		setInterval(@onEverySecond, 500)
+		setInterval(@onEverySecond, 750)
 
 	onEverySecond: =>
 		if not @recalcing
@@ -33,7 +33,7 @@ class smio.Client
 			for clingerID, clingee of @controlClings
 				clinger = @allControls[clingerID]
 				if clinger and clingee and clinger.el and clingee.el and (tpos = clingee.el.offset()) and (spos = clinger.el.offset())
-					gpos = top: tpos.top + clingee.el.outerHeight(), left: tpos.left
+					gpos = top: tpos.top + clingee.el.outerHeight() - 6, left: tpos.left
 					gw = clingee.el.outerWidth() + 40
 					sw = clinger.el.outerWidth()
 					if (gpos.left isnt spos.left) or (gpos.top isnt spos.top) or (gw isnt sw)
