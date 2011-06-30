@@ -61,6 +61,7 @@
                 'max-width': gw + 'px'
               });
             }
+            smio.Control.setClingerOpacity(clinger, clingee);
           }
         }
         return this.recalcing = false;

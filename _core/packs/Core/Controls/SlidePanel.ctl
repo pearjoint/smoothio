@@ -25,6 +25,14 @@ renderTemplate: =>
 		'div #edgenext .$CC-edge .$CC-edge-right':
 			'div .$CC-edge-arr .x9658': _: [@r 'slidepanel_next']
 
+getParentItemID: ($el) =>
+	[rid, li] = [undefined, $el.closest("div##{@id()} li.#{@args.itemClass or ''}")]
+	for itemID in @items
+		if li.prop('id') is @id("items_#{itemID}")
+			rid = itemID
+			break
+	rid
+
 init: =>
 	@curItem = 0
 	@items = []
@@ -50,7 +58,7 @@ scrollTo: (item, force) =>
 		bounce = false
 		scrollLefts = []
 		distances = []
-		for it, i in @items
+		for it in @items
 			scrollLefts.push(tmp = (curPos + @sub('items_' + it).position().left - edgePrev.width()))
 			distances.push(Math.abs(tmp - curPos))
 		item = distances.indexOf(Math.min(distances...))
@@ -70,6 +78,9 @@ scrollTo: (item, force) =>
 		goalPos = curPos + @sub('items_' + @items[item]).position().left - edgePrev.width()
 		rnd = smio.Util.Number.randomInt(48) + 48
 		morpheus.tween(200, ((pos) => scrollBox.scrollLeft(pos)), onDone, null, curPos, (if bounce then (if (goalPos < curPos) then -rnd else rnd) else 0) + goalPos)
+
+showClinger: (clinger, clingee) =>
+	@curItem is @items.indexOf(@getParentItemID(clingee.el))
 
 #endif
 

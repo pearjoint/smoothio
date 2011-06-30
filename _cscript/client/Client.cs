@@ -38,6 +38,7 @@ class smio.Client
 					sw = clinger.el.outerWidth()
 					if (gpos.left isnt spos.left) or (gpos.top isnt spos.top) or (gw isnt sw)
 						clinger.el.css(top: gpos.top, left: gpos.left, width: gw + 'px', 'max-width': gw + 'px')
+					smio.Control.setClingerOpacity(clinger, clingee)
 			@recalcing = false
 
 	onWindowResize: =>

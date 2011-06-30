@@ -146,6 +146,11 @@ class smio.Packs_#{className} extends smio.Control
 	@load: (className, parent, args) ->
 		smio.Control.tagRenderers.ctl(parent, className, args, undefined, true)
 
+	@setClingerOpacity: (clinger, clingee) ->
+		go = if clingee.showClinger(clinger, clingee) then 1 else 0
+		if clinger.el and clinger.el.css('opacity') isnt go
+			clinger.el.css(opacity: go)
+
 	clingTo: (ctl) =>
 		cid = @id()
 		if (not ctl) and @client.controlClings[cid]
@@ -153,6 +158,7 @@ class smio.Packs_#{className} extends smio.Control
 			delete @client.controlClings[cid]
 		else
 			@client.controlClings[cid] = ctl
+			smio.Control.setClingerOpacity(@, ctl)
 		@client.onEverySecond()
 
 	coreDisable: (disable) =>
@@ -203,7 +209,7 @@ class smio.Packs_#{className} extends smio.Control
 			sub.html(smio.Control.util.florette).addClass('smio-spin')
 		@onInvoking(cmd, args)
 		msg = @client.socket.message(args, cmd: [cmd], ctlID: [@id()])
-		setTimeout((=> @client.socket.send(msg)), 2000)
+		setTimeout((=> @client.socket.send(msg)), 200)
 
 	jsSelf: =>
 		"smio.client.allControls['" + @id() + "']"
@@ -267,6 +273,9 @@ class smio.Packs_#{className} extends smio.Control
 			ctl.onLoad()
 
 	onWindowResize: (width, height) =>
+
+	showClinger: (clinger, clingee) =>
+		(not @parent) or @parent.showClinger(clinger, clingee)
 
 	sub: (id) =>
 		ctl = @
@@ -345,6 +354,12 @@ class smio.Packs_#{className} extends smio.Control
 			if sub
 				a.push(sub)
 		a.join('-')
+
+	findAncestor: (fn) =>
+		p = @parent
+		while p and not fn(p)
+			p = p.parent
+		p
 
 	id: (subID) =>
 		# (if @idStack.length then ((@idStack.join '_') + '_') else '')

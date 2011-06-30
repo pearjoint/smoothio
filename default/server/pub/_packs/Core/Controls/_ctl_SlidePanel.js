@@ -55,6 +55,19 @@
         }
       };
     };
+    Packs_Core_Controls_SlidePanel.prototype.getParentItemID = function($el) {
+      var itemID, li, rid, _i, _len, _ref, _ref2;
+      _ref = [void 0, $el.closest("div#" + (this.id()) + " li." + (this.args.itemClass || ''))], rid = _ref[0], li = _ref[1];
+      _ref2 = this.items;
+      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+        itemID = _ref2[_i];
+        if (li.prop('id') === this.id("items_" + itemID)) {
+          rid = itemID;
+          break;
+        }
+      }
+      return rid;
+    };
     Packs_Core_Controls_SlidePanel.prototype.init = function() {
       this.curItem = 0;
       this.items = [];
@@ -83,7 +96,7 @@
       return this.scrollTo(this.curItem, true);
     };
     Packs_Core_Controls_SlidePanel.prototype.scrollTo = function(item, force) {
-      var bounce, curPos, distances, edgeNext, edgePrev, goalPos, i, it, onDone, rnd, scrollBox, scrollLefts, tmp, _len, _ref, _ref2;
+      var bounce, curPos, distances, edgeNext, edgePrev, goalPos, it, onDone, rnd, scrollBox, scrollLefts, tmp, _i, _len, _ref, _ref2;
       _ref = [this.sub('edgeprev'), this.sub('edgenext'), this.sub('scrollbox'), true], edgePrev = _ref[0], edgeNext = _ref[1], scrollBox = _ref[2], bounce = _ref[3];
       curPos = scrollBox.scrollLeft();
       if (item === null) {
@@ -91,8 +104,8 @@
         scrollLefts = [];
         distances = [];
         _ref2 = this.items;
-        for (i = 0, _len = _ref2.length; i < _len; i++) {
-          it = _ref2[i];
+        for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+          it = _ref2[_i];
           scrollLefts.push(tmp = curPos + this.sub('items_' + it).position().left - edgePrev.width());
           distances.push(Math.abs(tmp - curPos));
         }
@@ -126,11 +139,16 @@
         }, this)), onDone, null, curPos, (bounce ? (goalPos < curPos ? -rnd : rnd) : 0) + goalPos);
       }
     };
+    Packs_Core_Controls_SlidePanel.prototype.showClinger = function(clinger, clingee) {
+      return this.curItem === this.items.indexOf(this.getParentItemID(clingee.el));
+    };
     function Packs_Core_Controls_SlidePanel(client, parent, args) {
+      this.showClinger = __bind(this.showClinger, this);
       this.scrollTo = __bind(this.scrollTo, this);
       this.onWindowResize = __bind(this.onWindowResize, this);
       this.onLoad = __bind(this.onLoad, this);
       this.init = __bind(this.init, this);
+      this.getParentItemID = __bind(this.getParentItemID, this);
       this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_SlidePanel.__super__.constructor.call(this, client, parent, args);
       this.init();
     }

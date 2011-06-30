@@ -11,6 +11,15 @@
     Control.load = function(className, parent, args) {
       return smio.Control.tagRenderers.ctl(parent, className, args, void 0, true);
     };
+    Control.setClingerOpacity = function(clinger, clingee) {
+      var go;
+      go = clingee.showClinger(clinger, clingee) ? 1 : 0;
+      if (clinger.el && clinger.el.css('opacity') !== go) {
+        return clinger.el.css({
+          opacity: go
+        });
+      }
+    };
     Control.prototype.clingTo = function(ctl) {
       var cid;
       cid = this.id();
@@ -19,6 +28,7 @@
         delete this.client.controlClings[cid];
       } else {
         this.client.controlClings[cid] = ctl;
+        smio.Control.setClingerOpacity(this, ctl);
       }
       return this.client.onEverySecond();
     };
@@ -91,7 +101,7 @@
       });
       return setTimeout((__bind(function() {
         return this.client.socket.send(msg);
-      }, this)), 2000);
+      }, this)), 200);
     };
     Control.prototype.jsSelf = function() {
       return "smio.client.allControls['" + this.id() + "']";
@@ -184,6 +194,9 @@
       return _results;
     };
     Control.prototype.onWindowResize = function(width, height) {};
+    Control.prototype.showClinger = function(clinger, clingee) {
+      return (!this.parent) || this.parent.showClinger(clinger, clingee);
+    };
     Control.prototype.sub = function(id) {
       var ctl, i, parts, _ref;
       ctl = this;
@@ -272,6 +285,7 @@
       this.jsonTemplates_HasLabel = __bind(this.jsonTemplates_HasLabel, this);
       this.init = __bind(this.init, this);
       this.id = __bind(this.id, this);
+      this.findAncestor = __bind(this.findAncestor, this);
       this.cssClass = __bind(this.cssClass, this);
       this.cssBaseClass = __bind(this.cssBaseClass, this);
       this.cls = __bind(this.cls, this);
@@ -280,6 +294,7 @@
       this.un = __bind(this.un, this);
       this.syncUpdate = __bind(this.syncUpdate, this);
       this.sub = __bind(this.sub, this);
+      this.showClinger = __bind(this.showClinger, this);
       this.onWindowResize = __bind(this.onWindowResize, this);
       this.onLoad = __bind(this.onLoad, this);
       this.onInvokeResult = __bind(this.onInvokeResult, this);
@@ -328,6 +343,14 @@
         }
       }
       return a.join('-');
+    };
+    Control.prototype.findAncestor = function(fn) {
+      var p;
+      p = this.parent;
+      while (p && !fn(p)) {
+        p = p.parent;
+      }
+      return p;
     };
     Control.prototype.id = function(subID) {
       return (this.parent ? "" + (this.parent.id()) + "_" + this.ctlID : this.ctlID) + (subID ? '_' + subID : '');

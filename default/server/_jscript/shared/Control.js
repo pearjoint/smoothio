@@ -261,6 +261,7 @@
       this.jsonTemplates_HasLabel = __bind(this.jsonTemplates_HasLabel, this);
       this.init = __bind(this.init, this);
       this.id = __bind(this.id, this);
+      this.findAncestor = __bind(this.findAncestor, this);
       this.cssClass = __bind(this.cssClass, this);
       this.cssBaseClass = __bind(this.cssBaseClass, this);
       this.cls = __bind(this.cls, this);
@@ -304,6 +305,14 @@
         }
       }
       return a.join('-');
+    };
+    Control.prototype.findAncestor = function(fn) {
+      var p;
+      p = this.parent;
+      while (p && !fn(p)) {
+        p = p.parent;
+      }
+      return p;
     };
     Control.prototype.id = function(subID) {
       return (this.parent ? "" + (this.parent.id()) + "_" + this.ctlID : this.ctlID) + (subID ? '_' + subID : '');
