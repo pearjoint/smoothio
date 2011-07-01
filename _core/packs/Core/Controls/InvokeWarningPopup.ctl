@@ -15,9 +15,14 @@ renderTemplate: =>
 				'div .smio-invwarndetails-btns':
 					html: ['Retry or Cancel']
 
+coreDisable: (disable) =>
+	@sub('close').css(display: if disable then 'none' else 'inline-block').prop('disabled', disable)
+
 onLoad: =>
 	super()
-	@sub('close').click(=> @removeControl())
+	@sub('close').click =>
+		if not (@disabled or @sub('close').prop('disabled'))
+			@removeControl()
 
 #endif
 

@@ -15,9 +15,10 @@
       var go;
       go = clingee.showClinger(clinger, clingee) ? 1 : 0;
       if (clinger.el && clinger.el.css('opacity') !== go) {
-        return clinger.el.css({
+        clinger.el.css({
           opacity: go
         });
+        return clinger.disable(go === 0, true);
       }
     };
     Control.prototype.clingTo = function(ctl) {

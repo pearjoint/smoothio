@@ -37,14 +37,22 @@
         }
       };
     };
+    Packs_Core_Controls_InvokeWarningPopup.prototype.coreDisable = function(disable) {
+      return this.sub('close').css({
+        display: disable ? 'none' : 'inline-block'
+      }).prop('disabled', disable);
+    };
     Packs_Core_Controls_InvokeWarningPopup.prototype.onLoad = function() {
       Packs_Core_Controls_InvokeWarningPopup.__super__.onLoad.call(this);
       return this.sub('close').click(__bind(function() {
-        return this.removeControl();
+        if (!(this.disabled || this.sub('close').prop('disabled'))) {
+          return this.removeControl();
+        }
       }, this));
     };
     function Packs_Core_Controls_InvokeWarningPopup(client, parent, args) {
       this.onLoad = __bind(this.onLoad, this);
+      this.coreDisable = __bind(this.coreDisable, this);
       this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_InvokeWarningPopup.__super__.constructor.call(this, client, parent, args);
       this.init();
     }

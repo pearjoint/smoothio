@@ -150,6 +150,7 @@ class smio.Packs_#{className} extends smio.Control
 		go = if clingee.showClinger(clinger, clingee) then 1 else 0
 		if clinger.el and clinger.el.css('opacity') isnt go
 			clinger.el.css(opacity: go)
+			clinger.disable(go is 0, true)
 
 	clingTo: (ctl) =>
 		cid = @id()
