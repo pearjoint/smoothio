@@ -11768,16 +11768,7 @@ if (!JSON) {
             return c === ctl;
           });
           if (ctl.el) {
-            if (ctl.el.hasClass('smio-fade')) {
-              ctl.el.css({
-                opacity: 0.05
-              });
-              setTimeout((function() {
-                return ctl.el.remove();
-              }), 500);
-            } else {
-              ctl.el.remove();
-            }
+            ctl.el.remove();
           }
         }
         if (this.client) {
@@ -12564,14 +12555,28 @@ if (!JSON) {
             }
           },
           'div .smio-invwarndetails-box': {
+            'a #close .smio-invwarndetails-close': {
+              href: smio.Control.util.jsVoid,
+              html: ['&times;']
+            },
             'div .smio-invwarndetails-inner': {
-              html: ['Last attempted <i>5 minutes ago</i>:<br/><br/><b>This server already contains a Hub. Try a complete reload (CTRL+R).</b><br/><br/>Retry or Cancel']
+              html: ['Last attempted <i>5 minutes ago</i>:<br/><br/><b>This server already contains a Hub. Try a complete reload (CTRL+R).</b>'],
+              'div .smio-invwarndetails-btns': {
+                html: ['Retry or Cancel']
+              }
             }
           }
         }
       };
     };
+    Packs_Core_Controls_InvokeWarningPopup.prototype.onLoad = function() {
+      Packs_Core_Controls_InvokeWarningPopup.__super__.onLoad.call(this);
+      return this.sub('close').click(__bind(function() {
+        return this.removeControl();
+      }, this));
+    };
     function Packs_Core_Controls_InvokeWarningPopup(client, parent, args) {
+      this.onLoad = __bind(this.onLoad, this);
       this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_InvokeWarningPopup.__super__.constructor.call(this, client, parent, args);
       this.init();
     }
@@ -12661,6 +12666,43 @@ if (!JSON) {
       return "Core_Controls";
     };
     return Packs_Core_Controls_LinkButton;
+  })();
+}).call(this);
+
+/** server/pub/_packs/Core/Controls/_ctl_LinkButtons.js **/
+(function() {
+  /*
+  Auto-generated from Core/Controls/LinkButtons.ctl
+  */  var smio, smoothio;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
+  };
+  smio = smoothio = global.smoothio;
+  smio.Packs_Core_Controls_LinkButtons = (function() {
+    __extends(Packs_Core_Controls_LinkButtons, smio.Control);
+    Packs_Core_Controls_LinkButtons.prototype.renderTemplate = function() {
+      return {
+        'div': {
+          html: 'retry or cancel'
+        }
+      };
+    };
+    function Packs_Core_Controls_LinkButtons(client, parent, args) {
+      this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_LinkButtons.__super__.constructor.call(this, client, parent, args);
+      this.init();
+    }
+    Packs_Core_Controls_LinkButtons.prototype.className = function() {
+      return "Core_Controls_LinkButtons";
+    };
+    Packs_Core_Controls_LinkButtons.prototype.classNamespace = function() {
+      return "Core_Controls";
+    };
+    return Packs_Core_Controls_LinkButtons;
   })();
 }).call(this);
 

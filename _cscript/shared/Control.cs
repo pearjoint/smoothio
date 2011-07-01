@@ -387,11 +387,7 @@ class smio.Packs_#{className} extends smio.Control
 			if not auto
 				@controls = _.reject(@controls, (c) -> c is ctl)
 				if ctl.el
-					if ctl.el.hasClass('smio-fade')
-						ctl.el.css(opacity: 0.05)
-						setTimeout((-> ctl.el.remove()), 500)
-					else
-						ctl.el.remove()
+					ctl.el.remove()
 			if @client
 				if @client.allControls[cid = ctl.id()]
 					@client.allControls[cid] = undefined

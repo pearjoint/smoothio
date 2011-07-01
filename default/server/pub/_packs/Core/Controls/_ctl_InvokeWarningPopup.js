@@ -23,14 +23,28 @@
             }
           },
           'div .smio-invwarndetails-box': {
+            'a #close .smio-invwarndetails-close': {
+              href: smio.Control.util.jsVoid,
+              html: ['&times;']
+            },
             'div .smio-invwarndetails-inner': {
-              html: ['Last attempted <i>5 minutes ago</i>:<br/><br/><b>This server already contains a Hub. Try a complete reload (CTRL+R).</b><br/><br/>Retry or Cancel']
+              html: ['Last attempted <i>5 minutes ago</i>:<br/><br/><b>This server already contains a Hub. Try a complete reload (CTRL+R).</b>'],
+              'div .smio-invwarndetails-btns': {
+                html: ['Retry or Cancel']
+              }
             }
           }
         }
       };
     };
+    Packs_Core_Controls_InvokeWarningPopup.prototype.onLoad = function() {
+      Packs_Core_Controls_InvokeWarningPopup.__super__.onLoad.call(this);
+      return this.sub('close').click(__bind(function() {
+        return this.removeControl();
+      }, this));
+    };
     function Packs_Core_Controls_InvokeWarningPopup(client, parent, args) {
+      this.onLoad = __bind(this.onLoad, this);
       this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_InvokeWarningPopup.__super__.constructor.call(this, client, parent, args);
       this.init();
     }

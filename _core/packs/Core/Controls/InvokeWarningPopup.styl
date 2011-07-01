@@ -13,6 +13,35 @@ $siz = 1.5em
 	line-height 0
 	smio-transition all 0.5s
 
+a.smio-invwarndetails-close
+	width 0.9em
+	height 0.9em
+	text-align center
+	line-height 0.8
+	margin-right 0.33em
+	margin-top 0.33em
+	padding-top 0.1em
+	padding-right 0.1em
+	float right
+	display inline-block
+	opacity 0
+	border 1px outset transparent
+	smio-border-radius 0.2em
+	smio-nowrapflow()
+
+.smio-invwarndetails:hover a.smio-invwarndetails-close
+	opacity 1
+
+a.smio-invwarndetails-close:active
+	opacity 1
+	background-color $col
+	border 1px inset #c0c0c0
+
+a.smio-invwarndetails-close:hover, a.smio-invwarndetails-close:focus
+	opacity 1
+	background-color $col
+	border 1px outset #c0c0c0
+
 .smio-invwarndetails-edge
 	display inline-block
 	margin-left 1em

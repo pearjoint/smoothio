@@ -384,16 +384,7 @@
             return c === ctl;
           });
           if (ctl.el) {
-            if (ctl.el.hasClass('smio-fade')) {
-              ctl.el.css({
-                opacity: 0.05
-              });
-              setTimeout((function() {
-                return ctl.el.remove();
-              }), 500);
-            } else {
-              ctl.el.remove();
-            }
+            ctl.el.remove();
           }
         }
         if (this.client) {
