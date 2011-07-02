@@ -19,7 +19,7 @@ renderTemplate: =>
 		"div .$CC":
 			"div .$CC-outer .$CC-outer-top":
 				"div .$CC-header":
-					html: [@r('title', '$CC-header-detail', smio.Control.util.jsVoid, @urlSeg())]
+					html: [@r 'title']
 				"div .$CC-header-desc": [@r 'desc']
 			"div .$CC-inner":
 				"SlidePanel #stepslide .$CC-stepslide":
@@ -105,13 +105,8 @@ onCreateHubResult: (errs, result, fresp) =>
 
 onLoad: =>
 	super()
-	$('.$CC-header-detail').click =>
-		port = if ("#{@client.pageUrl.attr 'port'}" is '80') then '' else ":#{@client.pageUrl.attr 'port'}"
-		nurl = prompt(@r('url_hint', @client.pageUrl.attr('protocol'), @client.pageUrl.attr('host'), port), urlseg = @urlSeg())
-		if nurl? and (nurl isnt null) and ((nurl = smio.Util.String.urlify(_.trim(nurl))) isnt urlseg)
-			if (not _.startsWith(nurl, '/')) or (not _.endsWith(nurl, '/'))
-				nurl = "/#{_.trim(nurl, '/')}/"
-			location.replace(nurl)
+	if @urlSeg() isnt '/'
+		location.replace('/')
 	[$u, $p1, $p2, $t] = [@input('user/name'), @input('user/pass'), @input('user/pass2'), @input('hubtitle')]
 	$u.val('test')
 	$p1.val('test')

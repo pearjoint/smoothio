@@ -21,27 +21,37 @@ class smio.Packs_Core_Controls_InvokeWarningPopup extends smio.Control
 			'div .$CC-box':
 				'a #close .$CC-close':
 					href: smio.Control.util.jsVoid
+					title: @r 'close'
 					html: ['&times;']
 				'div .$CC-inner':
 					'div .$CC-intro':
-						html: ['Last attempted <i>5 minutes ago</i>:']
+						html: [@r('invwarn_lasttried', @args.invCtl.invtime.getTime(), JSON.stringify(@args.invCtl.invtime))]
 					'div .$CC-msg':
 						html: ['This server already contains a Hub. Try a complete reload (CTRL+R).']
 					'LinkButtons #btns .$CC-btns .smio-bigbutton-strip':
 						btnClass: 'smio-bigbutton'
 						items:
 							'retry':
-								labelRawHtml: '<span class="smio-invbtn-icon smio-invbtn-retry">&#x27A5;</span> Neuer Versuch'
+								labelRawHtml: "<span class=\"smio-invbtn-icon smio-invbtn-retry\">&#x27A5;</span> #{@r 'invwarn_retry'}"
+								onClick: =>
+									if @args.invCtl and @args.invCtl.el and not @isDisabled()
+										@args.invCtl.el.click()
 							'cancel':
-								labelRawHtml: '<span class="smio-invbtn-icon smio-invbtn-cancel">&#x2718;</span> Abbrechen'
+								labelRawHtml: "<span class=\"smio-invbtn-icon smio-invbtn-cancel\">&#x2718;</span> #{@r 'invwarn_cancel'}"
+								onClick: =>
+									if @args.invCtl and not @isDisabled()
+										@args.invCtl.resetInvoke()
 	
 	coreDisable: (disable) =>
 		@sub('close').css(display: if disable then 'none' else 'inline-block').prop('disabled', disable)
 	
+	isDisabled: =>
+		@disabled or @sub('close').prop('disabled')
+	
 	onLoad: =>
 		super()
 		@sub('close').click =>
-			if not (@disabled or @sub('close').prop('disabled'))
+			if not @isDisabled()
 				@removeControl()
 	
 #endif

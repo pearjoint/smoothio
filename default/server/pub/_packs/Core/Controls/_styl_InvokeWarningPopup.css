@@ -32,15 +32,16 @@
 }
 .smio-invwarn-btns a.smio-bigbutton {
   font-weight: normal;
+  letter-spacing: 0;
   position: relative;
-  padding-left: 1.75em;
+  padding-left: 1.8em;
 }
 .smio-invwarn-btns a.smio-bigbutton span.smio-invbtn-icon {
   font-size: 1.4em;
   opacity: 0.6;
   display: inline-block;
   position: absolute;
-  left: 0.2em;
+  left: 0.3em;
   top: 0.05em;
 }
 .smio-invwarn-btns a.smio-bigbutton span.smio-invbtn-cancel {
@@ -114,11 +115,11 @@ a.smio-invwarn-close:focus {
   box-shadow: 0em 0.1em 0.75em #a0a0a0;
 }
 .smio-invwarn-box {
-  background: -ms-linear-gradient(#fe9, rgba(255,238,153,0.9));
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fe9), to(rgba(255,238,153,0.9)));
-  background: -moz-linear-gradient(#fe9, rgba(255,238,153,0.9));
-  background: -webkit-linear-gradient(#fe9, rgba(255,238,153,0.9));
-  background: -o-linear-gradient(#fe9, rgba(255,238,153,0.9));
+  background: -ms-linear-gradient(#fe9, rgba(255,238,153,0.85));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fe9), to(rgba(255,238,153,0.85)));
+  background: -moz-linear-gradient(#fe9, rgba(255,238,153,0.85));
+  background: -webkit-linear-gradient(#fe9, rgba(255,238,153,0.85));
+  background: -o-linear-gradient(#fe9, rgba(255,238,153,0.85));
   -moz-box-shadow: 0em 0.1em 0.75em #a0a0a0;
   -webkit-box-shadow: 0em 0.1em 0.75em #a0a0a0;
   box-shadow: 0em 0.1em 0.75em #a0a0a0;

@@ -11472,12 +11472,16 @@ if (!JSON) {
       var ctl, lh, msg, root, sub;
       root = this.root();
       this.disable(true, true);
+      delete this.invwarn;
+      this.invtime = new Date();
       this.el.addClass('smio-invoking').removeClass('smio-hasinvwarn');
       if ((ctl = this.client.allControls[root.id(this.id('invdet'))])) {
         root.removeControl(ctl);
       }
-      if ((sub = this.sub('inv')) && (lh = sub.html())) {
-        this.lh = lh;
+      if ((sub = this.sub('inv'))) {
+        if (!this.lh && (lh = sub.html())) {
+          this.lh = lh;
+        }
         sub.html(smio.Control.util.florette).addClass('smio-spin');
       }
       this.onInvoking(cmd, args);
@@ -11529,28 +11533,36 @@ if (!JSON) {
     };
     Control.prototype.onInvoking = function(msg, args) {};
     Control.prototype.onInvokeResult = function(errs, res, fresp) {
-      var cid, ctl, lh, root, sub, _ref, _ref2;
+      var cid, ctl, lh, mkCtl, root, sub, _ref, _ref2;
       root = this.root();
       this.el.removeClass('smio-invoking');
       this.disable(false, true);
       if (((lh = this['lh']) != null) && (sub = this.sub('inv'))) {
         sub.html(lh + '').removeClass('smio-spin');
-        this.lh = void 0;
-        delete this['lh'];
         if (errs && errs.length) {
-          this.lh = lh;
           sub.html('<b>&#x26A0;</b>');
         }
       }
       if (errs && errs.length) {
+        this.invwarn = errs;
         this.el.addClass('smio-hasinvwarn');
-        if (!(ctl = this.client.allControls[root.id(cid = this.id('invdet'))])) {
-          ctl = root.addControl('InvokeWarningPopup', {
-            id: cid
-          });
-          ctl.clingTo(this);
+        cid = this.id('invdet');
+        mkCtl = __bind(function() {
+          return root.addControl('InvokeWarningPopup', {
+            id: cid,
+            invCtl: this
+          }).clingTo(this);
+        }, this);
+        if (!this.client.allControls[root.id(cid)]) {
+          mkCtl();
+          this.el.mouseenter(__bind(function() {
+            if (this.invwarn && !this.client.allControls[root.id(cid)]) {
+              return mkCtl();
+            }
+          }, this));
         }
       } else {
+        delete this.invwarn;
         if ((ctl = this.client.allControls[root.id(this.id('invdet'))])) {
           root.removeControl(ctl);
         }
@@ -11580,6 +11592,18 @@ if (!JSON) {
       return _results;
     };
     Control.prototype.onWindowResize = function(width, height) {};
+    Control.prototype.resetInvoke = function(invWarnCtl) {
+      var lh, root, sub;
+      root = this.root();
+      delete this.invwarn;
+      this.el.removeClass('smio-hasinvwarn');
+      if (invWarnCtl || (invWarnCtl = this.client.allControls[root.id(this.id('invdet'))])) {
+        root.removeControl(invWarnCtl);
+      }
+      if (((lh = this['lh']) != null) && (sub = this.sub('inv'))) {
+        return sub.html(lh + '').removeClass('smio-spin');
+      }
+    };
     Control.prototype.showClinger = function(clinger, clingee) {
       return (!this.parent) || this.parent.showClinger(clinger, clingee);
     };
@@ -11681,6 +11705,7 @@ if (!JSON) {
       this.syncUpdate = __bind(this.syncUpdate, this);
       this.sub = __bind(this.sub, this);
       this.showClinger = __bind(this.showClinger, this);
+      this.resetInvoke = __bind(this.resetInvoke, this);
       this.onWindowResize = __bind(this.onWindowResize, this);
       this.onLoad = __bind(this.onLoad, this);
       this.onInvokeResult = __bind(this.onInvokeResult, this);
@@ -12312,13 +12337,24 @@ if (!JSON) {
       }
     };
     Util.String = {
+      namedHtmlEntities: {
+        'ß': 'szlig',
+        'ä': 'auml',
+        'Ä': 'Auml',
+        'ö': 'ouml',
+        'Ö': 'Ouml',
+        'ü': 'uuml',
+        'Ü': 'Uuml'
+      },
       htmlEncode: function(str) {
-        var c, cc, i, len, ret, tmp, _len, _ref;
+        var c, cc, ent, i, len, ret, tmp, _len, _ref;
         _ref = ['', _.escapeHTML(str)], ret = _ref[0], tmp = _ref[1];
         len = tmp.length;
         for (i = 0, _len = tmp.length; i < _len; i++) {
           c = tmp[i];
-          if ((cc = tmp.charCodeAt(i)) > 127) {
+          if ((ent = smio.Util.String.namedHtmlEntities[c])) {
+            ret += "&" + ent + ";";
+          } else if ((cc = tmp.charCodeAt(i)) > 127) {
             ret += "&#" + cc + ";";
           } else {
             ret += c;
@@ -12559,11 +12595,12 @@ if (!JSON) {
           'div .smio-invwarn-box': {
             'a #close .smio-invwarn-close': {
               href: smio.Control.util.jsVoid,
+              title: this.r('close'),
               html: ['&times;']
             },
             'div .smio-invwarn-inner': {
               'div .smio-invwarn-intro': {
-                html: ['Last attempted <i>5 minutes ago</i>:']
+                html: [this.r('invwarn_lasttried', this.args.invCtl.invtime.getTime(), JSON.stringify(this.args.invCtl.invtime))]
               },
               'div .smio-invwarn-msg': {
                 html: ['This server already contains a Hub. Try a complete reload (CTRL+R).']
@@ -12572,10 +12609,20 @@ if (!JSON) {
                 btnClass: 'smio-bigbutton',
                 items: {
                   'retry': {
-                    labelRawHtml: '<span class="smio-invbtn-icon smio-invbtn-retry">&#x27A5;</span> Neuer Versuch'
+                    labelRawHtml: "<span class=\"smio-invbtn-icon smio-invbtn-retry\">&#x27A5;</span> " + (this.r('invwarn_retry')),
+                    onClick: __bind(function() {
+                      if (this.args.invCtl && this.args.invCtl.el && !this.isDisabled()) {
+                        return this.args.invCtl.el.click();
+                      }
+                    }, this)
                   },
                   'cancel': {
-                    labelRawHtml: '<span class="smio-invbtn-icon smio-invbtn-cancel">&#x2718;</span> Abbrechen'
+                    labelRawHtml: "<span class=\"smio-invbtn-icon smio-invbtn-cancel\">&#x2718;</span> " + (this.r('invwarn_cancel')),
+                    onClick: __bind(function() {
+                      if (this.args.invCtl && !this.isDisabled()) {
+                        return this.args.invCtl.resetInvoke();
+                      }
+                    }, this)
                   }
                 }
               }
@@ -12589,16 +12636,20 @@ if (!JSON) {
         display: disable ? 'none' : 'inline-block'
       }).prop('disabled', disable);
     };
+    Packs_Core_Controls_InvokeWarningPopup.prototype.isDisabled = function() {
+      return this.disabled || this.sub('close').prop('disabled');
+    };
     Packs_Core_Controls_InvokeWarningPopup.prototype.onLoad = function() {
       Packs_Core_Controls_InvokeWarningPopup.__super__.onLoad.call(this);
       return this.sub('close').click(__bind(function() {
-        if (!(this.disabled || this.sub('close').prop('disabled'))) {
+        if (!this.isDisabled()) {
           return this.removeControl();
         }
       }, this));
     };
     function Packs_Core_Controls_InvokeWarningPopup(client, parent, args) {
       this.onLoad = __bind(this.onLoad, this);
+      this.isDisabled = __bind(this.isDisabled, this);
       this.coreDisable = __bind(this.coreDisable, this);
       this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_InvokeWarningPopup.__super__.constructor.call(this, client, parent, args);
       this.init();
@@ -13315,7 +13366,7 @@ if (!JSON) {
           "div .smio-setup": {
             "div .smio-setup-outer .smio-setup-outer-top": {
               "div .smio-setup-header": {
-                html: [this.r('title', 'smio-setup-header-detail', smio.Control.util.jsVoid, this.urlSeg())]
+                html: [this.r('title')]
               },
               "div .smio-setup-header-desc": [this.r('desc')]
             },
@@ -13461,17 +13512,9 @@ if (!JSON) {
     Packs_Core_ServerSetup_InitialHubSetup.prototype.onLoad = function() {
       var $p1, $p2, $t, $u, _ref;
       Packs_Core_ServerSetup_InitialHubSetup.__super__.onLoad.call(this);
-      $('.smio-setup-header-detail').click(__bind(function() {
-        var nurl, port, urlseg;
-        port = ("" + (this.client.pageUrl.attr('port'))) === '80' ? '' : ":" + (this.client.pageUrl.attr('port'));
-        nurl = prompt(this.r('url_hint', this.client.pageUrl.attr('protocol'), this.client.pageUrl.attr('host'), port), urlseg = this.urlSeg());
-        if ((nurl != null) && (nurl !== null) && ((nurl = smio.Util.String.urlify(_.trim(nurl))) !== urlseg)) {
-          if ((!_.startsWith(nurl, '/')) || (!_.endsWith(nurl, '/'))) {
-            nurl = "/" + (_.trim(nurl, '/')) + "/";
-          }
-          return location.replace(nurl);
-        }
-      }, this));
+      if (this.urlSeg() !== '/') {
+        location.replace('/');
+      }
       _ref = [this.input('user/name'), this.input('user/pass'), this.input('user/pass2'), this.input('hubtitle')], $u = _ref[0], $p1 = _ref[1], $p2 = _ref[2], $t = _ref[3];
       $u.val('test');
       $p1.val('test');

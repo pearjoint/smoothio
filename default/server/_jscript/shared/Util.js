@@ -198,13 +198,24 @@
       }
     };
     Util.String = {
+      namedHtmlEntities: {
+        'ß': 'szlig',
+        'ä': 'auml',
+        'Ä': 'Auml',
+        'ö': 'ouml',
+        'Ö': 'Ouml',
+        'ü': 'uuml',
+        'Ü': 'Uuml'
+      },
       htmlEncode: function(str) {
-        var c, cc, i, len, ret, tmp, _len, _ref;
+        var c, cc, ent, i, len, ret, tmp, _len, _ref;
         _ref = ['', _.escapeHTML(str)], ret = _ref[0], tmp = _ref[1];
         len = tmp.length;
         for (i = 0, _len = tmp.length; i < _len; i++) {
           c = tmp[i];
-          if ((cc = tmp.charCodeAt(i)) > 127) {
+          if ((ent = smio.Util.String.namedHtmlEntities[c])) {
+            ret += "&" + ent + ";";
+          } else if ((cc = tmp.charCodeAt(i)) > 127) {
             ret += "&#" + cc + ";";
           } else {
             ret += c;

@@ -89,12 +89,16 @@
       var ctl, lh, msg, root, sub;
       root = this.root();
       this.disable(true, true);
+      delete this.invwarn;
+      this.invtime = new Date();
       this.el.addClass('smio-invoking').removeClass('smio-hasinvwarn');
       if ((ctl = this.client.allControls[root.id(this.id('invdet'))])) {
         root.removeControl(ctl);
       }
-      if ((sub = this.sub('inv')) && (lh = sub.html())) {
-        this.lh = lh;
+      if ((sub = this.sub('inv'))) {
+        if (!this.lh && (lh = sub.html())) {
+          this.lh = lh;
+        }
         sub.html(smio.Control.util.florette).addClass('smio-spin');
       }
       this.onInvoking(cmd, args);
@@ -146,28 +150,36 @@
     };
     Control.prototype.onInvoking = function(msg, args) {};
     Control.prototype.onInvokeResult = function(errs, res, fresp) {
-      var cid, ctl, lh, root, sub, _ref, _ref2;
+      var cid, ctl, lh, mkCtl, root, sub, _ref, _ref2;
       root = this.root();
       this.el.removeClass('smio-invoking');
       this.disable(false, true);
       if (((lh = this['lh']) != null) && (sub = this.sub('inv'))) {
         sub.html(lh + '').removeClass('smio-spin');
-        this.lh = void 0;
-        delete this['lh'];
         if (errs && errs.length) {
-          this.lh = lh;
           sub.html('<b>&#x26A0;</b>');
         }
       }
       if (errs && errs.length) {
+        this.invwarn = errs;
         this.el.addClass('smio-hasinvwarn');
-        if (!(ctl = this.client.allControls[root.id(cid = this.id('invdet'))])) {
-          ctl = root.addControl('InvokeWarningPopup', {
-            id: cid
-          });
-          ctl.clingTo(this);
+        cid = this.id('invdet');
+        mkCtl = __bind(function() {
+          return root.addControl('InvokeWarningPopup', {
+            id: cid,
+            invCtl: this
+          }).clingTo(this);
+        }, this);
+        if (!this.client.allControls[root.id(cid)]) {
+          mkCtl();
+          this.el.mouseenter(__bind(function() {
+            if (this.invwarn && !this.client.allControls[root.id(cid)]) {
+              return mkCtl();
+            }
+          }, this));
         }
       } else {
+        delete this.invwarn;
         if ((ctl = this.client.allControls[root.id(this.id('invdet'))])) {
           root.removeControl(ctl);
         }
@@ -197,6 +209,18 @@
       return _results;
     };
     Control.prototype.onWindowResize = function(width, height) {};
+    Control.prototype.resetInvoke = function(invWarnCtl) {
+      var lh, root, sub;
+      root = this.root();
+      delete this.invwarn;
+      this.el.removeClass('smio-hasinvwarn');
+      if (invWarnCtl || (invWarnCtl = this.client.allControls[root.id(this.id('invdet'))])) {
+        root.removeControl(invWarnCtl);
+      }
+      if (((lh = this['lh']) != null) && (sub = this.sub('inv'))) {
+        return sub.html(lh + '').removeClass('smio-spin');
+      }
+    };
     Control.prototype.showClinger = function(clinger, clingee) {
       return (!this.parent) || this.parent.showClinger(clinger, clingee);
     };
@@ -298,6 +322,7 @@
       this.syncUpdate = __bind(this.syncUpdate, this);
       this.sub = __bind(this.sub, this);
       this.showClinger = __bind(this.showClinger, this);
+      this.resetInvoke = __bind(this.resetInvoke, this);
       this.onWindowResize = __bind(this.onWindowResize, this);
       this.onLoad = __bind(this.onLoad, this);
       this.onInvokeResult = __bind(this.onInvokeResult, this);

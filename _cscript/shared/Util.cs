@@ -118,11 +118,14 @@ class smio.Util
 			last
 
 	@String:
+		namedHtmlEntities: { 'ß': 'szlig', 'ä': 'auml', 'Ä': 'Auml', 'ö': 'ouml', 'Ö': 'Ouml', 'ü': 'uuml', 'Ü': 'Uuml' }
 		htmlEncode: (str) ->
 			[ret, tmp] = ['', _.escapeHTML(str)]
 			len = tmp.length
 			for c, i in tmp
-				if (cc = tmp.charCodeAt i) > 127
+				if (ent = smio.Util.String.namedHtmlEntities[c])
+					ret += ("&#{ent};")
+				else if (cc = tmp.charCodeAt i) > 127
 					ret += ("&##{cc};")
 				else
 					ret += c

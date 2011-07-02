@@ -20,7 +20,7 @@
           "div .smio-setup": {
             "div .smio-setup-outer .smio-setup-outer-top": {
               "div .smio-setup-header": {
-                html: [this.r('title', 'smio-setup-header-detail', smio.Control.util.jsVoid, this.urlSeg())]
+                html: [this.r('title')]
               },
               "div .smio-setup-header-desc": [this.r('desc')]
             },
@@ -166,17 +166,9 @@
     Packs_Core_ServerSetup_InitialHubSetup.prototype.onLoad = function() {
       var $p1, $p2, $t, $u, _ref;
       Packs_Core_ServerSetup_InitialHubSetup.__super__.onLoad.call(this);
-      $('.smio-setup-header-detail').click(__bind(function() {
-        var nurl, port, urlseg;
-        port = ("" + (this.client.pageUrl.attr('port'))) === '80' ? '' : ":" + (this.client.pageUrl.attr('port'));
-        nurl = prompt(this.r('url_hint', this.client.pageUrl.attr('protocol'), this.client.pageUrl.attr('host'), port), urlseg = this.urlSeg());
-        if ((nurl != null) && (nurl !== null) && ((nurl = smio.Util.String.urlify(_.trim(nurl))) !== urlseg)) {
-          if ((!_.startsWith(nurl, '/')) || (!_.endsWith(nurl, '/'))) {
-            nurl = "/" + (_.trim(nurl, '/')) + "/";
-          }
-          return location.replace(nurl);
-        }
-      }, this));
+      if (this.urlSeg() !== '/') {
+        location.replace('/');
+      }
       _ref = [this.input('user/name'), this.input('user/pass'), this.input('user/pass2'), this.input('hubtitle')], $u = _ref[0], $p1 = _ref[1], $p2 = _ref[2], $t = _ref[3];
       $u.val('test');
       $p1.val('test');

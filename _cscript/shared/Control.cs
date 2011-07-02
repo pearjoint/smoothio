@@ -202,11 +202,14 @@ class smio.Packs_#{className} extends smio.Control
 	invoke: (cmd, args) =>
 		root = @root()
 		@disable(true, true)
+		delete @invwarn
+		@invtime = new Date()
 		@el.addClass('smio-invoking').removeClass('smio-hasinvwarn')
 		if (ctl = @client.allControls[root.id(@id('invdet'))])
 			root.removeControl(ctl)
-		if (sub = @sub('inv')) and (lh = sub.html())
-			@lh = lh
+		if (sub = @sub('inv'))
+			if not @lh and (lh = sub.html())
+				@lh = lh
 			sub.html(smio.Control.util.florette).addClass('smio-spin')
 		@onInvoking(cmd, args)
 		msg = @client.socket.message(args, cmd: [cmd], ctlID: [@id()])
@@ -245,17 +248,20 @@ class smio.Packs_#{className} extends smio.Control
 		@disable(false, true)
 		if (lh = @['lh'])? and (sub = @sub('inv'))
 			sub.html(lh + '').removeClass('smio-spin')
-			@lh = undefined
-			delete @['lh']
 			if errs and errs.length
-				@lh = lh
 				sub.html('<b>&#x26A0;</b>')
 		if errs and errs.length
+			@invwarn = errs
 			@el.addClass('smio-hasinvwarn')
-			if not (ctl = @client.allControls[root.id(cid = @id('invdet'))])
-				ctl = root.addControl('InvokeWarningPopup', id: cid)
-				ctl.clingTo(@)
+			cid = @id('invdet')
+			mkCtl = => root.addControl('InvokeWarningPopup', id: cid, invCtl: @).clingTo(@)
+			if not @client.allControls[root.id(cid)]
+				mkCtl()
+				@el.mouseenter =>
+					if @invwarn and not @client.allControls[root.id(cid)]
+						mkCtl()
 		else
+			delete @invwarn
 			if (ctl = @client.allControls[root.id(@id('invdet'))])
 				root.removeControl(ctl)
 			@el.removeClass('smio-hasinvwarn')
@@ -274,6 +280,15 @@ class smio.Packs_#{className} extends smio.Control
 			ctl.onLoad()
 
 	onWindowResize: (width, height) =>
+
+	resetInvoke: (invWarnCtl) =>
+		root = @root()
+		delete @invwarn
+		@el.removeClass('smio-hasinvwarn')
+		if invWarnCtl or (invWarnCtl = @client.allControls[root.id(@id('invdet'))])
+			root.removeControl(invWarnCtl)
+		if (lh = @['lh'])? and (sub = @sub('inv'))
+			sub.html(lh + '').removeClass('smio-spin')
 
 	showClinger: (clinger, clingee) =>
 		(not @parent) or @parent.showClinger(clinger, clingee)
