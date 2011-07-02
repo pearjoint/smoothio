@@ -257,6 +257,29 @@ body {
   border-radius: 0 0 0.66em 0.66em;
 }
 
+/** server/pub/_packs/Core/Controls/_styl_LinkButtons.css **/
+.smio-bigbutton-strip {
+  text-align: center;
+}
+.smio-bigbutton-strip .smio-bigbutton {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  -moz-box-shadow: inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.15);
+  -webkit-box-shadow: inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.15);
+  box-shadow: inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.15);
+}
+.smio-bigbutton-strip .smio-bigbutton:first-child {
+  -webkit-border-radius: 0.4em 0 0 0.4em;
+  -moz-border-radius: 0.4em 0 0 0.4em;
+  border-radius: 0.4em 0 0 0.4em;
+}
+.smio-bigbutton-strip .smio-bigbutton:last-child {
+  -webkit-border-radius: 0 0.4em 0.4em 0;
+  -moz-border-radius: 0 0.4em 0.4em 0;
+  border-radius: 0 0.4em 0.4em 0;
+}
+
 /** server/pub/_packs/Core/Controls/_styl_SlidePanel.css **/
 div.smio-slidepanel {
   position: relative;
@@ -599,6 +622,8 @@ input.smio-textinput[readonly]:focus {
   color: #505050;
   text-shadow: 0 1px #f0f0f0;
   border: 0.094em outset rgba(255,255,255,0.5);
+  overflow: hidden;
+  white-space: nowrap;
   letter-spacing: -0.05em;
   -webkit-border-radius: 0.25em 0.25em 0.25em 0.25em;
   -moz-border-radius: 0.25em 0.25em 0.25em 0.25em;
@@ -607,12 +632,13 @@ input.smio-textinput[readonly]:focus {
   -webkit-box-shadow: 0 1px 5px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.15);
   box-shadow: 0 1px 5px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.15);
 }
-.smio-bigbutton.smio-invwarn {
+.smio-bigbutton.smio-hasinvwarn {
   background-color: rgba(255,160,0,0.25);
 }
 .smio-bigbutton.smio-enabled:hover,
 .smio-bigbutton.smio-enabled:focus {
   background-color: rgba(128,208,255,0.25);
+  color: #303030;
   -moz-box-shadow: 0 1px 5px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.35);
   -webkit-box-shadow: 0 1px 5px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.35);
   box-shadow: 0 1px 5px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.3), inset 0 10px rgba(255,255,255,0.2), inset 0 10px 20px rgba(255,255,255,0.25), inset 0 -15px 30px rgba(0,0,0,0.35);
@@ -625,13 +651,16 @@ input.smio-textinput[readonly]:focus {
 }
 
 /** server/pub/_packs/Core/Controls/_styl_InvokeWarningPopup.css **/
-.smio-invwarndetails {
-  opacity: 1;
+.smio-invwarn {
+  opacity: 0;
   display: inline-block;
   z-index: 2147483640;
   position: absolute;
+  left: 50%;
+  top: 50%;
   width: auto;
   height: auto;
+  min-width: 20em;
   white-space: normal;
   margin-left: -20px;
   line-height: 0;
@@ -641,7 +670,43 @@ input.smio-textinput[readonly]:focus {
   -ms-transition: all 0.5s;
   transition: all 0.5s;
 }
-a.smio-invwarndetails-close {
+.smio-invwarn-intro {
+  color: #606060;
+  font-size: 0.9em;
+}
+.smio-invwarn-btns {
+  visibility: hidden;
+  padding: 0.66em;
+  overflow: hidden;
+  font-size: 0.9em;
+}
+.smio-invwarn:hover .smio-invwarn-btns {
+  visibility: visible;
+}
+.smio-invwarn-btns a.smio-bigbutton {
+  font-weight: normal;
+  position: relative;
+  padding-left: 1.75em;
+}
+.smio-invwarn-btns a.smio-bigbutton span.smio-invbtn-icon {
+  font-size: 1.4em;
+  opacity: 0.6;
+  display: inline-block;
+  position: absolute;
+  left: 0.2em;
+  top: 0.05em;
+}
+.smio-invwarn-btns a.smio-bigbutton span.smio-invbtn-cancel {
+  color: #800;
+}
+.smio-invwarn-btns a.smio-bigbutton span.smio-invbtn-retry {
+  color: #070;
+}
+.smio-invwarn-msg {
+  padding-top: 0.33em;
+  font-weight: bold;
+}
+a.smio-invwarn-close {
   width: 0.9em;
   height: 0.9em;
   text-align: center;
@@ -652,7 +717,7 @@ a.smio-invwarndetails-close {
   padding-right: 0.1em;
   float: right;
   display: inline-block;
-  opacity: 0;
+  visibility: hidden;
   border: 1px outset transparent;
   -webkit-border-radius: 0.2em;
   -moz-border-radius: 0.2em;
@@ -660,21 +725,19 @@ a.smio-invwarndetails-close {
   overflow: hidden;
   white-space: nowrap;
 }
-.smio-invwarndetails:hover a.smio-invwarndetails-close {
-  opacity: 1;
+.smio-invwarn:hover a.smio-invwarn-close {
+  visibility: visible;
 }
-a.smio-invwarndetails-close:active {
-  opacity: 1;
+a.smio-invwarn-close:active {
   background-color: #fe9;
   border: 1px inset #c0c0c0;
 }
-a.smio-invwarndetails-close:hover,
-a.smio-invwarndetails-close:focus {
-  opacity: 1;
+a.smio-invwarn-close:hover,
+a.smio-invwarn-close:focus {
   background-color: #fe9;
   border: 1px outset #c0c0c0;
 }
-.smio-invwarndetails-edge {
+.smio-invwarn-edge {
   display: inline-block;
   margin-left: 1em;
   height: 1em;
@@ -683,7 +746,7 @@ a.smio-invwarndetails-close:focus {
   overflow: hidden;
   white-space: nowrap;
 }
-.smio-invwarndetails-arr {
+.smio-invwarn-arr {
   background-color: #fe9;
   display: inline-block;
   max-width: 1.5em;
@@ -703,12 +766,12 @@ a.smio-invwarndetails-close:focus {
   -webkit-box-shadow: 0em 0.1em 0.75em #a0a0a0;
   box-shadow: 0em 0.1em 0.75em #a0a0a0;
 }
-.smio-invwarndetails-box {
-  background: -ms-linear-gradient(#fe9, rgba(255,238,153,0.75));
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fe9), to(rgba(255,238,153,0.75)));
-  background: -moz-linear-gradient(#fe9, rgba(255,238,153,0.75));
-  background: -webkit-linear-gradient(#fe9, rgba(255,238,153,0.75));
-  background: -o-linear-gradient(#fe9, rgba(255,238,153,0.75));
+.smio-invwarn-box {
+  background: -ms-linear-gradient(#fe9, rgba(255,238,153,0.9));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fe9), to(rgba(255,238,153,0.9)));
+  background: -moz-linear-gradient(#fe9, rgba(255,238,153,0.9));
+  background: -webkit-linear-gradient(#fe9, rgba(255,238,153,0.9));
+  background: -o-linear-gradient(#fe9, rgba(255,238,153,0.9));
   -moz-box-shadow: 0em 0.1em 0.75em #a0a0a0;
   -webkit-box-shadow: 0em 0.1em 0.75em #a0a0a0;
   box-shadow: 0em 0.1em 0.75em #a0a0a0;
@@ -716,10 +779,10 @@ a.smio-invwarndetails-close:focus {
   -moz-border-radius: 0.5em;
   border-radius: 0.5em;
 }
-.smio-invwarndetails-inner {
+.smio-invwarn-inner {
   line-height: 1.25;
   font-size: 0.8em;
-  padding: 0.66em 0.66em 2em 0.66em;
+  padding: 1.5em 1.5em 0 1.5em;
 }
 
 /** server/pub/_packs/Core/ServerSetup/_styl_InitialHubSetup.css **/

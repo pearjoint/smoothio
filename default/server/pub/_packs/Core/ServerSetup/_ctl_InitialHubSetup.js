@@ -154,6 +154,7 @@
       return this.sub("stepslide/" + sp + "/input");
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.onCreateHubResult = function(errs, result, fresp) {
+      return;
       if (errs) {
         return alert(JSON.stringify(errs));
       } else if (result) {

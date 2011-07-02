@@ -158,8 +158,8 @@ class smio.Packs_#{className} extends smio.Control
 			@client.controlClings[cid] = undefined
 			delete @client.controlClings[cid]
 		else
+			@el.css(opacity: 0)
 			@client.controlClings[cid] = ctl
-			smio.Control.setClingerOpacity(@, ctl)
 		@client.onEverySecond()
 
 	coreDisable: (disable) =>
@@ -202,7 +202,7 @@ class smio.Packs_#{className} extends smio.Control
 	invoke: (cmd, args) =>
 		root = @root()
 		@disable(true, true)
-		@el.addClass('smio-invoking').removeClass('smio-invwarn')
+		@el.addClass('smio-invoking').removeClass('smio-hasinvwarn')
 		if (ctl = @client.allControls[root.id(@id('invdet'))])
 			root.removeControl(ctl)
 		if (sub = @sub('inv')) and (lh = sub.html())
@@ -210,7 +210,7 @@ class smio.Packs_#{className} extends smio.Control
 			sub.html(smio.Control.util.florette).addClass('smio-spin')
 		@onInvoking(cmd, args)
 		msg = @client.socket.message(args, cmd: [cmd], ctlID: [@id()])
-		setTimeout((=> @client.socket.send(msg)), 200)
+		setTimeout((=> @client.socket.send(msg)), 500)
 
 	jsSelf: =>
 		"smio.client.allControls['" + @id() + "']"
@@ -251,14 +251,14 @@ class smio.Packs_#{className} extends smio.Control
 				@lh = lh
 				sub.html('<b>&#x26A0;</b>')
 		if errs and errs.length
-			@el.addClass('smio-invwarn')
+			@el.addClass('smio-hasinvwarn')
 			if not (ctl = @client.allControls[root.id(cid = @id('invdet'))])
 				ctl = root.addControl('InvokeWarningPopup', id: cid)
 				ctl.clingTo(@)
 		else
 			if (ctl = @client.allControls[root.id(@id('invdet'))])
 				root.removeControl(ctl)
-			@el.removeClass('smio-invwarn')
+			@el.removeClass('smio-hasinvwarn')
 		if res and @args?['invoke']?['onResult']
 			@args.invoke.onResult(errs, res, fresp)
 

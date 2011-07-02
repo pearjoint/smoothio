@@ -57,8 +57,7 @@
               clinger.el.css({
                 top: gpos.top,
                 left: gpos.left,
-                width: gw + 'px',
-                'max-width': gw + 'px'
+                width: gw + 'px'
               });
             }
             smio.Control.setClingerOpacity(clinger, clingee);

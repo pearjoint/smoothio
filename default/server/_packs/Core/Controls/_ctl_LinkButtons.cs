@@ -9,8 +9,12 @@ class smio.Packs_Core_Controls_LinkButtons extends smio.Control
 
 
 	renderTemplate: =>
-		'div':
-			html: 'retry or cancel'
+		div = 'div':
+			id: ''
+			class: "#{@args.class}"
+		for itemID, item of @args.items
+			div.div["LinkButton ##{itemID} .#{@args.btnClass}"] = item
+		div
 	
 	
 

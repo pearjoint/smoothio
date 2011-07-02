@@ -14,11 +14,19 @@
   smio.Packs_Core_Controls_LinkButtons = (function() {
     __extends(Packs_Core_Controls_LinkButtons, smio.Control);
     Packs_Core_Controls_LinkButtons.prototype.renderTemplate = function() {
-      return {
+      var div, item, itemID, _ref;
+      div = {
         'div': {
-          html: 'retry or cancel'
+          id: '',
+          "class": "" + this.args["class"]
         }
       };
+      _ref = this.args.items;
+      for (itemID in _ref) {
+        item = _ref[itemID];
+        div.div["LinkButton #" + itemID + " ." + this.args.btnClass] = item;
+      }
+      return div;
     };
     function Packs_Core_Controls_LinkButtons(client, parent, args) {
       this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_LinkButtons.__super__.constructor.call(this, client, parent, args);

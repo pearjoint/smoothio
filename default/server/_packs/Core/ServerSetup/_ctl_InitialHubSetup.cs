@@ -105,6 +105,7 @@ class smio.Packs_Core_ServerSetup_InitialHubSetup extends smio.Control
 		@sub("stepslide/#{sp}/input")
 	
 	onCreateHubResult: (errs, result, fresp) =>
+		return
 		if errs
 			alert JSON.stringify errs
 		else if result

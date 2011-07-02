@@ -95,6 +95,7 @@ input: (sp) =>
 	@sub("stepslide/#{sp}/input")
 
 onCreateHubResult: (errs, result, fresp) =>
+	return
 	if errs
 		alert JSON.stringify errs
 	else if result

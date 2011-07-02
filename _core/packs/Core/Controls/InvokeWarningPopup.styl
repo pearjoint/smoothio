@@ -1,19 +1,58 @@
 $col = #fe9
 $siz = 1.5em
 
-.smio-invwarndetails
-	opacity 1
+.smio-invwarn
+	opacity 0
 	display inline-block
 	z-index 2147483640
 	position absolute
+	left 50%
+	top 50%
 	width auto
 	height auto
+	min-width 20em
 	white-space normal
 	margin-left -20px
 	line-height 0
 	smio-transition all 0.5s
 
-a.smio-invwarndetails-close
+.smio-invwarn-intro
+	color #606060
+	font-size 0.9em
+
+.smio-invwarn-btns
+	visibility hidden
+	padding 0.66em
+	overflow hidden
+	font-size 0.9em
+
+.smio-invwarn:hover .smio-invwarn-btns
+	visibility visible
+
+.smio-invwarn-btns a.smio-bigbutton
+	font-weight normal
+	position relative
+	padding-left 1.75em
+
+.smio-invwarn-btns a.smio-bigbutton span.smio-invbtn-icon
+	font-size 1.4em
+	opacity 0.6
+	display inline-block
+	position absolute
+	left 0.2em
+	top 0.05em
+
+.smio-invwarn-btns a.smio-bigbutton span.smio-invbtn-cancel
+	color #800
+
+.smio-invwarn-btns a.smio-bigbutton span.smio-invbtn-retry
+	color #070
+
+.smio-invwarn-msg
+	padding-top 0.33em
+	font-weight bold
+
+a.smio-invwarn-close
 	width 0.9em
 	height 0.9em
 	text-align center
@@ -24,25 +63,23 @@ a.smio-invwarndetails-close
 	padding-right 0.1em
 	float right
 	display inline-block
-	opacity 0
+	visibility hidden
 	border 1px outset transparent
 	smio-border-radius 0.2em
 	smio-nowrapflow()
 
-.smio-invwarndetails:hover a.smio-invwarndetails-close
-	opacity 1
+.smio-invwarn:hover a.smio-invwarn-close
+	visibility visible
 
-a.smio-invwarndetails-close:active
-	opacity 1
+a.smio-invwarn-close:active
 	background-color $col
 	border 1px inset #c0c0c0
 
-a.smio-invwarndetails-close:hover, a.smio-invwarndetails-close:focus
-	opacity 1
+a.smio-invwarn-close:hover, a.smio-invwarn-close:focus
 	background-color $col
 	border 1px outset #c0c0c0
 
-.smio-invwarndetails-edge
+.smio-invwarn-edge
 	display inline-block
 	margin-left 1em
 	height 1em
@@ -50,7 +87,7 @@ a.smio-invwarndetails-close:hover, a.smio-invwarndetails-close:focus
 	text-align center
 	smio-nowrapflow()
 
-.smio-invwarndetails-arr
+.smio-invwarn-arr
 	background-color $col
 	display inline-block
 	max-width $siz
@@ -60,13 +97,13 @@ a.smio-invwarndetails-close:hover, a.smio-invwarndetails-close:focus
 	smio-nowrapflow()
 	smio-box-shadow 0em 0.1em 0.75em #a0a0a0
 
-.smio-invwarndetails-box
-	smio-background-vgradient rgba($col, 1) rgba($col, 0.75)
+.smio-invwarn-box
+	smio-background-vgradient rgba($col, 1) rgba($col, 0.9)
 	smio-box-shadow 0em 0.1em 0.75em #a0a0a0
 	smio-border-radius 0.5em
 
-.smio-invwarndetails-inner
+.smio-invwarn-inner
 	line-height 1.25
 	font-size 0.8em
-	padding 0.66em 0.66em 2em 0.66em
+	padding 1.5em 1.5em 0 1.5em
 

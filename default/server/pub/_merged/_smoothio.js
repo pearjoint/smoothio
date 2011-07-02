@@ -11064,8 +11064,7 @@ if (!JSON) {
               clinger.el.css({
                 top: gpos.top,
                 left: gpos.left,
-                width: gw + 'px',
-                'max-width': gw + 'px'
+                width: gw + 'px'
               });
             }
             smio.Control.setClingerOpacity(clinger, clingee);
@@ -11412,8 +11411,10 @@ if (!JSON) {
         this.client.controlClings[cid] = void 0;
         delete this.client.controlClings[cid];
       } else {
+        this.el.css({
+          opacity: 0
+        });
         this.client.controlClings[cid] = ctl;
-        smio.Control.setClingerOpacity(this, ctl);
       }
       return this.client.onEverySecond();
     };
@@ -11471,7 +11472,7 @@ if (!JSON) {
       var ctl, lh, msg, root, sub;
       root = this.root();
       this.disable(true, true);
-      this.el.addClass('smio-invoking').removeClass('smio-invwarn');
+      this.el.addClass('smio-invoking').removeClass('smio-hasinvwarn');
       if ((ctl = this.client.allControls[root.id(this.id('invdet'))])) {
         root.removeControl(ctl);
       }
@@ -11486,7 +11487,7 @@ if (!JSON) {
       });
       return setTimeout((__bind(function() {
         return this.client.socket.send(msg);
-      }, this)), 200);
+      }, this)), 500);
     };
     Control.prototype.jsSelf = function() {
       return "smio.client.allControls['" + this.id() + "']";
@@ -11542,7 +11543,7 @@ if (!JSON) {
         }
       }
       if (errs && errs.length) {
-        this.el.addClass('smio-invwarn');
+        this.el.addClass('smio-hasinvwarn');
         if (!(ctl = this.client.allControls[root.id(cid = this.id('invdet'))])) {
           ctl = root.addControl('InvokeWarningPopup', {
             id: cid
@@ -11553,7 +11554,7 @@ if (!JSON) {
         if ((ctl = this.client.allControls[root.id(this.id('invdet'))])) {
           root.removeControl(ctl);
         }
-        this.el.removeClass('smio-invwarn');
+        this.el.removeClass('smio-hasinvwarn');
       }
       if (res && ((_ref = this.args) != null ? (_ref2 = _ref['invoke']) != null ? _ref2['onResult'] : void 0 : void 0)) {
         return this.args.invoke.onResult(errs, res, fresp);
@@ -12548,22 +12549,35 @@ if (!JSON) {
     __extends(Packs_Core_Controls_InvokeWarningPopup, smio.Control);
     Packs_Core_Controls_InvokeWarningPopup.prototype.renderTemplate = function() {
       return {
-        'div .smio-invwarndetails .smio-fade': {
+        'div .smio-invwarn .smio-fade': {
           id: '',
-          'div .smio-invwarndetails-edge': {
-            'div .smio-invwarndetails-arr': {
+          'div .smio-invwarn-edge': {
+            'div .smio-invwarn-arr': {
               html: ['&nbsp;']
             }
           },
-          'div .smio-invwarndetails-box': {
-            'a #close .smio-invwarndetails-close': {
+          'div .smio-invwarn-box': {
+            'a #close .smio-invwarn-close': {
               href: smio.Control.util.jsVoid,
               html: ['&times;']
             },
-            'div .smio-invwarndetails-inner': {
-              html: ['Last attempted <i>5 minutes ago</i>:<br/><br/><b>This server already contains a Hub. Try a complete reload (CTRL+R).</b>'],
-              'div .smio-invwarndetails-btns': {
-                html: ['Retry or Cancel']
+            'div .smio-invwarn-inner': {
+              'div .smio-invwarn-intro': {
+                html: ['Last attempted <i>5 minutes ago</i>:']
+              },
+              'div .smio-invwarn-msg': {
+                html: ['This server already contains a Hub. Try a complete reload (CTRL+R).']
+              },
+              'LinkButtons #btns .smio-invwarn-btns .smio-bigbutton-strip': {
+                btnClass: 'smio-bigbutton',
+                items: {
+                  'retry': {
+                    labelRawHtml: '<span class="smio-invbtn-icon smio-invbtn-retry">&#x27A5;</span> Neuer Versuch'
+                  },
+                  'cancel': {
+                    labelRawHtml: '<span class="smio-invbtn-icon smio-invbtn-cancel">&#x2718;</span> Abbrechen'
+                  }
+                }
               }
             }
           }
@@ -12695,11 +12709,19 @@ if (!JSON) {
   smio.Packs_Core_Controls_LinkButtons = (function() {
     __extends(Packs_Core_Controls_LinkButtons, smio.Control);
     Packs_Core_Controls_LinkButtons.prototype.renderTemplate = function() {
-      return {
+      var div, item, itemID, _ref;
+      div = {
         'div': {
-          html: 'retry or cancel'
+          id: '',
+          "class": "" + this.args["class"]
         }
       };
+      _ref = this.args.items;
+      for (itemID in _ref) {
+        item = _ref[itemID];
+        div.div["LinkButton #" + itemID + " ." + this.args.btnClass] = item;
+      }
+      return div;
     };
     function Packs_Core_Controls_LinkButtons(client, parent, args) {
       this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Controls_LinkButtons.__super__.constructor.call(this, client, parent, args);
@@ -13427,6 +13449,7 @@ if (!JSON) {
       return this.sub("stepslide/" + sp + "/input");
     };
     Packs_Core_ServerSetup_InitialHubSetup.prototype.onCreateHubResult = function(errs, result, fresp) {
+      return;
       if (errs) {
         return alert(JSON.stringify(errs));
       } else if (result) {

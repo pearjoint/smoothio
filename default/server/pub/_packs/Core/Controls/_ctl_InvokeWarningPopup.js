@@ -15,22 +15,35 @@
     __extends(Packs_Core_Controls_InvokeWarningPopup, smio.Control);
     Packs_Core_Controls_InvokeWarningPopup.prototype.renderTemplate = function() {
       return {
-        'div .smio-invwarndetails .smio-fade': {
+        'div .smio-invwarn .smio-fade': {
           id: '',
-          'div .smio-invwarndetails-edge': {
-            'div .smio-invwarndetails-arr': {
+          'div .smio-invwarn-edge': {
+            'div .smio-invwarn-arr': {
               html: ['&nbsp;']
             }
           },
-          'div .smio-invwarndetails-box': {
-            'a #close .smio-invwarndetails-close': {
+          'div .smio-invwarn-box': {
+            'a #close .smio-invwarn-close': {
               href: smio.Control.util.jsVoid,
               html: ['&times;']
             },
-            'div .smio-invwarndetails-inner': {
-              html: ['Last attempted <i>5 minutes ago</i>:<br/><br/><b>This server already contains a Hub. Try a complete reload (CTRL+R).</b>'],
-              'div .smio-invwarndetails-btns': {
-                html: ['Retry or Cancel']
+            'div .smio-invwarn-inner': {
+              'div .smio-invwarn-intro': {
+                html: ['Last attempted <i>5 minutes ago</i>:']
+              },
+              'div .smio-invwarn-msg': {
+                html: ['This server already contains a Hub. Try a complete reload (CTRL+R).']
+              },
+              'LinkButtons #btns .smio-invwarn-btns .smio-bigbutton-strip': {
+                btnClass: 'smio-bigbutton',
+                items: {
+                  'retry': {
+                    labelRawHtml: '<span class="smio-invbtn-icon smio-invbtn-retry">&#x27A5;</span> Neuer Versuch'
+                  },
+                  'cancel': {
+                    labelRawHtml: '<span class="smio-invbtn-icon smio-invbtn-cancel">&#x2718;</span> Abbrechen'
+                  }
+                }
               }
             }
           }
