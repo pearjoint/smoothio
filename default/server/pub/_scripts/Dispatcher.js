@@ -2,8 +2,8 @@
   var smio;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   smio = global.smoothio;
-  smio.Socket = (function() {
-    function Socket(client, isSocketIO, host, secure, port) {
+  smio.Dispatcher = (function() {
+    function Dispatcher(client, isSocketIO, host, secure, port) {
       var opts;
       this.client = client;
       this.setTimer = __bind(this.setTimer, this);
@@ -85,7 +85,7 @@
         };
       }
     }
-    Socket.prototype.connect = function() {
+    Dispatcher.prototype.connect = function() {
       this.ready = true;
       $('#smio_offline').attr('title', smio.resources.smoothio.connecting_hint);
       if (this.socket) {
@@ -98,18 +98,18 @@
         return this.poll.send(this.messageFetch());
       }
     };
-    Socket.prototype.message = function(msg, funcs) {
+    Dispatcher.prototype.message = function(msg, funcs) {
       return new smio.FetchRequestMessage(msg, smio.Util.Object.mergeDefaults(funcs, {
         url: ["/"]
       }));
     };
-    Socket.prototype.messageFetch = function() {
+    Dispatcher.prototype.messageFetch = function() {
       return this.message({}, {
         cmd: 'f',
         ticks: this.lastFetchTime
       });
     };
-    Socket.prototype.onError = function(xhr, textStatus, error, freq) {
+    Dispatcher.prototype.onError = function(xhr, textStatus, error, freq) {
       var cid, ctl;
       if (!this.poll) {
         return alert(JSON.stringify(xhr));
@@ -137,7 +137,7 @@
         }
       }
     };
-    Socket.prototype.onOffline = function() {
+    Dispatcher.prototype.onOffline = function() {
       this.offline++;
       if (this.offline === (this.poll ? 1 : 2)) {
         $('#smio_favicon').attr({
@@ -146,7 +146,7 @@
         return $('#smio_offline').show();
       }
     };
-    Socket.prototype.onOnline = function() {
+    Dispatcher.prototype.onOnline = function() {
       if (this.offline) {
         this.offline = 0;
         $('#smio_favicon').attr({
@@ -158,7 +158,7 @@
         }
       }
     };
-    Socket.prototype.onMessage = function(msg, textStatus, xhr) {
+    Dispatcher.prototype.onMessage = function(msg, textStatus, xhr) {
       var cfg, cid, ctl, ctls, data, err, fresp;
       this.onOnline();
       data = null;
@@ -211,41 +211,41 @@
         }
       }
     };
-    Socket.prototype.onSleepy = function(sleepy) {
+    Dispatcher.prototype.onSleepy = function(sleepy) {
       if (this.ready && this.poll) {
         return this.setTimer();
       }
     };
-    Socket.prototype.onSocketClose = function() {};
-    Socket.prototype.onSocketConnect = function() {
+    Dispatcher.prototype.onSocketClose = function() {};
+    Dispatcher.prototype.onSocketConnect = function() {
       return this.onOnline();
     };
-    Socket.prototype.onSocketConnectFailed = function() {
+    Dispatcher.prototype.onSocketConnectFailed = function() {
       return this.onOffline();
     };
-    Socket.prototype.onSocketConnecting = function(type) {
+    Dispatcher.prototype.onSocketConnecting = function(type) {
       return this.onOffline();
     };
-    Socket.prototype.onSocketDisconnect = function() {
+    Dispatcher.prototype.onSocketDisconnect = function() {
       return this.onOffline();
     };
-    Socket.prototype.onSocketReconnect = function() {
+    Dispatcher.prototype.onSocketReconnect = function() {
       return this.onOnline();
     };
-    Socket.prototype.onSocketReconnectFailed = function() {
+    Dispatcher.prototype.onSocketReconnectFailed = function() {
       return this.onOffline();
     };
-    Socket.prototype.onSocketReconnecting = function() {
+    Dispatcher.prototype.onSocketReconnecting = function() {
       return this.onOffline();
     };
-    Socket.prototype.send = function(freq) {
+    Dispatcher.prototype.send = function(freq) {
       if (this.socket) {
         return this.socket.send(JSON.stringify(freq.msg));
       } else if (this.poll) {
         return this.poll.send(freq);
       }
     };
-    Socket.prototype.setTimer = function(fn) {
+    Dispatcher.prototype.setTimer = function(fn) {
       var pi, val;
       pi = this.poll.interval;
       if (!fn) {
@@ -264,6 +264,6 @@
         return pi.handle = setInterval(fn, val);
       }
     };
-    return Socket;
+    return Dispatcher;
   })();
 }).call(this);

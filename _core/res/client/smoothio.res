@@ -17,6 +17,6 @@
 ,	"natlangtime_MM"				:	"%d months"
 ,	"natlangtime_y"					:	"a year"
 ,	"natlangtime_yy"				:	"%d years"
-,	"timeout"						:	"This request timed out before receiving a response from the server, and may or may not have been processed by now."
+,	"timeout"						:	"This request <b>timed out</b> before receiving a response from the server, and <b>may or may not have been processed</b> by now."
 }
 

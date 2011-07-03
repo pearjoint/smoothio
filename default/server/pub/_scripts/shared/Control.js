@@ -33,7 +33,7 @@
         });
         this.client.controlClings[cid] = ctl;
       }
-      return this.client.onEverySecond();
+      return this.client.doPageFixups();
     };
     Control.prototype.coreDisable = function(disable) {};
     Control.prototype.ctl = function(ctlID) {
@@ -102,12 +102,12 @@
         sub.html(smio.Control.util.florette).addClass('smio-spin');
       }
       this.onInvoking(cmd, args);
-      msg = this.client.socket.message(args, {
+      msg = this.client.disp.message(args, {
         cmd: [cmd],
         ctlID: [this.id()]
       });
       return setTimeout((__bind(function() {
-        return this.client.socket.send(msg);
+        return this.client.disp.send(msg);
       }, this)), 500);
     };
     Control.prototype.jsSelf = function() {

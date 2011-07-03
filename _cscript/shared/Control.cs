@@ -160,7 +160,7 @@ class smio.Packs_#{className} extends smio.Control
 		else
 			@el.css(opacity: 0)
 			@client.controlClings[cid] = ctl
-		@client.onEverySecond()
+		@client.doPageFixups()
 
 	coreDisable: (disable) =>
 
@@ -212,8 +212,8 @@ class smio.Packs_#{className} extends smio.Control
 				@lh = lh
 			sub.html(smio.Control.util.florette).addClass('smio-spin')
 		@onInvoking(cmd, args)
-		msg = @client.socket.message(args, cmd: [cmd], ctlID: [@id()])
-		setTimeout((=> @client.socket.send(msg)), 500)
+		msg = @client.disp.message(args, cmd: [cmd], ctlID: [@id()])
+		setTimeout((=> @client.disp.send(msg)), 500)
 
 	jsSelf: =>
 		"smio.client.allControls['" + @id() + "']"

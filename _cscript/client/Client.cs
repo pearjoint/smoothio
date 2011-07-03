@@ -6,6 +6,7 @@ class smio.Client
 		@sleepy = false
 		@allControls = {}
 		@controlClings = {}
+		@lastFixup = 0
 		@pageWindow = $(window)
 		@pageBody = $('#smio_body')
 		cookie = $.cookie('smoo')
@@ -17,21 +18,12 @@ class smio.Client
 		if not @smioCookie
 			@smioCookie = {}
 		@sessionID = @smioCookie['sessid']
-		@socket = new smio.Socket(@, false)
+		@disp = new smio.Dispatcher(@, false)
 		@pageWindow.resize(_.debounce((=> @onWindowResize()), 300))
 		@recalcing = false
 
-	init: =>
-		for k of _date.relativeTime
-			if (tl = smio.resources.smoothio["natlangtime_#{k}"])
-				_date.relativeTime[k] = tl
-		$.ajaxSetup(timeout: 3000)
-		$('#smio_offline_msg').text(smio.resources.smoothio.connecting)
-		@socket.connect()
-		setInterval(@onEverySecond, 750)
-
-	onEverySecond: =>
-		if not @recalcing
+	doPageFixups: =>
+		if (not @recalcing) and ((not @sleepy) or ((new Date().getTime() - @lastFixup) >= 5000))
 			@recalcing = true
 			$('.smio-dt').each (i, span) =>
 				$span = $(span)
@@ -46,7 +38,17 @@ class smio.Client
 					if (gpos.left isnt spos.left) or (gpos.top isnt spos.top) or (gw isnt sw)
 						clinger.el.css(top: gpos.top, left: gpos.left, width: gw + 'px')
 					smio.Control.setClingerOpacity(clinger, clingee)
+			@lastFixup = new Date().getTime()
 			@recalcing = false
+
+	init: =>
+		for k of _date.relativeTime
+			if (tl = smio.resources.smoothio["natlangtime_#{k}"])
+				_date.relativeTime[k] = tl
+		$.ajaxSetup(timeout: 3000)
+		$('#smio_offline_msg').text(smio.resources.smoothio.connecting)
+		@disp.connect()
+		setInterval(@doPageFixups, 750)
 
 	onWindowResize: =>
 		[w, h] = [@pageWindow.width(), @pageWindow.height()]

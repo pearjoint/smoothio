@@ -6,11 +6,12 @@
     function Client() {
       this.syncControls = __bind(this.syncControls, this);
       this.onWindowResize = __bind(this.onWindowResize, this);
-      this.onEverySecond = __bind(this.onEverySecond, this);
-      this.init = __bind(this.init, this);      var cookie;
+      this.init = __bind(this.init, this);
+      this.doPageFixups = __bind(this.doPageFixups, this);      var cookie;
       this.sleepy = false;
       this.allControls = {};
       this.controlClings = {};
+      this.lastFixup = 0;
       this.pageWindow = $(window);
       this.pageBody = $('#smio_body');
       cookie = $.cookie('smoo');
@@ -24,29 +25,15 @@
         this.smioCookie = {};
       }
       this.sessionID = this.smioCookie['sessid'];
-      this.socket = new smio.Socket(this, false);
+      this.disp = new smio.Dispatcher(this, false);
       this.pageWindow.resize(_.debounce((__bind(function() {
         return this.onWindowResize();
       }, this)), 300));
       this.recalcing = false;
     }
-    Client.prototype.init = function() {
-      var k, tl;
-      for (k in _date.relativeTime) {
-        if ((tl = smio.resources.smoothio["natlangtime_" + k])) {
-          _date.relativeTime[k] = tl;
-        }
-      }
-      $.ajaxSetup({
-        timeout: 3000
-      });
-      $('#smio_offline_msg').text(smio.resources.smoothio.connecting);
-      this.socket.connect();
-      return setInterval(this.onEverySecond, 750);
-    };
-    Client.prototype.onEverySecond = function() {
+    Client.prototype.doPageFixups = function() {
       var clingee, clinger, clingerID, gpos, gw, spos, sw, tpos, _ref;
-      if (!this.recalcing) {
+      if ((!this.recalcing) && ((!this.sleepy) || ((new Date().getTime() - this.lastFixup) >= 5000))) {
         this.recalcing = true;
         $('.smio-dt').each(__bind(function(i, span) {
           var $span, dt;
@@ -76,8 +63,23 @@
             smio.Control.setClingerOpacity(clinger, clingee);
           }
         }
+        this.lastFixup = new Date().getTime();
         return this.recalcing = false;
       }
+    };
+    Client.prototype.init = function() {
+      var k, tl;
+      for (k in _date.relativeTime) {
+        if ((tl = smio.resources.smoothio["natlangtime_" + k])) {
+          _date.relativeTime[k] = tl;
+        }
+      }
+      $.ajaxSetup({
+        timeout: 3000
+      });
+      $('#smio_offline_msg').text(smio.resources.smoothio.connecting);
+      this.disp.connect();
+      return setInterval(this.doPageFixups, 750);
     };
     Client.prototype.onWindowResize = function() {
       var ctl, h, id, w, _ref, _ref2, _results;

@@ -7,11 +7,13 @@ node_os = require 'os'
 node_static = require 'node-static'
 node_url = require 'url'
 node_util = require 'util'
-#socketio = require 'socket.io'
+socketio = require 'socket.io'
 smio = global.smoothio
 
 class smio.Server
 	@sockSessions: {}
+
+	tryrequire: (name) -> try require(name)
 
 	constructor: (@inst, @serverName, @hostName, @port, @processes) ->
 		hostName = @hostName
@@ -39,7 +41,7 @@ class smio.Server
 			sockLogger = smio.Util.Server.setupLogFile(@, 'sockLogFile', false, sockLogPath, (msg) -> msg)
 		else
 			sockLogger = ->
-		@socket = null # socketio.listen(@httpServer, resource: '/_/sockio/', flashPolicyServer: false, log: sockLogger)
+		@socket = socketio.listen(@httpServer, resource: '/_/sockio/', flashPolicyServer: false, log: sockLogger)
 		if @socket
 			@socket.on 'clientConnect', (client) => @onSocketConnect(client)
 			@socket.on 'clientDisconnect', (client) => @onSocketDisconnect(client)

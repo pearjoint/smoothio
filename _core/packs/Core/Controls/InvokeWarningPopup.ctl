@@ -3,6 +3,7 @@
 #if client
 
 renderTemplate: =>
+	noQuote = _.any(@args.errs, (e) -> e is smio.resources.smoothio.timeout)
 	'div .$CC .smio-fade':
 		id: ''
 		'div .$CC-edge':
@@ -21,7 +22,7 @@ renderTemplate: =>
 						dt: @args.invCtl.invtime
 					'span .__2':
 						html: [@r 'invwarn_lasttried2']
-				'div .$CC-msg': smio.Util.Array.toObject(@args.errs, ((v, i) -> "div .$CC-msg-text .__#{i}"), ((v) -> _: [v]))
+				'div .$CC-msg': smio.Util.Array.toObject(@args.errs, ((v, i) -> "div .$CC-msg-#{if noQuote then 'noquote' else 'quote'} .__#{i}"), ((v) -> html: [v]))
 				'LinkButtons #btns .$CC-btns .smio-bigbutton-strip':
 					btnClass: 'smio-bigbutton'
 					items:

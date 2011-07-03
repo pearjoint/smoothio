@@ -1,6 +1,6 @@
 smio = global.smoothio
 
-class smio.Socket
+class smio.Dispatcher
 	constructor: (@client, isSocketIO, host, secure, port) ->
 		@ready = false
 		@offline = 1

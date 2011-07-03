@@ -1,5 +1,5 @@
 (function() {
-  var node_http, node_multi, node_os, node_static, node_url, node_util, smio;
+  var node_http, node_multi, node_os, node_static, node_url, node_util, smio, socketio;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   require('./RequestContext');
   require('./Session');
@@ -9,9 +9,15 @@
   node_static = require('node-static');
   node_url = require('url');
   node_util = require('util');
+  socketio = require('socket.io');
   smio = global.smoothio;
   smio.Server = (function() {
     Server.sockSessions = {};
+    Server.prototype.tryrequire = function(name) {
+      try {
+        return require(name);
+      } catch (_e) {}
+    };
     function Server(inst, serverName, hostName, port, processes) {
       var host, ip, localHostName, sockLogPath, sockLogger, _ref;
       this.inst = inst;
@@ -71,7 +77,11 @@
       } else {
         sockLogger = function() {};
       }
-      this.socket = null;
+      this.socket = socketio.listen(this.httpServer, {
+        resource: '/_/sockio/',
+        flashPolicyServer: false,
+        log: sockLogger
+      });
       if (this.socket) {
         this.socket.on('clientConnect', __bind(function(client) {
           return this.onSocketConnect(client);

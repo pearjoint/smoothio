@@ -1,3 +1,7 @@
+IDEAS:
+SPB Shell 3D:
+2-state Widgets Folders Panels <-> Tray
+
 USE CASES
 http://successfulsoftware.net/2011/06/08/3-low-competition-niches-in-retail-software/
 http://gigaom.com/collaboration/tout-helps-to-template-schedule-and-optimize-your-email/

@@ -14,6 +14,10 @@
   smio.Packs_Core_Controls_InvokeWarningPopup = (function() {
     __extends(Packs_Core_Controls_InvokeWarningPopup, smio.Control);
     Packs_Core_Controls_InvokeWarningPopup.prototype.renderTemplate = function() {
+      var noQuote;
+      noQuote = _.any(this.args.errs, function(e) {
+        return e === smio.resources.smoothio.timeout;
+      });
       return {
         'div .smio-invwarn .smio-fade': {
           id: '',
@@ -41,10 +45,10 @@
                 }
               },
               'div .smio-invwarn-msg': smio.Util.Array.toObject(this.args.errs, (function(v, i) {
-                return "div .smio-invwarn-msg-text .__" + i;
+                return "div .smio-invwarn-msg-" + (noQuote ? 'noquote' : 'quote') + " .__" + i;
               }), (function(v) {
                 return {
-                  _: [v]
+                  html: [v]
                 };
               })),
               'LinkButtons #btns .smio-invwarn-btns .smio-bigbutton-strip': {
