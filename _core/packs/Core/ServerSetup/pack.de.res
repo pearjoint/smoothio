@@ -1,8 +1,8 @@
 {
 	"___resource_file_intro"		:	"This formatting ensures no JSON-required commas or colons are ever missed. To add new resources, copy&paste the next line."
 ,	"x"								:	"y"
-,	"title"							:	"Einrichten Ihres ersten Hubs"
-,	"desc"							:	"Dieser Server enthält noch keine Hubs. Erstellen Sie jetzt einen:"
+,	"title"							:	"Einrichten Ihres Stamm-Hubs"
+,	"desc"							:	"Dieser Server enthält noch keine Hubs. Erstellen Sie jetzt seinen Stamm-Hub:"
 ,	"owner_name"					:	"Benutzername:"
 ,	"owner_namehint"				:	"z.B. „MusterMax“ oder „admin“ etc..."
 ,	"owner_pass"					:	"Kennwort:"

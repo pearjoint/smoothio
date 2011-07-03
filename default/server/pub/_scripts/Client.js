@@ -31,8 +31,14 @@
       this.recalcing = false;
     }
     Client.prototype.init = function() {
+      var k, tl;
+      for (k in _date.relativeTime) {
+        if ((tl = smio.resources.smoothio["natlangtime_" + k])) {
+          _date.relativeTime[k] = tl;
+        }
+      }
       $.ajaxSetup({
-        timeout: 10000
+        timeout: 3000
       });
       $('#smio_offline_msg').text(smio.resources.smoothio.connecting);
       this.socket.connect();
@@ -42,6 +48,13 @@
       var clingee, clinger, clingerID, gpos, gw, spos, sw, tpos, _ref;
       if (!this.recalcing) {
         this.recalcing = true;
+        $('.smio-dt').each(__bind(function(i, span) {
+          var $span, dt;
+          $span = $(span);
+          if ((dt = smio.Util.Number.tryParse($span.attr('data-dt'), 0))) {
+            return $span.text(_date(dt).fromNow());
+          }
+        }, this));
         _ref = this.controlClings;
         for (clingerID in _ref) {
           clingee = _ref[clingerID];

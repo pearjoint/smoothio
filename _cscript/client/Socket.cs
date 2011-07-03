@@ -101,7 +101,7 @@ class smio.Socket
 				@client.syncControls(ctls)
 			if (cfg = fresp.settings())
 				if @poll and cfg.fi
-					@poll.interval.val = smio.Util.Number.tryParseInt(cfg.fi, 16000, (iv) -> (iv > 100) and (iv < 12000000))
+					@poll.interval.val = smio.Util.Number.tryParse(cfg.fi, 16000, (iv) -> (iv > 100) and (iv < 12000000))
 					@setTimer()
 				if cfg.bg
 					@client.pageBody.css('background-image': "url('#{cfg.bg}')")

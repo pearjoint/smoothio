@@ -195,7 +195,7 @@
         }
         if ((cfg = fresp.settings())) {
           if (this.poll && cfg.fi) {
-            this.poll.interval.val = smio.Util.Number.tryParseInt(cfg.fi, 16000, function(iv) {
+            this.poll.interval.val = smio.Util.Number.tryParse(cfg.fi, 16000, function(iv) {
               return (iv > 100) && (iv < 12000000);
             });
             this.setTimer();

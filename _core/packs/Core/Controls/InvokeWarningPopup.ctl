@@ -15,9 +15,13 @@ renderTemplate: =>
 				html: ['&times;']
 			'div .$CC-inner':
 				'div .$CC-intro':
-					html: [@r('invwarn_lasttried', @args.invCtl.invtime.getTime(), JSON.stringify(@args.invCtl.invtime))]
-				'div .$CC-msg':
-					html: ['This server already contains a Hub. Try a complete reload (CTRL+R).']
+					'span .__1':
+						html: [@r 'invwarn_lasttried1']
+					'NatLangTime #dt':
+						dt: @args.invCtl.invtime
+					'span .__2':
+						html: [@r 'invwarn_lasttried2']
+				'div .$CC-msg': smio.Util.Array.toObject(@args.errs, ((v, i) -> "div .$CC-msg-text .__#{i}"), ((v) -> _: [v]))
 				'LinkButtons #btns .$CC-btns .smio-bigbutton-strip':
 					btnClass: 'smio-bigbutton'
 					items:

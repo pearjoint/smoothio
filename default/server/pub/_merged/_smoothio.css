@@ -683,6 +683,9 @@ input.smio-textinput[readonly]:focus {
 .smio-invwarn:hover .smio-invwarn-btns {
   visibility: visible;
 }
+.smio-invwarn-btns.smio-bigbutton-strip {
+  text-align: right;
+}
 .smio-invwarn-btns a.smio-bigbutton {
   font-weight: normal;
   letter-spacing: 0;
@@ -704,6 +707,20 @@ input.smio-textinput[readonly]:focus {
   color: #070;
 }
 .smio-invwarn-msg {
+  padding-top: 0.33em;
+  font-weight: bold;
+}
+.smio-invwarn-msg-text:before,
+.smio-invwarn-msg-text:after {
+  color: #a0a0a0;
+}
+.smio-invwarn-msg-text:before {
+  content: "❝";
+}
+.smio-invwarn-msg-text:after {
+  content: "❞";
+}
+.smio-invwarn-msg-text {
   padding-top: 0.33em;
   font-weight: bold;
 }
@@ -768,11 +785,11 @@ a.smio-invwarn-close:focus {
   box-shadow: 0em 0.1em 0.75em #a0a0a0;
 }
 .smio-invwarn-box {
-  background: -ms-linear-gradient(#fe9, rgba(255,238,153,0.85));
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fe9), to(rgba(255,238,153,0.85)));
-  background: -moz-linear-gradient(#fe9, rgba(255,238,153,0.85));
-  background: -webkit-linear-gradient(#fe9, rgba(255,238,153,0.85));
-  background: -o-linear-gradient(#fe9, rgba(255,238,153,0.85));
+  background: -ms-linear-gradient(#fe9, rgba(255,238,153,0.8));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fe9), to(rgba(255,238,153,0.8)));
+  background: -moz-linear-gradient(#fe9, rgba(255,238,153,0.8));
+  background: -webkit-linear-gradient(#fe9, rgba(255,238,153,0.8));
+  background: -o-linear-gradient(#fe9, rgba(255,238,153,0.8));
   -moz-box-shadow: 0em 0.1em 0.75em #a0a0a0;
   -webkit-box-shadow: 0em 0.1em 0.75em #a0a0a0;
   box-shadow: 0em 0.1em 0.75em #a0a0a0;
@@ -783,7 +800,8 @@ a.smio-invwarn-close:focus {
 .smio-invwarn-inner {
   line-height: 1.25;
   font-size: 0.8em;
-  padding: 1.5em 1.5em 0 1.5em;
+  padding: 1.5em 0 0.25em 2em;
+  overflow: hidden;
 }
 
 /** server/pub/_packs/Core/ServerSetup/_styl_InitialHubSetup.css **/

@@ -69,8 +69,6 @@
     Hub.prototype.invoke = function(cmd, freq, fresp, cb) {
       smio.logit("INVOKE cmd: " + (JSON.stringify(cmd)));
       smio.logit("INVOKE freq: " + (JSON.stringify(freq)));
-      throw new Error('test error');
-      smio.logit("WOOMOO");
       return setTimeout((function() {
         return cb(null, null);
       }), 99999999);

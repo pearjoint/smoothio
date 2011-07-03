@@ -36,7 +36,7 @@ class smio.RequestContext
 
 	handleRequest: =>
 		#date.setTime date.getTime() + (@server.inst.config.session.timeout * 60 * 1000)
-		#expires=#{smio.Util.DateTime.addMinutes(smio.Util.Number.tryParseInt(@inst.config.session.timeout, 20)).toGMTString()}
+		#expires=#{smio.Util.DateTime.addMinutes(smio.Util.Number.tryParse(@inst.config.session.timeout, 20)).toGMTString()}
 		@inst.lastRequestTime = new Date()
 		if not @smioCookie['sessid']
 			@smioCookie['sessid'] = node_uuid()

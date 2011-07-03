@@ -254,7 +254,7 @@ class smio.Packs_#{className} extends smio.Control
 			@invwarn = errs
 			@el.addClass('smio-hasinvwarn')
 			cid = @id('invdet')
-			mkCtl = => root.addControl('InvokeWarningPopup', id: cid, invCtl: @).clingTo(@)
+			mkCtl = => root.addControl('InvokeWarningPopup', id: cid, invCtl: @, errs: _.map(errs, (e) -> if _.isString(e) then e else if ((e.textStatus is 'timeout') or (e.error is 'timeout')) then smio.resources.smoothio.timeout else if e.message then e.message else JSON.stringify(smio.Util.Object.exclude(e, 'xhr')))).clingTo(@)
 			if not @client.allControls[root.id(cid)]
 				mkCtl()
 				@el.mouseenter =>

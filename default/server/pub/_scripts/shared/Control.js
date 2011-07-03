@@ -167,7 +167,18 @@
         mkCtl = __bind(function() {
           return root.addControl('InvokeWarningPopup', {
             id: cid,
-            invCtl: this
+            invCtl: this,
+            errs: _.map(errs, function(e) {
+              if (_.isString(e)) {
+                return e;
+              } else if ((e.textStatus === 'timeout') || (e.error === 'timeout')) {
+                return smio.resources.smoothio.timeout;
+              } else if (e.message) {
+                return e.message;
+              } else {
+                return JSON.stringify(smio.Util.Object.exclude(e, 'xhr'));
+              }
+            })
           }).clingTo(this);
         }, this);
         if (!this.client.allControls[root.id(cid)]) {

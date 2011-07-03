@@ -29,6 +29,9 @@ $siz = 1.5em
 .smio-invwarn:hover .smio-invwarn-btns
 	visibility visible
 
+.smio-invwarn-btns.smio-bigbutton-strip
+	text-align right
+
 .smio-invwarn-btns a.smio-bigbutton
 	font-weight normal
 	letter-spacing 0
@@ -50,6 +53,19 @@ $siz = 1.5em
 	color #070
 
 .smio-invwarn-msg
+	padding-top 0.33em
+	font-weight bold
+
+.smio-invwarn-msg-text:before, .smio-invwarn-msg-text:after
+	color #A0A0A0
+
+.smio-invwarn-msg-text:before
+	content '❝'
+
+.smio-invwarn-msg-text:after
+	content: '❞'
+
+.smio-invwarn-msg-text
 	padding-top 0.33em
 	font-weight bold
 
@@ -99,12 +115,13 @@ a.smio-invwarn-close:hover, a.smio-invwarn-close:focus
 	smio-box-shadow 0em 0.1em 0.75em #a0a0a0
 
 .smio-invwarn-box
-	smio-background-vgradient rgba($col, 1) rgba($col, 0.85)
+	smio-background-vgradient rgba($col, 1) rgba($col, 0.8)
 	smio-box-shadow 0em 0.1em 0.75em #a0a0a0
 	smio-border-radius 0.5em
 
 .smio-invwarn-inner
 	line-height 1.25
 	font-size 0.8em
-	padding 1.5em 1.5em 0 1.5em
+	padding 1.5em 0 0.25em 2em
+	overflow hidden
 

@@ -22,7 +22,10 @@ class smio.Client
 		@recalcing = false
 
 	init: =>
-		$.ajaxSetup(timeout: 10000)
+		for k of _date.relativeTime
+			if (tl = smio.resources.smoothio["natlangtime_#{k}"])
+				_date.relativeTime[k] = tl
+		$.ajaxSetup(timeout: 3000)
 		$('#smio_offline_msg').text(smio.resources.smoothio.connecting)
 		@socket.connect()
 		setInterval(@onEverySecond, 750)
@@ -30,6 +33,10 @@ class smio.Client
 	onEverySecond: =>
 		if not @recalcing
 			@recalcing = true
+			$('.smio-dt').each (i, span) =>
+				$span = $(span)
+				if (dt = smio.Util.Number.tryParse($span.attr('data-dt'), 0))
+					$span.text(_date(dt).fromNow())
 			for clingerID, clingee of @controlClings
 				clinger = @allControls[clingerID]
 				if clinger and clingee and clinger.el and clingee.el and (tpos = clingee.el.offset()) and (spos = clinger.el.offset())

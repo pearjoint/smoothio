@@ -30,11 +30,23 @@
             },
             'div .smio-invwarn-inner': {
               'div .smio-invwarn-intro': {
-                html: [this.r('invwarn_lasttried', this.args.invCtl.invtime.getTime(), JSON.stringify(this.args.invCtl.invtime))]
+                'span .__1': {
+                  html: [this.r('invwarn_lasttried1')]
+                },
+                'NatLangTime #dt': {
+                  dt: this.args.invCtl.invtime
+                },
+                'span .__2': {
+                  html: [this.r('invwarn_lasttried2')]
+                }
               },
-              'div .smio-invwarn-msg': {
-                html: ['This server already contains a Hub. Try a complete reload (CTRL+R).']
-              },
+              'div .smio-invwarn-msg': smio.Util.Array.toObject(this.args.errs, (function(v, i) {
+                return "div .smio-invwarn-msg-text .__" + i;
+              }), (function(v) {
+                return {
+                  _: [v]
+                };
+              })),
               'LinkButtons #btns .smio-invwarn-btns .smio-bigbutton-strip': {
                 btnClass: 'smio-bigbutton',
                 items: {

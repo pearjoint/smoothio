@@ -55,12 +55,12 @@
       removeLast: function(arr) {
         return arr.slice(0, arr.length - 1);
       },
-      toObject: function(arr, keyGen) {
+      toObject: function(arr, keyGen, valGen) {
         var i, obj, v, _len;
         obj = {};
         for (i = 0, _len = arr.length; i < _len; i++) {
           v = arr[i];
-          obj[keyGen(v, i)] = v;
+          obj[keyGen ? keyGen(v, i) : i] = valGen ? valGen(v, i) : v;
         }
         return obj;
       }
@@ -72,6 +72,18 @@
         }
         dt.setTime(dt.getTime() + (minutes * 60 * 1000));
         return dt;
+      },
+      stringify: function(dt) {
+        var s;
+        if (!dt) {
+          dt = new Date();
+        }
+        s = JSON.stringify(dt);
+        if (_.startsWith(s, '"') && _.endsWith(s, '"')) {
+          return s.substr(1, s.length - 2);
+        } else {
+          return s;
+        }
       },
       ticks: function(dt) {
         if (!dt) {
@@ -127,7 +139,7 @@
       randomInt: function(max) {
         return Math.floor(Math.random() * (max + 1));
       },
-      tryParseInt: function(val, def, validate) {
+      tryParse: function(val, def, validate) {
         var num;
         num = parseInt("" + val);
         if (validate && !validate(num)) {
@@ -158,6 +170,13 @@
           return false;
         }
         return true;
+      },
+      exclude: function() {
+        var keys, obj;
+        obj = arguments[0], keys = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+        return smio.Util.Object.cloneFiltered(obj, function(k, v) {
+          return !(__indexOf.call(keys, k) >= 0);
+        });
       },
       isObject: function(o, checkArr) {
         return (typeof o === 'object') && ((!checkArr) || !_.isArray(o));

@@ -37,10 +37,10 @@ class smio.Util
 			val in arr
 		removeLast: (arr) ->
 			arr[0...(arr.length - 1)]
-		toObject: (arr, keyGen) ->
+		toObject: (arr, keyGen, valGen) ->
 			obj = {}
 			for v, i in arr
-				obj[keyGen(v, i)] = v
+				obj[if keyGen then keyGen(v, i) else i] = if valGen then valGen(v, i) else v
 			obj
 
 	@DateTime:
@@ -49,6 +49,11 @@ class smio.Util
 				dt = new Date()
 			dt.setTime(dt.getTime() + (minutes * 60 * 1000))
 			dt
+		stringify: (dt) ->
+			if not dt
+				dt = new Date()
+			s = JSON.stringify(dt)
+			if _.startsWith(s, '"') and _.endsWith(s, '"') then s.substr(1, s.length - 2) else s
 		ticks: (dt) ->
 			if not dt
 				dt = new Date()
@@ -80,7 +85,7 @@ class smio.Util
 	@Number:
 		randomInt: (max) ->
 			Math.floor(Math.random() * (max + 1))
-		tryParseInt: (val, def, validate) ->
+		tryParse: (val, def, validate) ->
 			num = parseInt("#{val}")
 			if validate and not validate(num)
 				num = def
@@ -97,6 +102,8 @@ class smio.Util
 			for p of obj
 				return false
 			true
+		exclude: (obj, keys...) ->
+			smio.Util.Object.cloneFiltered(obj, (k, v) -> not (k in keys))
 		isObject: (o, checkArr) ->
 			(typeof(o) is 'object') and ((not checkArr) or not _.isArray(o))
 		mergeDefaults: (cfg, defs) ->
