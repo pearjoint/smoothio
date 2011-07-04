@@ -1,27 +1,28 @@
-Mon Jul  4 03:40:16 [initandlisten] MongoDB starting : pid=12328 port=61234 dbpath=/home/roxor/smoothio/default/server/dbs/ 64-bit 
-Mon Jul  4 03:40:16 [initandlisten] db version v1.8.1, pdfile version 4.5
-Mon Jul  4 03:40:16 [initandlisten] git version: a429cd4f535b2499cc4130b06ff7c26f41c00f04
-Mon Jul  4 03:40:16 [initandlisten] build sys info: Linux bs-linux64.10gen.cc 2.6.21.7-2.ec2.v1.2.fc8xen #1 SMP Fri Nov 20 17:48:28 EST 2009 x86_64 BOOST_LIB_VERSION=1_41
-Mon Jul  4 03:40:16 [initandlisten] waiting for connections on port 61234
-Mon Jul  4 03:40:16 [websvr] web admin interface listening on port 62234
-Mon Jul  4 03:40:16 [initandlisten] connection accepted from 127.0.0.1:36409 #1
-Mon Jul  4 03:40:17 [initandlisten] connection accepted from 127.0.0.1:36410 #2
-Mon Jul  4 03:40:17 [initandlisten] connection accepted from 127.0.0.1:36411 #3
-Mon Jul  4 03:40:18 [initandlisten] connection accepted from 127.0.0.1:36412 #4
-Mon Jul  4 03:40:18 [initandlisten] connection accepted from 127.0.0.1:36413 #5
-Mon Jul  4 04:06:28 [conn5] terminating, shutdown command received
-Mon Jul  4 04:06:28 dbexit: shutdown called
-Mon Jul  4 04:06:28 [conn5] shutdown: going to close listening sockets...
-Mon Jul  4 04:06:28 [conn5] closing listening socket: 5
-Mon Jul  4 04:06:28 [conn5] closing listening socket: 7
-Mon Jul  4 04:06:28 [conn5] closing listening socket: 8
-Mon Jul  4 04:06:28 [conn5] closing listening socket: 9
-Mon Jul  4 04:06:28 [conn5] removing socket file: /tmp/mongodb-61234.sock
-Mon Jul  4 04:06:28 [conn5] removing socket file: /tmp/mongodb-62234.sock
-Mon Jul  4 04:06:28 [conn5] shutdown: going to flush diaglog...
-Mon Jul  4 04:06:28 [conn5] shutdown: going to close sockets...
-Mon Jul  4 04:06:28 [conn5] shutdown: waiting for fs preallocator...
-Mon Jul  4 04:06:28 [conn5] shutdown: closing all files...
-Mon Jul  4 04:06:28 closeAllFiles() finished
-Mon Jul  4 04:06:28 [conn5] shutdown: removing fs lock...
-Mon Jul  4 04:06:28 dbexit: really exiting now
+Mon Jul  4 05:02:27 [initandlisten] MongoDB starting : pid=12918 port=61234 dbpath=/home/roxor/smoothio/default/server/dbs/ 64-bit 
+Mon Jul  4 05:02:27 [initandlisten] db version v1.8.1, pdfile version 4.5
+Mon Jul  4 05:02:27 [initandlisten] git version: a429cd4f535b2499cc4130b06ff7c26f41c00f04
+Mon Jul  4 05:02:27 [initandlisten] build sys info: Linux bs-linux64.10gen.cc 2.6.21.7-2.ec2.v1.2.fc8xen #1 SMP Fri Nov 20 17:48:28 EST 2009 x86_64 BOOST_LIB_VERSION=1_41
+Mon Jul  4 05:02:27 [initandlisten] waiting for connections on port 61234
+Mon Jul  4 05:02:27 [websvr] web admin interface listening on port 62234
+Mon Jul  4 05:02:27 [initandlisten] connection accepted from 127.0.0.1:38585 #1
+Mon Jul  4 05:02:28 [initandlisten] connection accepted from 127.0.0.1:38586 #2
+Mon Jul  4 05:02:28 [initandlisten] connection accepted from 127.0.0.1:38587 #3
+Mon Jul  4 05:02:29 [initandlisten] connection accepted from 127.0.0.1:38588 #4
+Mon Jul  4 05:02:29 [initandlisten] connection accepted from 127.0.0.1:38589 #5
+Mon Jul  4 05:05:35 [initandlisten] connection accepted from 127.0.0.1:38604 #6
+Mon Jul  4 05:15:39 [conn5] terminating, shutdown command received
+Mon Jul  4 05:15:39 dbexit: shutdown called
+Mon Jul  4 05:15:39 [conn5] shutdown: going to close listening sockets...
+Mon Jul  4 05:15:39 [conn5] closing listening socket: 5
+Mon Jul  4 05:15:39 [conn5] closing listening socket: 7
+Mon Jul  4 05:15:39 [conn5] closing listening socket: 8
+Mon Jul  4 05:15:39 [conn5] closing listening socket: 9
+Mon Jul  4 05:15:39 [conn5] removing socket file: /tmp/mongodb-61234.sock
+Mon Jul  4 05:15:39 [conn5] removing socket file: /tmp/mongodb-62234.sock
+Mon Jul  4 05:15:39 [conn5] shutdown: going to flush diaglog...
+Mon Jul  4 05:15:39 [conn5] shutdown: going to close sockets...
+Mon Jul  4 05:15:39 [conn5] shutdown: waiting for fs preallocator...
+Mon Jul  4 05:15:39 [conn5] shutdown: closing all files...
+Mon Jul  4 05:15:39 closeAllFiles() finished
+Mon Jul  4 05:15:39 [conn5] shutdown: removing fs lock...
+Mon Jul  4 05:15:39 dbexit: really exiting now

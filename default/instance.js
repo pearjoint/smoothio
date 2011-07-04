@@ -88,7 +88,7 @@ smio.compileCoffeeScripts = function(dirOrFilePath, srvOutDirPath, cltOutDirPath
 
 smio.compileConfigFile = function(filePath, outDirPath) {
 	var fileContent, js, fileName = node_path.basename(filePath);
-	if ((fileContent = node_fs.readFileSync(filePath, 'utf-8')) && (js = coffee.compile('###\nDo not modify: auto-generated from ' + filePath + '\n###\nmodule.exports = ' + fileContent)))
+	if ((fileContent = node_fs.readFileSync(filePath, 'utf-8')) && (js = coffee.compile('###\nDo not modify: auto-generated from ((your-instance-folder))/' + filePath + '\n###\nmodule.exports = ' + fileContent)))
 		node_fs.writeFileSync(node_path.join(outDirPath, '_cfg_' + fileName.substr(0, fileName.lastIndexOf('.')) + '.js'), js);
 }
 

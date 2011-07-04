@@ -1,6 +1,6 @@
 (function() {
   /*
-  Do not modify: auto-generated from instance.ccfg
+  Do not modify: auto-generated from ((your-instance-folder))/instance.ccfg
   */  module.exports = {
     smoothio: {
       autorestart: {
