@@ -77,11 +77,7 @@
       } else {
         sockLogger = function() {};
       }
-      this.socket = socketio.listen(this.httpServer, {
-        resource: '/_/sockio/',
-        flashPolicyServer: false,
-        log: sockLogger
-      });
+      this.socket = null;
       if (this.socket) {
         this.socket.on('clientConnect', __bind(function(client) {
           return this.onSocketConnect(client);

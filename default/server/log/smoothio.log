@@ -1,32 +1,28 @@
-2011-07-03T20:52:54.602Z - [default] Compiling Stylus sheets...
-2011-07-03T20:52:54.653Z - [default] Compiling CoffeeScripts...
-2011-07-03T20:52:55.160Z - [default.packs.Core] PACKAGE 'Core': loading...
-2011-07-03T20:52:55.573Z - [default.packs.Core] PACKAGE 'Core': successfully loaded.
-2011-07-03T20:52:55.575Z - [default] Merging client scripts and style sheets...
-2011-07-03T20:52:55.654Z - [default.mongodb] forked process: 6173
+2011-07-04T01:40:15.413Z - [default] Compiling Stylus sheets...
+2011-07-04T01:40:15.463Z - [default] Compiling CoffeeScripts...
+2011-07-04T01:40:15.989Z - [default.packs.Core] PACKAGE 'Core': loading...
+2011-07-04T01:40:16.418Z - [default.packs.Core] PACKAGE 'Core': successfully loaded.
+2011-07-04T01:40:16.420Z - [default] Merging client scripts and style sheets...
+2011-07-04T01:40:16.476Z - [default.mongodb] forked process: 12328
 all output going to: /home/roxor/smoothio/default/server/log/mongodb/mongodb.log
-2011-07-03T20:52:55.658Z - [default.servers.server1] SERVER 'server1' listening at localhost:2020
-2011-07-03T20:52:55.658Z - [default.servers.server2] SERVER 'server2' listening at 192.168.56.1:4040
-2011-07-03T20:52:55.658Z - [default.servers.server3] SERVER 'server3' listening at 192.168.42.203:6060
-2011-07-03T20:52:56.165Z - [default.mongodb.admin] Connected to MongoDB Admin database.
-2011-07-03T20:52:56.662Z - [default.mongodb.smoothio_shared] Connected to smoothio Shared database.
-2011-07-03T20:52:57.162Z - [default.mongodb.smoothio__server1] Connected to smoothio server1 database.
-2011-07-03T20:52:57.661Z - [default.mongodb.smoothio__server2] Connected to smoothio server2 database.
-2011-07-03T20:52:58.162Z - [default.mongodb.smoothio__server3] Connected to smoothio server3 database.
-2011-07-03T20:53:03.355Z - [default] INVOKE cmd: "create"
-2011-07-03T20:53:03.355Z - [default] INVOKE freq: {"msg":{"u":"test","p":"test","t":"test","_c":"Hub.create","_i":"sm_stepslide_hub_create","_u":"/"}}
-2011-07-03T20:53:13.946Z - [default] INVOKE cmd: "create"
-2011-07-03T20:53:13.946Z - [default] INVOKE freq: {"msg":{"u":"test","p":"test","t":"test","_c":"Hub.create","_i":"sm_stepslide_hub_create","_u":"/"}}
-2011-07-03T20:53:30.900Z - [default] INVOKE cmd: "create"
-2011-07-03T20:53:30.900Z - [default] INVOKE freq: {"msg":{"u":"test","p":"test","t":"test","_c":"Hub.create","_i":"sm_stepslide_hub_create","_u":"/"}}
-2011-07-03T21:37:46.105Z - [default] INVOKE cmd: "create"
-2011-07-03T21:37:46.105Z - [default] INVOKE freq: {"msg":{"u":"test","p":"test","t":"test","_c":"Hub.create","_i":"sm_stepslide_hub_create","_u":"/"}}
-2011-07-03T21:50:11.301Z - [default] Shutting down servers...
-2011-07-03T21:50:11.303Z - [default.servers.server1] Closing...
-2011-07-03T21:50:11.303Z - [default.servers.server1] Closed.
-2011-07-03T21:50:11.303Z - [default.servers.server2] Closing...
-2011-07-03T21:50:11.303Z - [default.servers.server2] Closed.
-2011-07-03T21:50:11.303Z - [default.servers.server3] Closing...
-2011-07-03T21:50:11.303Z - [default.servers.server3] Closed.
-2011-07-03T21:50:11.560Z - [default] Shutdown of all servers completed.
+2011-07-04T01:40:16.480Z - [default.servers.server1] SERVER 'server1' listening at localhost:2020
+2011-07-04T01:40:16.480Z - [default.servers.server2] SERVER 'server2' listening at 192.168.56.1:4040
+2011-07-04T01:40:16.480Z - [default.servers.server3] SERVER 'server3' listening at 192.168.42.203:6060
+2011-07-04T01:40:16.984Z - [default.mongodb.admin] Connected to MongoDB Admin database.
+2011-07-04T01:40:17.487Z - [default.mongodb.smoothio_shared] Connected to smoothio Shared database.
+2011-07-04T01:40:17.982Z - [default.mongodb.smoothio__server1] Connected to smoothio server1 database.
+2011-07-04T01:40:18.481Z - [default.mongodb.smoothio__server2] Connected to smoothio server2 database.
+2011-07-04T01:40:18.981Z - [default.mongodb.smoothio__server3] Connected to smoothio server3 database.
+2011-07-04T01:40:53.262Z - [default] INVOKE cmd: "create"
+2011-07-04T01:40:53.262Z - [default] INVOKE freq: {"msg":{"u":"test","p":"test","t":"test","_c":"Hub.create","_i":"sm_stepslide_hub_create","_u":"/"}}
+2011-07-04T01:41:04.993Z - [default] INVOKE cmd: "create"
+2011-07-04T01:41:04.993Z - [default] INVOKE freq: {"msg":{"u":"test","p":"test","t":"test","_c":"Hub.create","_i":"sm_stepslide_hub_create","_u":"/"}}
+2011-07-04T02:06:28.209Z - [default] Shutting down servers...
+2011-07-04T02:06:28.210Z - [default.servers.server1] Closing...
+2011-07-04T02:06:28.210Z - [default.servers.server1] Closed.
+2011-07-04T02:06:28.210Z - [default.servers.server2] Closing...
+2011-07-04T02:06:28.210Z - [default.servers.server2] Closed.
+2011-07-04T02:06:28.211Z - [default.servers.server3] Closing...
+2011-07-04T02:06:28.211Z - [default.servers.server3] Closed.
+2011-07-04T02:06:28.469Z - [default] Shutdown of all servers completed.
 

@@ -28,10 +28,11 @@ class smio.Pack
 					if fname isnt 'pack'
 						parts.push(fname)
 					parts.join('_')
-				dontCopy = ['*.config', '*.res']
+				dontCopy = ['*.ccfg', '*.cres']
 				smio.logit(@inst.r('log_pack_loading', @packName), 'packs.' + @packName)
-				lastFilePath = cfgFilePath = node_path.join(@packPath, 'pack.config')
-				@config = smio.Util.Object.mergeDefaults(JSON.parse(smio.Util.FileSystem.readTextFile(cfgFilePath)), pack: dontcopy: dontCopy)
+				lastFilePath = node_path.join(@packPath, 'pack.ccfg')
+				smio.compileConfigFile(lastFilePath, "server/_packs/#{@packName}")
+				@config = smio.Util.Object.mergeDefaults(require("../_packs/#{@packName}/_cfg_pack"), pack: dontcopy: dontCopy)
 				smio.Util.Array.ensure @config.pack.dontcopy, dontCopy...
 				if @config.pack['depends_on']? and @config.pack.depends_on.length
 					for dep in @config.pack.depends_on	

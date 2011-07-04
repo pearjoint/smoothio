@@ -167,11 +167,11 @@ class smio.Util
 	@FileSystem:
 		mkdirMode: 0777
 		ensureDirs: (srcDirPath, outDirPath) ->
-			smio.walkDir srcDirPath, null, null, null, null, null, true, (curDirPath, _, relDirPath) =>
+			smio.walkDir srcDirPath, null, null, null, null, null, true, (curDirPath, _, relDirPath) ->
 				path = node_path.join(outDirPath, relDirPath)
 				if not node_path.existsSync(path = node_path.join(outDirPath, relDirPath))
 					node_fs.mkdirSync(path, smio.Util.FileSystem.mkdirMode)
-		isPathMatch: (path, pattern) =>
+		isPathMatch: (path, pattern) ->
 			if (begins = _.startsWith(pattern, '*')) and (ends = _.endsWith(pattern, '*'))
 				pattern.substr(1, pattern.length - 2) in path
 			else if begins

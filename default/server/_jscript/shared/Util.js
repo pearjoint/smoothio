@@ -5,7 +5,7 @@
       if (this[i] === item) return i;
     }
     return -1;
-  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  };
   _ = require('underscore');
   _.mixin(require('underscore.string'));
   node_fs = require('fs');
@@ -306,15 +306,15 @@
     Util.FileSystem = {
       mkdirMode: 0777,
       ensureDirs: function(srcDirPath, outDirPath) {
-        return smio.walkDir(srcDirPath, null, null, null, null, null, true, __bind(function(curDirPath, _, relDirPath) {
+        return smio.walkDir(srcDirPath, null, null, null, null, null, true, function(curDirPath, _, relDirPath) {
           var path;
           path = node_path.join(outDirPath, relDirPath);
           if (!node_path.existsSync(path = node_path.join(outDirPath, relDirPath))) {
             return node_fs.mkdirSync(path, smio.Util.FileSystem.mkdirMode);
           }
-        }, this));
+        });
       },
-      isPathMatch: __bind(function(path, pattern) {
+      isPathMatch: function(path, pattern) {
         var begins, ends, _ref;
         if ((begins = _.startsWith(pattern, '*')) && (ends = _.endsWith(pattern, '*'))) {
           return _ref = pattern.substr(1, pattern.length - 2), __indexOf.call(path, _ref) >= 0;
@@ -325,7 +325,7 @@
         } else {
           return path === pattern;
         }
-      }, Util),
+      },
       readTextFile: function(path) {
         return node_fs.readFileSync(path, 'utf-8');
       }
@@ -410,5 +410,5 @@
       }
     };
     return Util;
-  }).call(this);
+  })();
 }).call(this);

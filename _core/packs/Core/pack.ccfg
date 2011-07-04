@@ -1,0 +1,3 @@
+pack:
+	x_depends_on: ["FooPack", "BarPack", "Bla"]
+

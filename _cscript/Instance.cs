@@ -120,35 +120,22 @@ class smio.Instance
 
 	start: =>
 		defHost = '127.0.0.1'
-		try
-			@config = smio.Util.Object.mergeDefaults JSON.parse(smio.Util.FileSystem.readTextFile('instance.config')), {
-				"smoothio": {
-					"enabled": true,
-					"processes": 1,
-					"autorestart": { "on_files_changed": false, "on_crash_after_uptime_secs": @restartMinUptime },
-					"logging": { "details": false, "stack": false, "path": "server/log/smoothio.log" },
-					"language": "en",
-					"minify": true,
-					"dns_preresolve": { "enabled": (process.platform is 'cygwin'), "hostnames": { "localhost": defHost, "$localhostname": defHost } }
-				},
-				"session": {
-					"timeout": 20
-				},
-				"sockets": {
-					"xdomain_swf": false,
-					"logpath": "server/log/sockets.log"
-				},
-				"mongodb": {
-					"host": defHost,
-					"port": 61234,
-					"dbpath": "server/dbs/",
-					"logpath": "server/log/mongodb/mongodb.log"
-				}
-			}
-		catch err
-			err.ml_error_filepath = 'instance.config'
-			err.message = 'ERROR parsing instance.config: ' + err.message
-			throw err
+		@config = smio.Util.Object.mergeDefaults require('./_cfg_instance'),
+			smoothio:
+				enabled: true,
+				processes: 1,
+				autorestart: { on_files_changed: false, on_crash_after_uptime_secs: @restartMinUptime },
+				logging: { details: false, stack: false, path: 'server/log/smoothio.log' },
+				language: 'en',
+				minify: true,
+				dns_preresolve: { enabled: (process.platform is 'cygwin'), hostnames: { localhost: defHost, '$localhostname': defHost } }
+			sockets:
+				logpath: 'server/log/sockets.log'
+			mongodb:
+				host: defHost,
+				port: 61234,
+				dbpath: 'server/dbs/',
+				logpath: 'server/log/mongodb/mongodb.log'
 		if (logPath = @expandLogPath(@config.smoothio.logging.path))
 			smio.logit = smio.Util.Server.setupLogFile(@, 'logFile', true, logPath, smio.logit)
 		if not @config.smoothio.enabled

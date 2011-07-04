@@ -23,7 +23,7 @@
       this.config = {};
     }
     Pack.prototype.load = function() {
-      var cfgFilePath, dep, dontCopy, lastFilePath, pack, _i, _len, _ref, _ref2;
+      var dep, dontCopy, lastFilePath, pack, _i, _len, _ref, _ref2;
       if ((!this.loaded) && (!(this.loadError != null))) {
         try {
           this.inst.loadResourceSets(this.packPath, true, __bind(function(fpath, fname, relpath) {
@@ -37,10 +37,11 @@
             }
             return parts.join('_');
           }, this));
-          dontCopy = ['*.config', '*.res'];
+          dontCopy = ['*.ccfg', '*.cres'];
           smio.logit(this.inst.r('log_pack_loading', this.packName), 'packs.' + this.packName);
-          lastFilePath = cfgFilePath = node_path.join(this.packPath, 'pack.config');
-          this.config = smio.Util.Object.mergeDefaults(JSON.parse(smio.Util.FileSystem.readTextFile(cfgFilePath)), {
+          lastFilePath = node_path.join(this.packPath, 'pack.ccfg');
+          smio.compileConfigFile(lastFilePath, "server/_packs/" + this.packName);
+          this.config = smio.Util.Object.mergeDefaults(require("../_packs/" + this.packName + "/_cfg_pack"), {
             pack: {
               dontcopy: dontCopy
             }

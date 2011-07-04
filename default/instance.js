@@ -86,6 +86,12 @@ smio.compileCoffeeScripts = function(dirOrFilePath, srvOutDirPath, cltOutDirPath
 	}
 }
 
+smio.compileConfigFile = function(filePath, outDirPath) {
+	var fileContent, js, fileName = node_path.basename(filePath);
+	if ((fileContent = node_fs.readFileSync(filePath, 'utf-8')) && (js = coffee.compile('###\nDo not modify: auto-generated from ' + filePath + '\n###\nmodule.exports = ' + fileContent)))
+		node_fs.writeFileSync(node_path.join(outDirPath, '_cfg_' + fileName.substr(0, fileName.lastIndexOf('.')) + '.js'), js);
+}
+
 smio.iif = function(test, ifTrue, ifFalse) {
 	if (arguments.length < 3)
 		ifFalse = false;
@@ -335,7 +341,7 @@ function startSmoothio() {
 		hasCoffee = node_path.existsSync('../_cscript'),
 		hasStylus = node_path.existsSync('../_core/stylus'),
 		returnCode = 1,
-		watchExtensions = ['res', 'config', 'ctl', 'styl', 'cs'],
+		watchExtensions = ['res', 'ccfg', 'config', 'ctl', 'styl', 'cs'],
 		watchSelective = function(fpath) {
 			for (var i = 0; i < watchExtensions.length; i++)
 				if (fpath.indexOf(watchExtensions[i]) == (fpath.length - watchExtensions[i].length))
@@ -349,6 +355,7 @@ function startSmoothio() {
 		clearDirectory('server/_jscript');
 		clearDirectory('server/pub/_scripts');
 	}
+	smio.compileConfigFile('instance.ccfg', 'server/_jscript');
 	if (hasStylus) {
 		clearDirectory('server/pub/_styles');
 		smio.logit('Compiling Stylus sheets...');

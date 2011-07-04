@@ -41,7 +41,7 @@ class smio.Server
 			sockLogger = smio.Util.Server.setupLogFile(@, 'sockLogFile', false, sockLogPath, (msg) -> msg)
 		else
 			sockLogger = ->
-		@socket = socketio.listen(@httpServer, resource: '/_/sockio/', flashPolicyServer: false, log: sockLogger)
+		@socket = null # socketio.listen(@httpServer)
 		if @socket
 			@socket.on 'clientConnect', (client) => @onSocketConnect(client)
 			@socket.on 'clientDisconnect', (client) => @onSocketDisconnect(client)
