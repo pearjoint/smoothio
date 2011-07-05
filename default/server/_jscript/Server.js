@@ -77,25 +77,30 @@
       } else {
         sockLogger = function() {};
       }
-      this.socket = null;
-      if (this.socket) {
-        this.socket.on('clientConnect', __bind(function(client) {
-          return this.onSocketConnect(client);
+      if ((this.io = socketio.listen(this.httpServer))) {
+        this.io.configure('', __bind(function() {
+          this.io.set('resource', '/_/sockio/');
+          this.io.set('transports', ['websocket']);
+          this.io.disable('flash policy server');
+          return this.io.disable('browser client');
         }, this));
-        this.socket.on('clientDisconnect', __bind(function(client) {
-          return this.onSocketDisconnect(client);
-        }, this));
-        this.socket.on('clientMessage', __bind(function(msg, client) {
-          return this.onSocketMessage(msg, client);
+        this.io.sockets.on('connection', __bind(function(socket) {
+          socket.on('disconnect', __bind(function(sock) {
+            return this.onSocketDisconnect(sock || socket);
+          }, this));
+          socket.on('message', __bind(function(msg, sock) {
+            return this.onSocketMessage(msg, sock || socket);
+          }, this));
+          return this.onSocketConnect(socket);
         }, this));
       }
     }
-    Server.prototype.getSocketSessionID = function(client) {
+    Server.prototype.getSocketSessionID = function(socket) {
       var _ref, _ref2;
-      if (!smio.Server.sockSessions[client.sessionId]) {
-        smio.Server.sockSessions[client.sessionId] = smio.RequestContext.parseSmioCookie((_ref = client['request']) != null ? (_ref2 = _ref['headers']) != null ? _ref2['cookie'] : void 0 : void 0).sessid;
+      if (!smio.Server.sockSessions[socket.id]) {
+        smio.Server.sockSessions[socket.id] = smio.RequestContext.parseSmioCookie((_ref = socket['request']) != null ? (_ref2 = _ref['headers']) != null ? _ref2['cookie'] : void 0 : void 0).sessid;
       }
-      return smio.Server.sockSessions[client.sessionId];
+      return smio.Server.sockSessions[socket.id];
     };
     Server.prototype.onBind = function() {
       this.status = 1;
@@ -146,36 +151,36 @@
         return ctx = new smio.RequestContext(this, uri, request, response, this.inst.mongos['admin'], this.inst.mongos['smoothio_shared'], this.inst.mongos["smoothio__" + this.serverName]);
       }
     };
-    Server.prototype.onSocketConnect = function(client) {
+    Server.prototype.onSocketConnect = function(socket) {
       var sess, sessid;
-      if ((sessid = this.getSocketSessionID(client)) && (sess = smio.Session.getBySessionID(this, sessid))) {
+      if ((sessid = this.getSocketSessionID(socket)) && (sess = smio.Session.getBySessionID(this, sessid))) {
         sess.onInit();
-        return client.send(client.sessionId);
+        return socket.send(socket.id);
       } else {
-        return client.send("smoonocookie");
+        return socket.send("smoonocookie");
       }
     };
-    Server.prototype.onSocketDisconnect = function(client) {
+    Server.prototype.onSocketDisconnect = function(socket) {
       var sess, sessid;
-      if ((sessid = this.getSocketSessionID(client)) && (sess = smio.Session.all[sessid])) {
+      if ((sessid = this.getSocketSessionID(socket)) && (sess = smio.Session.all[sessid])) {
         sess.onEnd();
         smio.Session.all[sessid] = null;
         delete smio.Session.all[sessid];
       }
-      if (smio.Server.sockSessions[client.sessionId]) {
-        smio.Server.sockSessions[client.sessionId] = null;
-        return delete smio.Server.sockSessions[client.sessionId];
+      if (smio.Server.sockSessions[socket.id]) {
+        smio.Server.sockSessions[socket.id] = null;
+        return delete smio.Server.sockSessions[socket.id];
       }
     };
-    Server.prototype.onSocketMessage = function(message, client) {
+    Server.prototype.onSocketMessage = function(message, socket) {
       var sess, sessid;
       if (message) {
-        if ((sessid = this.getSocketSessionID(client)) && (sess = smio.Session.getBySessionID(this, sessid))) {
+        if ((sessid = this.getSocketSessionID(socket)) && (sess = smio.Session.getBySessionID(this, sessid))) {
           return sess.handleFetch(null, message, function(data) {
-            return client.send(JSON.stringify(data));
+            return socket.send(JSON.stringify(data));
           });
         } else {
-          return client.send("smoonocookie");
+          return socket.send("smoonocookie");
         }
       }
     };

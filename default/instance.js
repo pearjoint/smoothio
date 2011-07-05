@@ -1,7 +1,7 @@
 
 /*
 	smoothio bootstrap script / NodeJS entry point.
-	Compiles CoffeeScripts and Stylus sheets, starts monitoring them for changes (if set in instance.config).
+	Compiles CoffeeScripts and Stylus sheets, starts monitoring them for changes (if set in instance.ccfg).
 	Then runs the main CoffeeScript (_cscript/Instance.cs).
  */
 
@@ -88,14 +88,18 @@ smio.compileCoffeeScripts = function(dirOrFilePath, srvOutDirPath, cltOutDirPath
 
 smio.compileConfigFile = function(filePath, outDirPath) {
 	var fileContent, js, fileName = node_path.basename(filePath);
-	if ((fileContent = node_fs.readFileSync(filePath, 'utf-8')) && (js = coffee.compile('###\nDo not modify: auto-generated from ((your-instance-folder))/' + filePath + '\n###\nmodule.exports = ' + fileContent)))
+	if ((fileContent = node_fs.readFileSync(filePath, 'utf-8')) && (js = coffee.compile('###\nDo not modify: auto-generated from ((your-instance-folder))/' + filePath + '\n###\nmodule.exports = ' + fileContent))) {
+		watchFile(filePath);
 		node_fs.writeFileSync(node_path.join(outDirPath, '_cfg_' + fileName.substr(0, fileName.lastIndexOf('.')) + '.js'), js);
+	}
 }
 
 smio.compileResourceFile = function(filePath, outDirPath) {
 	var fileContent, js, fileName = node_path.basename(filePath);
-	if ((fileContent = node_fs.readFileSync(filePath, 'utf-8')) && (js = coffee.compile('###\nDo not modify: auto-generated from ((your-instance-folder))/' + filePath + '\n###\nmodule.exports = ' + fileContent)))
+	if ((fileContent = node_fs.readFileSync(filePath, 'utf-8')) && (js = coffee.compile('###\nDo not modify: auto-generated from ((your-instance-folder))/' + filePath + '\n###\nmodule.exports = ' + fileContent))) {
+		watchFile(filePath);
 		node_fs.writeFileSync(node_path.join(outDirPath, '_res_' + fileName.substr(0, fileName.lastIndexOf('.')) + '.js'), js);
+	}
 }
 
 smio.iif = function(test, ifTrue, ifFalse) {
@@ -390,7 +394,7 @@ function startSmoothio() {
 					node_fs.unwatchFile(watchedFiles[i]);
 				watchedFiles = [];
 			}
-			watchFile('instance.config');
+			watchFile('instance.ccfg');
 			smio.logit('STARTUP TOOK ' + ((new Date().getTime() - startTime) / 1000) + ' SECONDS.');
 		} else {
 			smio.inst = null;

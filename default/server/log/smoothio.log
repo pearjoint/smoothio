@@ -1,33 +1,25 @@
-2011-07-05T00:52:22.328Z - [default] Compiling Stylus sheets...
-2011-07-05T00:52:22.384Z - [default] Compiling CoffeeScripts...
-2011-07-05T00:52:22.938Z - [default.packs.Core] PACKAGE Core: loading...
-2011-07-05T00:52:23.379Z - [default.packs.Core] PACKAGE Core: successfully loaded.
-2011-07-05T00:52:23.381Z - [default] Merging client scripts and style sheets...
-2011-07-05T00:52:23.418Z - [default] STARTUP TOOK 1.107 SECONDS.
-2011-07-05T00:52:23.419Z - [default.mongodb] forked process: 14778
+2011-07-05T03:19:38.634Z - [default] Compiling Stylus sheets...
+2011-07-05T03:19:38.693Z - [default] Compiling CoffeeScripts...
+2011-07-05T03:19:39.249Z - [default.packs.Core] PACKAGE Core: loading...
+2011-07-05T03:19:39.706Z - [default.packs.Core] PACKAGE Core: successfully loaded.
+2011-07-05T03:19:39.708Z - [default] Merging client scripts and style sheets...
+2011-07-05T03:19:39.750Z - [default] STARTUP TOOK 1.133 SECONDS.
+2011-07-05T03:19:39.751Z - [default.mongodb] forked process: 16802
 all output going to: /home/roxor/smoothio/default/server/log/mongodb/mongodb.log
-2011-07-05T00:52:23.423Z - [default.servers.server1] SERVER server1 listening at localhost:2020
-2011-07-05T00:52:23.423Z - [default.servers.server2] SERVER server2 listening at 192.168.56.1:4040
-2011-07-05T00:52:23.423Z - [default.servers.server3] SERVER server3 listening at 192.168.42.203:6060
-2011-07-05T00:52:23.926Z - [default.mongodb.admin] Connected to MongoDB Admin database.
-2011-07-05T00:52:24.423Z - [default.mongodb.smoothio_shared] Connected to smoothio Shared database.
-2011-07-05T00:52:24.923Z - [default.mongodb.smoothio__server1] Connected to smoothio server1 database.
-2011-07-05T00:52:25.433Z - [default.mongodb.smoothio__server2] Connected to smoothio server2 database.
-2011-07-05T00:52:25.933Z - [default.mongodb.smoothio__server3] Connected to smoothio server3 database.
-2011-07-05T00:52:31.045Z - [default] INVOKE cmd: "create"
-2011-07-05T00:52:31.045Z - [default] INVOKE freq: {"msg":{"u":"test","p":"test","t":"test","_c":"Hub.create","_i":"sm_stepslide_hub_create","_u":"/"}}
-2011-07-05T00:52:49.537Z - [default] INVOKE cmd: "create"
-2011-07-05T00:52:49.537Z - [default] INVOKE freq: {"msg":{"u":"test","p":"test","t":"test","_c":"Hub.create","_i":"sm_stepslide_hub_create","_u":"/"}}
-2011-07-05T01:31:28.884Z - [default] INVOKE cmd: "create"
-2011-07-05T01:31:28.884Z - [default] INVOKE freq: {"msg":{"u":"test","p":"test","t":"test","_c":"Hub.create","_i":"sm_stepslide_hub_create","_u":"/"}}
-2011-07-05T02:24:28.545Z - [default] INVOKE cmd: "create"
-2011-07-05T02:24:28.545Z - [default] INVOKE freq: {"msg":{"u":"test","p":"test","t":"test","_c":"Hub.create","_i":"sm_stepslide_hub_create","_u":"/"}}
-2011-07-05T02:45:58.920Z - [default] Shutting down servers...
-2011-07-05T02:45:58.921Z - [default.servers.server1] Closing...
-2011-07-05T02:45:58.921Z - [default.servers.server1] Closed.
-2011-07-05T02:45:58.921Z - [default.servers.server2] Closing...
-2011-07-05T02:45:58.922Z - [default.servers.server2] Closed.
-2011-07-05T02:45:58.922Z - [default.servers.server3] Closing...
-2011-07-05T02:45:58.922Z - [default.servers.server3] Closed.
-2011-07-05T02:45:59.179Z - [default] Shutdown of all servers completed.
+2011-07-05T03:19:39.755Z - [default.servers.server1] SERVER server1 listening at localhost:2020
+2011-07-05T03:19:39.755Z - [default.servers.server2] SERVER server2 listening at 192.168.56.1:4040
+2011-07-05T03:19:39.755Z - [default.servers.server3] SERVER server3 listening at 192.168.42.203:6060
+2011-07-05T03:19:40.258Z - [default.mongodb.admin] Connected to MongoDB Admin database.
+2011-07-05T03:19:40.762Z - [default.mongodb.smoothio_shared] Connected to smoothio Shared database.
+2011-07-05T03:19:41.261Z - [default.mongodb.smoothio__server1] Connected to smoothio server1 database.
+2011-07-05T03:19:41.761Z - [default.mongodb.smoothio__server2] Connected to smoothio server2 database.
+2011-07-05T03:19:42.262Z - [default.mongodb.smoothio__server3] Connected to smoothio server3 database.
+2011-07-05T03:28:34.489Z - [default] Shutting down servers...
+2011-07-05T03:28:34.490Z - [default.servers.server1] Closing...
+2011-07-05T03:28:34.490Z - [default.servers.server1] Closed.
+2011-07-05T03:28:34.490Z - [default.servers.server2] Closing...
+2011-07-05T03:28:34.490Z - [default.servers.server2] Closed.
+2011-07-05T03:28:34.491Z - [default.servers.server3] Closing...
+2011-07-05T03:28:34.491Z - [default.servers.server3] Closed.
+2011-07-05T03:28:34.741Z - [default] Shutdown of all servers completed.
 

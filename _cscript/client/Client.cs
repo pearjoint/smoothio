@@ -18,7 +18,7 @@ class smio.Client
 		if not @smioCookie
 			@smioCookie = {}
 		@sessionID = @smioCookie['sessid']
-		@disp = new smio.Dispatcher(@, false)
+		@disp = new smio.Dispatcher(@, true)
 		@pageWindow.resize(_.debounce((=> @onWindowResize()), 300))
 		@recalcing = false
 

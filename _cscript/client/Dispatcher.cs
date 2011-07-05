@@ -1,16 +1,14 @@
 smio = global.smoothio
 
 class smio.Dispatcher
-	constructor: (@client, isSocketIO, host, secure, port) ->
+	constructor: (@client, isSocketIO, host) ->
 		@ready = false
 		@offline = 1
 		@initialFetchDone = false
 		@lastFetchTime = 0
 		if isSocketIO
-			opts = resource: '/_/sockio/', transports: ['websocket'], rememberTransport: false, reconnect: true, connectTimeout: 5000, secure: smio.iif(secure)
-			if port
-				opts.port = port
-			@socket = new io.Socket(host, opts)
+			opts = resource: '/_/sockio/', transports: ['websocket'], rememberTransport: false, 'remember transport': false, 'try multiple transports': false, reconnect: true, 'connect timeout': 5000
+			@socket = io.connect(host, opts)
 			@socket.on 'connect', => @onSocketConnect()
 			@socket.on 'connect_failed', => @onSocketConnectFailed()
 			@socket.on 'connecting', (type) => @onSocketConnecting(type)

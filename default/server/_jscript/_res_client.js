@@ -2,6 +2,7 @@
   /*
   Do not modify: auto-generated from ((your-instance-folder))/../_core/res/client.cres
   */  module.exports = {
+    nbsp: '&nbsp;',
     close: 'Close',
     connecting: 'Connecting',
     connecting_hint: 'Either your network connection or our server is down. You will be reconnected shortly.',

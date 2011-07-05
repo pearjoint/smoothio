@@ -41,16 +41,21 @@ class smio.Server
 			sockLogger = smio.Util.Server.setupLogFile(@, 'sockLogFile', false, sockLogPath, (msg) -> msg)
 		else
 			sockLogger = ->
-		@socket = null # socketio.listen(@httpServer)
-		if @socket
-			@socket.on 'clientConnect', (client) => @onSocketConnect(client)
-			@socket.on 'clientDisconnect', (client) => @onSocketDisconnect(client)
-			@socket.on 'clientMessage', (msg, client) => @onSocketMessage(msg, client)
+		if (@io = socketio.listen(@httpServer))
+			@io.configure '', =>
+				@io.set('resource', '/_/sockio/')
+				@io.set('transports', ['websocket'])
+				@io.disable('flash policy server')
+				@io.disable('browser client')
+			@io.sockets.on 'connection', (socket) =>
+				socket.on 'disconnect', (sock) => @onSocketDisconnect(sock or socket)
+				socket.on 'message', (msg, sock) => @onSocketMessage(msg, sock or socket)
+				@onSocketConnect(socket)
 
-	getSocketSessionID: (client) =>
-		if not smio.Server.sockSessions[client.sessionId]
-			smio.Server.sockSessions[client.sessionId] = smio.RequestContext.parseSmioCookie(client['request']?['headers']?['cookie']).sessid
-		smio.Server.sockSessions[client.sessionId]
+	getSocketSessionID: (socket) =>
+		if not smio.Server.sockSessions[socket.id]
+			smio.Server.sockSessions[socket.id] = smio.RequestContext.parseSmioCookie(socket['request']?['headers']?['cookie']).sessid
+		smio.Server.sockSessions[socket.id]
 
 	onBind: =>
 		@status = 1
@@ -80,29 +85,29 @@ class smio.Server
 			uri.url = url
 			ctx = new smio.RequestContext(@, uri, request, response, @inst.mongos['admin'], @inst.mongos['smoothio_shared'], @inst.mongos["smoothio__#{@serverName}"])
 
-	onSocketConnect: (client) =>
-		if (sessid = @getSocketSessionID(client)) and (sess = smio.Session.getBySessionID(@, sessid))
+	onSocketConnect: (socket) =>
+		if (sessid = @getSocketSessionID(socket)) and (sess = smio.Session.getBySessionID(@, sessid))
 			sess.onInit()
-			client.send(client.sessionId)
+			socket.send(socket.id)
 		else
-			client.send("smoonocookie")
+			socket.send("smoonocookie")
 
-	onSocketDisconnect: (client) =>
-		if (sessid = @getSocketSessionID(client)) and (sess = smio.Session.all[sessid])
+	onSocketDisconnect: (socket) =>
+		if (sessid = @getSocketSessionID(socket)) and (sess = smio.Session.all[sessid])
 			sess.onEnd()
 			smio.Session.all[sessid] = null
 			delete smio.Session.all[sessid]
-		if smio.Server.sockSessions[client.sessionId]
-			smio.Server.sockSessions[client.sessionId] = null
-			delete smio.Server.sockSessions[client.sessionId]
+		if smio.Server.sockSessions[socket.id]
+			smio.Server.sockSessions[socket.id] = null
+			delete smio.Server.sockSessions[socket.id]
 
-	onSocketMessage: (message, client) =>
+	onSocketMessage: (message, socket) =>
 		if message
-			if (sessid = @getSocketSessionID(client)) and (sess = smio.Session.getBySessionID(@, sessid))
+			if (sessid = @getSocketSessionID(socket)) and (sess = smio.Session.getBySessionID(@, sessid))
 				sess.handleFetch null, message, (data) ->
-					client.send(JSON.stringify(data))
+					socket.send(JSON.stringify(data))
 			else
-				client.send("smoonocookie")
+				socket.send("smoonocookie")
 
 	stop: =>
 		@status = -2

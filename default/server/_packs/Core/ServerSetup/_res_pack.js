@@ -2,7 +2,6 @@
   /*
   Do not modify: auto-generated from ((your-instance-folder))/../_core/packs/Core/ServerSetup/pack.cres
   */  module.exports = {
-    nbsp: '&nbsp;',
     title: 'Setting up your root Hub',
     desc: 'This server does not contain any Hubs yet. Create its root Hub now:',
     owner_name: 'User name:',

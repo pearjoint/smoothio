@@ -3,7 +3,7 @@
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   smio = global.smoothio;
   smio.Dispatcher = (function() {
-    function Dispatcher(client, isSocketIO, host, secure, port) {
+    function Dispatcher(client, isSocketIO, host) {
       var opts;
       this.client = client;
       this.setTimer = __bind(this.setTimer, this);
@@ -33,14 +33,12 @@
           resource: '/_/sockio/',
           transports: ['websocket'],
           rememberTransport: false,
+          'remember transport': false,
+          'try multiple transports': false,
           reconnect: true,
-          connectTimeout: 5000,
-          secure: smio.iif(secure)
+          'connect timeout': 5000
         };
-        if (port) {
-          opts.port = port;
-        }
-        this.socket = new io.Socket(host, opts);
+        this.socket = io.connect(host, opts);
         this.socket.on('connect', __bind(function() {
           return this.onSocketConnect();
         }, this));
