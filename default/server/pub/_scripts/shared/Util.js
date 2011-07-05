@@ -136,6 +136,12 @@
       }
     };
     Util.Number = {
+      max: function() {
+        return Math.pow(2, 31) - 1;
+      },
+      min: function() {
+        return Math.pow(-2, 31);
+      },
       randomInt: function(max) {
         return Math.floor(Math.random() * (max + 1));
       },

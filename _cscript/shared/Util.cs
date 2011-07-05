@@ -83,6 +83,10 @@ class smio.Util
 				fn(checkDone)
 
 	@Number:
+		max: () ->
+			Math.pow(2, 31) - 1
+		min: () ->
+			Math.pow(-2, 31)
 		randomInt: (max) ->
 			Math.floor(Math.random() * (max + 1))
 		tryParse: (val, def, validate) ->

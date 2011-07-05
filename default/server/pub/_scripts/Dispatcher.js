@@ -4,7 +4,6 @@
   smio = global.smoothio;
   smio.Dispatcher = (function() {
     function Dispatcher(client, isSocketIO, host) {
-      var opts;
       this.client = client;
       this.setTimer = __bind(this.setTimer, this);
       this.send = __bind(this.send, this);
@@ -29,16 +28,38 @@
       this.initialFetchDone = false;
       this.lastFetchTime = 0;
       if (isSocketIO) {
-        opts = {
-          resource: '/_/sockio/',
+        this.socket = host || true;
+      } else {
+        this.poll = {
+          interval: {
+            val: 0,
+            handle: null,
+            sleepyFactor: 4
+          },
+          send: __bind(function(freq) {
+            return $.post("/_/poll/?t=" + (smio.Util.DateTime.ticks()), JSON.stringify(freq.msg), (__bind(function(m, t, x) {
+              return this.onMessage(m, t, x);
+            }, this)), 'text').error(__bind(function(x, t, e) {
+              return this.onError(x, t, e, freq);
+            }, this));
+          }, this)
+        };
+      }
+    }
+    Dispatcher.prototype.connect = function() {
+      this.ready = true;
+      $('#smio_offline').attr('title', smio.resources.client.connecting_hint);
+      if (this.socket) {
+        this.socket = io.connect((_.isString(this.socket) ? this.socket : void 0), {
           transports: ['websocket'],
-          rememberTransport: false,
-          'remember transport': false,
           'try multiple transports': false,
           reconnect: true,
-          'connect timeout': 5000
-        };
-        this.socket = io.connect(host, opts);
+          'connect timeout': 5000,
+          'reconnection delay': 5000,
+          'max reconnection attempts': smio.Util.Number.max(),
+          rememberTransport: false,
+          'remember transport': false
+        });
         this.socket.on('connect', __bind(function() {
           return this.onSocketConnect();
         }, this));
@@ -63,31 +84,9 @@
         this.socket.on('reconnect_failed', __bind(function() {
           return this.onSocketReconnectFailed();
         }, this));
-        this.socket.on('reconnecting', __bind(function(delay, attempts) {
+        return this.socket.on('reconnecting', __bind(function(delay, attempts) {
           return this.onSocketReconnecting(delay, attempts);
         }, this));
-      } else {
-        this.poll = {
-          interval: {
-            val: 0,
-            handle: null,
-            sleepyFactor: 4
-          },
-          send: __bind(function(freq) {
-            return $.post("/_/poll/?t=" + (smio.Util.DateTime.ticks()), JSON.stringify(freq.msg), (__bind(function(m, t, x) {
-              return this.onMessage(m, t, x);
-            }, this)), 'text').error(__bind(function(x, t, e) {
-              return this.onError(x, t, e, freq);
-            }, this));
-          }, this)
-        };
-      }
-    }
-    Dispatcher.prototype.connect = function() {
-      this.ready = true;
-      $('#smio_offline').attr('title', smio.resources.client.connecting_hint);
-      if (this.socket) {
-        return this.socket.connect();
       } else if (this.poll) {
         this.poll.send(this.message({}, {
           cmd: 's',
@@ -214,7 +213,9 @@
         return this.setTimer();
       }
     };
-    Dispatcher.prototype.onSocketClose = function() {};
+    Dispatcher.prototype.onSocketClose = function() {
+      return this.onOffline();
+    };
     Dispatcher.prototype.onSocketConnect = function() {
       return this.onOnline();
     };

@@ -7,17 +7,7 @@ class smio.Dispatcher
 		@initialFetchDone = false
 		@lastFetchTime = 0
 		if isSocketIO
-			opts = resource: '/_/sockio/', transports: ['websocket'], rememberTransport: false, 'remember transport': false, 'try multiple transports': false, reconnect: true, 'connect timeout': 5000
-			@socket = io.connect(host, opts)
-			@socket.on 'connect', => @onSocketConnect()
-			@socket.on 'connect_failed', => @onSocketConnectFailed()
-			@socket.on 'connecting', (type) => @onSocketConnecting(type)
-			@socket.on 'close', => @onSocketClose()
-			@socket.on 'disconnect', => @onSocketDisconnect()
-			@socket.on 'message', (msg) => @onMessage(msg)
-			@socket.on 'reconnect', (type, attempts) => @onSocketReconnect(type, attempts)
-			@socket.on 'reconnect_failed', => @onSocketReconnectFailed()
-			@socket.on 'reconnecting', (delay, attempts) => @onSocketReconnecting(delay, attempts)
+			@socket = host or true
 		else
 			@poll =
 				interval:
@@ -31,7 +21,16 @@ class smio.Dispatcher
 		@ready = true
 		$('#smio_offline').attr('title', smio.resources.client.connecting_hint)
 		if @socket
-			@socket.connect()
+			@socket = io.connect((if _.isString(@socket) then @socket else undefined), transports: ['websocket'], 'try multiple transports': false, reconnect: true, 'connect timeout': 5000, 'reconnection delay': 5000, 'max reconnection attempts': smio.Util.Number.max(), rememberTransport: false, 'remember transport': false)
+			@socket.on 'connect', => @onSocketConnect()
+			@socket.on 'connect_failed', => @onSocketConnectFailed()
+			@socket.on 'connecting', (type) => @onSocketConnecting(type)
+			@socket.on 'close', => @onSocketClose()
+			@socket.on 'disconnect', => @onSocketDisconnect()
+			@socket.on 'message', (msg) => @onMessage(msg)
+			@socket.on 'reconnect', (type, attempts) => @onSocketReconnect(type, attempts)
+			@socket.on 'reconnect_failed', => @onSocketReconnectFailed()
+			@socket.on 'reconnecting', (delay, attempts) => @onSocketReconnecting(delay, attempts)
 		else if @poll
 			@poll.send(@message({}, cmd: 's', settings: [['fi', 'bg']]))
 			@poll.send(@messageFetch())
@@ -111,6 +110,7 @@ class smio.Dispatcher
 			@setTimer()
 
 	onSocketClose: =>
+		@onOffline()
 
 	onSocketConnect: =>
 		@onOnline()

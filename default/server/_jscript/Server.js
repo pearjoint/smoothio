@@ -77,10 +77,14 @@
       } else {
         sockLogger = function() {};
       }
-      if ((this.io = socketio.listen(this.httpServer))) {
+      if ((this.io = socketio.listen(this.httpServer, {
+        transports: ['websocket'],
+        'flash policy server': false,
+        'browser client': false
+      }))) {
         this.io.configure('', __bind(function() {
-          this.io.set('resource', '/_/sockio/');
           this.io.set('transports', ['websocket']);
+          this.io.set('logger', {});
           this.io.disable('flash policy server');
           return this.io.disable('browser client');
         }, this));
@@ -98,7 +102,7 @@
     Server.prototype.getSocketSessionID = function(socket) {
       var _ref, _ref2;
       if (!smio.Server.sockSessions[socket.id]) {
-        smio.Server.sockSessions[socket.id] = smio.RequestContext.parseSmioCookie((_ref = socket['request']) != null ? (_ref2 = _ref['headers']) != null ? _ref2['cookie'] : void 0 : void 0).sessid;
+        smio.Server.sockSessions[socket.id] = smio.RequestContext.parseSmioCookie((_ref = socket['handshake']) != null ? (_ref2 = _ref['headers']) != null ? _ref2['cookie'] : void 0 : void 0).sessid;
       }
       return smio.Server.sockSessions[socket.id];
     };
@@ -180,6 +184,7 @@
             return socket.send(JSON.stringify(data));
           });
         } else {
+          smio.logit("NOOOCOOKIE");
           return socket.send("smoonocookie");
         }
       }

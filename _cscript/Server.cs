@@ -41,10 +41,10 @@ class smio.Server
 			sockLogger = smio.Util.Server.setupLogFile(@, 'sockLogFile', false, sockLogPath, (msg) -> msg)
 		else
 			sockLogger = ->
-		if (@io = socketio.listen(@httpServer))
+		if (@io = socketio.listen(@httpServer, transports: ['websocket'], 'flash policy server': false, 'browser client': false))
 			@io.configure '', =>
-				@io.set('resource', '/_/sockio/')
 				@io.set('transports', ['websocket'])
+				@io.set('logger', {})
 				@io.disable('flash policy server')
 				@io.disable('browser client')
 			@io.sockets.on 'connection', (socket) =>
@@ -54,7 +54,7 @@ class smio.Server
 
 	getSocketSessionID: (socket) =>
 		if not smio.Server.sockSessions[socket.id]
-			smio.Server.sockSessions[socket.id] = smio.RequestContext.parseSmioCookie(socket['request']?['headers']?['cookie']).sessid
+			smio.Server.sockSessions[socket.id] = smio.RequestContext.parseSmioCookie(socket['handshake']?['headers']?['cookie']).sessid
 		smio.Server.sockSessions[socket.id]
 
 	onBind: =>
@@ -107,6 +107,7 @@ class smio.Server
 				sess.handleFetch null, message, (data) ->
 					socket.send(JSON.stringify(data))
 			else
+				smio.logit "NOOOCOOKIE"
 				socket.send("smoonocookie")
 
 	stop: =>
