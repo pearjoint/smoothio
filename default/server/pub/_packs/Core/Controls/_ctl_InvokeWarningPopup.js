@@ -16,7 +16,7 @@
     Packs_Core_Controls_InvokeWarningPopup.prototype.renderTemplate = function() {
       var noQuote;
       noQuote = _.any(this.args.errs, function(e) {
-        return e === smio.resources.smoothio.timeout;
+        return e === smio.resources.client.timeout;
       });
       return {
         'div .smio-invwarn .smio-fade': {

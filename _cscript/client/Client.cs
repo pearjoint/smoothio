@@ -43,10 +43,10 @@ class smio.Client
 
 	init: =>
 		for k of _date.relativeTime
-			if (tl = smio.resources.smoothio["natlangtime_#{k}"])
+			if (tl = smio.resources.client["natlangtime_#{k}"])
 				_date.relativeTime[k] = tl
 		$.ajaxSetup(timeout: 3000)
-		$('#smio_offline_msg').text(smio.resources.smoothio.connecting)
+		$('#smio_offline_msg').text(smio.resources.client.connecting)
 		@disp.connect()
 		setInterval(@doPageFixups, 750)
 

@@ -25,7 +25,7 @@ class smio.Instance
 		@servers = []
 		@mongoHasShutDown = false
 		@mongos = {}
-		if (resErrs = @loadResourceSets('../_core/res/server', false)) and resErrs.length
+		if (resErrs = @loadResourceSets('server/_jscript', false, './', null)) and resErrs.length
 			throw resErrs[0]
 
 	expandLogPath: (path) ->
@@ -46,7 +46,7 @@ class smio.Instance
 				@mongos["smoothio__#{sname}"] = @getDb(@mongo, "smoothio__#{sname}", "smoothio #{sname}", lastInterval += 500)
 
 	formatError: (err) =>
-		smio.Util.Server.formatError(err, @config.smoothio.logging.details, @config.smoothio.logging.stack)
+		smio.Util.Server.formatError(err, @config?['smoothio']?['logging']?['details'], @config?['smoothio']?['logging']?['stack'])
 
 	jsonError: (err) =>
 		[d, s] = [@config.smoothio.logging.details, @config.smoothio.logging.stack]
@@ -71,12 +71,12 @@ class smio.Instance
 				return false
 		if (@mongoIsLocal and @mongos['admin']) then @mongoHasShutDown else true
 
-	loadResourceSets: (dirPath, recurse, getBaseName) =>
-		errs = []
+	loadResourceSets: (dirPath, recurse, relModulePathPrefix, getBaseName) =>
+		[prefix, errs] = ['_res_', []]
 		if not _.isFunction(getBaseName)
-			getBaseName = (fpath, fname, relpath) -> fname
+			getBaseName = (fpath, fname, relpath) -> if _.startsWith(fname, prefix) then fname.substr(prefix.length) else fname
 		smio.walkDir dirPath, null, (fpath, fname, relpath) =>
-			if _.endsWith(fname, '.res')
+			if _.endsWith(fname, '.js') and _.startsWith(fname, prefix)
 				resBaseName = getBaseName(fpath, fname.substr(0, pos = fname.indexOf('.')), relpath)
 				if 'en' is (resLang = if pos is (lpos = fname.lastIndexOf('.')) then '' else fname.substr(pos + 1, lpos - pos - 1))
 					resLang = ''
@@ -89,9 +89,8 @@ class smio.Instance
 				if resLang and not @resourceSets[resBaseName][resLang]
 					@resourceSets[resBaseName][resLang] = {}
 				try
-					for name, val of (resSet = JSON.parse(smio.Util.FileSystem.readTextFile(fpath)))
-						if (name isnt 'x') and (name isnt '___resource_file_intro')
-							@resourceSets[resBaseName][if resLang then resLang else 'en'][name] = val
+					for name, val of (resSet = require(relModulePathPrefix + relpath.substr(0, relpath.lastIndexOf('.'))))
+						@resourceSets[resBaseName][if resLang then resLang else 'en'][name] = val
 				catch err
 					err['ml_error_filepath'] = fpath
 					errs.push(err)
@@ -105,7 +104,7 @@ class smio.Instance
 	res: (resSet, resName, lang, args...) =>
 		val = ''
 		if not resSet
-			resSet = 'smoothio'
+			resSet = 'server'
 		if (not lang) and not (lang = @config.smoothio.language)
 			lang = 'en'
 		if @resourceSets[resSet]?

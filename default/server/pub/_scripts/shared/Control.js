@@ -172,7 +172,7 @@
               if (_.isString(e)) {
                 return e;
               } else if ((e.textStatus === 'timeout') || (e.error === 'timeout')) {
-                return smio.resources.smoothio.timeout;
+                return smio.resources.client.timeout;
               } else if (e.message) {
                 return e.message;
               } else {
@@ -569,7 +569,7 @@
           }
         }
         if (!ret) {
-          ret = this.client ? resSets.smoothio[name] : resSets.smoothio[lang][name];
+          ret = this.client ? resSets.client[name] : resSets.client[lang][name] ? resSets.client[lang][name] : resSets.server[lang][name];
         }
       }
       if (ret) {

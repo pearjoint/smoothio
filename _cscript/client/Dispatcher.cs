@@ -31,7 +31,7 @@ class smio.Dispatcher
 
 	connect: =>
 		@ready = true
-		$('#smio_offline').attr('title', smio.resources.smoothio.connecting_hint)
+		$('#smio_offline').attr('title', smio.resources.client.connecting_hint)
 		if @socket
 			@socket.connect()
 		else if @poll

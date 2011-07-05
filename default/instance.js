@@ -92,6 +92,12 @@ smio.compileConfigFile = function(filePath, outDirPath) {
 		node_fs.writeFileSync(node_path.join(outDirPath, '_cfg_' + fileName.substr(0, fileName.lastIndexOf('.')) + '.js'), js);
 }
 
+smio.compileResourceFile = function(filePath, outDirPath) {
+	var fileContent, js, fileName = node_path.basename(filePath);
+	if ((fileContent = node_fs.readFileSync(filePath, 'utf-8')) && (js = coffee.compile('###\nDo not modify: auto-generated from ((your-instance-folder))/' + filePath + '\n###\nmodule.exports = ' + fileContent)))
+		node_fs.writeFileSync(node_path.join(outDirPath, '_res_' + fileName.substr(0, fileName.lastIndexOf('.')) + '.js'), js);
+}
+
 smio.iif = function(test, ifTrue, ifFalse) {
 	if (arguments.length < 3)
 		ifFalse = false;
@@ -169,28 +175,19 @@ function clearDirectory(dirPath, removeDirs) {
 	smio.walkDir(dirPath, null, node_fs.unlinkSync, null, false, null, false, removeDirs ? node_fs.rmdirSync : null);
 }
 
-function compileClientResources(srcPaths, outDirPath, minify, watch) {
-	var dels = ['___resource_file_intro', 'x'], all = { '': {} }, outScripts = {}, outScript, fileFunc = function(filePath, fileName, relPath) {
-		var resKey, json, pos, pos2, resLang;
-		if (_.endsWith(fileName, '.res') && ((pos = fileName.indexOf('.')) > 0) && ((pos2 = fileName.lastIndexOf('.')) > 0) && (resContent = node_fs.readFileSync(filePath, 'utf-8')) && (json = JSON.parse(resContent))) {
-			for (var i = 0, l = dels.length; i < l; i++) {
-				json[dels[i]] = null;
-				delete json[dels[i]];
+function compileClientResources(outDirPath, minify, watch) {
+	var all = { '': {} }, outScripts = {}, outScript, lk;
+	for (var resSet in smio.inst.resourceSets)
+		if (resSet != 'server')
+			for (var lang in smio.inst.resourceSets[resSet]) {
+				lk = ((lang == 'en') ? '' : lang);
+				if (!all[lk])
+					all[lk] = {};
+				if (!all[lk][resSet])
+					all[lk][resSet] = {};
+				for (var resName in smio.inst.resourceSets[resSet][lang])
+					all[lk][resSet][resName] = smio.inst.resourceSets[resSet][lang][resName];
 			}
-			resLang = ((pos == pos2) ? '' : fileName.substr(pos + 1, (pos2 - pos) - 1));
-			resKey = ((pos = relPath.indexOf('.')) > 0) ? relPath.substr(0, pos) : relPath;
-			if (_.endsWith(resKey, '/pack'))
-				resKey = resKey.substr(0, resKey.length - '/pack'.length);
-			resKey = resKey.split('/').join('_')
-			if (!all[resLang])
-				all[resLang] = {};
-			all[resLang][resKey] = json;
-			if (watch)
-				watchFile(filePath);
-		}
-	};
-	for (var i = 0, l = srcPaths.length; i < l; i++)
-		smio.walkDir(srcPaths[i], null, fileFunc, null, false, null, false, null, true);
 	for (var lang in all)
 		if (lang) {
 			if (_.indexOf(smio.resLangs, lang) < 0)
@@ -337,7 +334,8 @@ function restartSmoothio() {
 }
 
 function startSmoothio() {
-	var coffeeDone = false,
+	var startTime = new Date().getTime(),
+		coffeeDone = false,
 		hasCoffee = node_path.existsSync('../_cscript'),
 		hasStylus = node_path.existsSync('../_core/stylus'),
 		returnCode = 1,
@@ -356,6 +354,10 @@ function startSmoothio() {
 		clearDirectory('server/pub/_scripts');
 	}
 	smio.compileConfigFile('instance.ccfg', 'server/_jscript');
+	smio.walkDir('../_core/res', null, function(filePath, fileName, relFilePath) {
+		if (_.endsWith(fileName, '.cres'))
+			smio.compileResourceFile(filePath, 'server/_jscript');
+	});
 	if (hasStylus) {
 		clearDirectory('server/pub/_styles');
 		smio.logit('Compiling Stylus sheets...');
@@ -378,7 +380,7 @@ function startSmoothio() {
 			smio.logit('Merging client scripts and style sheets...');
 			mergeFiles('.css', 'server/pub/_merged/_smoothio.css', ['server/pub/_styles', 'server/pub/_packs'], smio.inst.config.smoothio.minify);
 			mergeFiles('.js', 'server/pub/_merged/_smoothio.js', ['../_core/scripts', 'server/pub/_scripts', 'server/pub/_packs'], smio.inst.config.smoothio.minify, true);
-			compileClientResources(['../_core/res/client', '../_core/packs'], 'server/pub/_merged', smio.inst.config.smoothio.minify, smio.inst.autoRestart);
+			compileClientResources('server/pub/_merged', smio.inst.config.smoothio.minify, smio.inst.autoRestart);
 			if (smio.inst.autoRestart) {
 				smio.walkDir('../_core/packs', null, watchSelective);
 				smio.walkDir('packs', null, watchSelective);
@@ -389,6 +391,7 @@ function startSmoothio() {
 				watchedFiles = [];
 			}
 			watchFile('instance.config');
+			smio.logit('STARTUP TOOK ' + ((new Date().getTime() - startTime) / 1000) + ' SECONDS.');
 		} else {
 			smio.inst = null;
 			process.exit(returnCode);

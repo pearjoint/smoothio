@@ -11519,14 +11519,14 @@ if (!JSON) {
     Client.prototype.init = function() {
       var k, tl;
       for (k in _date.relativeTime) {
-        if ((tl = smio.resources.smoothio["natlangtime_" + k])) {
+        if ((tl = smio.resources.client["natlangtime_" + k])) {
           _date.relativeTime[k] = tl;
         }
       }
       $.ajaxSetup({
         timeout: 3000
       });
-      $('#smio_offline_msg').text(smio.resources.smoothio.connecting);
+      $('#smio_offline_msg').text(smio.resources.client.connecting);
       this.disp.connect();
       return setInterval(this.doPageFixups, 750);
     };
@@ -11656,7 +11656,7 @@ if (!JSON) {
     }
     Dispatcher.prototype.connect = function() {
       this.ready = true;
-      $('#smio_offline').attr('title', smio.resources.smoothio.connecting_hint);
+      $('#smio_offline').attr('title', smio.resources.client.connecting_hint);
       if (this.socket) {
         return this.socket.connect();
       } else if (this.poll) {
@@ -12012,7 +12012,7 @@ if (!JSON) {
               if (_.isString(e)) {
                 return e;
               } else if ((e.textStatus === 'timeout') || (e.error === 'timeout')) {
-                return smio.resources.smoothio.timeout;
+                return smio.resources.client.timeout;
               } else if (e.message) {
                 return e.message;
               } else {
@@ -12409,7 +12409,7 @@ if (!JSON) {
           }
         }
         if (!ret) {
-          ret = this.client ? resSets.smoothio[name] : resSets.smoothio[lang][name];
+          ret = this.client ? resSets.client[name] : resSets.client[lang][name] ? resSets.client[lang][name] : resSets.server[lang][name];
         }
       }
       if (ret) {
@@ -13073,7 +13073,7 @@ if (!JSON) {
     Packs_Core_Controls_InvokeWarningPopup.prototype.renderTemplate = function() {
       var noQuote;
       noQuote = _.any(this.args.errs, function(e) {
-        return e === smio.resources.smoothio.timeout;
+        return e === smio.resources.client.timeout;
       });
       return {
         'div .smio-invwarn .smio-fade': {

@@ -26,18 +26,7 @@
       var dep, dontCopy, lastFilePath, pack, _i, _len, _ref, _ref2;
       if ((!this.loaded) && (!(this.loadError != null))) {
         try {
-          this.inst.loadResourceSets(this.packPath, true, __bind(function(fpath, fname, relpath) {
-            var parts;
-            parts = [this.packName];
-            if (relpath.indexOf('/') > 0) {
-              parts.push(smio.Util.Array.removeLast(relpath.split('/')));
-            }
-            if (fname !== 'pack') {
-              parts.push(fname);
-            }
-            return parts.join('_');
-          }, this));
-          dontCopy = ['*.ccfg', '*.cres'];
+          dontCopy = ['*.ccfg', '*.cres', '.cs'];
           smio.logit(this.inst.r('log_pack_loading', this.packName), 'packs.' + this.packName);
           lastFilePath = node_path.join(this.packPath, 'pack.ccfg');
           smio.compileConfigFile(lastFilePath, "server/_packs/" + this.packName);
@@ -82,6 +71,8 @@
               }, this));
             } else if (_.endsWith(fname, '.cs')) {
               return smio.compileCoffeeScripts(fpath, outDirPathServer, outDirPathClient, true, true);
+            } else if (_.endsWith(fname, '.cres')) {
+              return smio.compileResourceFile(fpath, outDirPathServer);
             } else if (_.endsWith(fname, '.ctl') && (tmplContent = smio.Util.FileSystem.readTextFile(fpath))) {
               lastFilePath = fpath;
               if ((ccsContent = smio.Control.compile(this.inst, tmplContent, node_path.join(this.packName, relPath)))) {
@@ -102,6 +93,17 @@
                 return node_fs.linkSync(fpath, node_path.join(outDirPathClient, fname));
               }
             }
+          }, this));
+          this.inst.loadResourceSets("server/_packs/" + this.packName, true, "../_packs/" + this.packName + "/", __bind(function(fpath, fname, relpath) {
+            var parts;
+            parts = [this.packName];
+            if (relpath.indexOf('/') > 0) {
+              parts.push(smio.Util.Array.removeLast(relpath.split('/')));
+            }
+            if (fname !== '_res_pack') {
+              parts.push(fname);
+            }
+            return parts.join('_');
           }, this));
           smio.logit(this.inst.r('log_pack_loaded', this.packName), 'packs.' + this.packName);
           return this.loaded = true;

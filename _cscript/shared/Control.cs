@@ -254,7 +254,7 @@ class smio.Packs_#{className} extends smio.Control
 			@invwarn = errs
 			@el.addClass('smio-hasinvwarn')
 			cid = @id('invdet')
-			mkCtl = => root.addControl('InvokeWarningPopup', id: cid, invCtl: @, errs: _.map(errs, (e) -> if _.isString(e) then e else if ((e.textStatus is 'timeout') or (e.error is 'timeout')) then smio.resources.smoothio.timeout else if e.message then e.message else JSON.stringify(smio.Util.Object.exclude(e, 'xhr')))).clingTo(@)
+			mkCtl = => root.addControl('InvokeWarningPopup', id: cid, invCtl: @, errs: _.map(errs, (e) -> if _.isString(e) then e else if ((e.textStatus is 'timeout') or (e.error is 'timeout')) then smio.resources.client.timeout else if e.message then e.message else JSON.stringify(smio.Util.Object.exclude(e, 'xhr')))).clingTo(@)
 			if not @client.allControls[root.id(cid)]
 				mkCtl()
 				@el.mouseenter =>
@@ -502,7 +502,7 @@ class smio.Packs_#{className} extends smio.Control
 				if (resSet = resSets[parts[0..i].join('_')]) and (ret = (if @client then resSet[name] else resSet[lang][name]))
 					break
 			if not ret
-				ret = if @client then resSets.smoothio[name] else resSets.smoothio[lang][name]
+				ret = if @client then resSets.client[name] else if resSets.client[lang][name] then resSets.client[lang][name] else resSets.server[lang][name]
 		if ret then (if args.length then _.sprintf(ret, args...) else ret) else (if @parent then @parent.res(name, args...) else "!!RES::#{name}!!")
 
 	root: () =>

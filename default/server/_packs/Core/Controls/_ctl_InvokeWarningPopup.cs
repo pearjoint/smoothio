@@ -13,7 +13,7 @@ class smio.Packs_Core_Controls_InvokeWarningPopup extends smio.Control
 #if client
 	
 	renderTemplate: =>
-		noQuote = _.any(@args.errs, (e) -> e is smio.resources.smoothio.timeout)
+		noQuote = _.any(@args.errs, (e) -> e is smio.resources.client.timeout)
 		'div .$CC .smio-fade':
 			id: ''
 			'div .$CC-edge':

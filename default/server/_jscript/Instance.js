@@ -36,7 +36,7 @@
       this.servers = [];
       this.mongoHasShutDown = false;
       this.mongos = {};
-      if ((resErrs = this.loadResourceSets('../_core/res/server', false)) && resErrs.length) {
+      if ((resErrs = this.loadResourceSets('server/_jscript', false, './', null)) && resErrs.length) {
         throw resErrs[0];
       }
     }
@@ -63,7 +63,8 @@
       return _results;
     };
     Instance.prototype.formatError = function(err) {
-      return smio.Util.Server.formatError(err, this.config.smoothio.logging.details, this.config.smoothio.logging.stack);
+      var _ref, _ref2, _ref3, _ref4, _ref5, _ref6;
+      return smio.Util.Server.formatError(err, (_ref = this.config) != null ? (_ref2 = _ref['smoothio']) != null ? (_ref3 = _ref2['logging']) != null ? _ref3['details'] : void 0 : void 0 : void 0, (_ref4 = this.config) != null ? (_ref5 = _ref4['smoothio']) != null ? (_ref6 = _ref5['logging']) != null ? _ref6['stack'] : void 0 : void 0 : void 0);
     };
     Instance.prototype.jsonError = function(err) {
       var d, s, _ref;
@@ -112,17 +113,21 @@
         return true;
       }
     };
-    Instance.prototype.loadResourceSets = function(dirPath, recurse, getBaseName) {
-      var errs;
-      errs = [];
+    Instance.prototype.loadResourceSets = function(dirPath, recurse, relModulePathPrefix, getBaseName) {
+      var errs, prefix, _ref;
+      _ref = ['_res_', []], prefix = _ref[0], errs = _ref[1];
       if (!_.isFunction(getBaseName)) {
         getBaseName = function(fpath, fname, relpath) {
-          return fname;
+          if (_.startsWith(fname, prefix)) {
+            return fname.substr(prefix.length);
+          } else {
+            return fname;
+          }
         };
       }
       smio.walkDir(dirPath, null, __bind(function(fpath, fname, relpath) {
-        var generic, lpos, name, pos, resBaseName, resLang, resSet, specific, val, _ref, _results;
-        if (_.endsWith(fname, '.res')) {
+        var generic, lpos, name, pos, resBaseName, resLang, resSet, specific, val, _ref2, _results;
+        if (_.endsWith(fname, '.js') && _.startsWith(fname, prefix)) {
           resBaseName = getBaseName(fpath, fname.substr(0, pos = fname.indexOf('.')), relpath);
           if ('en' === (resLang = pos === (lpos = fname.lastIndexOf('.')) ? '' : fname.substr(pos + 1, lpos - pos - 1))) {
             resLang = '';
@@ -141,11 +146,11 @@
             this.resourceSets[resBaseName][resLang] = {};
           }
           try {
-            _ref = (resSet = JSON.parse(smio.Util.FileSystem.readTextFile(fpath)));
+            _ref2 = (resSet = require(relModulePathPrefix + relpath.substr(0, relpath.lastIndexOf('.'))));
             _results = [];
-            for (name in _ref) {
-              val = _ref[name];
-              _results.push((name !== 'x') && (name !== '___resource_file_intro') ? this.resourceSets[resBaseName][resLang ? resLang : 'en'][name] = val : void 0);
+            for (name in _ref2) {
+              val = _ref2[name];
+              _results.push(this.resourceSets[resBaseName][resLang ? resLang : 'en'][name] = val);
             }
             return _results;
           } catch (err) {
@@ -167,7 +172,7 @@
       resSet = arguments[0], resName = arguments[1], lang = arguments[2], args = 4 <= arguments.length ? __slice.call(arguments, 3) : [];
       val = '';
       if (!resSet) {
-        resSet = 'smoothio';
+        resSet = 'server';
       }
       if ((!lang) && !(lang = this.config.smoothio.language)) {
         lang = 'en';

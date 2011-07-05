@@ -70,14 +70,14 @@
     Client.prototype.init = function() {
       var k, tl;
       for (k in _date.relativeTime) {
-        if ((tl = smio.resources.smoothio["natlangtime_" + k])) {
+        if ((tl = smio.resources.client["natlangtime_" + k])) {
           _date.relativeTime[k] = tl;
         }
       }
       $.ajaxSetup({
         timeout: 3000
       });
-      $('#smio_offline_msg').text(smio.resources.smoothio.connecting);
+      $('#smio_offline_msg').text(smio.resources.client.connecting);
       this.disp.connect();
       return setInterval(this.doPageFixups, 750);
     };

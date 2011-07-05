@@ -21,14 +21,7 @@ class smio.Pack
 	load: =>
 		if (not @loaded) and (not @loadError?)
 			try
-				@inst.loadResourceSets @packPath, true, (fpath, fname, relpath) =>
-					parts = [@packName]
-					if relpath.indexOf('/') > 0
-						parts.push(smio.Util.Array.removeLast(relpath.split('/')))
-					if fname isnt 'pack'
-						parts.push(fname)
-					parts.join('_')
-				dontCopy = ['*.ccfg', '*.cres']
+				dontCopy = ['*.ccfg', '*.cres', '.cs']
 				smio.logit(@inst.r('log_pack_loading', @packName), 'packs.' + @packName)
 				lastFilePath = node_path.join(@packPath, 'pack.ccfg')
 				smio.compileConfigFile(lastFilePath, "server/_packs/#{@packName}")
@@ -58,6 +51,8 @@ class smio.Pack
 								node_fs.writeFileSync(node_path.join(outDirPathClient, "_styl_" + fname.substr(0, fname.lastIndexOf('.')) + '.css'), css)
 					else if _.endsWith(fname, '.cs')
 						smio.compileCoffeeScripts(fpath, outDirPathServer, outDirPathClient, true, true)
+					else if _.endsWith(fname, '.cres')
+						smio.compileResourceFile(fpath, outDirPathServer)
 					else if _.endsWith(fname, '.ctl') and (tmplContent = smio.Util.FileSystem.readTextFile(fpath))
 						lastFilePath = fpath
 						if (ccsContent = smio.Control.compile(@inst, tmplContent, node_path.join(@packName, relPath)))
@@ -66,6 +61,13 @@ class smio.Pack
 					else
 						if not _.any((smio.Util.FileSystem.isPathMatch(fname, pattern) for pattern in @config.pack.dontcopy))
 							node_fs.linkSync(fpath, node_path.join(outDirPathClient, fname))
+				@inst.loadResourceSets "server/_packs/#{@packName}", true, "../_packs/#{@packName}/", (fpath, fname, relpath) =>
+					parts = [@packName]
+					if relpath.indexOf('/') > 0
+						parts.push(smio.Util.Array.removeLast(relpath.split('/')))
+					if fname isnt '_res_pack'
+						parts.push(fname)
+					parts.join('_')
 				smio.logit(@inst.r('log_pack_loaded', @packName), 'packs.' + @packName)
 				@loaded = true
 			catch err
