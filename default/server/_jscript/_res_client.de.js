@@ -18,6 +18,6 @@
     natlangtime_MM: '%d Monaten',
     natlangtime_y: '1 Jahr',
     natlangtime_yy: '%d Jahren',
-    timeout: 'Diese Anfrage ist noch vor Erhalt einer Server-Antwort <b>abgelaufen</b>, sie wurde möglicherweise bereits verarbeitet <b>oder auch nicht</b>.'
+    timeout: 'Diese Anfrage ist noch vor Erhalt einer Server-Antwort <b>abgelaufen</b>, sie wurde ggf. bereits verarbeitet <b>oder auch nicht</b>.'
   };
 }).call(this);
