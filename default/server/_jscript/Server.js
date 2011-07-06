@@ -180,11 +180,10 @@
       var sess, sessid;
       if (message) {
         if ((sessid = this.getSocketSessionID(socket)) && (sess = smio.Session.getBySessionID(this, sessid))) {
-          return sess.handleFetch(null, message, function(data) {
+          return sess.handleInvoke(null, message, function(data) {
             return socket.send(JSON.stringify(data));
           });
         } else {
-          smio.logit("NOOOCOOKIE");
           return socket.send("smoonocookie");
         }
       }

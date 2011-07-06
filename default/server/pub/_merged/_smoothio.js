@@ -15011,7 +15011,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         this.smioCookie = {};
       }
       this.sessionID = this.smioCookie['sessid'];
-      this.disp = new smio.Dispatcher(this, true);
+      this.disp = new smio.Dispatcher(this, false);
       this.pageWindow.resize(_.debounce((__bind(function() {
         return this.onWindowResize();
       }, this)), 300));
@@ -15257,6 +15257,10 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         });
         $('#smio_offline').hide();
         if (this.socket) {
+          this.send(this.message({}, {
+            cmd: 's',
+            settings: [['fi', 'bg']]
+          }));
           return this.send(this.messageFetch());
         }
       }
@@ -15533,7 +15537,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       if (((lh = this['lh']) != null) && (sub = this.sub('inv'))) {
         sub.html(lh + '').removeClass('smio-spin');
         if (errs && errs.length) {
-          sub.html('<b>&#x26A0;</b>');
+          sub.html('<span class="smio-picon">!</span>');
         }
       }
       if (errs && errs.length) {
@@ -16654,7 +16658,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                 btnClass: 'smio-bigbutton',
                 items: {
                   'retry': {
-                    labelRawHtml: "<span class=\"smio-invbtn-icon smio-invbtn-retry\">&#x27A5;</span> " + (this.r('invwarn_retry')),
+                    labelRawHtml: "<span class=\"smio-invbtn-icon smio-invbtn-retry smio-picon\">1</span> " + (this.r('invwarn_retry')),
                     onClick: __bind(function() {
                       if (this.args.invCtl && this.args.invCtl.el && !this.isDisabled()) {
                         return this.args.invCtl.el.click();
@@ -16662,7 +16666,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
                     }, this)
                   },
                   'cancel': {
-                    labelRawHtml: "<span class=\"smio-invbtn-icon smio-invbtn-cancel\">&#x2718;</span> " + (this.r('invwarn_cancel')),
+                    labelRawHtml: "<span class=\"smio-invbtn-icon smio-invbtn-cancel smio-picon\">D</span> " + (this.r('invwarn_cancel')),
                     onClick: __bind(function() {
                       if (this.args.invCtl && !this.isDisabled()) {
                         return this.args.invCtl.resetInvoke();

@@ -13,6 +13,13 @@
 ::-moz-selection
 	smio-selection()
 
+@font-face
+	font-family 'Pictos'
+	src: url('/_/file/fonts/pictos-web.eot');
+	src: local('☺'), url('/_/file/fonts/pictos-web.woff') format('woff'), url('/_/file/fonts/pictos-web.ttf') format('truetype'), url('/_/file/fonts/pictos-web.svg#webfontphKv1xv9') format('svg')
+	font-weight normal
+	font-style normal
+
 @keyframes animspin
 	0%
 		smio-transform rotate(0deg)
@@ -26,6 +33,11 @@
 		opacity 0
 	100%
 		opacity 1
+
+.smio-picon
+	font-family Pictos !important
+	line-height 0
+	font-weight 100
 
 .smio-blink
 	smio-animation animblink 0.33s linear infinite alternate
@@ -48,7 +60,7 @@ body
 	cursor default
 	color $coldark
 	margin 0
-	font-family Helvetica, Helvetica Neue, Sans-Serif
+	font-family Arial, Helvetica, Helvetica Neue, Sans-Serif
 	smio-select none
 	smio-drag none
 	background-color #d0c8b8

@@ -104,10 +104,9 @@ class smio.Server
 	onSocketMessage: (message, socket) =>
 		if message
 			if (sessid = @getSocketSessionID(socket)) and (sess = smio.Session.getBySessionID(@, sessid))
-				sess.handleFetch null, message, (data) ->
+				sess.handleInvoke null, message, (data) ->
 					socket.send(JSON.stringify(data))
 			else
-				smio.logit "NOOOCOOKIE"
 				socket.send("smoonocookie")
 
 	stop: =>

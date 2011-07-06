@@ -151,6 +151,10 @@
         });
         $('#smio_offline').hide();
         if (this.socket) {
+          this.send(this.message({}, {
+            cmd: 's',
+            settings: [['fi', 'bg']]
+          }));
           return this.send(this.messageFetch());
         }
       }

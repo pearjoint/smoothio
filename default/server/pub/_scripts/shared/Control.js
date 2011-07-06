@@ -157,7 +157,7 @@
       if (((lh = this['lh']) != null) && (sub = this.sub('inv'))) {
         sub.html(lh + '').removeClass('smio-spin');
         if (errs && errs.length) {
-          sub.html('<b>&#x26A0;</b>');
+          sub.html('<span class="smio-picon">!</span>');
         }
       }
       if (errs && errs.length) {

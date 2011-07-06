@@ -70,8 +70,8 @@
       smio.logit("INVOKE cmd: " + (JSON.stringify(cmd)));
       smio.logit("INVOKE freq: " + (JSON.stringify(freq)));
       return setTimeout((function() {
-        return cb(null, null);
-      }), 99999999);
+        return cb(new Error('foo'), null);
+      }), 2000);
     };
     Hub.prototype.getControlUpdates = function(sinceTicks, freq, fresp, cb) {
       var ct;

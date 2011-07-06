@@ -249,7 +249,7 @@ class smio.Packs_#{className} extends smio.Control
 		if (lh = @['lh'])? and (sub = @sub('inv'))
 			sub.html(lh + '').removeClass('smio-spin')
 			if errs and errs.length
-				sub.html('<b>&#x26A0;</b>')
+				sub.html('<span class="smio-picon">!</span>')
 		if errs and errs.length
 			@invwarn = errs
 			@el.addClass('smio-hasinvwarn')

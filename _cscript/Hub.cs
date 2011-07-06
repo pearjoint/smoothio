@@ -42,7 +42,7 @@ class smio.Hub
 	invoke: (cmd, freq, fresp, cb) =>
 		smio.logit "INVOKE cmd: #{JSON.stringify cmd}"
 		smio.logit "INVOKE freq: #{JSON.stringify freq}"
-		setTimeout((-> cb(null, null)), 99999999)
+		setTimeout((-> cb(new Error('foo'), null)), 2000)
 
 	getControlUpdates: (sinceTicks, freq, fresp, cb) =>
 		if sinceTicks

@@ -25,7 +25,7 @@
         this.smioCookie = {};
       }
       this.sessionID = this.smioCookie['sessid'];
-      this.disp = new smio.Dispatcher(this, true);
+      this.disp = new smio.Dispatcher(this, false);
       this.pageWindow.resize(_.debounce((__bind(function() {
         return this.onWindowResize();
       }, this)), 300));

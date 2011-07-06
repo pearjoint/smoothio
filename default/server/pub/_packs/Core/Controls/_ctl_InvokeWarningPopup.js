@@ -55,7 +55,7 @@
                 btnClass: 'smio-bigbutton',
                 items: {
                   'retry': {
-                    labelRawHtml: "<span class=\"smio-invbtn-icon smio-invbtn-retry\">&#x27A5;</span> " + (this.r('invwarn_retry')),
+                    labelRawHtml: "<span class=\"smio-invbtn-icon smio-invbtn-retry smio-picon\">1</span> " + (this.r('invwarn_retry')),
                     onClick: __bind(function() {
                       if (this.args.invCtl && this.args.invCtl.el && !this.isDisabled()) {
                         return this.args.invCtl.el.click();
@@ -63,7 +63,7 @@
                     }, this)
                   },
                   'cancel': {
-                    labelRawHtml: "<span class=\"smio-invbtn-icon smio-invbtn-cancel\">&#x2718;</span> " + (this.r('invwarn_cancel')),
+                    labelRawHtml: "<span class=\"smio-invbtn-icon smio-invbtn-cancel smio-picon\">D</span> " + (this.r('invwarn_cancel')),
                     onClick: __bind(function() {
                       if (this.args.invCtl && !this.isDisabled()) {
                         return this.args.invCtl.resetInvoke();

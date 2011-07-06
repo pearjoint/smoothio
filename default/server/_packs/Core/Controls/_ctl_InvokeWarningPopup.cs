@@ -37,12 +37,12 @@ class smio.Packs_Core_Controls_InvokeWarningPopup extends smio.Control
 						btnClass: 'smio-bigbutton'
 						items:
 							'retry':
-								labelRawHtml: "<span class=\"smio-invbtn-icon smio-invbtn-retry\">&#x27A5;</span> #{@r 'invwarn_retry'}"
+								labelRawHtml: "<span class=\"smio-invbtn-icon smio-invbtn-retry smio-picon\">1</span> #{@r 'invwarn_retry'}"
 								onClick: =>
 									if @args.invCtl and @args.invCtl.el and not @isDisabled()
 										@args.invCtl.el.click()
 							'cancel':
-								labelRawHtml: "<span class=\"smio-invbtn-icon smio-invbtn-cancel\">&#x2718;</span> #{@r 'invwarn_cancel'}"
+								labelRawHtml: "<span class=\"smio-invbtn-icon smio-invbtn-cancel smio-picon\">D</span> #{@r 'invwarn_cancel'}"
 								onClick: =>
 									if @args.invCtl and not @isDisabled()
 										@args.invCtl.resetInvoke()

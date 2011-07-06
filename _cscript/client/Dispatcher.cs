@@ -69,6 +69,7 @@ class smio.Dispatcher
 			$('#smio_favicon').attr('href': '/_/file/images/smoothio.png')
 			$('#smio_offline').hide()
 			if @socket
+				@send(@message({}, cmd: 's', settings: [['fi', 'bg']]))
 				@send(@messageFetch())
 
 	onMessage: (msg, textStatus, xhr) =>

@@ -87,19 +87,19 @@ smio.compileCoffeeScripts = function(dirOrFilePath, srvOutDirPath, cltOutDirPath
 }
 
 smio.compileConfigFile = function(filePath, outDirPath) {
+	smio.compileCsonFile(filePath, outDirPath, '_cfg_');
+}
+
+smio.compileCsonFile = function(filePath, outDirPath, prefix) {
 	var fileContent, js, fileName = node_path.basename(filePath);
 	if ((fileContent = node_fs.readFileSync(filePath, 'utf-8')) && (js = coffee.compile('###\nDo not modify: auto-generated from ((your-instance-folder))/' + filePath + '\n###\nmodule.exports = ' + fileContent))) {
 		watchFile(filePath);
-		node_fs.writeFileSync(node_path.join(outDirPath, '_cfg_' + fileName.substr(0, fileName.lastIndexOf('.')) + '.js'), js);
+		node_fs.writeFileSync(node_path.join(outDirPath, prefix + fileName.substr(0, fileName.lastIndexOf('.')) + '.js'), js);
 	}
 }
 
 smio.compileResourceFile = function(filePath, outDirPath) {
-	var fileContent, js, fileName = node_path.basename(filePath);
-	if ((fileContent = node_fs.readFileSync(filePath, 'utf-8')) && (js = coffee.compile('###\nDo not modify: auto-generated from ((your-instance-folder))/' + filePath + '\n###\nmodule.exports = ' + fileContent))) {
-		watchFile(filePath);
-		node_fs.writeFileSync(node_path.join(outDirPath, '_res_' + fileName.substr(0, fileName.lastIndexOf('.')) + '.js'), js);
-	}
+	smio.compileCsonFile(filePath, outDirPath, '_res_');
 }
 
 smio.iif = function(test, ifTrue, ifFalse) {
