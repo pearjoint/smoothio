@@ -1,10 +1,12 @@
 (function() {
-  var mongodb, node_url, smio;
+  var mongodb, node_url, smio, _;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-  require('./shared/PromiseProxy');
-  require('./Database');
+  _ = require('underscore');
+  _.mixin(require('underscore.string'));
   mongodb = require('mongodb');
   node_url = require('url');
+  require('./shared/PromiseProxy');
+  require('./Database');
   smio = global.smoothio;
   smio.Hub = (function() {
     function Hub(session, url, rc) {
@@ -40,7 +42,7 @@
           }
           makeQuery = function(url) {
             return function() {
-              return url.indexOf(this.url) === 0;
+              return url.indexOf(this.u) === 0;
             };
           };
           return col.find({
@@ -51,7 +53,7 @@
             }
             if (results && results.length) {
               this.doc = _.sortBy(results, function(doc) {
-                return -doc.url.length;
+                return -doc.u.length;
               })[0];
               return cb_err_hasHubs(null, true);
             } else {
@@ -63,15 +65,29 @@
         }, this));
       }
     };
-    Hub.prototype.create = function(args, cb) {
-      return null;
+    Hub.prototype.create = function(freq, fresp, cb) {
+      return this.dbServer.withCollection("hubs", __bind(function(err, col) {
+        if (err) {
+          return cb(err, col);
+        }
+        return col.insert({
+          t: freq.msg.t,
+          u: '/'
+        }, __bind(function(err, docs) {
+          smio.logit(JSON.stringify({
+            e: err,
+            d: docs
+          }));
+          return cb(err, docs);
+        }, this));
+      }, this));
     };
     Hub.prototype.invoke = function(cmd, freq, fresp, cb) {
-      smio.logit("INVOKE cmd: " + (JSON.stringify(cmd)));
-      smio.logit("INVOKE freq: " + (JSON.stringify(freq)));
-      return setTimeout((function() {
-        return cb(new Error('foo'), null);
-      }), 2000);
+      if (cmd === 'create') {
+        return this.create(freq, fresp, cb);
+      } else {
+        return cb(new Error("Unknown command <b>" + cmd + "</b>"));
+      }
     };
     Hub.prototype.getControlUpdates = function(sinceTicks, freq, fresp, cb) {
       var ct;

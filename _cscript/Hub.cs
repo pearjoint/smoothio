@@ -1,8 +1,11 @@
 
-require './shared/PromiseProxy'
-require './Database'
+_ = require 'underscore'
+_.mixin require 'underscore.string'
 mongodb = require 'mongodb'
 node_url = require 'url'
+
+require './shared/PromiseProxy'
+require './Database'
 
 smio = global.smoothio
 
@@ -26,23 +29,28 @@ class smio.Hub
 		else
 			@dbServer.withCollection "hubs", (err, col) =>
 				return cb_err_hasHubs(err) if err
-				makeQuery = (url) -> -> url.indexOf(this.url) is 0
+				makeQuery = (url) -> -> url.indexOf(this.u) is 0
 				col.find($where: makeQuery(@url)).toArray (err, results) =>
 					return cb_err_hasHubs(err) if err
 					if results and results.length
-						@doc = _.sortBy(results, (doc) -> -doc.url.length)[0]
+						@doc = _.sortBy(results, (doc) -> -doc.u.length)[0]
 						cb_err_hasHubs(null, true)
 					else
 						col.find().nextObject (err, doc) =>
 							cb_err_hasHubs(err, smio.iif(doc))
 
-	create: (args, cb) =>
-		null
+	create: (freq, fresp, cb) =>
+		@dbServer.withCollection "hubs", (err, col) =>
+			return cb(err, col) if err
+			col.insert { t: freq.msg.t, u: '/' }, (err, docs) =>
+				smio.logit JSON.stringify { e: err, d: docs }
+				return cb(err, docs)
 
 	invoke: (cmd, freq, fresp, cb) =>
-		smio.logit "INVOKE cmd: #{JSON.stringify cmd}"
-		smio.logit "INVOKE freq: #{JSON.stringify freq}"
-		setTimeout((-> cb(new Error('foo'), null)), 2000)
+		if cmd is 'create'
+			@create(freq, fresp, cb)
+		else
+			cb(new Error("Unknown command <b>#{cmd}</b>"))
 
 	getControlUpdates: (sinceTicks, freq, fresp, cb) =>
 		if sinceTicks

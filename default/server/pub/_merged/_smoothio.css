@@ -139,8 +139,8 @@ table {
 }
 @font-face {
   font-family: "Pictos";
-  src: url("/_/file/fonts/pictos-web.eot");
-  src: local("☺"), url("/_/file/fonts/pictos-web.woff") format("woff"), url("/_/file/fonts/pictos-web.ttf") format("truetype"), url("/_/file/fonts/pictos-web.svg#webfontphKv1xv9") format("svg");
+  src: url("/_/file/images/peot");
+  src: local("☺"), url("/_/file/images/pwoff") format("woff"), url("/_/file/images/pweb.ttf") format("truetype"), url("/_/file/images/psvg#webfontphKv1xv9") format("svg");
   font-weight: normal;
   font-style: normal;
 }
@@ -709,7 +709,7 @@ input.smio-textinput[readonly]:focus {
   opacity: 0.6;
   display: inline-block;
   position: absolute;
-  left: 0.266em;
+  left: 0.3em;
   top: 0.266em;
 }
 .smio-invwarn-btns a.smio-bigbutton span.smio-invbtn-cancel {
