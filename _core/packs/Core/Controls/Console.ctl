@@ -1,18 +1,19 @@
-<%script:
+renderTemplate: =>
+	div:
+		id: ''
+		class: "smio-console smio-console-#{if @args['topDown'] then 'top' else 'bottom'}"
+		'div #ever .smio-console-ever':
+			_: ['Zeh Header']
+		'div #hover':
+			_: ['Zeh Hovva']
+		'div #detail':
+			_: ['Zeh Details']
+
 #if client
-	init: =>
-
-	onLoad: ($el) =>
-		super()
-		if not @args['topDown']
-			$("##{@id()}_detail").insertBefore("##{@id()}_ever")
-			$("##{@id()}_hover").insertBefore("##{@id()}_ever")
-
+onLoad: ($el) =>
+	super()
+	if not @args['topDown']
+		$("##{@id 'detail'}").insertBefore("##{@id('ever')}")
+		$("##{@id 'hover'}").insertBefore("##{@id('ever')}")
 #endif
-%>
-<div id="<%=@id()%>" class="smio-console smio-console-<%= if @args['topDown'] then 'top' else 'bottom'%>">
-	<div id="<%=@id()%>_ever" class="smio-console-ever">header</div>
-	<div id="<%=@id()%>_hover" class="smio-console-hover" style="display: none;">hover</div>
-	<div id="<%=@id()%>_detail" class="smio-console-detail" style="display: none;">details</div>
-</div>
 
