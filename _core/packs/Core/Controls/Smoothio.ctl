@@ -54,6 +54,8 @@
 			if (!global['smoothio'])
 				global['smoothio'] = {}
 			smio = global.smoothio;
+			if (!smio['gfx'])
+				smio.gfx = {};
 			smio.pageLoadError = null;
 			smio.iif = function(c, t, f) {
 				if (arguments.length < 3) f = false;

@@ -356,6 +356,7 @@ function startSmoothio() {
 	if (hasCoffee) {
 		clearDirectory('server/_jscript');
 		clearDirectory('server/pub/_scripts');
+		clearDirectory('server/pub/_scripts/gfx');
 	}
 	smio.compileConfigFile('instance.ccfg', 'server/_jscript');
 	smio.walkDir('../_core/res', null, function(filePath, fileName, relFilePath) {
@@ -372,6 +373,7 @@ function startSmoothio() {
 			smio.logit('Compiling CoffeeScripts...');
 			smio.compileCoffeeScripts('../_cscript', 'server/_jscript');
 			smio.compileCoffeeScripts('../_cscript/shared', 'server/_jscript/shared', 'server/pub/_scripts/shared');
+			smio.compileCoffeeScripts('../_cscript/client/gfx', '', 'server/pub/_scripts/gfx');
 			smio.compileCoffeeScripts('../_cscript/client', 'server/pub/_scripts');
 			coffeeDone = true;
 		} catch (err) {

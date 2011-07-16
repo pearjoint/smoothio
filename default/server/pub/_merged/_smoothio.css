@@ -225,7 +225,8 @@ body {
   -webkit-user-drag: none;
   -ms-user-drag: none;
   user-drag: none;
-  background-color: #d0c8b8;
+  xbackground-color: #d0c8b8;
+  background-color: #000;
   background-position: left top;
   overflow-x: hidden;
 }
@@ -812,6 +813,18 @@ a.smio-invwarn-close:focus {
   font-size: 0.8em;
   padding: 1.5em 0 0.25em 2em;
   overflow: hidden;
+}
+
+/** server/pub/_packs/Core/Earth/_styl_MainFrame.css **/
+canvas.smio-canvas3d {
+  display: block;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  width: 100%;
+  height: 100%;
 }
 
 /** server/pub/_packs/Core/ServerSetup/_styl_InitialHubSetup.css **/

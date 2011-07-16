@@ -224,7 +224,8 @@ body {
   -webkit-user-drag: none;
   -ms-user-drag: none;
   user-drag: none;
-  background-color: #d0c8b8;
+  xbackground-color: #d0c8b8;
+  background-color: #000;
   background-position: left top;
   overflow-x: hidden;
 }

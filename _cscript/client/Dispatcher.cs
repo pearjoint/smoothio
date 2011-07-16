@@ -32,7 +32,7 @@ class smio.Dispatcher
 			@socket.on 'reconnect_failed', => @onSocketReconnectFailed()
 			@socket.on 'reconnecting', (delay, attempts) => @onSocketReconnecting(delay, attempts)
 		else if @poll
-			@poll.send(@message({}, cmd: 's', settings: [['fi', 'bg']]))
+			#@poll.send(@message({}, cmd: 's', settings: [['fi', 'bg']]))
 			@poll.send(@messageFetch())
 
 	message: (msg, funcs) =>
@@ -60,16 +60,14 @@ class smio.Dispatcher
 	onOffline: =>
 		@offline++
 		if @offline is (if @poll then 1 else 2)
-			$('#smio_favicon').attr('href': '/_/file/images/bg.png')
 			$('#smio_offline').show()
 
 	onOnline: =>
 		if @offline
 			@offline = 0
-			$('#smio_favicon').attr('href': '/_/file/images/smoothio.png')
 			$('#smio_offline').hide()
 			if @socket
-				@send(@message({}, cmd: 's', settings: [['fi', 'bg']]))
+				#@send(@message({}, cmd: 's', settings: [['fi', 'bg']]))
 				@send(@messageFetch())
 
 	onMessage: (msg, textStatus, xhr) =>
@@ -141,6 +139,7 @@ class smio.Dispatcher
 			@poll.send(freq)
 
 	setTimer: (fn) =>
+		return
 		pi = @poll.interval
 		if not fn
 			fn = => @poll.send(@messageFetch())

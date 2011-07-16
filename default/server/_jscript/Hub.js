@@ -91,6 +91,11 @@
     };
     Hub.prototype.getControlUpdates = function(sinceTicks, freq, fresp, cb) {
       var ct;
+      return cb(null, {
+        '': {
+          '_': 'Core_Earth_MainFrame'
+        }
+      });
       if (sinceTicks) {
         return cb(null, {});
       } else {

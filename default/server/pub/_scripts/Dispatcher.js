@@ -88,10 +88,6 @@
           return this.onSocketReconnecting(delay, attempts);
         }, this));
       } else if (this.poll) {
-        this.poll.send(this.message({}, {
-          cmd: 's',
-          settings: [['fi', 'bg']]
-        }));
         return this.poll.send(this.messageFetch());
       }
     };
@@ -137,24 +133,14 @@
     Dispatcher.prototype.onOffline = function() {
       this.offline++;
       if (this.offline === (this.poll ? 1 : 2)) {
-        $('#smio_favicon').attr({
-          'href': '/_/file/images/bg.png'
-        });
         return $('#smio_offline').show();
       }
     };
     Dispatcher.prototype.onOnline = function() {
       if (this.offline) {
         this.offline = 0;
-        $('#smio_favicon').attr({
-          'href': '/_/file/images/smoothio.png'
-        });
         $('#smio_offline').hide();
         if (this.socket) {
-          this.send(this.message({}, {
-            cmd: 's',
-            settings: [['fi', 'bg']]
-          }));
           return this.send(this.messageFetch());
         }
       }
@@ -250,6 +236,7 @@
     };
     Dispatcher.prototype.setTimer = function(fn) {
       var pi, val;
+      return;
       pi = this.poll.interval;
       if (!fn) {
         fn = __bind(function() {

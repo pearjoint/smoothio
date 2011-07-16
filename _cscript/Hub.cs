@@ -53,6 +53,7 @@ class smio.Hub
 			cb(new Error("Unknown command <b>#{cmd}</b>"))
 
 	getControlUpdates: (sinceTicks, freq, fresp, cb) =>
+		return cb(null, '': '_': 'Core_Earth_MainFrame')
 		if sinceTicks
 			cb(null, {})
 		else
