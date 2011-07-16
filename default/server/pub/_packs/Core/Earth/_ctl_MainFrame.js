@@ -18,6 +18,8 @@
         'div .smio-main': {
           id: '',
           'canvas #c3d .smio-canvas3d': {
+            width: '480',
+            height: '320',
             html: ['']
           }
         }
@@ -25,9 +27,15 @@
     };
     Packs_Core_Earth_MainFrame.prototype.onLoad = function() {
       Packs_Core_Earth_MainFrame.__super__.onLoad.call(this);
-      return new smio.gfx.Renderer(this.id('c3d'));
+      this.renderer = new smio.gfx.Renderer(this.id('c3d'));
+      return this.onWindowResize(this.client.pageWindow.width(), this.client.pageWindow.height());
+    };
+    Packs_Core_Earth_MainFrame.prototype.onWindowResize = function(w, h) {
+      this.renderer.canvas.width(w).height(h);
+      return this.renderer.cam.setAspectRatio(w / h);
     };
     function Packs_Core_Earth_MainFrame(client, parent, args) {
+      this.onWindowResize = __bind(this.onWindowResize, this);
       this.onLoad = __bind(this.onLoad, this);
       this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Earth_MainFrame.__super__.constructor.call(this, client, parent, args);
       this.init();

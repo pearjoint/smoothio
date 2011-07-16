@@ -227,7 +227,7 @@ body {
   xbackground-color: #d0c8b8;
   background-color: #000;
   background-position: left top;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 .smio-disabledfaded {
   opacity: 0.5;

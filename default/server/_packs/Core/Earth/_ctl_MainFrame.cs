@@ -12,11 +12,18 @@ class smio.Packs_Core_Earth_MainFrame extends smio.Control
 		'div .smio-main':
 			id: ''
 			'canvas #c3d .smio-canvas3d':
+				width: '480'
+				height: '320'
 				html: ['']
 	
 	onLoad: =>
 		super()
-		new smio.gfx.Renderer(@id('c3d'))
+		@renderer = new smio.gfx.Renderer(@id('c3d'))
+		@onWindowResize(@client.pageWindow.width(), @client.pageWindow.height())
+	
+	onWindowResize: (w, h) =>
+		@renderer.canvas.width(w).height(h)
+		@renderer.cam.setAspectRatio(w / h)
 	
 	
 

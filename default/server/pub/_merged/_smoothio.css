@@ -228,7 +228,7 @@ body {
   xbackground-color: #d0c8b8;
   background-color: #000;
   background-position: left top;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 .smio-disabledfaded {
   opacity: 0.5;
@@ -821,10 +821,6 @@ canvas.smio-canvas3d {
   position: absolute;
   top: 0px;
   left: 0px;
-  right: 0px;
-  bottom: 0px;
-  width: 100%;
-  height: 100%;
 }
 
 /** server/pub/_packs/Core/ServerSetup/_styl_InitialHubSetup.css **/

@@ -13,21 +13,31 @@
     __extends(Renderer, CL3D.CopperLicht);
     function Renderer(cid) {
       Renderer.__super__.constructor.call(this, cid, true, 30, true);
-      if (this.initRenderer()) {
+      if ((this.canvas = $("#" + cid)) && (this.initRenderer())) {
         this.addScene(this.scene = new CL3D.Scene());
-        this.scene.setBackgroundColor(CL3D.createColor(1, 0, 0, 64));
-        this.scene.getRootSceneNode().addChild(this.node = new smio.gfx.SceneNode(this));
-        this.node.addAnimator(new CL3D.AnimatorRotation(new CL3D.Vect3d(0, 0.6, 0.8)));
-        this.billboard = new CL3D.BillboardSceneNode();
-        this.billboard.setSize(20, 20);
-        this.billboard.Pos.Y = 30;
-        this.billboard.getMaterial(0).Tex1 = this.getTextureManager().getTexture('/_/file/images/bg1.jpg', true);
-        this.billboard.getMaterial(0).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
-        this.scene.getRootSceneNode().addChild(this.billboard);
+        this.scene.setBackgroundColor(CL3D.createColor(255, 0, 0, 0));
+        this.scene.getRootSceneNode().addChild(this.universe = new smio.gfx.UniverseSceneNode(this));
+        this.skybox = new CL3D.SkyBoxSceneNode();
+        this.skybox.getMaterial(0).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ2.png', true);
+        this.skybox.getMaterial(0).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
+        this.skybox.getMaterial(1).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ1.png', true);
+        this.skybox.getMaterial(1).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
+        this.skybox.getMaterial(2).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ1.png', true);
+        this.skybox.getMaterial(2).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
+        this.skybox.getMaterial(3).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ2.png', true);
+        this.skybox.getMaterial(3).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
+        this.skybox.getMaterial(4).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ1.png', true);
+        this.skybox.getMaterial(4).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
+        this.skybox.getMaterial(5).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ2.png', true);
+        this.skybox.getMaterial(5).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
+        this.scene.getRootSceneNode().addChild(this.skybox);
         this.cam = new CL3D.CameraSceneNode();
+        this.cam.setAspectRatio(this.canvas.prop('width') / this.canvas.prop('height'));
+        this.cam.setFov(45);
         this.cam.Pos.X = 50;
         this.cam.Pos.Y = 20;
-        this.cam.addAnimator(this.animator = new CL3D.AnimatorCameraFPS(this.cam, this));
+        this.animator = new CL3D.AnimatorCameraFPS(this.cam, this);
+        this.cam.addAnimator(this.animator);
         this.animator.lookAt(new CL3D.Vect3d(0, 20, 0));
         this.scene.getRootSceneNode().addChild(this.cam);
         this.scene.setActiveCamera(this.cam);

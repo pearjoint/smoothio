@@ -15390,21 +15390,31 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     __extends(Renderer, CL3D.CopperLicht);
     function Renderer(cid) {
       Renderer.__super__.constructor.call(this, cid, true, 30, true);
-      if (this.initRenderer()) {
+      if ((this.canvas = $("#" + cid)) && (this.initRenderer())) {
         this.addScene(this.scene = new CL3D.Scene());
-        this.scene.setBackgroundColor(CL3D.createColor(1, 0, 0, 64));
-        this.scene.getRootSceneNode().addChild(this.node = new smio.gfx.SceneNode(this));
-        this.node.addAnimator(new CL3D.AnimatorRotation(new CL3D.Vect3d(0, 0.6, 0.8)));
-        this.billboard = new CL3D.BillboardSceneNode();
-        this.billboard.setSize(20, 20);
-        this.billboard.Pos.Y = 30;
-        this.billboard.getMaterial(0).Tex1 = this.getTextureManager().getTexture('/_/file/images/bg1.jpg', true);
-        this.billboard.getMaterial(0).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
-        this.scene.getRootSceneNode().addChild(this.billboard);
+        this.scene.setBackgroundColor(CL3D.createColor(255, 0, 0, 0));
+        this.scene.getRootSceneNode().addChild(this.universe = new smio.gfx.UniverseSceneNode(this));
+        this.skybox = new CL3D.SkyBoxSceneNode();
+        this.skybox.getMaterial(0).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ2.png', true);
+        this.skybox.getMaterial(0).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
+        this.skybox.getMaterial(1).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ1.png', true);
+        this.skybox.getMaterial(1).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
+        this.skybox.getMaterial(2).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ1.png', true);
+        this.skybox.getMaterial(2).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
+        this.skybox.getMaterial(3).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ2.png', true);
+        this.skybox.getMaterial(3).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
+        this.skybox.getMaterial(4).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ1.png', true);
+        this.skybox.getMaterial(4).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
+        this.skybox.getMaterial(5).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ2.png', true);
+        this.skybox.getMaterial(5).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
+        this.scene.getRootSceneNode().addChild(this.skybox);
         this.cam = new CL3D.CameraSceneNode();
+        this.cam.setAspectRatio(this.canvas.prop('width') / this.canvas.prop('height'));
+        this.cam.setFov(45);
         this.cam.Pos.X = 50;
         this.cam.Pos.Y = 20;
-        this.cam.addAnimator(this.animator = new CL3D.AnimatorCameraFPS(this.cam, this));
+        this.animator = new CL3D.AnimatorCameraFPS(this.cam, this);
+        this.cam.addAnimator(this.animator);
         this.animator.lookAt(new CL3D.Vect3d(0, 20, 0));
         this.scene.getRootSceneNode().addChild(this.cam);
         this.scene.setActiveCamera(this.cam);
@@ -15414,7 +15424,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   })();
 }).call(this);
 
-/** server/pub/_scripts/gfx/SceneNode.js **/
+/** server/pub/_scripts/gfx/UniverseSceneNode.js **/
 (function() {
   var smio;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
@@ -15426,14 +15436,14 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     return child;
   };
   smio = global.smoothio;
-  smio.gfx.SceneNode = (function() {
-    __extends(SceneNode, CL3D.SceneNode);
-    function SceneNode(engine) {
+  smio.gfx.UniverseSceneNode = (function() {
+    __extends(UniverseSceneNode, CL3D.SceneNode);
+    function UniverseSceneNode(engine) {
       var buf;
       this.engine = engine;
       this.render = __bind(this.render, this);
       this.OnRegisterSceneNode = __bind(this.OnRegisterSceneNode, this);
-      SceneNode.__super__.constructor.call(this, this.engine);
+      UniverseSceneNode.__super__.constructor.call(this, this.engine);
       this.init();
       (this.mesh = new CL3D.Mesh()).AddMeshBuffer(buf = new CL3D.MeshBuffer());
       buf.Indices = [0, 2, 3, 2, 1, 3, 1, 0, 3, 2, 0, 1];
@@ -15443,7 +15453,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       buf.Vertices.push(this.createVertex(-10, 20, -10, 1, 1));
       buf.Mat.Tex1 = this.engine.getTextureManager().getTexture('/_/file/images/bg0.jpg', true);
     }
-    SceneNode.prototype.createVertex = function(x, y, z, s, t) {
+    UniverseSceneNode.prototype.createVertex = function(x, y, z, s, t) {
       var v;
       v = new CL3D.Vertex3D(true);
       v.Pos.X = x;
@@ -15453,15 +15463,15 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       v.TCoords.Y = t;
       return v;
     };
-    SceneNode.prototype.OnRegisterSceneNode = function(scene) {
+    UniverseSceneNode.prototype.OnRegisterSceneNode = function(scene) {
       scene.registerNodeForRendering(this, CL3D.Scene.RENDER_MODE_DEFAULT);
-      return SceneNode.__super__.OnRegisterSceneNode.call(this, scene);
+      return UniverseSceneNode.__super__.OnRegisterSceneNode.call(this, scene);
     };
-    SceneNode.prototype.render = function(renderer) {
+    UniverseSceneNode.prototype.render = function(renderer) {
       renderer.setWorld(this.getAbsoluteTransformation());
       return renderer.drawMesh(this.mesh);
     };
-    return SceneNode;
+    return UniverseSceneNode;
   })();
 }).call(this);
 
@@ -17507,6 +17517,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         'div .smio-main': {
           id: '',
           'canvas #c3d .smio-canvas3d': {
+            width: '480',
+            height: '320',
             html: ['']
           }
         }
@@ -17514,9 +17526,15 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     };
     Packs_Core_Earth_MainFrame.prototype.onLoad = function() {
       Packs_Core_Earth_MainFrame.__super__.onLoad.call(this);
-      return new smio.gfx.Renderer(this.id('c3d'));
+      this.renderer = new smio.gfx.Renderer(this.id('c3d'));
+      return this.onWindowResize(this.client.pageWindow.width(), this.client.pageWindow.height());
+    };
+    Packs_Core_Earth_MainFrame.prototype.onWindowResize = function(w, h) {
+      this.renderer.canvas.width(w).height(h);
+      return this.renderer.cam.setAspectRatio(w / h);
     };
     function Packs_Core_Earth_MainFrame(client, parent, args) {
+      this.onWindowResize = __bind(this.onWindowResize, this);
       this.onLoad = __bind(this.onLoad, this);
       this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Earth_MainFrame.__super__.constructor.call(this, client, parent, args);
       this.init();
