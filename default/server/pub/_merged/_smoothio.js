@@ -15377,7 +15377,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
 /** server/pub/_scripts/gfx/Renderer.js **/
 (function() {
   var smio;
-  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
     ctor.prototype = parent.prototype;
@@ -15389,38 +15389,129 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio.gfx.Renderer = (function() {
     __extends(Renderer, CL3D.CopperLicht);
     function Renderer(cid) {
-      Renderer.__super__.constructor.call(this, cid, true, 30, true);
+      this.isContextLost = __bind(this.isContextLost, this);      Renderer.__super__.constructor.call(this, cid, false, 30, false);
       if ((this.canvas = $("#" + cid)) && (this.initRenderer())) {
         this.addScene(this.scene = new CL3D.Scene());
-        this.scene.setBackgroundColor(CL3D.createColor(255, 0, 0, 0));
+        this.scene.setBackgroundColor(CL3D.createColor(255, 0, 0, 48));
         this.scene.getRootSceneNode().addChild(this.universe = new smio.gfx.UniverseSceneNode(this));
-        this.skybox = new CL3D.SkyBoxSceneNode();
-        this.skybox.getMaterial(0).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ2.png', true);
-        this.skybox.getMaterial(0).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
-        this.skybox.getMaterial(1).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ1.png', true);
-        this.skybox.getMaterial(1).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
-        this.skybox.getMaterial(2).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ1.png', true);
-        this.skybox.getMaterial(2).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
-        this.skybox.getMaterial(3).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ2.png', true);
-        this.skybox.getMaterial(3).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
-        this.skybox.getMaterial(4).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ1.png', true);
-        this.skybox.getMaterial(4).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
-        this.skybox.getMaterial(5).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ2.png', true);
-        this.skybox.getMaterial(5).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
-        this.scene.getRootSceneNode().addChild(this.skybox);
         this.cam = new CL3D.CameraSceneNode();
+        this.cam.setFov(CL3D.degToRad(70));
         this.cam.setAspectRatio(this.canvas.prop('width') / this.canvas.prop('height'));
-        this.cam.setFov(45);
-        this.cam.Pos.X = 50;
-        this.cam.Pos.Y = 20;
+        this.cam.setFarValue((smio.gfx.UniverseSceneNode.consts.astroDist + 1) * 10);
+        this.cam.setNearValue(1);
+        this.cam.Pos.X = -8378100;
+        this.cam.Pos.Y = 0;
         this.animator = new CL3D.AnimatorCameraFPS(this.cam, this);
         this.cam.addAnimator(this.animator);
-        this.animator.lookAt(new CL3D.Vect3d(0, 20, 0));
+        this.animator.lookAt(new CL3D.Vect3d(0, 0, 0));
         this.scene.getRootSceneNode().addChild(this.cam);
         this.scene.setActiveCamera(this.cam);
       }
     }
+    Renderer.prototype.createVertex = function(x, y, z, s, t) {
+      var v;
+      v = new CL3D.Vertex3D(true);
+      v.Pos.X = x;
+      v.Pos.Y = y;
+      v.Pos.Z = z;
+      v.TCoords.X = s;
+      v.TCoords.Y = t;
+      return v;
+    };
+    Renderer.prototype.isContextLost = function() {
+      return this.getRenderer().getWebGL().isContextLost;
+    };
     return Renderer;
+  })();
+}).call(this);
+
+/** server/pub/_scripts/gfx/SphereSceneNode.js **/
+(function() {
+  var smio;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
+  };
+  smio = global.smoothio;
+  smio.gfx.SphereSceneNode = (function() {
+    __extends(SphereSceneNode, CL3D.SceneNode);
+    function SphereSceneNode(engine, radius, posx, posy, posz) {
+      var cosPhi, cosTheta, first, indices, lat, lats, lon, lons, meshbuf, phi, pi, second, sinPhi, sinTheta, theta, u, v, vert, vertex, verts, x, y, z, _i, _len, _ref;
+      this.engine = engine;
+      if (radius == null) {
+        radius = 20;
+      }
+      if (posx == null) {
+        posx = 0;
+      }
+      if (posy == null) {
+        posy = 0;
+      }
+      if (posz == null) {
+        posz = 0;
+      }
+      this.render = __bind(this.render, this);
+      this.OnRegisterSceneNode = __bind(this.OnRegisterSceneNode, this);
+      SphereSceneNode.__super__.constructor.call(this, this.engine);
+      this.init();
+      (this.mesh = new CL3D.Mesh()).AddMeshBuffer(meshbuf = new CL3D.MeshBuffer());
+      _ref = [12, 24, [], [], Math.PI], lats = _ref[0], lons = _ref[1], indices = _ref[2], verts = _ref[3], pi = _ref[4];
+      for (lat = 0; 0 <= lats ? lat <= lats : lat >= lats; 0 <= lats ? lat++ : lat--) {
+        theta = lat * pi / lats;
+        sinTheta = Math.sin(theta);
+        cosTheta = Math.cos(theta);
+        for (lon = 0; 0 <= lons ? lon <= lons : lon >= lons; 0 <= lons ? lon++ : lon--) {
+          phi = lon * 2 * pi / lons;
+          sinPhi = Math.sin(phi);
+          cosPhi = Math.cos(phi);
+          x = cosPhi * sinTheta;
+          y = cosTheta;
+          z = sinPhi * sinTheta;
+          u = 1 - (lon / lons);
+          v = lat / lats;
+          vertex = this.engine.createVertex(radius * x, radius * y, radius * z, 1 - u, v);
+          vertex.Normal.X = x;
+          vertex.Normal.Y = y;
+          vertex.Normal.Z = z;
+          verts.push(vertex);
+        }
+      }
+      for (lat = 0; 0 <= lats ? lat < lats : lat > lats; 0 <= lats ? lat++ : lat--) {
+        for (lon = 0; 0 <= lons ? lon < lons : lon > lons; 0 <= lons ? lon++ : lon--) {
+          first = (lat * (lons + 1)) + lon;
+          second = first + lons + 1;
+          indices.push(first + 1);
+          indices.push(second);
+          indices.push(first);
+          indices.push(first + 1);
+          indices.push(second + 1);
+          indices.push(second);
+        }
+      }
+      meshbuf.Indices = indices;
+      for (_i = 0, _len = verts.length; _i < _len; _i++) {
+        vert = verts[_i];
+        meshbuf.Vertices.push(vert);
+      }
+      meshbuf.Mat.Tex1 = this.engine.getTextureManager().getTexture('/_/file/images/earth.jpg', true);
+      this.Pos.X = posx;
+      this.Pos.Y = posy;
+      this.Pos.Z = posz;
+      this.updateAbsolutePosition();
+    }
+    SphereSceneNode.prototype.OnRegisterSceneNode = function(scene) {
+      scene.registerNodeForRendering(this, CL3D.Scene.RENDER_MODE_DEFAULT);
+      return SphereSceneNode.__super__.OnRegisterSceneNode.call(this, scene);
+    };
+    SphereSceneNode.prototype.render = function(renderer) {
+      renderer.setWorld(this.getAbsoluteTransformation());
+      return renderer.drawMesh(this.mesh);
+    };
+    return SphereSceneNode;
   })();
 }).call(this);
 
@@ -15438,38 +15529,28 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio = global.smoothio;
   smio.gfx.UniverseSceneNode = (function() {
     __extends(UniverseSceneNode, CL3D.SceneNode);
+    UniverseSceneNode.consts = {
+      astroDist: 149597870700,
+      earthRadius: 6378100,
+      moonDist: 356400000,
+      moonRadius: 1738140,
+      sunRadius: 697000000
+    };
     function UniverseSceneNode(engine) {
-      var buf;
       this.engine = engine;
       this.render = __bind(this.render, this);
       this.OnRegisterSceneNode = __bind(this.OnRegisterSceneNode, this);
       UniverseSceneNode.__super__.constructor.call(this, this.engine);
       this.init();
-      (this.mesh = new CL3D.Mesh()).AddMeshBuffer(buf = new CL3D.MeshBuffer());
-      buf.Indices = [0, 2, 3, 2, 1, 3, 1, 0, 3, 2, 0, 1];
-      buf.Vertices.push(this.createVertex(0, 0, 10, 0, 0));
-      buf.Vertices.push(this.createVertex(10, 0, -10, 1, 0));
-      buf.Vertices.push(this.createVertex(0, 20, 0, 0, 1));
-      buf.Vertices.push(this.createVertex(-10, 20, -10, 1, 1));
-      buf.Mat.Tex1 = this.engine.getTextureManager().getTexture('/_/file/images/bg0.jpg', true);
+      this.addChild(this.earth = new smio.gfx.SphereSceneNode(this.engine, smio.gfx.UniverseSceneNode.consts.earthRadius, 0, 0, 0));
     }
-    UniverseSceneNode.prototype.createVertex = function(x, y, z, s, t) {
-      var v;
-      v = new CL3D.Vertex3D(true);
-      v.Pos.X = x;
-      v.Pos.Y = y;
-      v.Pos.Z = z;
-      v.TCoords.X = s;
-      v.TCoords.Y = t;
-      return v;
-    };
     UniverseSceneNode.prototype.OnRegisterSceneNode = function(scene) {
       scene.registerNodeForRendering(this, CL3D.Scene.RENDER_MODE_DEFAULT);
       return UniverseSceneNode.__super__.OnRegisterSceneNode.call(this, scene);
     };
     UniverseSceneNode.prototype.render = function(renderer) {
       renderer.setWorld(this.getAbsoluteTransformation());
-      return renderer.drawMesh(this.mesh);
+      return this.earth.render(renderer);
     };
     return UniverseSceneNode;
   })();
@@ -17517,9 +17598,19 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         'div .smio-main': {
           id: '',
           'canvas #c3d .smio-canvas3d': {
-            width: '480',
-            height: '320',
+            width: '640',
+            height: '360',
             html: ['']
+          },
+          'div #ctlpanel': {
+            'input #lat': {
+              type: 'text',
+              value: '52.52627'
+            },
+            'input #long': {
+              type: 'text',
+              value: '13.40722'
+            }
           }
         }
       };
@@ -17530,7 +17621,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       return this.onWindowResize(this.client.pageWindow.width(), this.client.pageWindow.height());
     };
     Packs_Core_Earth_MainFrame.prototype.onWindowResize = function(w, h) {
-      this.renderer.canvas.width(w).height(h);
+      this.renderer.canvas.width(w).height(h - this.sub('ctlpanel').height());
+      this.renderer.cam.setFov(CL3D.degToRad(70));
       return this.renderer.cam.setAspectRatio(w / h);
     };
     function Packs_Core_Earth_MainFrame(client, parent, args) {

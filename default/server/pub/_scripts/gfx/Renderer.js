@@ -1,6 +1,6 @@
 (function() {
   var smio;
-  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
     ctor.prototype = parent.prototype;
@@ -12,37 +12,38 @@
   smio.gfx.Renderer = (function() {
     __extends(Renderer, CL3D.CopperLicht);
     function Renderer(cid) {
-      Renderer.__super__.constructor.call(this, cid, true, 30, true);
+      this.isContextLost = __bind(this.isContextLost, this);      Renderer.__super__.constructor.call(this, cid, false, 30, false);
       if ((this.canvas = $("#" + cid)) && (this.initRenderer())) {
         this.addScene(this.scene = new CL3D.Scene());
-        this.scene.setBackgroundColor(CL3D.createColor(255, 0, 0, 0));
+        this.scene.setBackgroundColor(CL3D.createColor(255, 0, 0, 48));
         this.scene.getRootSceneNode().addChild(this.universe = new smio.gfx.UniverseSceneNode(this));
-        this.skybox = new CL3D.SkyBoxSceneNode();
-        this.skybox.getMaterial(0).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ2.png', true);
-        this.skybox.getMaterial(0).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
-        this.skybox.getMaterial(1).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ1.png', true);
-        this.skybox.getMaterial(1).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
-        this.skybox.getMaterial(2).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ1.png', true);
-        this.skybox.getMaterial(2).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
-        this.skybox.getMaterial(3).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ2.png', true);
-        this.skybox.getMaterial(3).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
-        this.skybox.getMaterial(4).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ1.png', true);
-        this.skybox.getMaterial(4).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
-        this.skybox.getMaterial(5).Tex1 = this.getTextureManager().getTexture('/_/file/images/univ2.png', true);
-        this.skybox.getMaterial(5).Type = CL3D.Material.EMT_TRANSPARENT_ADD_COLOR;
-        this.scene.getRootSceneNode().addChild(this.skybox);
         this.cam = new CL3D.CameraSceneNode();
+        this.cam.setFov(CL3D.degToRad(70));
         this.cam.setAspectRatio(this.canvas.prop('width') / this.canvas.prop('height'));
-        this.cam.setFov(45);
-        this.cam.Pos.X = 50;
-        this.cam.Pos.Y = 20;
+        this.cam.setFarValue((smio.gfx.UniverseSceneNode.consts.astroDist + 1) * 10);
+        this.cam.setNearValue(1);
+        this.cam.Pos.X = -8378100;
+        this.cam.Pos.Y = 0;
         this.animator = new CL3D.AnimatorCameraFPS(this.cam, this);
         this.cam.addAnimator(this.animator);
-        this.animator.lookAt(new CL3D.Vect3d(0, 20, 0));
+        this.animator.lookAt(new CL3D.Vect3d(0, 0, 0));
         this.scene.getRootSceneNode().addChild(this.cam);
         this.scene.setActiveCamera(this.cam);
       }
     }
+    Renderer.prototype.createVertex = function(x, y, z, s, t) {
+      var v;
+      v = new CL3D.Vertex3D(true);
+      v.Pos.X = x;
+      v.Pos.Y = y;
+      v.Pos.Z = z;
+      v.TCoords.X = s;
+      v.TCoords.Y = t;
+      return v;
+    };
+    Renderer.prototype.isContextLost = function() {
+      return this.getRenderer().getWebGL().isContextLost;
+    };
     return Renderer;
   })();
 }).call(this);

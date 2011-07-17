@@ -11,38 +11,28 @@
   smio = global.smoothio;
   smio.gfx.UniverseSceneNode = (function() {
     __extends(UniverseSceneNode, CL3D.SceneNode);
+    UniverseSceneNode.consts = {
+      astroDist: 149597870700,
+      earthRadius: 6378100,
+      moonDist: 356400000,
+      moonRadius: 1738140,
+      sunRadius: 697000000
+    };
     function UniverseSceneNode(engine) {
-      var buf;
       this.engine = engine;
       this.render = __bind(this.render, this);
       this.OnRegisterSceneNode = __bind(this.OnRegisterSceneNode, this);
       UniverseSceneNode.__super__.constructor.call(this, this.engine);
       this.init();
-      (this.mesh = new CL3D.Mesh()).AddMeshBuffer(buf = new CL3D.MeshBuffer());
-      buf.Indices = [0, 2, 3, 2, 1, 3, 1, 0, 3, 2, 0, 1];
-      buf.Vertices.push(this.createVertex(0, 0, 10, 0, 0));
-      buf.Vertices.push(this.createVertex(10, 0, -10, 1, 0));
-      buf.Vertices.push(this.createVertex(0, 20, 0, 0, 1));
-      buf.Vertices.push(this.createVertex(-10, 20, -10, 1, 1));
-      buf.Mat.Tex1 = this.engine.getTextureManager().getTexture('/_/file/images/bg0.jpg', true);
+      this.addChild(this.earth = new smio.gfx.SphereSceneNode(this.engine, smio.gfx.UniverseSceneNode.consts.earthRadius, 0, 0, 0));
     }
-    UniverseSceneNode.prototype.createVertex = function(x, y, z, s, t) {
-      var v;
-      v = new CL3D.Vertex3D(true);
-      v.Pos.X = x;
-      v.Pos.Y = y;
-      v.Pos.Z = z;
-      v.TCoords.X = s;
-      v.TCoords.Y = t;
-      return v;
-    };
     UniverseSceneNode.prototype.OnRegisterSceneNode = function(scene) {
       scene.registerNodeForRendering(this, CL3D.Scene.RENDER_MODE_DEFAULT);
       return UniverseSceneNode.__super__.OnRegisterSceneNode.call(this, scene);
     };
     UniverseSceneNode.prototype.render = function(renderer) {
       renderer.setWorld(this.getAbsoluteTransformation());
-      return renderer.drawMesh(this.mesh);
+      return this.earth.render(renderer);
     };
     return UniverseSceneNode;
   })();

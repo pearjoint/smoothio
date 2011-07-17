@@ -18,9 +18,19 @@
         'div .smio-main': {
           id: '',
           'canvas #c3d .smio-canvas3d': {
-            width: '480',
-            height: '320',
+            width: '640',
+            height: '360',
             html: ['']
+          },
+          'div #ctlpanel': {
+            'input #lat': {
+              type: 'text',
+              value: '52.52627'
+            },
+            'input #long': {
+              type: 'text',
+              value: '13.40722'
+            }
           }
         }
       };
@@ -31,7 +41,8 @@
       return this.onWindowResize(this.client.pageWindow.width(), this.client.pageWindow.height());
     };
     Packs_Core_Earth_MainFrame.prototype.onWindowResize = function(w, h) {
-      this.renderer.canvas.width(w).height(h);
+      this.renderer.canvas.width(w).height(h - this.sub('ctlpanel').height());
+      this.renderer.cam.setFov(CL3D.degToRad(70));
       return this.renderer.cam.setAspectRatio(w / h);
     };
     function Packs_Core_Earth_MainFrame(client, parent, args) {

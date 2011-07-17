@@ -2,25 +2,17 @@ smio = global.smoothio
 
 class smio.gfx.UniverseSceneNode extends CL3D.SceneNode
 
+	@consts:
+		astroDist: 149597870700
+		earthRadius: 6378100
+		moonDist: 356400000
+		moonRadius: 1738140
+		sunRadius: 697000000
+
 	constructor: (@engine) ->
 		super(@engine)
 		@init()
-		(@mesh = new CL3D.Mesh()).AddMeshBuffer(buf = new CL3D.MeshBuffer())
-		buf.Indices = [0,2,3, 2,1,3, 1,0,3, 2,0,1]
-		buf.Vertices.push(@createVertex(0, 0, 10, 0, 0))
-		buf.Vertices.push(@createVertex(10, 0, -10, 1, 0))
-		buf.Vertices.push(@createVertex(0, 20, 0, 0, 1))
-		buf.Vertices.push(@createVertex(-10, 20, -10, 1, 1))
-		buf.Mat.Tex1 = @engine.getTextureManager().getTexture('/_/file/images/bg0.jpg', true)
-
-	createVertex: (x, y, z, s, t) ->
-		v = new CL3D.Vertex3D(true)
-		v.Pos.X = x
-		v.Pos.Y = y
-		v.Pos.Z = z
-		v.TCoords.X = s
-		v.TCoords.Y = t
-		v
+		@addChild(@earth = new smio.gfx.SphereSceneNode(@engine, smio.gfx.UniverseSceneNode.consts.earthRadius, 0, 0, 0))
 
 	OnRegisterSceneNode: (scene) =>
 		scene.registerNodeForRendering(@, CL3D.Scene.RENDER_MODE_DEFAULT)
@@ -28,5 +20,5 @@ class smio.gfx.UniverseSceneNode extends CL3D.SceneNode
 
 	render: (renderer) =>
 		renderer.setWorld(@getAbsoluteTransformation())
-		renderer.drawMesh(@mesh)
+		@earth.render(renderer)
 

@@ -822,6 +822,14 @@ canvas.smio-canvas3d {
   top: 0px;
   left: 0px;
 }
+#sm_ctlpanel {
+  background: #f0f0f0;
+  padding: 1em;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+}
 
 /** server/pub/_packs/Core/ServerSetup/_styl_InitialHubSetup.css **/
 div.smio-setup {
