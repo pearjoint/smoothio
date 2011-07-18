@@ -19,16 +19,22 @@
         'div .smio-main': {
           id: '',
           'canvas #c3d .smio-canvas3d': {
-            width: '640',
-            height: '360',
+            width: '672',
+            height: '420',
             html: ['']
           },
           'div #ctlpanel': {
-            'input #lat': {
+            'span .tmp1': {
+              _: ['Lat: ']
+            },
+            'input #lat .smio-textinput': {
               type: 'text',
               value: '52.52627'
             },
-            'input #long': {
+            'span .tmp2': {
+              _: ['Long: ']
+            },
+            'input #long .smio-textinput': {
               type: 'text',
               value: '13.40722'
             }
@@ -41,13 +47,19 @@
       this.renderer = new smio.gfx.Renderer(this.id('c3d'));
       return this.onWindowResize(this.client.pageWindow.width(), this.client.pageWindow.height());
     };
+    Packs_Core_Earth_MainFrame.prototype.onSleepy = function(sleepy) {
+      if (sleepy) {
+        return this.renderer.pressedKeys = [];
+      }
+    };
     Packs_Core_Earth_MainFrame.prototype.onWindowResize = function(w, h) {
       this.renderer.canvas.width(w).height(h - this.sub('ctlpanel').height());
-      this.renderer.cam.setFov(CL3D.degToRad(70));
-      return this.renderer.cam.setAspectRatio(w / h);
+      this.renderer.canvas.prop('width', w / 2).prop('height', (h - this.sub('ctlpanel').height()) / 2);
+      return this.renderer.universe.camSettings(w / h, CL3D.degToRad(70));
     };
     function Packs_Core_Earth_MainFrame(client, parent, args) {
       this.onWindowResize = __bind(this.onWindowResize, this);
+      this.onSleepy = __bind(this.onSleepy, this);
       this.onLoad = __bind(this.onLoad, this);
       this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Earth_MainFrame.__super__.constructor.call(this, client, parent, args);
       this.init();

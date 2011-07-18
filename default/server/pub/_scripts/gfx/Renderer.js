@@ -12,23 +12,18 @@
   smio.gfx.Renderer = (function() {
     __extends(Renderer, CL3D.CopperLicht);
     function Renderer(cid) {
-      this.isContextLost = __bind(this.isContextLost, this);      Renderer.__super__.constructor.call(this, cid, false, 30, false);
+      this.isContextLost = __bind(this.isContextLost, this);
+      this.handleMouseMove = __bind(this.handleMouseMove, this);
+      this.handleKeyUp = __bind(this.handleKeyUp, this);
+      this.handleKeyDown = __bind(this.handleKeyDown, this);
+      this.getSightDistance = __bind(this.getSightDistance, this);      Renderer.__super__.constructor.call(this, cid, false, 30, false);
+      this.pressedKeys = [];
       if ((this.canvas = $("#" + cid)) && (this.initRenderer())) {
         this.addScene(this.scene = new CL3D.Scene());
         this.scene.setBackgroundColor(CL3D.createColor(255, 0, 0, 48));
         this.scene.getRootSceneNode().addChild(this.universe = new smio.gfx.UniverseSceneNode(this));
-        this.cam = new CL3D.CameraSceneNode();
-        this.cam.setFov(CL3D.degToRad(70));
-        this.cam.setAspectRatio(this.canvas.prop('width') / this.canvas.prop('height'));
-        this.cam.setFarValue((smio.gfx.UniverseSceneNode.consts.astroDist + 1) * 10);
-        this.cam.setNearValue(1);
-        this.cam.Pos.X = -8378100;
-        this.cam.Pos.Y = 0;
-        this.animator = new CL3D.AnimatorCameraFPS(this.cam, this);
-        this.cam.addAnimator(this.animator);
-        this.animator.lookAt(new CL3D.Vect3d(0, 0, 0));
-        this.scene.getRootSceneNode().addChild(this.cam);
-        this.scene.setActiveCamera(this.cam);
+        this.scene.setActiveCamera(this.universe.cam);
+        this.universe.camSettings(this.canvas.prop('width') / this.canvas.prop('height'), CL3D.degToRad(45), this.getSightDistance(20), 1);
       }
     }
     Renderer.prototype.createVertex = function(x, y, z, s, t) {
@@ -40,6 +35,30 @@
       v.TCoords.X = s;
       v.TCoords.Y = t;
       return v;
+    };
+    Renderer.prototype.getSightDistance = function(eyeHeight) {
+      return Math.sqrt((2 * smio.gfx.UniverseSceneNode.consts.earthRadius * eyeHeight) + (eyeHeight * eyeHeight));
+    };
+    Renderer.prototype.handleKeyDown = function(e) {
+      var c;
+      if (!_.contains(this.pressedKeys, e.keyCode)) {
+        this.pressedKeys.push(e.keyCode);
+      }
+      if ((c = String.fromCharCode(e.keyCode)) && (c = c.toUpperCase())) {
+        if (c === 'C') {
+          this.universe.camFar = !this.universe.camFar;
+        }
+      }
+      return Renderer.__super__.handleKeyDown.call(this, e);
+    };
+    Renderer.prototype.handleKeyUp = function(e) {
+      if (_.contains(this.pressedKeys, e.keyCode)) {
+        this.pressedKeys = _.without(this.pressedKeys, e.keyCode);
+      }
+      return Renderer.__super__.handleKeyUp.call(this, e);
+    };
+    Renderer.prototype.handleMouseMove = function(e) {
+      return Renderer.__super__.handleMouseMove.call(this, e);
     };
     Renderer.prototype.isContextLost = function() {
       return this.getRenderer().getWebGL().isContextLost;

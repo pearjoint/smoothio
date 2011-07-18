@@ -28,7 +28,9 @@
       server1: {
         host: 'localhost',
         port: 2020
-      },
+      }
+    },
+    fooignore: {
       server2: {
         host: '192.168.56.1',
         port: 4040

@@ -279,6 +279,8 @@ class smio.Packs_#{className} extends smio.Control
 		for ctl in @controls
 			ctl.onLoad()
 
+	onSleepy: (sleepy) =>
+
 	onWindowResize: (width, height) =>
 
 	resetInvoke: (invWarnCtl) =>

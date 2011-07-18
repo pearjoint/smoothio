@@ -69,7 +69,7 @@
         vert = verts[_i];
         meshbuf.Vertices.push(vert);
       }
-      meshbuf.Mat.Tex1 = this.engine.getTextureManager().getTexture('/_/file/images/earth.jpg', true);
+      meshbuf.Mat.Tex1 = this.engine.getTextureManager().getTexture('/_/file/images/bg0.jpg', true);
       this.Pos.X = posx;
       this.Pos.Y = posy;
       this.Pos.Z = posz;

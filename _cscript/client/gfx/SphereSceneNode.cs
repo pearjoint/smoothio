@@ -40,7 +40,7 @@ class smio.gfx.SphereSceneNode extends CL3D.SceneNode
 		meshbuf.Indices = indices
 		for vert in verts
 			meshbuf.Vertices.push(vert)
-		meshbuf.Mat.Tex1 = @engine.getTextureManager().getTexture('/_/file/images/earth.jpg', true)
+		meshbuf.Mat.Tex1 = @engine.getTextureManager().getTexture('/_/file/images/bg0.jpg', true)
 		@Pos.X = posx
 		@Pos.Y = posy
 		@Pos.Z = posz

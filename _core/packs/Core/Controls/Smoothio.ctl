@@ -27,8 +27,13 @@
 			}
 
 			function onSmoothioSleepy(sleepy) {
-				if (smio && smio.client && smio.client.socket && (sleepy != smio.client.sleepy))
-					smio.client.socket.onSleepy(smio.client.sleepy = sleepy);
+				if (smio && smio.client && (sleepy != smio.client.sleepy)) {
+					smio.client.sleepy = sleepy;
+					if (smio.client.socket)
+						smio.client.socket.onSleepy(sleepy);
+					for (var cid in smio.client.allControls)
+						smio.client.allControls[cid].onSleepy(sleepy);
+				}
 			}
 
 			function onScriptError(scriptName) {
@@ -36,7 +41,7 @@
 					smio.pageLoadError = scriptName;
 			}
 		</script>
-		<link rel="stylesheet" href="/_/file/_merged/_smoothio.css"/>
+		<link rel="stylesheet" href="/_/file/_merged/_smoothio.css?r=<%= smio.Util.Number.randomInt(999999)%>"/>
 		<link rel="shortcut icon" type="image/png" id="smio_favicon" href="/_/file/images/smoothio.png" />
 		<style type="text/css"> span.smio-noscript { display: none; } </style>
 	</head>
@@ -68,7 +73,7 @@
 		</noscript>
 		<div id="smio_main" class="smio-main"><span class="smio-noscript" id="smio_noscript_content"><%arg:htmlContent%></span></div>
 		<script type="text/javascript" language="JavaScript" src="/_/dynfile/?config=_res.js" onerror="onScriptError('_res.js');" defer="defer" async="async"></script>
-		<script type="text/javascript" language="JavaScript" src="/_/file/_merged/_smoothio.js" onerror="onScriptError('_smoothio.js');" defer="defer" async="async"></script>
+		<script type="text/javascript" language="JavaScript" src="/_/file/_merged/_smoothio.js?r=<%= smio.Util.Number.randomInt(999999)%>" onerror="onScriptError('_smoothio.js');" defer="defer" async="async"></script>
 		<!--xscript type="text/javascript" language="JavaScript" src="/_/file/coffee-script.js" onerror="onScriptError('coffee-script.js');" defer="defer" async="async"></xscript-->
 	</body>
 </html>

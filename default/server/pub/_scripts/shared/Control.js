@@ -219,6 +219,7 @@
       }
       return _results;
     };
+    Control.prototype.onSleepy = function(sleepy) {};
     Control.prototype.onWindowResize = function(width, height) {};
     Control.prototype.resetInvoke = function(invWarnCtl) {
       var lh, root, sub;
@@ -335,6 +336,7 @@
       this.showClinger = __bind(this.showClinger, this);
       this.resetInvoke = __bind(this.resetInvoke, this);
       this.onWindowResize = __bind(this.onWindowResize, this);
+      this.onSleepy = __bind(this.onSleepy, this);
       this.onLoad = __bind(this.onLoad, this);
       this.onInvokeResult = __bind(this.onInvokeResult, this);
       this.onInvoking = __bind(this.onInvoking, this);

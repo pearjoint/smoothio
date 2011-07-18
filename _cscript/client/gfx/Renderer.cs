@@ -4,22 +4,13 @@ class smio.gfx.Renderer extends CL3D.CopperLicht
 
 	constructor: (cid) ->
 		super(cid, false, 30, false)
+		@pressedKeys = []
 		if (@canvas = $("##{cid}")) and (@initRenderer())
 			@addScene(@scene = new CL3D.Scene())
 			@scene.setBackgroundColor(CL3D.createColor(255, 0, 0, 48))
 			@scene.getRootSceneNode().addChild(@universe = new smio.gfx.UniverseSceneNode(@))
-			@cam = new CL3D.CameraSceneNode()
-			@cam.setFov(CL3D.degToRad(70))
-			@cam.setAspectRatio(@canvas.prop('width') / @canvas.prop('height'))
-			@cam.setFarValue((smio.gfx.UniverseSceneNode.consts.astroDist + 1) * 10)
-			@cam.setNearValue(1)
-			@cam.Pos.X = -8378100
-			@cam.Pos.Y = 0
-			@animator = new CL3D.AnimatorCameraFPS(@cam, @)
-			@cam.addAnimator(@animator)
-			@animator.lookAt(new CL3D.Vect3d(0, 0, 0))
-			@scene.getRootSceneNode().addChild(@cam)
-			@scene.setActiveCamera(@cam)
+			@scene.setActiveCamera(@universe.cam)
+			@universe.camSettings(@canvas.prop('width') / @canvas.prop('height'), CL3D.degToRad(45), @getSightDistance(20), 1)
 
 	createVertex: (x, y, z, s, t) ->
 		v = new CL3D.Vertex3D(true)
@@ -29,6 +20,26 @@ class smio.gfx.Renderer extends CL3D.CopperLicht
 		v.TCoords.X = s
 		v.TCoords.Y = t
 		v
+
+	getSightDistance: (eyeHeight) =>
+		Math.sqrt((2 * smio.gfx.UniverseSceneNode.consts.earthRadius * eyeHeight) + (eyeHeight * eyeHeight))
+
+	handleKeyDown: (e) =>
+		if not _.contains(@pressedKeys, e.keyCode)
+			@pressedKeys.push(e.keyCode)
+		if (c = String.fromCharCode(e.keyCode)) and (c = c.toUpperCase())
+			if c is 'C'
+				@universe.camFar = not @universe.camFar
+		super(e)
+
+	handleKeyUp: (e) =>
+		if _.contains(@pressedKeys, e.keyCode)
+			@pressedKeys = _.without(@pressedKeys, e.keyCode)
+		super(e)
+
+	handleMouseMove: (e) =>
+		#document.title = "#{e.clientX} / #{e.clientY}"
+		super(e)
 
 	isContextLost: =>
 		@getRenderer().getWebGL().isContextLost
