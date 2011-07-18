@@ -31,8 +31,8 @@
       this.debugOutput.setShowBackgroundColor(true, CL3D.createColor(255, 255, 255, 255));
       this.debugOutput.FontName = '8;default;arial;normal;normal;false';
       this.addChild(this.ground = new smio.gfx.GroundSceneNode(this.engine));
-      this.addChild(this.fig1 = new smio.gfx.DummyAvatarSceneNode(this.engine, 1, 3, 0, 0, 1.6));
-      this.addChild(this.curFig = this.fig2 = new smio.gfx.DummyAvatarSceneNode(this.engine, 2, -3, 0, 0, 1.9));
+      this.addChild(this.fig1 = new smio.gfx.DummyAvatarSceneNode(this.engine, 1, 3, 0, 49500000, 1.6));
+      this.addChild(this.curFig = this.fig2 = new smio.gfx.DummyAvatarSceneNode(this.engine, 2, -3, 0, 49500000, 1.9));
       this.fig2.addChild(this.cam = new CL3D.CameraSceneNode());
       this.cam.Pos.X = 0;
       this.cam.Pos.Y = this.curFig.head.Pos.Y;

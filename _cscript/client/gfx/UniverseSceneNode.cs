@@ -18,8 +18,8 @@ class smio.gfx.UniverseSceneNode extends CL3D.SceneNode
 		@debugOutput.setShowBackgroundColor(true, CL3D.createColor(255, 255, 255, 255))
 		@debugOutput.FontName = '8;default;arial;normal;normal;false'
 		@addChild(@ground = new smio.gfx.GroundSceneNode(@engine))
-		@addChild(@fig1 = new smio.gfx.DummyAvatarSceneNode(@engine, 1, 3, 0, 0, 1.6))
-		@addChild(@curFig = @fig2 = new smio.gfx.DummyAvatarSceneNode(@engine, 2, -3, 0, 0, 1.9))
+		@addChild(@fig1 = new smio.gfx.DummyAvatarSceneNode(@engine, 1, 3, 0, 49500000, 1.6))
+		@addChild(@curFig = @fig2 = new smio.gfx.DummyAvatarSceneNode(@engine, 2, -3, 0, 49500000, 1.9))
 		@fig2.addChild(@cam = new CL3D.CameraSceneNode())
 		@cam.Pos.X = 0
 		@cam.Pos.Y = @curFig.head.Pos.Y
