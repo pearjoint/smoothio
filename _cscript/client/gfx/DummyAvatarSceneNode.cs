@@ -2,7 +2,7 @@ smio = global.smoothio
 
 class smio.gfx.DummyAvatarSceneNode extends CL3D.SceneNode
 
-	constructor: (@engine, num, posx, posy, posz, height = 1.8) ->
+	constructor: (@engine, name, posx, posy, posz, height = 1.8) ->
 		super(@engine)
 		@init()
 		subHeight = (height - 0.3) / 2
@@ -13,8 +13,8 @@ class smio.gfx.DummyAvatarSceneNode extends CL3D.SceneNode
 		@body.Rot.Y = 45
 		@legs.updateAbsolutePosition()
 		@body.updateAbsolutePosition()
-		@legs.getMaterial(0).Tex1 = @engine.getTextureManager().getTexture("/_/file/images/bg#{num + 2}.jpg", true)
-		@body.getMaterial(0).Tex1 = @engine.getTextureManager().getTexture("/_/file/images/bg#{num}.jpg", true)
+		@legs.getMaterial(0).Tex1 = @engine.getTextureManager().getTexture("/_/file/images/textures/#{name}.jpg", true)
+		@body.getMaterial(0).Tex1 = @engine.getTextureManager().getTexture("/_/file/images/textures/#{name}.jpg", true)
 		@addChild(@head = new smio.gfx.SphereSceneNode(@engine, 0.25, 0, height - 0.15, 0))
 		@Pos.X = posx
 		@Pos.Y = posy
@@ -28,4 +28,13 @@ class smio.gfx.DummyAvatarSceneNode extends CL3D.SceneNode
 	render: (renderer) =>
 		renderer.setWorld(@getAbsoluteTransformation())
 		super(renderer)
+
+	rotate: (deg) =>
+		cy = @Rot.Y
+		y = cy + deg
+		if (y < 0)
+			y = 360 + cy
+		if (y > 360)
+			y = cy - 360
+		@Rot.Y = y
 

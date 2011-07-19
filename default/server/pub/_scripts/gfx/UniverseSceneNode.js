@@ -31,8 +31,8 @@
       this.debugOutput.setShowBackgroundColor(true, CL3D.createColor(255, 255, 255, 255));
       this.debugOutput.FontName = '8;default;arial;normal;normal;false';
       this.addChild(this.ground = new smio.gfx.GroundSceneNode(this.engine));
-      this.addChild(this.fig1 = new smio.gfx.DummyAvatarSceneNode(this.engine, 1, 3, 0, 49500000, 1.6));
-      this.addChild(this.curFig = this.fig2 = new smio.gfx.DummyAvatarSceneNode(this.engine, 2, -3, 0, 49500000, 1.9));
+      this.addChild(this.fig1 = new smio.gfx.DummyAvatarSceneNode(this.engine, 'wood', 0, 0, 0, 1.6));
+      this.addChild(this.curFig = this.fig2 = new smio.gfx.DummyAvatarSceneNode(this.engine, 'roster', 92, 0, -123, 1.9));
       this.fig2.addChild(this.cam = new CL3D.CameraSceneNode());
       this.cam.Pos.X = 0;
       this.cam.Pos.Y = this.curFig.head.Pos.Y;
@@ -40,6 +40,8 @@
       this.cam.setTarget(this.curFig.head.getAbsolutePosition());
       this.cam.updateAbsolutePosition();
       this.camFar = true;
+      this.busy = false;
+      this.mouseLook = false;
     }
     UniverseSceneNode.prototype.camSettings = function(aspectRatio, fieldOfView, farValue, nearValue) {
       var obj;
@@ -61,83 +63,107 @@
       scene.registerNodeForRendering(this, CL3D.Scene.RENDER_MODE_DEFAULT);
       return UniverseSceneNode.__super__.OnRegisterSceneNode.call(this, scene);
     };
-    UniverseSceneNode.prototype.render = function(r) {
-      var cam, cur, far, moveDiff, moveDiffXZ, near, pi, pressed, rotate, self, updatePos, xz, _ref;
-      _ref = [false, Math.PI, this.cam], updatePos = _ref[0], pi = _ref[1], cam = _ref[2];
-      pressed = __bind(function(keyCode) {
-        return _.contains(this.engine.pressedKeys, keyCode);
-      }, this);
-      moveDiff = function(step) {
-        if (step == null) {
-          step = 0.3;
+    UniverseSceneNode.prototype.render = function(renderer) {
+      var cam, cur, diff, far, finalz, headPos, mouseX, mouseY, moveDiff, moveDiffXZ, near, odiff, pi, prCtrl, prDown, prLeft, prRight, prShift, prTop, self, tpos, updatePos, xz, ydif, yval, zfromx, _ref;
+      if (!this.busy) {
+        this.busy = true;
+        _ref = [false, Math.PI, this.cam, 0], updatePos = _ref[0], pi = _ref[1], cam = _ref[2], ydif = _ref[3];
+        prLeft = this.engine.isKeyPressed(37);
+        prTop = this.engine.isKeyPressed(38);
+        prRight = this.engine.isKeyPressed(39);
+        prDown = this.engine.isKeyPressed(40);
+        prShift = this.engine.isKeyPressed(16);
+        prCtrl = this.engine.isKeyPressed(17);
+        if (this.engine.isKeyPressed()) {
+          this.mouseLook = false;
         }
-        return step * (pressed(16) ? 10 : 1);
-      };
-      moveDiffXZ = __bind(function(step) {
-        var mult, rad;
-        if (step == null) {
-          step = 0.05;
+        moveDiff = function() {
+          return 0.3 * (prShift ? 10 : 1);
+        };
+        moveDiffXZ = __bind(function(step, noFast) {
+          var mult, rad;
+          if (step == null) {
+            step = 0.05;
+          }
+          rad = CL3D.degToRad(this.curFig.Rot.Y);
+          mult = prShift && !noFast ? 44 : 1;
+          return [Math.sin(rad) * step * mult, Math.cos(rad) * step * mult];
+        }, this);
+        if (prLeft && !prRight) {
+          this.curFig.rotate(-3);
+          updatePos = true;
         }
-        rad = CL3D.degToRad(this.curFig.Rot.Y);
-        mult = pressed(16) ? 44 : 1;
-        return [Math.sin(rad) * step * mult, Math.cos(rad) * step * mult];
-      }, this);
-      rotate = __bind(function(deg) {
-        var cy, y;
-        cy = this.curFig.Rot.Y;
-        y = cy + deg;
-        if (y < 0) {
-          y = 360 + cy;
+        if (prRight && !prLeft) {
+          this.curFig.rotate(3);
+          updatePos = true;
         }
-        if (y > 360) {
-          y = cy - 360;
+        if (prTop && !prDown) {
+          if (prCtrl) {
+            this.curFig.Pos.Y += (ydif = moveDiff());
+          } else {
+            xz = moveDiffXZ();
+            this.curFig.Pos.X += xz[0];
+            this.curFig.Pos.Z += xz[1];
+          }
+          updatePos = true;
         }
-        return this.curFig.Rot.Y = y;
-      }, this);
-      if (pressed(37) && !pressed(39)) {
-        rotate(-3);
-        updatePos = true;
-      }
-      if (pressed(39) && !pressed(37)) {
-        rotate(3);
-        updatePos = true;
-      }
-      if (pressed(38) && !pressed(40)) {
-        if (pressed(17)) {
-          this.curFig.Pos.Y += moveDiff();
-        } else {
-          xz = moveDiffXZ();
-          this.curFig.Pos.X += xz[0];
-          this.curFig.Pos.Z += xz[1];
+        if (prDown && !prTop) {
+          if (prCtrl) {
+            this.curFig.Pos.Y += (ydif = -moveDiff());
+          } else {
+            xz = moveDiffXZ();
+            this.curFig.Pos.X -= xz[0];
+            this.curFig.Pos.Z -= xz[1];
+          }
+          updatePos = true;
         }
-        updatePos = true;
-      }
-      if (pressed(40) && !pressed(38)) {
-        if (pressed(17)) {
-          this.curFig.Pos.Y -= moveDiff();
-          if (this.curFig.Pos.Y < 0) {
-            this.curFig.Pos.Y = 0;
+        if (updatePos) {
+          this.curFig.updateAbsolutePosition();
+        }
+        headPos = this.curFig.head.Pos;
+        mouseX = this.mouseLook ? -(this.engine.getMouseX() - this.engine.canvasSize.w2) : 0;
+        mouseY = this.mouseLook ? this.engine.getMouseY() - this.engine.canvasSize.h22 : 0;
+        near = 2;
+        far = 4;
+        self = 0;
+        cur = this.camFar ? far : near;
+        cam.Pos.Y = headPos.Y + 0.5 + (mouseY === 0 ? 0 : (headPos.Y * 2) / (this.engine.canvasSize.h / mouseY));
+        yval = (mouseY === 0 ? 0 : cur / (this.engine.canvasSize.h15 / Math.abs(mouseY)));
+        odiff = this.engine.canvasSize.w4 - Math.abs(mouseX);
+        diff = Math.abs(odiff);
+        if (mouseX < 0) {
+          cam.Pos.X = -cur + (diff === 0 ? 0 : cur / (this.engine.canvasSize.w4 / diff));
+          if (odiff < 0) {
+            zfromx = cur + cam.Pos.X;
+          } else {
+            zfromx = -cur - cam.Pos.X;
           }
         } else {
-          xz = moveDiffXZ();
-          this.curFig.Pos.X -= xz[0];
-          this.curFig.Pos.Z -= xz[1];
+          cam.Pos.X = cur - (diff === 0 ? 0 : cur / (this.engine.canvasSize.w4 / diff));
+          if (odiff < 0) {
+            zfromx = cur - cam.Pos.X;
+          } else {
+            zfromx = -cur + cam.Pos.X;
+          }
         }
-        updatePos = true;
+        if (zfromx < 0) {
+          if ((finalz = zfromx + yval) > 0) {
+            finalz = 0;
+          }
+        } else {
+          if ((finalz = zfromx - yval) < 0) {
+            finalz = 0;
+          }
+        }
+        cam.Pos.Z = finalz;
+        tpos = this.curFig.head.getAbsolutePosition();
+        cam.setTarget(new CL3D.Vect3d(tpos.X, tpos.Y - (cur === near ? 0.1 : 0.5), tpos.Z));
+        cam.updateAbsolutePosition();
+        this.debugOutput.setText("X=" + (parseInt(this.curFig.Pos.X)) + " Y=" + (parseInt(this.curFig.Pos.Y)) + " Z=" + (parseInt(this.curFig.Pos.Z)) + " R=" + this.curFig.Rot.Y);
+        renderer.setWorld(this.getAbsoluteTransformation());
+        UniverseSceneNode.__super__.render.call(this, renderer);
+        return this.busy = false;
       }
-      if (updatePos) {
-        this.curFig.updateAbsolutePosition();
-      }
-      near = [2.25, 0.5];
-      far = [3.5, 0.5];
-      self = [0, 0];
-      cur = this.camFar ? far : near;
-      cam.setTarget(this.curFig.head.getAbsolutePosition());
-      cam.Pos.Z = -cur[0];
-      cam.updateAbsolutePosition();
-      this.debugOutput.setText("X=" + (parseInt(this.curFig.Pos.X)) + " Y=" + (parseInt(this.curFig.Pos.Y)) + " Z=" + (parseInt(this.curFig.Pos.Z)) + " R=" + this.curFig.Rot.Y);
-      r.setWorld(this.getAbsoluteTransformation());
-      return UniverseSceneNode.__super__.render.call(this, r);
     };
     return UniverseSceneNode;
   })();

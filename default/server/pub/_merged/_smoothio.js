@@ -15388,12 +15388,13 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio = global.smoothio;
   smio.gfx.DummyAvatarSceneNode = (function() {
     __extends(DummyAvatarSceneNode, CL3D.SceneNode);
-    function DummyAvatarSceneNode(engine, num, posx, posy, posz, height) {
+    function DummyAvatarSceneNode(engine, name, posx, posy, posz, height) {
       var subHeight;
       this.engine = engine;
       if (height == null) {
         height = 1.8;
       }
+      this.rotate = __bind(this.rotate, this);
       this.render = __bind(this.render, this);
       this.OnRegisterSceneNode = __bind(this.OnRegisterSceneNode, this);
       DummyAvatarSceneNode.__super__.constructor.call(this, this.engine);
@@ -15406,8 +15407,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.body.Rot.Y = 45;
       this.legs.updateAbsolutePosition();
       this.body.updateAbsolutePosition();
-      this.legs.getMaterial(0).Tex1 = this.engine.getTextureManager().getTexture("/_/file/images/bg" + (num + 2) + ".jpg", true);
-      this.body.getMaterial(0).Tex1 = this.engine.getTextureManager().getTexture("/_/file/images/bg" + num + ".jpg", true);
+      this.legs.getMaterial(0).Tex1 = this.engine.getTextureManager().getTexture("/_/file/images/textures/" + name + ".jpg", true);
+      this.body.getMaterial(0).Tex1 = this.engine.getTextureManager().getTexture("/_/file/images/textures/" + name + ".jpg", true);
       this.addChild(this.head = new smio.gfx.SphereSceneNode(this.engine, 0.25, 0, height - 0.15, 0));
       this.Pos.X = posx;
       this.Pos.Y = posy;
@@ -15422,7 +15423,120 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       renderer.setWorld(this.getAbsoluteTransformation());
       return DummyAvatarSceneNode.__super__.render.call(this, renderer);
     };
+    DummyAvatarSceneNode.prototype.rotate = function(deg) {
+      var cy, y;
+      cy = this.Rot.Y;
+      y = cy + deg;
+      if (y < 0) {
+        y = 360 + cy;
+      }
+      if (y > 360) {
+        y = cy - 360;
+      }
+      return this.Rot.Y = y;
+    };
     return DummyAvatarSceneNode;
+  })();
+}).call(this);
+
+/** server/pub/_scripts/gfx/Engine.js **/
+(function() {
+  var smio;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
+  };
+  smio = global.smoothio;
+  smio.gfx.Engine = (function() {
+    __extends(Engine, CL3D.CopperLicht);
+    function Engine(cid) {
+      this.updateCanvasSize = __bind(this.updateCanvasSize, this);
+      this.isContextLost = __bind(this.isContextLost, this);
+      this.handleMouseMove = __bind(this.handleMouseMove, this);
+      this.handleKeyUp = __bind(this.handleKeyUp, this);
+      this.handleKeyDown = __bind(this.handleKeyDown, this);
+      this.isKeyPressed = __bind(this.isKeyPressed, this);
+      this.getSightDistance = __bind(this.getSightDistance, this);      Engine.__super__.constructor.call(this, cid, false, 30, false);
+      this.pressedKeys = [];
+      if ((this.canvas = $("#" + cid)) && (this.initRenderer())) {
+        this.updateCanvasSize();
+        this.addScene(this.scene = new CL3D.Scene());
+        this.scene.setBackgroundColor(CL3D.createColor(255, 0, 0, 48));
+        this.scene.getRootSceneNode().addChild(this.skyBox = new CL3D.SkyBoxSceneNode());
+        this.skyBox.getMaterial(5).Tex1 = this.getTextureManager().getTexture('/_/file/images/textures/stars.jpg', true);
+        this.skyBox.getMaterial(4).Tex1 = this.getTextureManager().getTexture('/_/file/images/textures/skxup.jpg', true);
+        this.skyBox.getMaterial(0).Tex1 = this.getTextureManager().getTexture('/_/file/images/textures/skx1.jpg', true);
+        this.skyBox.getMaterial(2).Tex1 = this.getTextureManager().getTexture('/_/file/images/textures/skx3.jpg', true);
+        this.skyBox.getMaterial(1).Tex1 = this.getTextureManager().getTexture('/_/file/images/textures/skx2.jpg', true);
+        this.skyBox.getMaterial(3).Tex1 = this.getTextureManager().getTexture('/_/file/images/textures/skx0.jpg', true);
+        this.scene.getRootSceneNode().addChild(this.universe = new smio.gfx.UniverseSceneNode(this));
+        this.scene.setActiveCamera(this.universe.cam);
+        this.universe.camSettings(this.canvas.prop('width') / this.canvas.prop('height'), CL3D.degToRad(45), this.getSightDistance(20), 1);
+      }
+    }
+    Engine.prototype.createVertex = function(x, y, z, s, t) {
+      var v;
+      v = new CL3D.Vertex3D(true);
+      v.Pos.X = x;
+      v.Pos.Y = y;
+      v.Pos.Z = z;
+      v.TCoords.X = s;
+      v.TCoords.Y = t;
+      return v;
+    };
+    Engine.prototype.getSightDistance = function(eyeHeight) {
+      return Math.sqrt((2 * smio.gfx.UniverseSceneNode.consts.earthRadius * eyeHeight) + (eyeHeight * eyeHeight));
+    };
+    Engine.prototype.isKeyPressed = function(keyCode) {
+      if (!(keyCode != null)) {
+        return this.pressedKeys.length;
+      } else {
+        return _.contains(this.pressedKeys, keyCode);
+      }
+    };
+    Engine.prototype.handleKeyDown = function(e) {
+      var c;
+      document.title = e.keyCode + '';
+      if (!_.contains(this.pressedKeys, e.keyCode)) {
+        this.pressedKeys.push(e.keyCode);
+      }
+      if ((c = String.fromCharCode(e.keyCode)) && (c = c.toUpperCase())) {
+        if (c === 'C') {
+          this.universe.camFar = !this.universe.camFar;
+        }
+      }
+      return Engine.__super__.handleKeyDown.call(this, e);
+    };
+    Engine.prototype.handleKeyUp = function(e) {
+      if (_.contains(this.pressedKeys, e.keyCode)) {
+        this.pressedKeys = _.without(this.pressedKeys, e.keyCode);
+      }
+      return Engine.__super__.handleKeyUp.call(this, e);
+    };
+    Engine.prototype.handleMouseMove = function(e) {
+      this.universe.mouseLook = true;
+      return Engine.__super__.handleMouseMove.call(this, e);
+    };
+    Engine.prototype.isContextLost = function() {
+      return this.getRenderer().getWebGL().isContextLost;
+    };
+    Engine.prototype.updateCanvasSize = function() {
+      var height, width, _ref;
+      _ref = [this.canvas.width(), this.canvas.height()], width = _ref[0], height = _ref[1];
+      return this.canvasSize = {
+        w: width,
+        h: height,
+        w2: width / 2,
+        w4: width / 4,
+        h22: height / 2.2,
+        h15: height / 1.5
+      };
+    };
+    return Engine;
   })();
 }).call(this);
 
@@ -15441,20 +15555,23 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio.gfx.GroundSceneNode = (function() {
     __extends(GroundSceneNode, CL3D.SceneNode);
     function GroundSceneNode(engine) {
-      var meshBuf, size;
+      var halfHeight, halfWidth, height, meshBuf, size, width;
       this.engine = engine;
       this.render = __bind(this.render, this);
       this.OnRegisterSceneNode = __bind(this.OnRegisterSceneNode, this);
       GroundSceneNode.__super__.constructor.call(this);
       this.init();
-      size = 4096;
+      width = 495;
+      halfWidth = height = width / 2;
+      halfHeight = height / 2;
+      size = width;
       (this.mesh = new CL3D.Mesh()).AddMeshBuffer(meshBuf = new CL3D.MeshBuffer());
-      meshBuf.Indices = [3, 1, 2, 0, 1, 3];
-      meshBuf.Vertices.push(this.engine.createVertex(size, 0, -size, 0, 0));
-      meshBuf.Vertices.push(this.engine.createVertex(-size, 0, -size, 1, 0));
-      meshBuf.Vertices.push(this.engine.createVertex(-size, 0, size, 1, 1));
-      meshBuf.Vertices.push(this.engine.createVertex(size, 0, size, 0, 1));
-      meshBuf.Mat.Tex1 = this.engine.getTextureManager().getTexture('/_/file/images/bg3.jpg', true);
+      meshBuf.Indices = [0, 1, 3, 1, 2, 3];
+      meshBuf.Vertices.push(this.engine.createVertex(halfWidth, 0, -halfHeight, 0, 0));
+      meshBuf.Vertices.push(this.engine.createVertex(-halfWidth, 0, -halfHeight, 1, 0));
+      meshBuf.Vertices.push(this.engine.createVertex(-halfWidth, 0, halfHeight, 1, 1));
+      meshBuf.Vertices.push(this.engine.createVertex(halfWidth, 0, halfHeight, 0, 1));
+      meshBuf.Mat.Tex1 = this.engine.getTextureManager().getTexture('/_/file/images/textures/earth.jpg', true);
     }
     GroundSceneNode.prototype.OnRegisterSceneNode = function(scene) {
       scene.registerNodeForRendering(this, CL3D.Scene.RENDER_MODE_DEFAULT);
@@ -15465,76 +15582,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       return renderer.drawMesh(this.mesh);
     };
     return GroundSceneNode;
-  })();
-}).call(this);
-
-/** server/pub/_scripts/gfx/Renderer.js **/
-(function() {
-  var smio;
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
-    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
-    function ctor() { this.constructor = child; }
-    ctor.prototype = parent.prototype;
-    child.prototype = new ctor;
-    child.__super__ = parent.prototype;
-    return child;
-  };
-  smio = global.smoothio;
-  smio.gfx.Renderer = (function() {
-    __extends(Renderer, CL3D.CopperLicht);
-    function Renderer(cid) {
-      this.isContextLost = __bind(this.isContextLost, this);
-      this.handleMouseMove = __bind(this.handleMouseMove, this);
-      this.handleKeyUp = __bind(this.handleKeyUp, this);
-      this.handleKeyDown = __bind(this.handleKeyDown, this);
-      this.getSightDistance = __bind(this.getSightDistance, this);      Renderer.__super__.constructor.call(this, cid, false, 30, false);
-      this.pressedKeys = [];
-      if ((this.canvas = $("#" + cid)) && (this.initRenderer())) {
-        this.addScene(this.scene = new CL3D.Scene());
-        this.scene.setBackgroundColor(CL3D.createColor(255, 0, 0, 48));
-        this.scene.getRootSceneNode().addChild(this.universe = new smio.gfx.UniverseSceneNode(this));
-        this.scene.setActiveCamera(this.universe.cam);
-        this.universe.camSettings(this.canvas.prop('width') / this.canvas.prop('height'), CL3D.degToRad(45), this.getSightDistance(20), 1);
-      }
-    }
-    Renderer.prototype.createVertex = function(x, y, z, s, t) {
-      var v;
-      v = new CL3D.Vertex3D(true);
-      v.Pos.X = x;
-      v.Pos.Y = y;
-      v.Pos.Z = z;
-      v.TCoords.X = s;
-      v.TCoords.Y = t;
-      return v;
-    };
-    Renderer.prototype.getSightDistance = function(eyeHeight) {
-      return Math.sqrt((2 * smio.gfx.UniverseSceneNode.consts.earthRadius * eyeHeight) + (eyeHeight * eyeHeight));
-    };
-    Renderer.prototype.handleKeyDown = function(e) {
-      var c;
-      if (!_.contains(this.pressedKeys, e.keyCode)) {
-        this.pressedKeys.push(e.keyCode);
-      }
-      if ((c = String.fromCharCode(e.keyCode)) && (c = c.toUpperCase())) {
-        if (c === 'C') {
-          this.universe.camFar = !this.universe.camFar;
-        }
-      }
-      return Renderer.__super__.handleKeyDown.call(this, e);
-    };
-    Renderer.prototype.handleKeyUp = function(e) {
-      if (_.contains(this.pressedKeys, e.keyCode)) {
-        this.pressedKeys = _.without(this.pressedKeys, e.keyCode);
-      }
-      return Renderer.__super__.handleKeyUp.call(this, e);
-    };
-    Renderer.prototype.handleMouseMove = function(e) {
-      return Renderer.__super__.handleMouseMove.call(this, e);
-    };
-    Renderer.prototype.isContextLost = function() {
-      return this.getRenderer().getWebGL().isContextLost;
-    };
-    return Renderer;
   })();
 }).call(this);
 
@@ -15610,7 +15657,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         vert = verts[_i];
         meshbuf.Vertices.push(vert);
       }
-      meshbuf.Mat.Tex1 = this.engine.getTextureManager().getTexture('/_/file/images/bg0.jpg', true);
+      meshbuf.Mat.Tex1 = this.engine.getTextureManager().getTexture('/_/file/images/textures/particle.png', true);
       this.Pos.X = posx;
       this.Pos.Y = posy;
       this.Pos.Z = posz;
@@ -15662,8 +15709,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.debugOutput.setShowBackgroundColor(true, CL3D.createColor(255, 255, 255, 255));
       this.debugOutput.FontName = '8;default;arial;normal;normal;false';
       this.addChild(this.ground = new smio.gfx.GroundSceneNode(this.engine));
-      this.addChild(this.fig1 = new smio.gfx.DummyAvatarSceneNode(this.engine, 1, 3, 0, 49500000, 1.6));
-      this.addChild(this.curFig = this.fig2 = new smio.gfx.DummyAvatarSceneNode(this.engine, 2, -3, 0, 49500000, 1.9));
+      this.addChild(this.fig1 = new smio.gfx.DummyAvatarSceneNode(this.engine, 'wood', 0, 0, 0, 1.6));
+      this.addChild(this.curFig = this.fig2 = new smio.gfx.DummyAvatarSceneNode(this.engine, 'roster', 92, 0, -123, 1.9));
       this.fig2.addChild(this.cam = new CL3D.CameraSceneNode());
       this.cam.Pos.X = 0;
       this.cam.Pos.Y = this.curFig.head.Pos.Y;
@@ -15671,6 +15718,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.cam.setTarget(this.curFig.head.getAbsolutePosition());
       this.cam.updateAbsolutePosition();
       this.camFar = true;
+      this.busy = false;
+      this.mouseLook = false;
     }
     UniverseSceneNode.prototype.camSettings = function(aspectRatio, fieldOfView, farValue, nearValue) {
       var obj;
@@ -15692,83 +15741,107 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       scene.registerNodeForRendering(this, CL3D.Scene.RENDER_MODE_DEFAULT);
       return UniverseSceneNode.__super__.OnRegisterSceneNode.call(this, scene);
     };
-    UniverseSceneNode.prototype.render = function(r) {
-      var cam, cur, far, moveDiff, moveDiffXZ, near, pi, pressed, rotate, self, updatePos, xz, _ref;
-      _ref = [false, Math.PI, this.cam], updatePos = _ref[0], pi = _ref[1], cam = _ref[2];
-      pressed = __bind(function(keyCode) {
-        return _.contains(this.engine.pressedKeys, keyCode);
-      }, this);
-      moveDiff = function(step) {
-        if (step == null) {
-          step = 0.3;
+    UniverseSceneNode.prototype.render = function(renderer) {
+      var cam, cur, diff, far, finalz, headPos, mouseX, mouseY, moveDiff, moveDiffXZ, near, odiff, pi, prCtrl, prDown, prLeft, prRight, prShift, prTop, self, tpos, updatePos, xz, ydif, yval, zfromx, _ref;
+      if (!this.busy) {
+        this.busy = true;
+        _ref = [false, Math.PI, this.cam, 0], updatePos = _ref[0], pi = _ref[1], cam = _ref[2], ydif = _ref[3];
+        prLeft = this.engine.isKeyPressed(37);
+        prTop = this.engine.isKeyPressed(38);
+        prRight = this.engine.isKeyPressed(39);
+        prDown = this.engine.isKeyPressed(40);
+        prShift = this.engine.isKeyPressed(16);
+        prCtrl = this.engine.isKeyPressed(17);
+        if (this.engine.isKeyPressed()) {
+          this.mouseLook = false;
         }
-        return step * (pressed(16) ? 10 : 1);
-      };
-      moveDiffXZ = __bind(function(step) {
-        var mult, rad;
-        if (step == null) {
-          step = 0.05;
+        moveDiff = function() {
+          return 0.3 * (prShift ? 10 : 1);
+        };
+        moveDiffXZ = __bind(function(step, noFast) {
+          var mult, rad;
+          if (step == null) {
+            step = 0.05;
+          }
+          rad = CL3D.degToRad(this.curFig.Rot.Y);
+          mult = prShift && !noFast ? 44 : 1;
+          return [Math.sin(rad) * step * mult, Math.cos(rad) * step * mult];
+        }, this);
+        if (prLeft && !prRight) {
+          this.curFig.rotate(-3);
+          updatePos = true;
         }
-        rad = CL3D.degToRad(this.curFig.Rot.Y);
-        mult = pressed(16) ? 44 : 1;
-        return [Math.sin(rad) * step * mult, Math.cos(rad) * step * mult];
-      }, this);
-      rotate = __bind(function(deg) {
-        var cy, y;
-        cy = this.curFig.Rot.Y;
-        y = cy + deg;
-        if (y < 0) {
-          y = 360 + cy;
+        if (prRight && !prLeft) {
+          this.curFig.rotate(3);
+          updatePos = true;
         }
-        if (y > 360) {
-          y = cy - 360;
+        if (prTop && !prDown) {
+          if (prCtrl) {
+            this.curFig.Pos.Y += (ydif = moveDiff());
+          } else {
+            xz = moveDiffXZ();
+            this.curFig.Pos.X += xz[0];
+            this.curFig.Pos.Z += xz[1];
+          }
+          updatePos = true;
         }
-        return this.curFig.Rot.Y = y;
-      }, this);
-      if (pressed(37) && !pressed(39)) {
-        rotate(-3);
-        updatePos = true;
-      }
-      if (pressed(39) && !pressed(37)) {
-        rotate(3);
-        updatePos = true;
-      }
-      if (pressed(38) && !pressed(40)) {
-        if (pressed(17)) {
-          this.curFig.Pos.Y += moveDiff();
-        } else {
-          xz = moveDiffXZ();
-          this.curFig.Pos.X += xz[0];
-          this.curFig.Pos.Z += xz[1];
+        if (prDown && !prTop) {
+          if (prCtrl) {
+            this.curFig.Pos.Y += (ydif = -moveDiff());
+          } else {
+            xz = moveDiffXZ();
+            this.curFig.Pos.X -= xz[0];
+            this.curFig.Pos.Z -= xz[1];
+          }
+          updatePos = true;
         }
-        updatePos = true;
-      }
-      if (pressed(40) && !pressed(38)) {
-        if (pressed(17)) {
-          this.curFig.Pos.Y -= moveDiff();
-          if (this.curFig.Pos.Y < 0) {
-            this.curFig.Pos.Y = 0;
+        if (updatePos) {
+          this.curFig.updateAbsolutePosition();
+        }
+        headPos = this.curFig.head.Pos;
+        mouseX = this.mouseLook ? -(this.engine.getMouseX() - this.engine.canvasSize.w2) : 0;
+        mouseY = this.mouseLook ? this.engine.getMouseY() - this.engine.canvasSize.h22 : 0;
+        near = 2;
+        far = 4;
+        self = 0;
+        cur = this.camFar ? far : near;
+        cam.Pos.Y = headPos.Y + 0.5 + (mouseY === 0 ? 0 : (headPos.Y * 2) / (this.engine.canvasSize.h / mouseY));
+        yval = (mouseY === 0 ? 0 : cur / (this.engine.canvasSize.h15 / Math.abs(mouseY)));
+        odiff = this.engine.canvasSize.w4 - Math.abs(mouseX);
+        diff = Math.abs(odiff);
+        if (mouseX < 0) {
+          cam.Pos.X = -cur + (diff === 0 ? 0 : cur / (this.engine.canvasSize.w4 / diff));
+          if (odiff < 0) {
+            zfromx = cur + cam.Pos.X;
+          } else {
+            zfromx = -cur - cam.Pos.X;
           }
         } else {
-          xz = moveDiffXZ();
-          this.curFig.Pos.X -= xz[0];
-          this.curFig.Pos.Z -= xz[1];
+          cam.Pos.X = cur - (diff === 0 ? 0 : cur / (this.engine.canvasSize.w4 / diff));
+          if (odiff < 0) {
+            zfromx = cur - cam.Pos.X;
+          } else {
+            zfromx = -cur + cam.Pos.X;
+          }
         }
-        updatePos = true;
+        if (zfromx < 0) {
+          if ((finalz = zfromx + yval) > 0) {
+            finalz = 0;
+          }
+        } else {
+          if ((finalz = zfromx - yval) < 0) {
+            finalz = 0;
+          }
+        }
+        cam.Pos.Z = finalz;
+        tpos = this.curFig.head.getAbsolutePosition();
+        cam.setTarget(new CL3D.Vect3d(tpos.X, tpos.Y - (cur === near ? 0.1 : 0.5), tpos.Z));
+        cam.updateAbsolutePosition();
+        this.debugOutput.setText("X=" + (parseInt(this.curFig.Pos.X)) + " Y=" + (parseInt(this.curFig.Pos.Y)) + " Z=" + (parseInt(this.curFig.Pos.Z)) + " R=" + this.curFig.Rot.Y);
+        renderer.setWorld(this.getAbsoluteTransformation());
+        UniverseSceneNode.__super__.render.call(this, renderer);
+        return this.busy = false;
       }
-      if (updatePos) {
-        this.curFig.updateAbsolutePosition();
-      }
-      near = [2.25, 0.5];
-      far = [3.5, 0.5];
-      self = [0, 0];
-      cur = this.camFar ? far : near;
-      cam.setTarget(this.curFig.head.getAbsolutePosition());
-      cam.Pos.Z = -cur[0];
-      cam.updateAbsolutePosition();
-      this.debugOutput.setText("X=" + (parseInt(this.curFig.Pos.X)) + " Y=" + (parseInt(this.curFig.Pos.Y)) + " Z=" + (parseInt(this.curFig.Pos.Z)) + " R=" + this.curFig.Rot.Y);
-      r.setWorld(this.getAbsoluteTransformation());
-      return UniverseSceneNode.__super__.render.call(this, r);
     };
     return UniverseSceneNode;
   })();
@@ -16695,6 +16768,24 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       },
       randomInt: function(max) {
         return Math.floor(Math.random() * (max + 1));
+      },
+      toOtherSign: function(test, val) {
+        if (test < 0) {
+          return Math.abs(val);
+        } else if (val <= 0) {
+          return val;
+        } else {
+          return -val;
+        }
+      },
+      toSameSign: function(test, val) {
+        if (test >= 0) {
+          return Math.abs(val);
+        } else if (val <= 0) {
+          return val;
+        } else {
+          return -val;
+        }
       },
       tryParse: function(val, def, validate) {
         var num;
@@ -17843,18 +17934,19 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     };
     Packs_Core_Earth_MainFrame.prototype.onLoad = function() {
       Packs_Core_Earth_MainFrame.__super__.onLoad.call(this);
-      this.renderer = new smio.gfx.Renderer(this.id('c3d'));
+      this.engine = new smio.gfx.Engine(this.id('c3d'));
       return this.onWindowResize(this.client.pageWindow.width(), this.client.pageWindow.height());
     };
     Packs_Core_Earth_MainFrame.prototype.onSleepy = function(sleepy) {
       if (sleepy) {
-        return this.renderer.pressedKeys = [];
+        return this.engine.pressedKeys = [];
       }
     };
     Packs_Core_Earth_MainFrame.prototype.onWindowResize = function(w, h) {
-      this.renderer.canvas.width(w).height(h - this.sub('ctlpanel').height());
-      this.renderer.canvas.prop('width', w / 2).prop('height', (h - this.sub('ctlpanel').height()) / 2);
-      return this.renderer.universe.camSettings(w / h, CL3D.degToRad(70));
+      this.engine.canvas.width(w).height(h - this.sub('ctlpanel').height());
+      this.engine.canvas.prop('width', w / 2).prop('height', (h - this.sub('ctlpanel').height()) / 2);
+      this.engine.universe.camSettings(w / h, CL3D.degToRad(70));
+      return this.engine.updateCanvasSize();
     };
     function Packs_Core_Earth_MainFrame(client, parent, args) {
       this.onWindowResize = __bind(this.onWindowResize, this);

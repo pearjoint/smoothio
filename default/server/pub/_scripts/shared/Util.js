@@ -145,6 +145,24 @@
       randomInt: function(max) {
         return Math.floor(Math.random() * (max + 1));
       },
+      toOtherSign: function(test, val) {
+        if (test < 0) {
+          return Math.abs(val);
+        } else if (val <= 0) {
+          return val;
+        } else {
+          return -val;
+        }
+      },
+      toSameSign: function(test, val) {
+        if (test >= 0) {
+          return Math.abs(val);
+        } else if (val <= 0) {
+          return val;
+        } else {
+          return -val;
+        }
+      },
       tryParse: function(val, def, validate) {
         var num;
         num = parseInt("" + val);

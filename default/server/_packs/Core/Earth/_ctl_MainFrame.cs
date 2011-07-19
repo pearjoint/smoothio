@@ -29,17 +29,18 @@ class smio.Packs_Core_Earth_MainFrame extends smio.Control
 	
 	onLoad: =>
 		super()
-		@renderer = new smio.gfx.Renderer(@id('c3d'))
+		@engine = new smio.gfx.Engine(@id('c3d'))
 		@onWindowResize(@client.pageWindow.width(), @client.pageWindow.height())
 	
 	onSleepy: (sleepy) =>
 		if (sleepy)
-			@renderer.pressedKeys = []
+			@engine.pressedKeys = []
 	
 	onWindowResize: (w, h) =>
-		@renderer.canvas.width(w).height(h - @sub('ctlpanel').height())
-		@renderer.canvas.prop('width', w / 2).prop('height', (h - @sub('ctlpanel').height()) / 2)
-		@renderer.universe.camSettings(w / h, CL3D.degToRad(70))
+		@engine.canvas.width(w).height(h - @sub('ctlpanel').height())
+		@engine.canvas.prop('width', w / 2).prop('height', (h - @sub('ctlpanel').height()) / 2)
+		@engine.universe.camSettings(w / h, CL3D.degToRad(70))
+		@engine.updateCanvasSize()
 	
 	
 

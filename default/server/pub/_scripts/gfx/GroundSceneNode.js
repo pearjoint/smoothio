@@ -12,20 +12,23 @@
   smio.gfx.GroundSceneNode = (function() {
     __extends(GroundSceneNode, CL3D.SceneNode);
     function GroundSceneNode(engine) {
-      var meshBuf, size;
+      var halfHeight, halfWidth, height, meshBuf, size, width;
       this.engine = engine;
       this.render = __bind(this.render, this);
       this.OnRegisterSceneNode = __bind(this.OnRegisterSceneNode, this);
       GroundSceneNode.__super__.constructor.call(this);
       this.init();
-      size = 4096;
+      width = 495;
+      halfWidth = height = width / 2;
+      halfHeight = height / 2;
+      size = width;
       (this.mesh = new CL3D.Mesh()).AddMeshBuffer(meshBuf = new CL3D.MeshBuffer());
-      meshBuf.Indices = [3, 1, 2, 0, 1, 3];
-      meshBuf.Vertices.push(this.engine.createVertex(size, 0, -size, 0, 0));
-      meshBuf.Vertices.push(this.engine.createVertex(-size, 0, -size, 1, 0));
-      meshBuf.Vertices.push(this.engine.createVertex(-size, 0, size, 1, 1));
-      meshBuf.Vertices.push(this.engine.createVertex(size, 0, size, 0, 1));
-      meshBuf.Mat.Tex1 = this.engine.getTextureManager().getTexture('/_/file/images/bg3.jpg', true);
+      meshBuf.Indices = [0, 1, 3, 1, 2, 3];
+      meshBuf.Vertices.push(this.engine.createVertex(halfWidth, 0, -halfHeight, 0, 0));
+      meshBuf.Vertices.push(this.engine.createVertex(-halfWidth, 0, -halfHeight, 1, 0));
+      meshBuf.Vertices.push(this.engine.createVertex(-halfWidth, 0, halfHeight, 1, 1));
+      meshBuf.Vertices.push(this.engine.createVertex(halfWidth, 0, halfHeight, 0, 1));
+      meshBuf.Mat.Tex1 = this.engine.getTextureManager().getTexture('/_/file/images/textures/earth.jpg', true);
     }
     GroundSceneNode.prototype.OnRegisterSceneNode = function(scene) {
       scene.registerNodeForRendering(this, CL3D.Scene.RENDER_MODE_DEFAULT);

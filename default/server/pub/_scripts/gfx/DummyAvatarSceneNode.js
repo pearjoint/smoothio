@@ -11,12 +11,13 @@
   smio = global.smoothio;
   smio.gfx.DummyAvatarSceneNode = (function() {
     __extends(DummyAvatarSceneNode, CL3D.SceneNode);
-    function DummyAvatarSceneNode(engine, num, posx, posy, posz, height) {
+    function DummyAvatarSceneNode(engine, name, posx, posy, posz, height) {
       var subHeight;
       this.engine = engine;
       if (height == null) {
         height = 1.8;
       }
+      this.rotate = __bind(this.rotate, this);
       this.render = __bind(this.render, this);
       this.OnRegisterSceneNode = __bind(this.OnRegisterSceneNode, this);
       DummyAvatarSceneNode.__super__.constructor.call(this, this.engine);
@@ -29,8 +30,8 @@
       this.body.Rot.Y = 45;
       this.legs.updateAbsolutePosition();
       this.body.updateAbsolutePosition();
-      this.legs.getMaterial(0).Tex1 = this.engine.getTextureManager().getTexture("/_/file/images/bg" + (num + 2) + ".jpg", true);
-      this.body.getMaterial(0).Tex1 = this.engine.getTextureManager().getTexture("/_/file/images/bg" + num + ".jpg", true);
+      this.legs.getMaterial(0).Tex1 = this.engine.getTextureManager().getTexture("/_/file/images/textures/" + name + ".jpg", true);
+      this.body.getMaterial(0).Tex1 = this.engine.getTextureManager().getTexture("/_/file/images/textures/" + name + ".jpg", true);
       this.addChild(this.head = new smio.gfx.SphereSceneNode(this.engine, 0.25, 0, height - 0.15, 0));
       this.Pos.X = posx;
       this.Pos.Y = posy;
@@ -44,6 +45,18 @@
     DummyAvatarSceneNode.prototype.render = function(renderer) {
       renderer.setWorld(this.getAbsoluteTransformation());
       return DummyAvatarSceneNode.__super__.render.call(this, renderer);
+    };
+    DummyAvatarSceneNode.prototype.rotate = function(deg) {
+      var cy, y;
+      cy = this.Rot.Y;
+      y = cy + deg;
+      if (y < 0) {
+        y = 360 + cy;
+      }
+      if (y > 360) {
+        y = cy - 360;
+      }
+      return this.Rot.Y = y;
     };
     return DummyAvatarSceneNode;
   })();

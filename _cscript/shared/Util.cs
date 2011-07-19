@@ -89,6 +89,10 @@ class smio.Util
 			Math.pow(-2, 31)
 		randomInt: (max) ->
 			Math.floor(Math.random() * (max + 1))
+		toOtherSign: (test, val) ->
+			if test < 0 then Math.abs(val) else if val <= 0 then val else -val
+		toSameSign: (test, val) ->
+			if test >= 0 then Math.abs(val) else if val <= 0 then val else -val
 		tryParse: (val, def, validate) ->
 			num = parseInt("#{val}")
 			if validate and not validate(num)

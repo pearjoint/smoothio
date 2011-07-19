@@ -43,18 +43,19 @@
     };
     Packs_Core_Earth_MainFrame.prototype.onLoad = function() {
       Packs_Core_Earth_MainFrame.__super__.onLoad.call(this);
-      this.renderer = new smio.gfx.Renderer(this.id('c3d'));
+      this.engine = new smio.gfx.Engine(this.id('c3d'));
       return this.onWindowResize(this.client.pageWindow.width(), this.client.pageWindow.height());
     };
     Packs_Core_Earth_MainFrame.prototype.onSleepy = function(sleepy) {
       if (sleepy) {
-        return this.renderer.pressedKeys = [];
+        return this.engine.pressedKeys = [];
       }
     };
     Packs_Core_Earth_MainFrame.prototype.onWindowResize = function(w, h) {
-      this.renderer.canvas.width(w).height(h - this.sub('ctlpanel').height());
-      this.renderer.canvas.prop('width', w / 2).prop('height', (h - this.sub('ctlpanel').height()) / 2);
-      return this.renderer.universe.camSettings(w / h, CL3D.degToRad(70));
+      this.engine.canvas.width(w).height(h - this.sub('ctlpanel').height());
+      this.engine.canvas.prop('width', w / 2).prop('height', (h - this.sub('ctlpanel').height()) / 2);
+      this.engine.universe.camSettings(w / h, CL3D.degToRad(70));
+      return this.engine.updateCanvasSize();
     };
     function Packs_Core_Earth_MainFrame(client, parent, args) {
       this.onWindowResize = __bind(this.onWindowResize, this);
