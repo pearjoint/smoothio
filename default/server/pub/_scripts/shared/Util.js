@@ -322,6 +322,22 @@
         }
       }
     };
+    Util.Geo = {
+      wgs: new Proj4js.Proj('WGS84'),
+      epsg: new Proj4js.Proj('EPSG:900913'),
+      fromMap: function(x, y) {
+        return Proj4js.transform(smio.Util.Geo.epsg, smio.Util.Geo.wgs, {
+          x: x,
+          y: y
+        });
+      },
+      toMap: function(lon, lat) {
+        return Proj4js.transform(smio.Util.Geo.wgs, smio.Util.Geo.epsg, {
+          x: lon,
+          y: lat
+        });
+      }
+    };
     return Util;
   })();
 }).call(this);

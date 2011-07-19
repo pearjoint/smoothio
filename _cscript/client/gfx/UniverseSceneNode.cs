@@ -15,7 +15,7 @@ class smio.gfx.UniverseSceneNode extends CL3D.SceneNode
 		@init()
 		@addChild(@debugOutput = new CL3D.Overlay2DSceneNode(@))
 		@debugOutput.set2DPosition(0, 0, 840, 12)
-		@debugOutput.setShowBackgroundColor(true, CL3D.createColor(255, 255, 255, 255))
+		@debugOutput.setShowBackgroundColor(true, CL3D.createColor(128, 255, 255, 255))
 		@debugOutput.FontName = '8;default;arial;normal;normal;false'
 		@addChild(@ground = new smio.gfx.GroundSceneNode(@engine))
 		@addChild(@fig1 = new smio.gfx.DummyAvatarSceneNode(@engine, 'wood', 0, 0, 0, 1.6))

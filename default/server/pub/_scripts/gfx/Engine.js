@@ -58,7 +58,6 @@
     };
     Engine.prototype.handleKeyDown = function(e) {
       var c;
-      document.title = e.keyCode + '';
       if (!_.contains(this.pressedKeys, e.keyCode)) {
         this.pressedKeys.push(e.keyCode);
       }

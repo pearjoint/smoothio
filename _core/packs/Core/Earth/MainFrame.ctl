@@ -7,15 +7,25 @@ renderTemplate: =>
 			html: ['']
 		'div #ctlpanel':
 			'span .tmp1':
-				_: ['Lat: ']
-			'input #lat .smio-textinput':
-				type: 'text'
-				value: '52.52627'
-			'span .tmp2':
-				_: ['Long: ']
-			'input #long .smio-textinput':
+				_: ['Lon/X: ']
+			'input #lon .smio-textinput':
 				type: 'text'
 				value: '13.40722'
+			'span .tmp2':
+				_: ['Lat/Y: ']
+			'input #lat .smio-textinput':
+				type: 'text'
+				value: '52.5260'
+			'LinkButton #l2x':
+				labelRawText: ' [LonLat2xy] '
+				onClick: =>
+					p = x: parseFloat(@sub('lon').val()), y: parseFloat(@sub('lat').val())
+					alert JSON.stringify Proj4js.transform(smio.Util.Geo.wgs, smio.Util.Geo.epsg, p)
+			'LinkButton #x2l':
+				labelRawText: ' [xy2LonLat] '
+				onClick: =>
+					p = x: parseFloat(@sub('lon').val()), y: parseFloat(@sub('lat').val())
+					alert JSON.stringify Proj4js.transform(smio.Util.Geo.epsg, smio.Util.Geo.wgs, p)
 
 onLoad: =>
 	super()

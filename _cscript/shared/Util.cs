@@ -171,6 +171,16 @@ class smio.Util
 			tmp = _.trim(o, "/#{e}")
 			if noLower then tmp else tmp.toLowerCase()
 
+#if client
+	@Geo:
+		wgs: new Proj4js.Proj('WGS84')
+		epsg: new Proj4js.Proj('EPSG:900913')
+		fromMap: (x, y) ->
+			Proj4js.transform(smio.Util.Geo.epsg, smio.Util.Geo.wgs, { x: x, y: y })
+		toMap: (lon, lat) ->
+			Proj4js.transform(smio.Util.Geo.wgs, smio.Util.Geo.epsg, { x: lon, y: lat })
+#endif
+
 #if server
 	@FileSystem:
 		mkdirMode: 0777

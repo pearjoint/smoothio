@@ -36,7 +36,6 @@ class smio.gfx.Engine extends CL3D.CopperLicht
 		if not keyCode? then @pressedKeys.length else _.contains(@pressedKeys, keyCode)
 
 	handleKeyDown: (e) =>
-		document.title = e.keyCode + ''
 		if not _.contains(@pressedKeys, e.keyCode)
 			@pressedKeys.push(e.keyCode)
 		if (c = String.fromCharCode(e.keyCode)) and (c = c.toUpperCase())

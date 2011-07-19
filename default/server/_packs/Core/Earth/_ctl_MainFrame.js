@@ -25,18 +25,40 @@
           },
           'div #ctlpanel': {
             'span .tmp1': {
-              _: ['Lat: ']
+              _: ['Lon/X: ']
+            },
+            'input #lon .smio-textinput': {
+              type: 'text',
+              value: '13.40722'
+            },
+            'span .tmp2': {
+              _: ['Lat/Y: ']
             },
             'input #lat .smio-textinput': {
               type: 'text',
-              value: '52.52627'
+              value: '52.5260'
             },
-            'span .tmp2': {
-              _: ['Long: ']
+            'LinkButton #l2x': {
+              labelRawText: ' [LonLat2xy] ',
+              onClick: __bind(function() {
+                var p;
+                p = {
+                  x: parseFloat(this.sub('lon').val()),
+                  y: parseFloat(this.sub('lat').val())
+                };
+                return alert(JSON.stringify(Proj4js.transform(smio.Util.Geo.wgs, smio.Util.Geo.epsg, p)));
+              }, this)
             },
-            'input #long .smio-textinput': {
-              type: 'text',
-              value: '13.40722'
+            'LinkButton #x2l': {
+              labelRawText: ' [xy2LonLat] ',
+              onClick: __bind(function() {
+                var p;
+                p = {
+                  x: parseFloat(this.sub('lon').val()),
+                  y: parseFloat(this.sub('lat').val())
+                };
+                return alert(JSON.stringify(Proj4js.transform(smio.Util.Geo.epsg, smio.Util.Geo.wgs, p)));
+              }, this)
             }
           }
         }

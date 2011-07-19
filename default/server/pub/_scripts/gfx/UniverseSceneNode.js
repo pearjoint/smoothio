@@ -28,7 +28,7 @@
       this.init();
       this.addChild(this.debugOutput = new CL3D.Overlay2DSceneNode(this));
       this.debugOutput.set2DPosition(0, 0, 840, 12);
-      this.debugOutput.setShowBackgroundColor(true, CL3D.createColor(255, 255, 255, 255));
+      this.debugOutput.setShowBackgroundColor(true, CL3D.createColor(128, 255, 255, 255));
       this.debugOutput.FontName = '8;default;arial;normal;normal;false';
       this.addChild(this.ground = new smio.gfx.GroundSceneNode(this.engine));
       this.addChild(this.fig1 = new smio.gfx.DummyAvatarSceneNode(this.engine, 'wood', 0, 0, 0, 1.6));
