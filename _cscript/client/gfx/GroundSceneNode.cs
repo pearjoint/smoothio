@@ -129,7 +129,7 @@ class smio.gfx.GroundSceneNode extends CL3D.SceneNode
 				[tx, ty] = [(if isGoalSect then tileNumX else (tileNumX + (-1 + cell))), (if isGoalSect then tileNumY else (tileNumY + (-1 + row)))]
 				if not (sect = @sectors[row][cell])
 					@sectors[row][cell] = sect = new smio.gfx.SectorTileSceneNode(@engine, tx, ty, sectorSize)
-				if (sect.tileNumX >= 0) and ((sub = @engine.ctl.sub("map#{cell}#{row}")).attr('url') isnt (url = "http://c.tile.openstreetmap.org/18/#{sect.tileNumX}/#{sect.tileNumY}.png"))
+				if ((sub = @engine.ctl.sub("map#{cell}#{row}")).attr('url') isnt (url = "http://c.tile.openstreetmap.org/18/#{sect.tileNumX}/#{sect.tileNumY}.png"))
 					sub.attr('src', url)
 				if isGoalSect and ((sub = @engine.ctl.sub('mapimg')).attr('url') isnt (url = "http://b.tile.openstreetmap.org/18/#{sect.tileNumX}/#{sect.tileNumY}.png"))
 					sub.attr('src', url)

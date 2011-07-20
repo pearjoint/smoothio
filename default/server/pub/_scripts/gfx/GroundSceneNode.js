@@ -187,7 +187,7 @@
           if (!(sect = this.sectors[row][cell])) {
             this.sectors[row][cell] = sect = new smio.gfx.SectorTileSceneNode(this.engine, tx, ty, sectorSize);
           }
-          if ((sect.tileNumX >= 0) && ((sub = this.engine.ctl.sub("map" + cell + row)).attr('url') !== (url = "http://c.tile.openstreetmap.org/18/" + sect.tileNumX + "/" + sect.tileNumY + ".png"))) {
+          if ((sub = this.engine.ctl.sub("map" + cell + row)).attr('url') !== (url = "http://c.tile.openstreetmap.org/18/" + sect.tileNumX + "/" + sect.tileNumY + ".png")) {
             sub.attr('src', url);
           }
           if (isGoalSect && ((sub = this.engine.ctl.sub('mapimg')).attr('url') !== (url = "http://b.tile.openstreetmap.org/18/" + sect.tileNumX + "/" + sect.tileNumY + ".png"))) {
