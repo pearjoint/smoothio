@@ -6,30 +6,58 @@ renderTemplate: =>
 			height: '420'
 			html: ['']
 		'div #ctlpanel':
-			'span .tmp1':
-				_: ['Lon/X: ']
-			'input #lon .smio-textinput':
-				type: 'text'
-				value: '13.40722'
-			'span .tmp2':
-				_: ['Lat/Y: ']
-			'input #lat .smio-textinput':
-				type: 'text'
-				value: '52.5260'
-			'LinkButton #l2x':
-				labelRawText: ' [LonLat2xy] '
-				onClick: =>
-					p = x: parseFloat(@sub('lon').val()), y: parseFloat(@sub('lat').val())
-					alert JSON.stringify Proj4js.transform(smio.Util.Geo.wgs, smio.Util.Geo.epsg, p)
-			'LinkButton #x2l':
-				labelRawText: ' [xy2LonLat] '
-				onClick: =>
-					p = x: parseFloat(@sub('lon').val()), y: parseFloat(@sub('lat').val())
-					alert JSON.stringify Proj4js.transform(smio.Util.Geo.epsg, smio.Util.Geo.wgs, p)
+			'div .smio-mapctl .d1':
+				'span .tmp1':
+					_: ['Lon/X: ']
+				'input #lon .smio-textinput':
+					type: 'text'
+					value: '13.40722'
+				'br .br1':
+					html: ['']
+				'span .tmp2':
+					_: ['Lat/Y: ']
+				'input #lat .smio-textinput':
+					type: 'text'
+					value: '52.5260'
+				'br .br2':
+					html: ['']
+				'LinkButton #l2x':
+					labelRawText: ' [Go2LonLat] '
+					onClick: =>
+						@engine.universe.curFig.goTo(parseFloat(@sub('lon').val()), parseFloat(@sub('lat').val()), true)
+				'LinkButton #x2l':
+					labelRawText: ' [Go2XZ] '
+					onClick: =>
+						@engine.universe.curFig.goTo(parseFloat(@sub('lon').val()), parseFloat(@sub('lat').val()))
+			'div .smio-mapctl .d2':
+				'div .r1':
+					'img #map00 .smio-mapsectortile':
+						src: '/_/file/images/textures/particle.png'
+					'img #map10 .smio-mapsectortile':
+						src: '/_/file/images/textures/particle.png'
+					'img #map20 .smio-mapsectortile':
+						src: '/_/file/images/textures/particle.png'
+				'div .r2':
+					'img #map01 .smio-mapsectortile':
+						src: '/_/file/images/textures/particle.png'
+					'img #map11 .smio-mapsectortile':
+						src: '/_/file/images/textures/particle.png'
+					'img #map21 .smio-mapsectortile':
+						src: '/_/file/images/textures/particle.png'
+				'div .r3':
+					'img #map02 .smio-mapsectortile':
+						src: '/_/file/images/textures/particle.png'
+					'img #map12 .smio-mapsectortile':
+						src: '/_/file/images/textures/particle.png'
+					'img #map22 .smio-mapsectortile':
+						src: '/_/file/images/textures/particle.png'
+			'div .smio-mapctl .d3':
+				'img #mapimg .smio-mapsectorbigtile':
+					src: '/_/file/images/textures/particle.png'
 
 onLoad: =>
 	super()
-	@engine = new smio.gfx.Engine(@id('c3d'))
+	@engine = new smio.gfx.Engine(@, @id('c3d'))
 	@onWindowResize(@client.pageWindow.width(), @client.pageWindow.height())
 
 onSleepy: (sleepy) =>

@@ -2,7 +2,7 @@ smio = global.smoothio
 
 class smio.gfx.Engine extends CL3D.CopperLicht
 
-	constructor: (cid) ->
+	constructor: (@ctl, cid) ->
 		super(cid, false, 30, false)
 		@pressedKeys = []
 		if (@canvas = $("##{cid}")) and (@initRenderer())

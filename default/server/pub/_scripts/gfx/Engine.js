@@ -11,14 +11,16 @@
   smio = global.smoothio;
   smio.gfx.Engine = (function() {
     __extends(Engine, CL3D.CopperLicht);
-    function Engine(cid) {
+    function Engine(ctl, cid) {
+      this.ctl = ctl;
       this.updateCanvasSize = __bind(this.updateCanvasSize, this);
       this.isContextLost = __bind(this.isContextLost, this);
       this.handleMouseMove = __bind(this.handleMouseMove, this);
       this.handleKeyUp = __bind(this.handleKeyUp, this);
       this.handleKeyDown = __bind(this.handleKeyDown, this);
       this.isKeyPressed = __bind(this.isKeyPressed, this);
-      this.getSightDistance = __bind(this.getSightDistance, this);      Engine.__super__.constructor.call(this, cid, false, 30, false);
+      this.getSightDistance = __bind(this.getSightDistance, this);
+      Engine.__super__.constructor.call(this, cid, false, 30, false);
       this.pressedKeys = [];
       if ((this.canvas = $("#" + cid)) && (this.initRenderer())) {
         this.updateCanvasSize();

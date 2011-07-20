@@ -17,9 +17,11 @@
       if (height == null) {
         height = 1.8;
       }
+      this.updateAbsolutePosition = __bind(this.updateAbsolutePosition, this);
       this.rotate = __bind(this.rotate, this);
       this.render = __bind(this.render, this);
       this.OnRegisterSceneNode = __bind(this.OnRegisterSceneNode, this);
+      this.goTo = __bind(this.goTo, this);
       DummyAvatarSceneNode.__super__.constructor.call(this, this.engine);
       this.init();
       subHeight = (height - 0.3) / 2;
@@ -38,6 +40,19 @@
       this.Pos.Z = posz;
       this.updateAbsolutePosition();
     }
+    DummyAvatarSceneNode.prototype.goTo = function(x, z, isLonLat) {
+      var p, _ref;
+      if (isLonLat) {
+        p = Proj4js.transform(smio.Util.Geo.wgs, smio.Util.Geo.epsg, p = {
+          x: x,
+          y: z
+        });
+        _ref = [p.x, p.y], x = _ref[0], z = _ref[1];
+      }
+      this.Pos.X = x;
+      this.Pos.Z = z;
+      return this.updateAbsolutePosition();
+    };
     DummyAvatarSceneNode.prototype.OnRegisterSceneNode = function(scene) {
       scene.registerNodeForRendering(this, CL3D.Scene.RENDER_MODE_DEFAULT);
       return DummyAvatarSceneNode.__super__.OnRegisterSceneNode.call(this, scene);
@@ -57,6 +72,17 @@
         y = cy - 360;
       }
       return this.Rot.Y = y;
+    };
+    DummyAvatarSceneNode.prototype.updateAbsolutePosition = function() {
+      var lonLat;
+      DummyAvatarSceneNode.__super__.updateAbsolutePosition.call(this);
+      lonLat = Proj4js.transform(smio.Util.Geo.epsg, smio.Util.Geo.wgs, lonLat = {
+        x: this.Pos.X,
+        y: this.Pos.Z
+      });
+      this.posLon = lonLat.x;
+      this.posLat = lonLat.y;
+      return this.posLatRad = CL3D.degToRad(this.posLat);
     };
     return DummyAvatarSceneNode;
   })();

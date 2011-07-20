@@ -145,6 +145,12 @@
       randomInt: function(max) {
         return Math.floor(Math.random() * (max + 1));
       },
+      secant: function(n) {
+        return 1 / Math.cos(n);
+      },
+      sinh: function(n) {
+        return (Math.exp(n) - Math.exp(-n)) / 2;
+      },
       toOtherSign: function(test, val) {
         if (test < 0) {
           return Math.abs(val);

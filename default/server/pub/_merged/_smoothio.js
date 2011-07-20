@@ -20383,9 +20383,11 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       if (height == null) {
         height = 1.8;
       }
+      this.updateAbsolutePosition = __bind(this.updateAbsolutePosition, this);
       this.rotate = __bind(this.rotate, this);
       this.render = __bind(this.render, this);
       this.OnRegisterSceneNode = __bind(this.OnRegisterSceneNode, this);
+      this.goTo = __bind(this.goTo, this);
       DummyAvatarSceneNode.__super__.constructor.call(this, this.engine);
       this.init();
       subHeight = (height - 0.3) / 2;
@@ -20404,6 +20406,19 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.Pos.Z = posz;
       this.updateAbsolutePosition();
     }
+    DummyAvatarSceneNode.prototype.goTo = function(x, z, isLonLat) {
+      var p, _ref;
+      if (isLonLat) {
+        p = Proj4js.transform(smio.Util.Geo.wgs, smio.Util.Geo.epsg, p = {
+          x: x,
+          y: z
+        });
+        _ref = [p.x, p.y], x = _ref[0], z = _ref[1];
+      }
+      this.Pos.X = x;
+      this.Pos.Z = z;
+      return this.updateAbsolutePosition();
+    };
     DummyAvatarSceneNode.prototype.OnRegisterSceneNode = function(scene) {
       scene.registerNodeForRendering(this, CL3D.Scene.RENDER_MODE_DEFAULT);
       return DummyAvatarSceneNode.__super__.OnRegisterSceneNode.call(this, scene);
@@ -20424,6 +20439,17 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       }
       return this.Rot.Y = y;
     };
+    DummyAvatarSceneNode.prototype.updateAbsolutePosition = function() {
+      var lonLat;
+      DummyAvatarSceneNode.__super__.updateAbsolutePosition.call(this);
+      lonLat = Proj4js.transform(smio.Util.Geo.epsg, smio.Util.Geo.wgs, lonLat = {
+        x: this.Pos.X,
+        y: this.Pos.Z
+      });
+      this.posLon = lonLat.x;
+      this.posLat = lonLat.y;
+      return this.posLatRad = CL3D.degToRad(this.posLat);
+    };
     return DummyAvatarSceneNode;
   })();
 }).call(this);
@@ -20442,14 +20468,16 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio = global.smoothio;
   smio.gfx.Engine = (function() {
     __extends(Engine, CL3D.CopperLicht);
-    function Engine(cid) {
+    function Engine(ctl, cid) {
+      this.ctl = ctl;
       this.updateCanvasSize = __bind(this.updateCanvasSize, this);
       this.isContextLost = __bind(this.isContextLost, this);
       this.handleMouseMove = __bind(this.handleMouseMove, this);
       this.handleKeyUp = __bind(this.handleKeyUp, this);
       this.handleKeyDown = __bind(this.handleKeyDown, this);
       this.isKeyPressed = __bind(this.isKeyPressed, this);
-      this.getSightDistance = __bind(this.getSightDistance, this);      Engine.__super__.constructor.call(this, cid, false, 30, false);
+      this.getSightDistance = __bind(this.getSightDistance, this);
+      Engine.__super__.constructor.call(this, cid, false, 30, false);
       this.pressedKeys = [];
       if ((this.canvas = $("#" + cid)) && (this.initRenderer())) {
         this.updateCanvasSize();
@@ -20543,24 +20571,38 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
   smio.gfx.GroundSceneNode = (function() {
     __extends(GroundSceneNode, CL3D.SceneNode);
     function GroundSceneNode(engine) {
-      var meshBuf;
       this.engine = engine;
+      this.unloadSector = __bind(this.unloadSector, this);
+      this.updateSectors = __bind(this.updateSectors, this);
       this.render = __bind(this.render, this);
       this.mapPositionToLatLong = __bind(this.mapPositionToLatLong, this);
       this.mapPositionFromLatLong = __bind(this.mapPositionFromLatLong, this);
       this.OnRegisterSceneNode = __bind(this.OnRegisterSceneNode, this);
-      GroundSceneNode.__super__.constructor.call(this);
+      GroundSceneNode.__super__.constructor.call(this, this.engine);
       this.init();
-      this.mapWidth = 495;
-      this.mapWidthHalf = this.mapHeight = this.mapWidth / 2;
-      this.mapHeightHalf = this.mapHeight / 2;
-      (this.mesh = new CL3D.Mesh()).AddMeshBuffer(meshBuf = new CL3D.MeshBuffer());
-      meshBuf.Indices = [0, 1, 3, 1, 2, 3];
-      meshBuf.Vertices.push(this.engine.createVertex(this.mapWidthHalf, 0, -this.mapHeightHalf, 0, 0));
-      meshBuf.Vertices.push(this.engine.createVertex(-this.mapWidthHalf, 0, -this.mapHeightHalf, 1, 0));
-      meshBuf.Vertices.push(this.engine.createVertex(-this.mapWidthHalf, 0, this.mapHeightHalf, 1, 1));
-      meshBuf.Vertices.push(this.engine.createVertex(this.mapWidthHalf, 0, this.mapHeightHalf, 0, 1));
-      meshBuf.Mat.Tex1 = this.engine.getTextureManager().getTexture('/_/file/images/textures/earth.png', true);
+      this.mppsEq = {
+        0: {
+          18: 0.597164,
+          17: 1.194329,
+          16: 2.388657,
+          15: 4.777314,
+          14: 9.554629,
+          13: 19.109257,
+          12: 38.218514,
+          11: 76.437028,
+          10: 152.874057,
+          9: 305.748113,
+          8: 611.496226,
+          7: 1222.992453,
+          6: 2445.984905,
+          5: 4891.969810,
+          4: 9783.939621,
+          3: 19567.879241,
+          2: 39135.758482
+        }
+      };
+      this.sectors = [[null, null, null], [null, null, null], [null, null, null]];
+      this.init();
     }
     GroundSceneNode.prototype.OnRegisterSceneNode = function(scene) {
       scene.registerNodeForRendering(this, CL3D.Scene.RENDER_MODE_DEFAULT);
@@ -20581,10 +20623,181 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       };
     };
     GroundSceneNode.prototype.render = function(renderer) {
-      renderer.setWorld(this.getAbsoluteTransformation());
-      return renderer.drawMesh(this.mesh);
+      this.updateSectors();
+      return renderer.setWorld(this.getAbsoluteTransformation());
+    };
+    GroundSceneNode.prototype.toTileLon = function(x, y, zoom2, pi) {
+      return x / zoom2 * 360 - 180;
+    };
+    GroundSceneNode.prototype.toTileLat = function(x, y, zoom2, pi) {
+      return (Math.atan(smio.Util.Number.sinh(pi * (1 - 2 * y / zoom2)))) * 180 / pi;
+    };
+    GroundSceneNode.prototype.toTileNumX = function(lon, zoom2, noInt) {
+      var r;
+      r = ((lon + 180) / 360) * zoom2;
+      if (noInt) {
+        return r;
+      } else {
+        return parseInt(r);
+      }
+    };
+    GroundSceneNode.prototype.toTileNumY = function(lon, lat, latRad, zoom2, pi, noInt) {
+      var r;
+      r = (1 - (Math.log(Math.tan(latRad) + smio.Util.Number.secant(latRad)) / pi)) / 2 * zoom2;
+      if (noInt) {
+        return r;
+      } else {
+        return parseInt(r);
+      }
+    };
+    GroundSceneNode.prototype.updateSectors = function() {
+      var cell, fig, goalSect, goalSectCell, goalSectRow, i, isGoalSect, lat, latRad, lon, mp, mpp, other, pi, row, sect, sectorSize, sub, tileNumX, tileNumY, tx, ty, url, x, y, z, zl, zoom, zoom2, _i, _j, _len, _len2, _ref, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8;
+      _ref = [this.engine.universe.curFig, null, -1, -1], fig = _ref[0], goalSect = _ref[1], goalSectRow = _ref[2], goalSectCell = _ref[3];
+      _ref2 = [18, Math.pow(2, 18), Math.PI, fig.Pos.X, fig.Pos.Z, fig.Pos.Z, fig.posLon, fig.posLat, fig.posLatRad], zoom = _ref2[0], zoom2 = _ref2[1], pi = _ref2[2], x = _ref2[3], y = _ref2[4], z = _ref2[5], lon = _ref2[6], lat = _ref2[7], latRad = _ref2[8];
+      if (!this.mppsEq[lat]) {
+        this.mppsEq[lat] = {};
+        _ref3 = this.mppsEq[0];
+        for (zl in _ref3) {
+          mp = _ref3[zl];
+          this.mppsEq[lat][zl] = mp / Math.cos(lat * pi / 180);
+        }
+      }
+      mpp = this.mppsEq[lat][zoom];
+      _ref4 = [mpp * 256, this.toTileNumX(lon, zoom2), this.toTileNumY(lon, lat, latRad, zoom2, pi)], sectorSize = _ref4[0], tileNumX = _ref4[1], tileNumY = _ref4[2];
+      for (row = 0; row <= 2; row++) {
+        for (cell = 0; cell <= 2; cell++) {
+          if ((sect = this.sectors[row][cell]) && sect.tileNumX === tileNumX && sect.tileNumY === tileNumY) {
+            _ref5 = [sect, row, cell], goalSect = _ref5[0], goalSectRow = _ref5[1], goalSectCell = _ref5[2];
+            break;
+          }
+        }
+      }
+      if (!goalSect) {
+        for (row = 0; row <= 2; row++) {
+          for (cell = 0; cell <= 2; cell++) {
+            this.unloadSector(row, cell);
+          }
+        }
+      } else if (goalSectRow !== 1 || goalSectCell !== 1) {
+        if (goalSectRow !== 1 && goalSectCell !== 1) {
+          if (goalSectRow === goalSectCell) {
+            other = goalSectRow === 0 ? 2 : 0;
+            this.sectors[other][other] = this.sectors[1][1];
+            this.sectors[other][1] = this.sectors[1][goalSectRow];
+            this.sectors[1][other] = this.sectors[goalSectRow][1];
+          } else if (goalSectRow === 0 && goalSectCell === 2) {
+            this.sectors[1][0] = this.sectors[0][1];
+            this.sectors[2][0] = this.sectors[1][1];
+            this.sectors[2][1] = this.sectors[1][2];
+          } else if (goalSectRow === 2 && goalSectCell === 0) {
+            this.sectors[0][1] = this.sectors[1][0];
+            this.sectors[0][2] = this.sectors[1][1];
+            this.sectors[1][2] = this.sectors[2][1];
+          }
+          this.sectors[1][1] = this.sectors[goalSectRow][goalSectCell];
+          if (goalSectRow === goalSectCell) {
+            this.unloadSector(0, 2);
+            this.unloadSector(2, 0);
+          } else {
+            this.unloadSector(0, 0);
+            this.unloadSector(2, 2);
+          }
+          this.sectors[1][goalSectCell] = null;
+          this.sectors[goalSectRow][goalSectCell] = null;
+          this.sectors[goalSectRow][1] = null;
+        } else if (goalSectRow !== 1) {
+          other = goalSectRow === 0 ? 2 : 0;
+          for (i = 0; i <= 2; i++) {
+            this.unloadSector(other, i);
+          }
+          for (i = 0; i <= 2; i++) {
+            this.sectors[other][i] = this.sectors[1][i];
+          }
+          for (i = 0; i <= 2; i++) {
+            this.sectors[1][i] = this.sectors[goalSectRow][i];
+          }
+          for (i = 0; i <= 2; i++) {
+            this.sectors[goalSectRow][i] = null;
+          }
+        } else if (goalSectCell !== 1) {
+          other = goalSectCell === 0 ? 2 : 0;
+          for (i = 0; i <= 2; i++) {
+            this.unloadSector(i, other);
+          }
+          for (i = 0; i <= 2; i++) {
+            this.sectors[i][other] = this.sectors[i][1];
+          }
+          for (i = 0; i <= 2; i++) {
+            this.sectors[i][1] = this.sectors[i][goalSectCell];
+          }
+          for (i = 0; i <= 2; i++) {
+            this.sectors[i][goalSectCell] = null;
+          }
+        }
+      }
+      _ref6 = [1, 0, 2];
+      for (_i = 0, _len = _ref6.length; _i < _len; _i++) {
+        row = _ref6[_i];
+        _ref7 = [1, 0, 2];
+        for (_j = 0, _len2 = _ref7.length; _j < _len2; _j++) {
+          cell = _ref7[_j];
+          isGoalSect = row === 1 && cell === 1;
+          _ref8 = [(isGoalSect ? tileNumX : tileNumX + (-1 + cell)), (isGoalSect ? tileNumY : tileNumY + (-1 + row))], tx = _ref8[0], ty = _ref8[1];
+          if (!(sect = this.sectors[row][cell])) {
+            this.sectors[row][cell] = sect = new smio.gfx.SectorTileSceneNode(this.engine, tx, ty, sectorSize);
+          }
+          if ((sect.tileNumX >= 0) && ((sub = this.engine.ctl.sub("map" + cell + row)).attr('url') !== (url = "http://c.tile.openstreetmap.org/18/" + sect.tileNumX + "/" + sect.tileNumY + ".png"))) {
+            sub.attr('src', url);
+          }
+          if (isGoalSect && ((sub = this.engine.ctl.sub('mapimg')).attr('url') !== (url = "http://b.tile.openstreetmap.org/18/" + sect.tileNumX + "/" + sect.tileNumY + ".png"))) {
+            sub.attr('src', url);
+          }
+        }
+      }
+      return document.title = "" + this.sectors;
+    };
+    GroundSceneNode.prototype.unloadSector = function(row, cell) {
+      var sect;
+      if ((sect = this.sectors[row][cell])) {
+        this.removeChild(sect);
+        return this.sectors[row][cell] = null;
+      }
     };
     return GroundSceneNode;
+  })();
+}).call(this);
+
+/** server/pub/_scripts/gfx/SectorTileSceneNode.js **/
+(function() {
+  var smio;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
+  };
+  smio = global.smoothio;
+  smio.gfx.SectorTileSceneNode = (function() {
+    __extends(SectorTileSceneNode, CL3D.SceneNode);
+    function SectorTileSceneNode(engine, tileNumX, tileNumY) {
+      this.engine = engine;
+      this.tileNumX = tileNumX;
+      this.tileNumY = tileNumY;
+      this.render = __bind(this.render, this);
+      this.OnRegisterSceneNode = __bind(this.OnRegisterSceneNode, this);
+      SectorTileSceneNode.__super__.constructor.call(this);
+      this.init();
+    }
+    SectorTileSceneNode.prototype.OnRegisterSceneNode = function(scene) {
+      scene.registerNodeForRendering(this, CL3D.Scene.RENDER_MODE_DEFAULT);
+      return SectorTileSceneNode.__super__.OnRegisterSceneNode.call(this, scene);
+    };
+    SectorTileSceneNode.prototype.render = function(renderer) {
+      return renderer.setWorld(this.getAbsoluteTransformation());
+    };
+    return SectorTileSceneNode;
   })();
 }).call(this);
 
@@ -20700,8 +20913,17 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       moonRadius: 1738140,
       sunRadius: 697000000
     };
-    function UniverseSceneNode(engine) {
+    function UniverseSceneNode(engine, figX, figY, figZ) {
       this.engine = engine;
+      if (figX == null) {
+        figX = 1492484;
+      }
+      if (figY == null) {
+        figY = 0;
+      }
+      if (figZ == null) {
+        figZ = 6895797;
+      }
       this.render = __bind(this.render, this);
       this.OnRegisterSceneNode = __bind(this.OnRegisterSceneNode, this);
       this.camSettings = __bind(this.camSettings, this);
@@ -20712,8 +20934,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       this.debugOutput.setShowBackgroundColor(true, CL3D.createColor(128, 255, 255, 255));
       this.debugOutput.FontName = '8;default;arial;normal;normal;false';
       this.addChild(this.ground = new smio.gfx.GroundSceneNode(this.engine));
-      this.addChild(this.fig1 = new smio.gfx.DummyAvatarSceneNode(this.engine, 'wood', 0, 0, 0, 1.6));
-      this.addChild(this.curFig = this.fig2 = new smio.gfx.DummyAvatarSceneNode(this.engine, 'roster', 92, 0, -123, 1.9));
+      this.addChild(this.fig1 = new smio.gfx.DummyAvatarSceneNode(this.engine, 'wood', figX + 2, 0, figZ + 2, 1.6));
+      this.addChild(this.curFig = this.fig2 = new smio.gfx.DummyAvatarSceneNode(this.engine, 'roster', figX, figY, figZ, 1.9));
       this.fig2.addChild(this.cam = new CL3D.CameraSceneNode());
       this.cam.Pos.X = 0;
       this.cam.Pos.Y = this.curFig.head.Pos.Y;
@@ -20755,9 +20977,6 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         prDown = this.engine.isKeyPressed(40);
         prShift = this.engine.isKeyPressed(16);
         prCtrl = this.engine.isKeyPressed(17);
-        if (this.engine.isKeyPressed()) {
-          this.mouseLook = false;
-        }
         moveDiff = function() {
           return 0.3 * (prShift ? 10 : 1);
         };
@@ -20802,8 +21021,8 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
           this.curFig.updateAbsolutePosition();
         }
         headPos = this.curFig.head.Pos;
-        mouseX = this.mouseLook ? -(this.engine.getMouseX() - this.engine.canvasSize.w2) : 0;
-        mouseY = this.mouseLook ? this.engine.getMouseY() - this.engine.canvasSize.h22 : 0;
+        mouseX = this.engine.isMouseOverCanvas() && this.mouseLook ? -(this.engine.getMouseX() - this.engine.canvasSize.w2) : 0;
+        mouseY = this.engine.isMouseOverCanvas() && this.mouseLook ? this.engine.getMouseY() - this.engine.canvasSize.h22 : 0;
         near = 2;
         far = 4;
         self = 0;
@@ -20840,7 +21059,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
         tpos = this.curFig.head.getAbsolutePosition();
         cam.setTarget(new CL3D.Vect3d(tpos.X, tpos.Y - (cur === near ? 0.1 : 0.5), tpos.Z));
         cam.updateAbsolutePosition();
-        this.debugOutput.setText("X=" + (parseInt(this.curFig.Pos.X)) + " Y=" + (parseInt(this.curFig.Pos.Y)) + " Z=" + (parseInt(this.curFig.Pos.Z)) + " R=" + this.curFig.Rot.Y);
+        this.debugOutput.setText("X=" + (parseInt(this.curFig.Pos.X)) + " Y=" + (parseInt(this.curFig.Pos.Y)) + " Z=" + (parseInt(this.curFig.Pos.Z)) + " R=" + this.curFig.Rot.Y + " Lon=" + this.curFig.posLon + " Lat=" + this.curFig.posLat);
         renderer.setWorld(this.getAbsoluteTransformation());
         UniverseSceneNode.__super__.render.call(this, renderer);
         return this.busy = false;
@@ -21771,6 +21990,12 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
       },
       randomInt: function(max) {
         return Math.floor(Math.random() * (max + 1));
+      },
+      secant: function(n) {
+        return 1 / Math.cos(n);
+      },
+      sinh: function(n) {
+        return (Math.exp(n) - Math.exp(-n)) / 2;
       },
       toOtherSign: function(test, val) {
         if (test < 0) {
@@ -22933,41 +23158,79 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
             html: ['']
           },
           'div #ctlpanel': {
-            'span .tmp1': {
-              _: ['Lon/X: ']
+            'div .smio-mapctl .d1': {
+              'span .tmp1': {
+                _: ['Lon/X: ']
+              },
+              'input #lon .smio-textinput': {
+                type: 'text',
+                value: '13.40722'
+              },
+              'br .br1': {
+                html: ['']
+              },
+              'span .tmp2': {
+                _: ['Lat/Y: ']
+              },
+              'input #lat .smio-textinput': {
+                type: 'text',
+                value: '52.5260'
+              },
+              'br .br2': {
+                html: ['']
+              },
+              'LinkButton #l2x': {
+                labelRawText: ' [Go2LonLat] ',
+                onClick: __bind(function() {
+                  return this.engine.universe.curFig.goTo(parseFloat(this.sub('lon').val()), parseFloat(this.sub('lat').val()), true);
+                }, this)
+              },
+              'LinkButton #x2l': {
+                labelRawText: ' [Go2XZ] ',
+                onClick: __bind(function() {
+                  return this.engine.universe.curFig.goTo(parseFloat(this.sub('lon').val()), parseFloat(this.sub('lat').val()));
+                }, this)
+              }
             },
-            'input #lon .smio-textinput': {
-              type: 'text',
-              value: '13.40722'
+            'div .smio-mapctl .d2': {
+              'div .r1': {
+                'img #map00 .smio-mapsectortile': {
+                  src: '/_/file/images/textures/particle.png'
+                },
+                'img #map10 .smio-mapsectortile': {
+                  src: '/_/file/images/textures/particle.png'
+                },
+                'img #map20 .smio-mapsectortile': {
+                  src: '/_/file/images/textures/particle.png'
+                }
+              },
+              'div .r2': {
+                'img #map01 .smio-mapsectortile': {
+                  src: '/_/file/images/textures/particle.png'
+                },
+                'img #map11 .smio-mapsectortile': {
+                  src: '/_/file/images/textures/particle.png'
+                },
+                'img #map21 .smio-mapsectortile': {
+                  src: '/_/file/images/textures/particle.png'
+                }
+              },
+              'div .r3': {
+                'img #map02 .smio-mapsectortile': {
+                  src: '/_/file/images/textures/particle.png'
+                },
+                'img #map12 .smio-mapsectortile': {
+                  src: '/_/file/images/textures/particle.png'
+                },
+                'img #map22 .smio-mapsectortile': {
+                  src: '/_/file/images/textures/particle.png'
+                }
+              }
             },
-            'span .tmp2': {
-              _: ['Lat/Y: ']
-            },
-            'input #lat .smio-textinput': {
-              type: 'text',
-              value: '52.5260'
-            },
-            'LinkButton #l2x': {
-              labelRawText: ' [LonLat2xy] ',
-              onClick: __bind(function() {
-                var p;
-                p = {
-                  x: parseFloat(this.sub('lon').val()),
-                  y: parseFloat(this.sub('lat').val())
-                };
-                return alert(JSON.stringify(Proj4js.transform(smio.Util.Geo.wgs, smio.Util.Geo.epsg, p)));
-              }, this)
-            },
-            'LinkButton #x2l': {
-              labelRawText: ' [xy2LonLat] ',
-              onClick: __bind(function() {
-                var p;
-                p = {
-                  x: parseFloat(this.sub('lon').val()),
-                  y: parseFloat(this.sub('lat').val())
-                };
-                return alert(JSON.stringify(Proj4js.transform(smio.Util.Geo.epsg, smio.Util.Geo.wgs, p)));
-              }, this)
+            'div .smio-mapctl .d3': {
+              'img #mapimg .smio-mapsectorbigtile': {
+                src: '/_/file/images/textures/particle.png'
+              }
             }
           }
         }
@@ -22975,7 +23238,7 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
     };
     Packs_Core_Earth_MainFrame.prototype.onLoad = function() {
       Packs_Core_Earth_MainFrame.__super__.onLoad.call(this);
-      this.engine = new smio.gfx.Engine(this.id('c3d'));
+      this.engine = new smio.gfx.Engine(this, this.id('c3d'));
       return this.onWindowResize(this.client.pageWindow.width(), this.client.pageWindow.height());
     };
     Packs_Core_Earth_MainFrame.prototype.onSleepy = function(sleepy) {

@@ -89,6 +89,10 @@ class smio.Util
 			Math.pow(-2, 31)
 		randomInt: (max) ->
 			Math.floor(Math.random() * (max + 1))
+		secant: (n) ->
+			1 / Math.cos(n)
+		sinh: (n) ->
+			(Math.exp(n) - Math.exp(-n)) / 2
 		toOtherSign: (test, val) ->
 			if test < 0 then Math.abs(val) else if val <= 0 then val else -val
 		toSameSign: (test, val) ->

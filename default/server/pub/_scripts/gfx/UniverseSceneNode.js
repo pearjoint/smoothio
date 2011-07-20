@@ -19,8 +19,17 @@
       moonRadius: 1738140,
       sunRadius: 697000000
     };
-    function UniverseSceneNode(engine) {
+    function UniverseSceneNode(engine, figX, figY, figZ) {
       this.engine = engine;
+      if (figX == null) {
+        figX = 1492484;
+      }
+      if (figY == null) {
+        figY = 0;
+      }
+      if (figZ == null) {
+        figZ = 6895797;
+      }
       this.render = __bind(this.render, this);
       this.OnRegisterSceneNode = __bind(this.OnRegisterSceneNode, this);
       this.camSettings = __bind(this.camSettings, this);
@@ -31,8 +40,8 @@
       this.debugOutput.setShowBackgroundColor(true, CL3D.createColor(128, 255, 255, 255));
       this.debugOutput.FontName = '8;default;arial;normal;normal;false';
       this.addChild(this.ground = new smio.gfx.GroundSceneNode(this.engine));
-      this.addChild(this.fig1 = new smio.gfx.DummyAvatarSceneNode(this.engine, 'wood', 0, 0, 0, 1.6));
-      this.addChild(this.curFig = this.fig2 = new smio.gfx.DummyAvatarSceneNode(this.engine, 'roster', 92, 0, -123, 1.9));
+      this.addChild(this.fig1 = new smio.gfx.DummyAvatarSceneNode(this.engine, 'wood', figX + 2, 0, figZ + 2, 1.6));
+      this.addChild(this.curFig = this.fig2 = new smio.gfx.DummyAvatarSceneNode(this.engine, 'roster', figX, figY, figZ, 1.9));
       this.fig2.addChild(this.cam = new CL3D.CameraSceneNode());
       this.cam.Pos.X = 0;
       this.cam.Pos.Y = this.curFig.head.Pos.Y;
@@ -74,9 +83,6 @@
         prDown = this.engine.isKeyPressed(40);
         prShift = this.engine.isKeyPressed(16);
         prCtrl = this.engine.isKeyPressed(17);
-        if (this.engine.isKeyPressed()) {
-          this.mouseLook = false;
-        }
         moveDiff = function() {
           return 0.3 * (prShift ? 10 : 1);
         };
@@ -121,8 +127,8 @@
           this.curFig.updateAbsolutePosition();
         }
         headPos = this.curFig.head.Pos;
-        mouseX = this.mouseLook ? -(this.engine.getMouseX() - this.engine.canvasSize.w2) : 0;
-        mouseY = this.mouseLook ? this.engine.getMouseY() - this.engine.canvasSize.h22 : 0;
+        mouseX = this.engine.isMouseOverCanvas() && this.mouseLook ? -(this.engine.getMouseX() - this.engine.canvasSize.w2) : 0;
+        mouseY = this.engine.isMouseOverCanvas() && this.mouseLook ? this.engine.getMouseY() - this.engine.canvasSize.h22 : 0;
         near = 2;
         far = 4;
         self = 0;
@@ -159,7 +165,7 @@
         tpos = this.curFig.head.getAbsolutePosition();
         cam.setTarget(new CL3D.Vect3d(tpos.X, tpos.Y - (cur === near ? 0.1 : 0.5), tpos.Z));
         cam.updateAbsolutePosition();
-        this.debugOutput.setText("X=" + (parseInt(this.curFig.Pos.X)) + " Y=" + (parseInt(this.curFig.Pos.Y)) + " Z=" + (parseInt(this.curFig.Pos.Z)) + " R=" + this.curFig.Rot.Y);
+        this.debugOutput.setText("X=" + (parseInt(this.curFig.Pos.X)) + " Y=" + (parseInt(this.curFig.Pos.Y)) + " Z=" + (parseInt(this.curFig.Pos.Z)) + " R=" + this.curFig.Rot.Y + " Lon=" + this.curFig.posLon + " Lat=" + this.curFig.posLat);
         renderer.setWorld(this.getAbsoluteTransformation());
         UniverseSceneNode.__super__.render.call(this, renderer);
         return this.busy = false;

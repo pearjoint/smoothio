@@ -24,41 +24,79 @@
             html: ['']
           },
           'div #ctlpanel': {
-            'span .tmp1': {
-              _: ['Lon/X: ']
+            'div .smio-mapctl .d1': {
+              'span .tmp1': {
+                _: ['Lon/X: ']
+              },
+              'input #lon .smio-textinput': {
+                type: 'text',
+                value: '13.40722'
+              },
+              'br .br1': {
+                html: ['']
+              },
+              'span .tmp2': {
+                _: ['Lat/Y: ']
+              },
+              'input #lat .smio-textinput': {
+                type: 'text',
+                value: '52.5260'
+              },
+              'br .br2': {
+                html: ['']
+              },
+              'LinkButton #l2x': {
+                labelRawText: ' [Go2LonLat] ',
+                onClick: __bind(function() {
+                  return this.engine.universe.curFig.goTo(parseFloat(this.sub('lon').val()), parseFloat(this.sub('lat').val()), true);
+                }, this)
+              },
+              'LinkButton #x2l': {
+                labelRawText: ' [Go2XZ] ',
+                onClick: __bind(function() {
+                  return this.engine.universe.curFig.goTo(parseFloat(this.sub('lon').val()), parseFloat(this.sub('lat').val()));
+                }, this)
+              }
             },
-            'input #lon .smio-textinput': {
-              type: 'text',
-              value: '13.40722'
+            'div .smio-mapctl .d2': {
+              'div .r1': {
+                'img #map00 .smio-mapsectortile': {
+                  src: '/_/file/images/textures/particle.png'
+                },
+                'img #map10 .smio-mapsectortile': {
+                  src: '/_/file/images/textures/particle.png'
+                },
+                'img #map20 .smio-mapsectortile': {
+                  src: '/_/file/images/textures/particle.png'
+                }
+              },
+              'div .r2': {
+                'img #map01 .smio-mapsectortile': {
+                  src: '/_/file/images/textures/particle.png'
+                },
+                'img #map11 .smio-mapsectortile': {
+                  src: '/_/file/images/textures/particle.png'
+                },
+                'img #map21 .smio-mapsectortile': {
+                  src: '/_/file/images/textures/particle.png'
+                }
+              },
+              'div .r3': {
+                'img #map02 .smio-mapsectortile': {
+                  src: '/_/file/images/textures/particle.png'
+                },
+                'img #map12 .smio-mapsectortile': {
+                  src: '/_/file/images/textures/particle.png'
+                },
+                'img #map22 .smio-mapsectortile': {
+                  src: '/_/file/images/textures/particle.png'
+                }
+              }
             },
-            'span .tmp2': {
-              _: ['Lat/Y: ']
-            },
-            'input #lat .smio-textinput': {
-              type: 'text',
-              value: '52.5260'
-            },
-            'LinkButton #l2x': {
-              labelRawText: ' [LonLat2xy] ',
-              onClick: __bind(function() {
-                var p;
-                p = {
-                  x: parseFloat(this.sub('lon').val()),
-                  y: parseFloat(this.sub('lat').val())
-                };
-                return alert(JSON.stringify(Proj4js.transform(smio.Util.Geo.wgs, smio.Util.Geo.epsg, p)));
-              }, this)
-            },
-            'LinkButton #x2l': {
-              labelRawText: ' [xy2LonLat] ',
-              onClick: __bind(function() {
-                var p;
-                p = {
-                  x: parseFloat(this.sub('lon').val()),
-                  y: parseFloat(this.sub('lat').val())
-                };
-                return alert(JSON.stringify(Proj4js.transform(smio.Util.Geo.epsg, smio.Util.Geo.wgs, p)));
-              }, this)
+            'div .smio-mapctl .d3': {
+              'img #mapimg .smio-mapsectorbigtile': {
+                src: '/_/file/images/textures/particle.png'
+              }
             }
           }
         }
@@ -66,7 +104,7 @@
     };
     Packs_Core_Earth_MainFrame.prototype.onLoad = function() {
       Packs_Core_Earth_MainFrame.__super__.onLoad.call(this);
-      this.engine = new smio.gfx.Engine(this.id('c3d'));
+      this.engine = new smio.gfx.Engine(this, this.id('c3d'));
       return this.onWindowResize(this.client.pageWindow.width(), this.client.pageWindow.height());
     };
     Packs_Core_Earth_MainFrame.prototype.onSleepy = function(sleepy) {

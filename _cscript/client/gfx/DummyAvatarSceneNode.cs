@@ -21,6 +21,14 @@ class smio.gfx.DummyAvatarSceneNode extends CL3D.SceneNode
 		@Pos.Z = posz
 		@updateAbsolutePosition()
 
+	goTo: (x, z, isLonLat) =>
+		if isLonLat
+			p = Proj4js.transform(smio.Util.Geo.wgs, smio.Util.Geo.epsg, p = { x: x, y: z })
+			[x, z] = [p.x, p.y]
+		@Pos.X = x
+		@Pos.Z = z
+		@updateAbsolutePosition()
+
 	OnRegisterSceneNode: (scene) =>
 		scene.registerNodeForRendering(@, CL3D.Scene.RENDER_MODE_DEFAULT)
 		super(scene)
@@ -37,4 +45,11 @@ class smio.gfx.DummyAvatarSceneNode extends CL3D.SceneNode
 		if (y > 360)
 			y = cy - 360
 		@Rot.Y = y
+
+	updateAbsolutePosition: =>
+		super()
+		lonLat = Proj4js.transform(smio.Util.Geo.epsg, smio.Util.Geo.wgs, lonLat = { x: @Pos.X, y: @Pos.Z })
+		@posLon = lonLat.x
+		@posLat = lonLat.y
+		@posLatRad = CL3D.degToRad(@posLat)
 

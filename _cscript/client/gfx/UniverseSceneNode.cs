@@ -10,7 +10,7 @@ class smio.gfx.UniverseSceneNode extends CL3D.SceneNode
 		moonRadius: 1738140
 		sunRadius: 697000000
 
-	constructor: (@engine) ->
+	constructor: (@engine, figX = 1492484, figY = 0, figZ = 6895797) ->
 		super(@engine)
 		@init()
 		@addChild(@debugOutput = new CL3D.Overlay2DSceneNode(@))
@@ -18,8 +18,8 @@ class smio.gfx.UniverseSceneNode extends CL3D.SceneNode
 		@debugOutput.setShowBackgroundColor(true, CL3D.createColor(128, 255, 255, 255))
 		@debugOutput.FontName = '8;default;arial;normal;normal;false'
 		@addChild(@ground = new smio.gfx.GroundSceneNode(@engine))
-		@addChild(@fig1 = new smio.gfx.DummyAvatarSceneNode(@engine, 'wood', 0, 0, 0, 1.6))
-		@addChild(@curFig = @fig2 = new smio.gfx.DummyAvatarSceneNode(@engine, 'roster', 92, 0, -123, 1.9))
+		@addChild(@fig1 = new smio.gfx.DummyAvatarSceneNode(@engine, 'wood', figX + 2, 0, figZ + 2, 1.6))
+		@addChild(@curFig = @fig2 = new smio.gfx.DummyAvatarSceneNode(@engine, 'roster', figX, figY, figZ, 1.9))
 		@fig2.addChild(@cam = new CL3D.CameraSceneNode())
 		@cam.Pos.X = 0
 		@cam.Pos.Y = @curFig.head.Pos.Y
@@ -55,8 +55,6 @@ class smio.gfx.UniverseSceneNode extends CL3D.SceneNode
 			prDown = @engine.isKeyPressed(40)
 			prShift = @engine.isKeyPressed(16)
 			prCtrl = @engine.isKeyPressed(17)
-			if @engine.isKeyPressed()
-				@mouseLook = false
 			moveDiff = -> 0.3 * (if prShift then 10 else 1)
 			moveDiffXZ = (step = 0.05, noFast) =>
 				rad = CL3D.degToRad(@curFig.Rot.Y)
@@ -87,8 +85,8 @@ class smio.gfx.UniverseSceneNode extends CL3D.SceneNode
 			if updatePos
 				@curFig.updateAbsolutePosition()
 			headPos = @curFig.head.Pos
-			mouseX = if @mouseLook then -(@engine.getMouseX() - (@engine.canvasSize.w2)) else 0
-			mouseY = if @mouseLook then (@engine.getMouseY() - (@engine.canvasSize.h22)) else 0
+			mouseX = if @engine.isMouseOverCanvas() and @mouseLook then -(@engine.getMouseX() - (@engine.canvasSize.w2)) else 0
+			mouseY = if @engine.isMouseOverCanvas() and @mouseLook then (@engine.getMouseY() - (@engine.canvasSize.h22)) else 0
 			near = 2
 			far = 4
 			self = 0
@@ -119,7 +117,7 @@ class smio.gfx.UniverseSceneNode extends CL3D.SceneNode
 			tpos = @curFig.head.getAbsolutePosition()
 			cam.setTarget(new CL3D.Vect3d(tpos.X, tpos.Y - (if cur is near then 0.1 else 0.5), tpos.Z))
 			cam.updateAbsolutePosition()
-			@debugOutput.setText("X=#{parseInt(@curFig.Pos.X)} Y=#{parseInt(@curFig.Pos.Y)} Z=#{parseInt(@curFig.Pos.Z)} R=#{@curFig.Rot.Y}")
+			@debugOutput.setText("X=#{parseInt(@curFig.Pos.X)} Y=#{parseInt(@curFig.Pos.Y)} Z=#{parseInt(@curFig.Pos.Z)} R=#{@curFig.Rot.Y} Lon=#{@curFig.posLon} Lat=#{@curFig.posLat}")
 			renderer.setWorld(@getAbsoluteTransformation())
 			super(renderer)
 			@busy = false

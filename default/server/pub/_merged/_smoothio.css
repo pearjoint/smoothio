@@ -830,6 +830,21 @@ canvas.smio-canvas3d {
   left: 0px;
   right: 0px;
 }
+#sm_ctlpanel input.smio-textinput {
+  width: 5em;
+}
+#sm_ctlpanel img.smio-mapsectortile {
+  width: 64px;
+  height: 64px;
+}
+#sm_ctlpanel img.smio-mapsectorbigtile {
+  width: 192px;
+  height: 192px;
+}
+#sm_ctlpanel div.smio-mapctl {
+  float: left;
+  padding: 4px 8px 4px 8px;
+}
 
 /** server/pub/_packs/Core/ServerSetup/_styl_InitialHubSetup.css **/
 div.smio-setup {
