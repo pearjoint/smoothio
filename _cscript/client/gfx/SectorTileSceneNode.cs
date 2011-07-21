@@ -1,6 +1,6 @@
 smio = global.smoothio
 
-class smio.gfx.SectorTileSceneNode extends CL3D.SceneNode
+class smio.gfx.SectorTileSceneNode #extends CL3D.SceneNode
 
 	constructor: (@engine, @tileNumX, @tileNumY) ->
 		super()

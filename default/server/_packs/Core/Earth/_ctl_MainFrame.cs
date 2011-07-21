@@ -75,9 +75,11 @@ class smio.Packs_Core_Earth_MainFrame extends smio.Control
 			@engine.pressedKeys = []
 	
 	onWindowResize: (w, h) =>
-		@engine.canvas.width(w).height(h - @sub('ctlpanel').height())
-		@engine.canvas.prop('width', w / 2).prop('height', (h - @sub('ctlpanel').height()) / 2)
-		@engine.universe.camSettings(w / h, CL3D.degToRad(70))
+		h = h - @sub('ctlpanel').height()
+		@engine.canvas.width(w).height(h)
+		@engine.gl.canvas.width = w # / 2
+		@engine.gl.canvas.height = h # / 2
+		#@engine.universe.camSettings(w / h, CL3D.degToRad(70))
 		@engine.updateCanvasSize()
 	
 	

@@ -1,6 +1,6 @@
 smio = global.smoothio
 
-class smio.gfx.GroundSceneNode extends CL3D.SceneNode
+class smio.gfx.GroundSceneNode #extends CL3D.SceneNode
 
 	constructor: (@engine) ->
 		super(@engine)

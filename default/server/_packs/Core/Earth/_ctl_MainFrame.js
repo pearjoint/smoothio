@@ -113,9 +113,10 @@
       }
     };
     Packs_Core_Earth_MainFrame.prototype.onWindowResize = function(w, h) {
-      this.engine.canvas.width(w).height(h - this.sub('ctlpanel').height());
-      this.engine.canvas.prop('width', w / 2).prop('height', (h - this.sub('ctlpanel').height()) / 2);
-      this.engine.universe.camSettings(w / h, CL3D.degToRad(70));
+      h = h - this.sub('ctlpanel').height();
+      this.engine.canvas.width(w).height(h);
+      this.engine.gl.canvas.width = w;
+      this.engine.gl.canvas.height = h;
       return this.engine.updateCanvasSize();
     };
     function Packs_Core_Earth_MainFrame(client, parent, args) {

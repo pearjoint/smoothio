@@ -1,6 +1,6 @@
 smio = global.smoothio
 
-class smio.gfx.UniverseSceneNode extends CL3D.SceneNode
+class smio.gfx.UniverseSceneNode #extends CL3D.SceneNode
 
 	@consts:
 		astroDist: 149597870700
