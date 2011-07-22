@@ -82,7 +82,24 @@ class smio.Util
 			for fn in funs
 				fn(checkDone)
 
+	@Matrix:
+		clone: (mat) ->
+			copy = mat4.create()
+			mat4.set(mat, copy)
+			copy
+		equals: (mat1, mat2) ->
+			if (not mat1) and (not mat2)
+				return true
+			if (not mat1) or (not mat2) or (mat1.length isnt mat2.length)
+				return false
+			for i in [0...mat1.length]
+				if mat1[i] isnt mat2[i]
+					return false
+			true
+
 	@Number:
+		degToRad: (deg) ->
+			deg * Math.PI / 180
 		max: () ->
 			Math.pow(2, 31) - 1
 		min: () ->

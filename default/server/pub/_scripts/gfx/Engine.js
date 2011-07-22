@@ -7,6 +7,8 @@
       this.ctl = ctl;
       this.updateCanvasSize = __bind(this.updateCanvasSize, this);
       this.setMatrixUniforms = __bind(this.setMatrixUniforms, this);
+      this.pushMatrix = __bind(this.pushMatrix, this);
+      this.popMatrix = __bind(this.popMatrix, this);
       this.play = __bind(this.play, this);
       this.isContextLost = __bind(this.isContextLost, this);
       this.handleMouseMove = __bind(this.handleMouseMove, this);
@@ -17,11 +19,16 @@
       this.initEngineShaders = __bind(this.initEngineShaders, this);
       this.initEngineBuffers = __bind(this.initEngineBuffers, this);
       this.initEngine = __bind(this.initEngine, this);
+      this.drawMesh = __bind(this.drawMesh, this);
       this.draw = __bind(this.draw, this);
       this.createShader = __bind(this.createShader, this);
       this.createVertexShader = __bind(this.createVertexShader, this);
       this.createFragmentShader = __bind(this.createFragmentShader, this);
+      this.fps = 0;
+      this.lastDrawTime = 0;
       this.pressedKeys = [];
+      this.matrixStack = [];
+      this.meshes = [new smio.gfx.MeshMerged(this, [new smio.gfx.MeshBillboard3(this), new smio.gfx.MeshBillboard4(this)])];
       if ((this.canvas = $("#" + cid)) && this.canvas.length && (this.canvEl = this.canvas[0]) && this.initEngine() && this.requestAnimFrame) {
         this.updateCanvasSize();
         this.play();
@@ -68,35 +75,51 @@
       v.TCoords.Y = t;
       return v;
     };
-    Engine.prototype.draw = function() {
-      var canvas, gl;
+    Engine.prototype.draw = function(timings) {
+      var canvas, gl, mesh, _i, _len, _ref, _results;
       if ((gl = this.gl) && (canvas = gl.canvas)) {
-        gl.viewport(0, 0, this.canvasSize.wpx, this.canvasSize.hpx);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        mat4.perspective(45, this.canvasSize.wpx / this.canvasSize.hpx, 0.1, 100.0, this.pMatrix);
-        mat4.identity(this.mvMatrix);
-        mat4.translate(this.mvMatrix, [-1.5, 0.0, -7.0]);
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.triangleVertexPositionBuffer);
-        gl.vertexAttribPointer(this.shaderProgram.myVertexPositionAttribute, this.triangleVertexPositionBuffer.myItemSize, gl.FLOAT, false, 0, 0);
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.triangleVertexColorBuffer);
-        gl.vertexAttribPointer(this.shaderProgram.myVertexColorAttribute, this.triangleVertexColorBuffer.myItemSize, gl.FLOAT, false, 0, 0);
-        this.setMatrixUniforms();
-        gl.drawArrays(gl.TRIANGLES, 0, this.triangleVertexPositionBuffer.myNumItems);
-        mat4.translate(this.mvMatrix, [3.0, 0.0, 0.0]);
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVertexPositionBuffer);
-        gl.vertexAttribPointer(this.shaderProgram.myVertexPositionAttribute, this.squareVertexPositionBuffer.myItemSize, gl.FLOAT, false, 0, 0);
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVertexColorBuffer);
-        gl.vertexAttribPointer(this.shaderProgram.myVertexColorAttribute, this.squareVertexColorBuffer.myItemSize, gl.FLOAT, false, 0, 0);
-        this.setMatrixUniforms();
-        return gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.squareVertexPositionBuffer.myNumItems);
+        mat4.identity(this.modelViewMatrix);
+        _ref = this.meshes;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          mesh = _ref[_i];
+          _results.push(!mesh.hidden ? this.drawMesh(gl, mesh, timings) : void 0);
+        }
+        return _results;
       }
+    };
+    Engine.prototype.drawMesh = function(gl, mesh, timings) {
+      this.pushMatrix();
+      mesh.beforeDraw(gl, timings);
+      mat4.translate(this.modelViewMatrix, [mesh.posX, mesh.posY, mesh.posZ]);
+      if (mesh.rotX) {
+        mat4.rotateX(this.modelViewMatrix, mesh.rotX);
+      }
+      if (mesh.rotY) {
+        mat4.rotateY(this.modelViewMatrix, mesh.rotY);
+      }
+      if (mesh.rotZ) {
+        mat4.rotateZ(this.modelViewMatrix, mesh.rotZ);
+      }
+      if (mesh.vertexBuffer) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, mesh.vertexBuffer);
+        gl.vertexAttribPointer(this.shaderProgram.myVertexPositionAttribute, mesh.vertices[0].length, gl.FLOAT, false, 0, 0);
+      }
+      if (mesh.colorBuffer) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, mesh.colorBuffer);
+        gl.vertexAttribPointer(this.shaderProgram.myVertexColorAttribute, mesh.colors[0].length, gl.FLOAT, false, 0, 0);
+      }
+      this.setMatrixUniforms();
+      mesh.draw(gl, timings);
+      return this.popMatrix();
     };
     Engine.prototype.initEngine = function() {
       var canvas, gl, name, names, _i, _len, _ref;
       _ref = [this.canvEl, null, ['webgl', 'experimental-webgl', 'webkit-3d', 'moz-webgl']], canvas = _ref[0], gl = _ref[1], names = _ref[2];
       this.requestAnimFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
-      this.mvMatrix = mat4.create();
-      this.pMatrix = mat4.create();
+      this.modelViewMatrix = mat4.create();
+      this.projectionMatrix = mat4.create();
       for (_i = 0, _len = names.length; _i < _len; _i++) {
         name = names[_i];
         try {
@@ -108,9 +131,7 @@
             premultipliedAlpha: true,
             preserveDrawingBuffer: false
           });
-        } catch (err) {
-
-        }
+        } catch (_e) {}
         if (gl) {
           break;
         }
@@ -120,32 +141,22 @@
         this.initEngineBuffers();
         gl.clearColor(0.1, 0.2, 0.3, 1.0);
         gl.enable(gl.DEPTH_TEST);
+        try {
+          gl.enable(gl.TEXTURE_2D);
+        } catch (_e) {}
       }
       return gl;
     };
     Engine.prototype.initEngineBuffers = function() {
-      var gl;
+      var gl, mesh, _i, _len, _ref, _results;
       if ((gl = this.gl)) {
-        this.triangleVertexColorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.triangleVertexColorBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0]), gl.STATIC_DRAW);
-        this.triangleVertexColorBuffer.myNumItems = 3;
-        this.triangleVertexColorBuffer.myItemSize = 4;
-        this.triangleVertexPositionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.triangleVertexPositionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0.0, 1.0, 0.0, -1.0, -1.0, 0.0, 1.0, -1.0, 0.0]), gl.STATIC_DRAW);
-        this.triangleVertexPositionBuffer.myNumItems = 3;
-        this.triangleVertexPositionBuffer.myItemSize = 3;
-        this.squareVertexColorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVertexColorBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.6, 0.3, 0.9, 1.0]), gl.STATIC_DRAW);
-        this.squareVertexColorBuffer.myNumItems = 4;
-        this.squareVertexColorBuffer.myItemSize = 4;
-        this.squareVertexPositionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVertexPositionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([1.0, 1.0, 0.0, -1.0, 1.0, 0.0, 1.0, -1.0, 0.0, -1.0, -1.0, 0.0]), gl.STATIC_DRAW);
-        this.squareVertexPositionBuffer.myNumItems = 4;
-        return this.squareVertexPositionBuffer.myItemSize = 3;
+        _ref = this.meshes;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          mesh = _ref[_i];
+          _results.push(mesh.updateBuffers());
+        }
+        return _results;
       }
     };
     Engine.prototype.initEngineShaders = function() {
@@ -205,20 +216,34 @@
       return this.gl.isContextLost;
     };
     Engine.prototype.play = function() {
-      var getAnimFrame;
+      var getAnimFrame, now;
       getAnimFrame = this.requestAnimFrame;
-      getAnimFrame(this.play);
-      this.draw();
-      return document.title = new Date().getTime();
+      this.draw({
+        now: (now = new Date().getTime()),
+        last: this.lastDrawTime,
+        dif: now - this.lastDrawTime
+      });
+      this.fps = this.fps + 1;
+      this.lastDrawTime = now;
+      return getAnimFrame(this.play);
+    };
+    Engine.prototype.popMatrix = function() {
+      return this.modelViewMatrix = this.matrixStack.pop();
+    };
+    Engine.prototype.pushMatrix = function() {
+      var copy;
+      copy = mat4.create();
+      mat4.set(this.modelViewMatrix, copy);
+      return this.matrixStack.push(copy);
     };
     Engine.prototype.setMatrixUniforms = function() {
-      this.gl.uniformMatrix4fv(this.shaderProgram.myPMatrixUniform, false, this.pMatrix);
-      return this.gl.uniformMatrix4fv(this.shaderProgram.myMVMatrixUniform, false, this.mvMatrix);
+      this.gl.uniformMatrix4fv(this.shaderProgram.myPMatrixUniform, false, this.projectionMatrix);
+      return this.gl.uniformMatrix4fv(this.shaderProgram.myMVMatrixUniform, false, this.modelViewMatrix);
     };
     Engine.prototype.updateCanvasSize = function() {
       var height, width, _ref;
       _ref = [this.canvas.width(), this.canvas.height()], width = _ref[0], height = _ref[1];
-      return this.canvasSize = {
+      this.canvasSize = {
         wpx: this.gl.drawingBufferWidth || this.gl.canvas.width,
         hpx: this.gl.drawingBufferHeight || this.gl.canvas.height,
         w: width,
@@ -228,6 +253,8 @@
         h22: height / 2.2,
         h15: height / 1.5
       };
+      this.gl.viewport(0, 0, this.canvasSize.wpx, this.canvasSize.hpx);
+      return mat4.perspective(45, this.canvasSize.wpx / this.canvasSize.hpx, 0.1, 100.0, this.projectionMatrix);
     };
     return Engine;
   })();

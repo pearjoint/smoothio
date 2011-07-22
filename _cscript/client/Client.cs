@@ -23,6 +23,8 @@ class smio.Client
 		@recalcing = false
 
 	doPageFixups: =>
+		@allControls[''].onEverySecond()
+		return
 		if (not @recalcing) and ((not @sleepy) or ((new Date().getTime() - @lastFixup) >= 5000))
 			@recalcing = true
 			$('.smio-dt').each (i, span) =>
@@ -48,7 +50,7 @@ class smio.Client
 		$.ajaxSetup(timeout: 3000)
 		$('#smio_offline_msg').text(smio.resources.client.connecting)
 		@disp.connect()
-		setInterval(@doPageFixups, 750)
+		setInterval(@doPageFixups, 1000)
 
 	onWindowResize: =>
 		[w, h] = [@pageWindow.width(), @pageWindow.height()]

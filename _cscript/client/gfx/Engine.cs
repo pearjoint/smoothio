@@ -3,7 +3,11 @@ smio = global.smoothio
 class smio.gfx.Engine #extends CL3D.CopperLicht
 
 	constructor: (@ctl, cid) ->
+		@fps = 0
+		@lastDrawTime = 0
 		@pressedKeys = []
+		@matrixStack = []
+		@meshes = [new smio.gfx.MeshMerged(@, [new smio.gfx.MeshBillboard3(@), new smio.gfx.MeshBillboard4(@)])]
 		if (@canvas = $("##{cid}")) and @canvas.length and (@canvEl = @canvas[0]) and @initEngine() and @requestAnimFrame
 			@updateCanvasSize()
 			@play()
@@ -45,38 +49,42 @@ class smio.gfx.Engine #extends CL3D.CopperLicht
 		v.TCoords.Y = t
 		v
 
-	draw: () =>
+	draw: (timings) =>
 		if (gl = @gl) and (canvas = gl.canvas)
-			gl.viewport(0, 0, @canvasSize.wpx, @canvasSize.hpx)
 			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-			mat4.perspective(45, @canvasSize.wpx / @canvasSize.hpx, 0.1, 100.0, @pMatrix)
-			mat4.identity(@mvMatrix)
-			# triangle
-			mat4.translate(@mvMatrix, [-1.5, 0.0, -7.0])
-			gl.bindBuffer(gl.ARRAY_BUFFER, @triangleVertexPositionBuffer)
-			gl.vertexAttribPointer(@shaderProgram.myVertexPositionAttribute, @triangleVertexPositionBuffer.myItemSize, gl.FLOAT, false, 0, 0)
-			gl.bindBuffer(gl.ARRAY_BUFFER, @triangleVertexColorBuffer)
-			gl.vertexAttribPointer(@shaderProgram.myVertexColorAttribute, @triangleVertexColorBuffer.myItemSize, gl.FLOAT, false, 0, 0)
-			@setMatrixUniforms()
-			gl.drawArrays(gl.TRIANGLES, 0, @triangleVertexPositionBuffer.myNumItems)
-			# square
-			mat4.translate(@mvMatrix, [3.0, 0.0, 0.0]) # moveby not moveto
-			gl.bindBuffer(gl.ARRAY_BUFFER, @squareVertexPositionBuffer);
-			gl.vertexAttribPointer(@shaderProgram.myVertexPositionAttribute, @squareVertexPositionBuffer.myItemSize, gl.FLOAT, false, 0, 0)
-			gl.bindBuffer(gl.ARRAY_BUFFER, @squareVertexColorBuffer)
-			gl.vertexAttribPointer(@shaderProgram.myVertexColorAttribute, @squareVertexColorBuffer.myItemSize, gl.FLOAT, false, 0, 0)
-			@setMatrixUniforms()
-			gl.drawArrays(gl.TRIANGLE_STRIP, 0, @squareVertexPositionBuffer.myNumItems)
+			mat4.identity(@modelViewMatrix)
+			for mesh in @meshes
+				if not mesh.hidden
+					@drawMesh(gl, mesh, timings)
+
+	drawMesh: (gl, mesh, timings) =>
+		@pushMatrix()
+		mesh.beforeDraw(gl, timings)
+		mat4.translate(@modelViewMatrix, [mesh.posX, mesh.posY, mesh.posZ])
+		if mesh.rotX
+			mat4.rotateX(@modelViewMatrix, mesh.rotX)
+		if mesh.rotY
+			mat4.rotateY(@modelViewMatrix, mesh.rotY)
+		if mesh.rotZ
+			mat4.rotateZ(@modelViewMatrix, mesh.rotZ)
+		if mesh.vertexBuffer
+			gl.bindBuffer(gl.ARRAY_BUFFER, mesh.vertexBuffer)
+			gl.vertexAttribPointer(@shaderProgram.myVertexPositionAttribute, mesh.vertices[0].length, gl.FLOAT, false, 0, 0)
+		if mesh.colorBuffer
+			gl.bindBuffer(gl.ARRAY_BUFFER, mesh.colorBuffer)
+			gl.vertexAttribPointer(@shaderProgram.myVertexColorAttribute, mesh.colors[0].length, gl.FLOAT, false, 0, 0)
+		@setMatrixUniforms()
+		mesh.draw(gl, timings)
+		@popMatrix()
 
 	initEngine: =>
 		[canvas, gl, names] = [@canvEl, null, ['webgl', 'experimental-webgl', 'webkit-3d', 'moz-webgl']]
 		@requestAnimFrame = window.requestAnimationFrame or window.webkitRequestAnimationFrame or window.mozRequestAnimationFrame or window.oRequestAnimationFrame or window.msRequestAnimationFrame
-		@mvMatrix = mat4.create()
-		@pMatrix = mat4.create()
+		@modelViewMatrix = mat4.create()
+		@projectionMatrix = mat4.create()
 		for name in names
 			try
 				gl = canvas.getContext(name, alpha: true, depth: true, stencil: true, antialias: true, premultipliedAlpha: true, preserveDrawingBuffer: false)
-			catch err
 			if gl
 				break
 		if (@gl = gl)
@@ -84,33 +92,14 @@ class smio.gfx.Engine #extends CL3D.CopperLicht
 			@initEngineBuffers()
 			gl.clearColor(0.1, 0.2, 0.3, 1.0)
 			gl.enable(gl.DEPTH_TEST)
+			try
+				gl.enable(gl.TEXTURE_2D)
 		gl
 
 	initEngineBuffers: =>
 		if (gl = @gl)
-			@triangleVertexColorBuffer = gl.createBuffer()
-			gl.bindBuffer(gl.ARRAY_BUFFER, @triangleVertexColorBuffer)
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0]), gl.STATIC_DRAW)
-			@triangleVertexColorBuffer.myNumItems = 3
-			@triangleVertexColorBuffer.myItemSize = 4
-
-			@triangleVertexPositionBuffer = gl.createBuffer()
-			gl.bindBuffer(gl.ARRAY_BUFFER, @triangleVertexPositionBuffer)
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0.0,1.0,0.0, -1.0,-1.0,0.0, 1.0,-1.0,0.0]), gl.STATIC_DRAW)
-			@triangleVertexPositionBuffer.myNumItems = 3
-			@triangleVertexPositionBuffer.myItemSize = 3
-
-			@squareVertexColorBuffer = gl.createBuffer()
-			gl.bindBuffer(gl.ARRAY_BUFFER, @squareVertexColorBuffer)
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.6, 0.3, 0.9, 1.0]), gl.STATIC_DRAW)
-			@squareVertexColorBuffer.myNumItems = 4
-			@squareVertexColorBuffer.myItemSize = 4
-
-			@squareVertexPositionBuffer = gl.createBuffer()
-			gl.bindBuffer(gl.ARRAY_BUFFER, @squareVertexPositionBuffer)
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([1.0,1.0,0.0, -1.0,1.0,0.0, 1.0,-1.0,0.0, -1.0,-1.0,0.0]), gl.STATIC_DRAW)
-			@squareVertexPositionBuffer.myNumItems = 4
-			@squareVertexPositionBuffer.myItemSize = 3
+			for mesh in @meshes
+				mesh.updateBuffers()
 
 	initEngineShaders: =>
 		if (gl = @gl)
@@ -158,15 +147,26 @@ class smio.gfx.Engine #extends CL3D.CopperLicht
 
 	play: =>
 		getAnimFrame = @requestAnimFrame
+		@draw(now: (now = new Date().getTime()), last: @lastDrawTime, dif: (now - @lastDrawTime))
+		@fps = @fps + 1
+		@lastDrawTime = now
 		getAnimFrame(@play)
-		@draw()
-		document.title = new Date().getTime()
+
+	popMatrix: =>
+		@modelViewMatrix = @matrixStack.pop()
+
+	pushMatrix: =>
+		copy = mat4.create()
+		mat4.set(@modelViewMatrix, copy)
+		@matrixStack.push(copy)
 
 	setMatrixUniforms: =>
-		@gl.uniformMatrix4fv(@shaderProgram.myPMatrixUniform, false, @pMatrix);
-		@gl.uniformMatrix4fv(@shaderProgram.myMVMatrixUniform, false, @mvMatrix);
+		@gl.uniformMatrix4fv(@shaderProgram.myPMatrixUniform, false, @projectionMatrix);
+		@gl.uniformMatrix4fv(@shaderProgram.myMVMatrixUniform, false, @modelViewMatrix);
 
 	updateCanvasSize: =>
 		[width, height] = [@canvas.width(), @canvas.height()]
 		@canvasSize = wpx: @gl.drawingBufferWidth or @gl.canvas.width, hpx: @gl.drawingBufferHeight or @gl.canvas.height, w: width, h: height, w2: (width / 2), w4: (width / 4), h22: (height / 2.2), h15: (height / 1.5)
+		@gl.viewport(0, 0, @canvasSize.wpx, @canvasSize.hpx)
+		mat4.perspective(45, @canvasSize.wpx / @canvasSize.hpx, 0.1, 100.0, @projectionMatrix)
 

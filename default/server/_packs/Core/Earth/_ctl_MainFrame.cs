@@ -17,6 +17,13 @@ class smio.Packs_Core_Earth_MainFrame extends smio.Control
 				html: ['']
 			'div #ctlpanel':
 				'div .smio-mapctl .d1':
+					'span .tmp0':
+						_: ['FPS: ']
+					'input #fps .smio-textinput':
+						type: 'text'
+						value: '0'
+					'br .br0':
+						html: ['']
 					'span .tmp1':
 						_: ['Lon/X: ']
 					'input #lon .smio-textinput':
@@ -70,6 +77,10 @@ class smio.Packs_Core_Earth_MainFrame extends smio.Control
 		@engine = new smio.gfx.Engine(@, @id('c3d'))
 		@onWindowResize(@client.pageWindow.width(), @client.pageWindow.height())
 	
+	onEverySecond: =>
+		document.getElementById('sm_fps').value = "#{@engine.fps}"
+		@engine.fps = 0
+	
 	onSleepy: (sleepy) =>
 		if (sleepy)
 			@engine.pressedKeys = []
@@ -77,8 +88,8 @@ class smio.Packs_Core_Earth_MainFrame extends smio.Control
 	onWindowResize: (w, h) =>
 		h = h - @sub('ctlpanel').height()
 		@engine.canvas.width(w).height(h)
-		@engine.gl.canvas.width = w # / 2
-		@engine.gl.canvas.height = h # / 2
+		@engine.gl.canvas.width = w / 2
+		@engine.gl.canvas.height = h / 2
 		#@engine.universe.camSettings(w / h, CL3D.degToRad(70))
 		@engine.updateCanvasSize()
 	

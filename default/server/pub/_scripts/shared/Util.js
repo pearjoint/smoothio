@@ -135,7 +135,33 @@
         return _results;
       }
     };
+    Util.Matrix = {
+      clone: function(mat) {
+        var copy;
+        copy = mat4.create();
+        mat4.set(mat, copy);
+        return copy;
+      },
+      equals: function(mat1, mat2) {
+        var i, _ref;
+        if ((!mat1) && (!mat2)) {
+          return true;
+        }
+        if ((!mat1) || (!mat2) || (mat1.length !== mat2.length)) {
+          return false;
+        }
+        for (i = 0, _ref = mat1.length; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
+          if (mat1[i] !== mat2[i]) {
+            return false;
+          }
+        }
+        return true;
+      }
+    };
     Util.Number = {
+      degToRad: function(deg) {
+        return deg * Math.PI / 180;
+      },
       max: function() {
         return Math.pow(2, 31) - 1;
       },

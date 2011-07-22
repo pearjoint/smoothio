@@ -33,6 +33,8 @@
     }
     Client.prototype.doPageFixups = function() {
       var clingee, clinger, clingerID, gpos, gw, spos, sw, tpos, _ref;
+      this.allControls[''].onEverySecond();
+      return;
       if ((!this.recalcing) && ((!this.sleepy) || ((new Date().getTime() - this.lastFixup) >= 5000))) {
         this.recalcing = true;
         $('.smio-dt').each(__bind(function(i, span) {
@@ -79,7 +81,7 @@
       });
       $('#smio_offline_msg').text(smio.resources.client.connecting);
       this.disp.connect();
-      return setInterval(this.doPageFixups, 750);
+      return setInterval(this.doPageFixups, 1000);
     };
     Client.prototype.onWindowResize = function() {
       var ctl, h, id, w, _ref, _ref2, _results;

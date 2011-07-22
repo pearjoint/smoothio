@@ -25,6 +25,16 @@
           },
           'div #ctlpanel': {
             'div .smio-mapctl .d1': {
+              'span .tmp0': {
+                _: ['FPS: ']
+              },
+              'input #fps .smio-textinput': {
+                type: 'text',
+                value: '0'
+              },
+              'br .br0': {
+                html: ['']
+              },
               'span .tmp1': {
                 _: ['Lon/X: ']
               },
@@ -107,6 +117,10 @@
       this.engine = new smio.gfx.Engine(this, this.id('c3d'));
       return this.onWindowResize(this.client.pageWindow.width(), this.client.pageWindow.height());
     };
+    Packs_Core_Earth_MainFrame.prototype.onEverySecond = function() {
+      document.getElementById('sm_fps').value = "" + this.engine.fps;
+      return this.engine.fps = 0;
+    };
     Packs_Core_Earth_MainFrame.prototype.onSleepy = function(sleepy) {
       if (sleepy) {
         return this.engine.pressedKeys = [];
@@ -115,13 +129,14 @@
     Packs_Core_Earth_MainFrame.prototype.onWindowResize = function(w, h) {
       h = h - this.sub('ctlpanel').height();
       this.engine.canvas.width(w).height(h);
-      this.engine.gl.canvas.width = w;
-      this.engine.gl.canvas.height = h;
+      this.engine.gl.canvas.width = w / 2;
+      this.engine.gl.canvas.height = h / 2;
       return this.engine.updateCanvasSize();
     };
     function Packs_Core_Earth_MainFrame(client, parent, args) {
       this.onWindowResize = __bind(this.onWindowResize, this);
       this.onSleepy = __bind(this.onSleepy, this);
+      this.onEverySecond = __bind(this.onEverySecond, this);
       this.onLoad = __bind(this.onLoad, this);
       this.renderTemplate = __bind(this.renderTemplate, this);      Packs_Core_Earth_MainFrame.__super__.constructor.call(this, client, parent, args);
       this.init();
