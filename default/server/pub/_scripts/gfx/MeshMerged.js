@@ -55,7 +55,6 @@
         if (mesh.rotZ) {
           mat4.rotateZ(this.engine.modelViewMatrix, mesh.rotZ);
         }
-        this.engine.setMatrixUniforms();
         mesh.draw(gl, timings);
         _results.push(this.engine.popMatrix());
       }

@@ -14,6 +14,21 @@ renderTemplate: =>
 					value: '0'
 				'br .br0':
 					html: ['']
+				'span .tmp01':
+					_: ['ms/d: ']
+				'input #drawdur .smio-textinput':
+					type: 'text'
+					value: '0'
+				'br .br01':
+					html: ['']
+				'input #lowq':
+					type: 'checkbox'
+					onclick: 'smio.client.onWindowResize()'
+				'label':
+					for: @id('lowq')
+					_: ['LQ']
+				'br .br02':
+					html: ['']
 				'span .tmp1':
 					_: ['Lon/X: ']
 				'input #lon .smio-textinput':
@@ -68,8 +83,10 @@ onLoad: =>
 	@onWindowResize(@client.pageWindow.width(), @client.pageWindow.height())
 
 onEverySecond: =>
-	document.getElementById('sm_fps').value = "#{@engine.fps}"
-	@engine.fps = 0
+	durs = @engine.drawTimes
+	@engine.drawTimes = []
+	document.getElementById('sm_fps').value = "#{durs.length}"
+	document.getElementById('sm_drawdur').value = "#{Math.round(smio.Util.Number.average(durs))}"
 
 onSleepy: (sleepy) =>
 	if (sleepy)
@@ -77,9 +94,10 @@ onSleepy: (sleepy) =>
 
 onWindowResize: (w, h) =>
 	h = h - @sub('ctlpanel').height()
+	q = if document.getElementById('sm_lowq').checked then 2 else 1
 	@engine.canvas.width(w).height(h)
-	@engine.gl.canvas.width = w / 2
-	@engine.gl.canvas.height = h / 2
+	@engine.gl.canvas.width = w / q
+	@engine.gl.canvas.height = h / q
 	#@engine.universe.camSettings(w / h, CL3D.degToRad(70))
 	@engine.updateCanvasSize()
 

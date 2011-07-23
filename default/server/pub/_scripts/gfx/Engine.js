@@ -6,11 +6,9 @@
     function Engine(ctl, cid) {
       this.ctl = ctl;
       this.updateCanvasSize = __bind(this.updateCanvasSize, this);
-      this.setMatrixUniforms = __bind(this.setMatrixUniforms, this);
       this.pushMatrix = __bind(this.pushMatrix, this);
       this.popMatrix = __bind(this.popMatrix, this);
       this.play = __bind(this.play, this);
-      this.isContextLost = __bind(this.isContextLost, this);
       this.handleMouseMove = __bind(this.handleMouseMove, this);
       this.handleKeyUp = __bind(this.handleKeyUp, this);
       this.handleKeyDown = __bind(this.handleKeyDown, this);
@@ -24,12 +22,17 @@
       this.createShader = __bind(this.createShader, this);
       this.createVertexShader = __bind(this.createVertexShader, this);
       this.createFragmentShader = __bind(this.createFragmentShader, this);
-      this.fps = 0;
+      this.drawTimes = [];
       this.lastDrawTime = 0;
       this.pressedKeys = [];
       this.matrixStack = [];
-      this.meshes = [new smio.gfx.MeshMerged(this, [new smio.gfx.MeshBillboard3(this), new smio.gfx.MeshBillboard4(this)])];
+      this.shaders = {};
+      this.meshes = [new smio.gfx.MeshCube(this)];
       if ((this.canvas = $("#" + cid)) && this.canvas.length && (this.canvEl = this.canvas[0]) && this.initEngine() && this.requestAnimFrame) {
+        this.texMan = new smio.gfx.TextureManager(this);
+        this.texMan.load('stones', '/_/file/images/textures/stones.jpg');
+        this.texMan.load('wood', '/_/file/images/textures/wood.jpg');
+        this.texMan.load('sky3', '/_/file/images/textures/sky3.jpg');
         this.updateCanvasSize();
         this.play();
         return;
@@ -76,20 +79,26 @@
       return v;
     };
     Engine.prototype.draw = function(timings) {
-      var canvas, gl, mesh, _i, _len, _ref, _results;
+      var canvas, gl, mesh, name, shaderProg, _i, _len, _ref, _ref2, _results;
       if ((gl = this.gl) && (canvas = gl.canvas)) {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         mat4.identity(this.modelViewMatrix);
-        _ref = this.meshes;
+        _ref = this.shaders;
+        for (name in _ref) {
+          shaderProg = _ref[name];
+          gl.uniformMatrix4fv(shaderProg.uniforms.pMatrix, false, this.projectionMatrix);
+        }
+        _ref2 = this.meshes;
         _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          mesh = _ref[_i];
+        for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+          mesh = _ref2[_i];
           _results.push(!mesh.hidden ? this.drawMesh(gl, mesh, timings) : void 0);
         }
         return _results;
       }
     };
     Engine.prototype.drawMesh = function(gl, mesh, timings) {
+      var name, shader, shaderProg, _ref, _ref2, _ref3, _ref4, _ref5;
       this.pushMatrix();
       mesh.beforeDraw(gl, timings);
       mat4.translate(this.modelViewMatrix, [mesh.posX, mesh.posY, mesh.posZ]);
@@ -104,13 +113,43 @@
       }
       if (mesh.vertexBuffer) {
         gl.bindBuffer(gl.ARRAY_BUFFER, mesh.vertexBuffer);
-        gl.vertexAttribPointer(this.shaderProgram.myVertexPositionAttribute, mesh.vertices[0].length, gl.FLOAT, false, 0, 0);
+        _ref = this.shaders;
+        for (name in _ref) {
+          shader = _ref[name];
+          gl.vertexAttribPointer(shader.atts.aVertexPosition, mesh.vertices[0].length, gl.FLOAT, false, 0, 0);
+        }
       }
       if (mesh.colorBuffer) {
         gl.bindBuffer(gl.ARRAY_BUFFER, mesh.colorBuffer);
-        gl.vertexAttribPointer(this.shaderProgram.myVertexColorAttribute, mesh.colors[0].length, gl.FLOAT, false, 0, 0);
+        _ref2 = this.shaders;
+        for (name in _ref2) {
+          shader = _ref2[name];
+          gl.vertexAttribPointer(shader.atts.aVertexColor, mesh.colors[0].length, gl.FLOAT, false, 0, 0);
+        }
       }
-      this.setMatrixUniforms();
+      if (mesh.texCoordsBuffer) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, mesh.texCoordsBuffer);
+        _ref3 = this.shaders;
+        for (name in _ref3) {
+          shader = _ref3[name];
+          gl.vertexAttribPointer(shader.atts.aTexCoord, mesh.texCoords[0].length, gl.FLOAT, false, 0, 0);
+        }
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.texMan.textures['sky3']);
+        _ref4 = this.shaders;
+        for (name in _ref4) {
+          shader = _ref4[name];
+          gl.uniform1i(shader.uniforms.uSampler, 0);
+        }
+      }
+      if (mesh.indexBuffer) {
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.indexBuffer);
+      }
+      _ref5 = this.shaders;
+      for (name in _ref5) {
+        shaderProg = _ref5[name];
+        gl.uniformMatrix4fv(shaderProg.uniforms.mvMatrix, false, this.modelViewMatrix);
+      }
       mesh.draw(gl, timings);
       return this.popMatrix();
     };
@@ -160,24 +199,51 @@
       }
     };
     Engine.prototype.initEngineShaders = function() {
-      var fragShader, gl, vertexShader;
+      var attName, fragShader, gl, name, prog, shader, uniName, vertexShader, _ref, _results;
       if ((gl = this.gl)) {
-        vertexShader = this.createVertexShader(smio.gfx.Shaders.coloredVertexShader);
-        fragShader = this.createFragmentShader(smio.gfx.Shaders.coloredFragmentShader);
-        this.shaderProgram = gl.createProgram();
-        gl.attachShader(this.shaderProgram, vertexShader);
-        gl.attachShader(this.shaderProgram, fragShader);
-        gl.linkProgram(this.shaderProgram);
-        if (!gl.getProgramParameter(this.shaderProgram, gl.LINK_STATUS)) {
-          alert('Could not link shader program.');
+        _ref = smio.gfx.Shaders;
+        _results = [];
+        for (name in _ref) {
+          shader = _ref[name];
+          _results.push((function() {
+            var _i, _j, _len, _len2, _ref2, _ref3, _results2;
+            if (!shader.disabled) {
+              vertexShader = this.createVertexShader(shader.vertex);
+              fragShader = this.createFragmentShader(shader.fragment);
+              this.shaders[name] = prog = gl.createProgram();
+              gl.attachShader(prog, vertexShader);
+              gl.attachShader(prog, fragShader);
+              gl.linkProgram(prog);
+              if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+                alert('Could not link shader program.');
+              }
+              gl.useProgram(prog);
+              if ((!shader.atts) || !shader.atts.length) {
+                shader.atts = ['aVertexPosition'];
+              } else if (!_.contains(shader.atts, 'aVertexPosition')) {
+                shader.atts.push('aVertexPosition');
+              }
+              prog.atts = {};
+              prog.uniforms = {
+                pMatrix: gl.getUniformLocation(prog, 'uPMatrix'),
+                mvMatrix: gl.getUniformLocation(prog, 'uMVMatrix')
+              };
+              _ref2 = shader.uniforms;
+              for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+                uniName = _ref2[_i];
+                prog.uniforms[uniName] = gl.getUniformLocation(prog, uniName);
+              }
+              _ref3 = shader.atts;
+              _results2 = [];
+              for (_j = 0, _len2 = _ref3.length; _j < _len2; _j++) {
+                attName = _ref3[_j];
+                _results2.push(gl.enableVertexAttribArray(prog.atts[attName] = gl.getAttribLocation(prog, attName)));
+              }
+              return _results2;
+            }
+          }).call(this));
         }
-        gl.useProgram(this.shaderProgram);
-        this.shaderProgram.myVertexPositionAttribute = gl.getAttribLocation(this.shaderProgram, 'aVertexPosition');
-        gl.enableVertexAttribArray(this.shaderProgram.myVertexPositionAttribute);
-        this.shaderProgram.myVertexColorAttribute = gl.getAttribLocation(this.shaderProgram, 'aVertexColor');
-        gl.enableVertexAttribArray(this.shaderProgram.myVertexColorAttribute);
-        this.shaderProgram.myPMatrixUniform = gl.getUniformLocation(this.shaderProgram, 'uPMatrix');
-        return this.shaderProgram.myMVMatrixUniform = gl.getUniformLocation(this.shaderProgram, 'uMVMatrix');
+        return _results;
       }
     };
     Engine.prototype.getSightDistance = function(eyeHeight) {
@@ -212,18 +278,19 @@
       this.universe.mouseLook = true;
       return Engine.__super__.handleMouseMove.call(this, e);
     };
-    Engine.prototype.isContextLost = function() {
-      return this.gl.isContextLost;
-    };
     Engine.prototype.play = function() {
-      var getAnimFrame, now;
+      var getAnimFrame, now, timings;
       getAnimFrame = this.requestAnimFrame;
-      this.draw({
+      if (this.gl.isContextLost()) {
+        alert('context lost');
+      }
+      timings = {
         now: (now = new Date().getTime()),
         last: this.lastDrawTime,
         dif: now - this.lastDrawTime
-      });
-      this.fps = this.fps + 1;
+      };
+      this.drawTimes.push(timings.dif);
+      this.draw(timings);
       this.lastDrawTime = now;
       return getAnimFrame(this.play);
     };
@@ -235,10 +302,6 @@
       copy = mat4.create();
       mat4.set(this.modelViewMatrix, copy);
       return this.matrixStack.push(copy);
-    };
-    Engine.prototype.setMatrixUniforms = function() {
-      this.gl.uniformMatrix4fv(this.shaderProgram.myPMatrixUniform, false, this.projectionMatrix);
-      return this.gl.uniformMatrix4fv(this.shaderProgram.myMVMatrixUniform, false, this.modelViewMatrix);
     };
     Engine.prototype.updateCanvasSize = function() {
       var height, width, _ref;
@@ -253,6 +316,7 @@
         h22: height / 2.2,
         h15: height / 1.5
       };
+      document.title = "" + this.canvasSize.wpx + " x " + this.canvasSize.hpx;
       this.gl.viewport(0, 0, this.canvasSize.wpx, this.canvasSize.hpx);
       return mat4.perspective(45, this.canvasSize.wpx / this.canvasSize.hpx, 0.1, 100.0, this.projectionMatrix);
     };

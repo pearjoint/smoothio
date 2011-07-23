@@ -15,7 +15,7 @@
       this.engine = engine;
       this.draw = __bind(this.draw, this);
       this.beforeDraw = __bind(this.beforeDraw, this);
-      MeshBillboard3.__super__.constructor.call(this, this.engine, 1.5, 0.0, -1.0);
+      MeshBillboard3.__super__.constructor.call(this, this.engine, 1.5, 0.0, -6.0);
       this.colors = [[1.0, 0.0, 0.0, 1.0], [0.0, 1.0, 0.0, 1.0], [0.0, 0.0, 1.0, 1.0]];
       this.vertices = [[0.0, 1.0, 0.0], [-1.0, -1.0, 0.0], [1.0, -1.0, 0.0]];
       this.rotDeg = 0;

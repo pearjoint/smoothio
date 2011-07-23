@@ -98,6 +98,10 @@ class smio.Util
 			true
 
 	@Number:
+		average: (nums) ->
+			sum = 0
+			sum = (sum + val) for val in nums
+			sum / nums.length
 		degToRad: (deg) ->
 			deg * Math.PI / 180
 		max: () ->

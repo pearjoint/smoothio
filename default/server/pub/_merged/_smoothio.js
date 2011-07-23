@@ -22283,11 +22283,9 @@ quat4.str = function(quat) {
     function Engine(ctl, cid) {
       this.ctl = ctl;
       this.updateCanvasSize = __bind(this.updateCanvasSize, this);
-      this.setMatrixUniforms = __bind(this.setMatrixUniforms, this);
       this.pushMatrix = __bind(this.pushMatrix, this);
       this.popMatrix = __bind(this.popMatrix, this);
       this.play = __bind(this.play, this);
-      this.isContextLost = __bind(this.isContextLost, this);
       this.handleMouseMove = __bind(this.handleMouseMove, this);
       this.handleKeyUp = __bind(this.handleKeyUp, this);
       this.handleKeyDown = __bind(this.handleKeyDown, this);
@@ -22301,12 +22299,17 @@ quat4.str = function(quat) {
       this.createShader = __bind(this.createShader, this);
       this.createVertexShader = __bind(this.createVertexShader, this);
       this.createFragmentShader = __bind(this.createFragmentShader, this);
-      this.fps = 0;
+      this.drawTimes = [];
       this.lastDrawTime = 0;
       this.pressedKeys = [];
       this.matrixStack = [];
-      this.meshes = [new smio.gfx.MeshMerged(this, [new smio.gfx.MeshBillboard3(this), new smio.gfx.MeshBillboard4(this)])];
+      this.shaders = {};
+      this.meshes = [new smio.gfx.MeshCube(this)];
       if ((this.canvas = $("#" + cid)) && this.canvas.length && (this.canvEl = this.canvas[0]) && this.initEngine() && this.requestAnimFrame) {
+        this.texMan = new smio.gfx.TextureManager(this);
+        this.texMan.load('stones', '/_/file/images/textures/stones.jpg');
+        this.texMan.load('wood', '/_/file/images/textures/wood.jpg');
+        this.texMan.load('sky3', '/_/file/images/textures/sky3.jpg');
         this.updateCanvasSize();
         this.play();
         return;
@@ -22353,20 +22356,26 @@ quat4.str = function(quat) {
       return v;
     };
     Engine.prototype.draw = function(timings) {
-      var canvas, gl, mesh, _i, _len, _ref, _results;
+      var canvas, gl, mesh, name, shaderProg, _i, _len, _ref, _ref2, _results;
       if ((gl = this.gl) && (canvas = gl.canvas)) {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         mat4.identity(this.modelViewMatrix);
-        _ref = this.meshes;
+        _ref = this.shaders;
+        for (name in _ref) {
+          shaderProg = _ref[name];
+          gl.uniformMatrix4fv(shaderProg.uniforms.pMatrix, false, this.projectionMatrix);
+        }
+        _ref2 = this.meshes;
         _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          mesh = _ref[_i];
+        for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+          mesh = _ref2[_i];
           _results.push(!mesh.hidden ? this.drawMesh(gl, mesh, timings) : void 0);
         }
         return _results;
       }
     };
     Engine.prototype.drawMesh = function(gl, mesh, timings) {
+      var name, shader, shaderProg, _ref, _ref2, _ref3, _ref4, _ref5;
       this.pushMatrix();
       mesh.beforeDraw(gl, timings);
       mat4.translate(this.modelViewMatrix, [mesh.posX, mesh.posY, mesh.posZ]);
@@ -22381,13 +22390,43 @@ quat4.str = function(quat) {
       }
       if (mesh.vertexBuffer) {
         gl.bindBuffer(gl.ARRAY_BUFFER, mesh.vertexBuffer);
-        gl.vertexAttribPointer(this.shaderProgram.myVertexPositionAttribute, mesh.vertices[0].length, gl.FLOAT, false, 0, 0);
+        _ref = this.shaders;
+        for (name in _ref) {
+          shader = _ref[name];
+          gl.vertexAttribPointer(shader.atts.aVertexPosition, mesh.vertices[0].length, gl.FLOAT, false, 0, 0);
+        }
       }
       if (mesh.colorBuffer) {
         gl.bindBuffer(gl.ARRAY_BUFFER, mesh.colorBuffer);
-        gl.vertexAttribPointer(this.shaderProgram.myVertexColorAttribute, mesh.colors[0].length, gl.FLOAT, false, 0, 0);
+        _ref2 = this.shaders;
+        for (name in _ref2) {
+          shader = _ref2[name];
+          gl.vertexAttribPointer(shader.atts.aVertexColor, mesh.colors[0].length, gl.FLOAT, false, 0, 0);
+        }
       }
-      this.setMatrixUniforms();
+      if (mesh.texCoordsBuffer) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, mesh.texCoordsBuffer);
+        _ref3 = this.shaders;
+        for (name in _ref3) {
+          shader = _ref3[name];
+          gl.vertexAttribPointer(shader.atts.aTexCoord, mesh.texCoords[0].length, gl.FLOAT, false, 0, 0);
+        }
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.texMan.textures['sky3']);
+        _ref4 = this.shaders;
+        for (name in _ref4) {
+          shader = _ref4[name];
+          gl.uniform1i(shader.uniforms.uSampler, 0);
+        }
+      }
+      if (mesh.indexBuffer) {
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.indexBuffer);
+      }
+      _ref5 = this.shaders;
+      for (name in _ref5) {
+        shaderProg = _ref5[name];
+        gl.uniformMatrix4fv(shaderProg.uniforms.mvMatrix, false, this.modelViewMatrix);
+      }
       mesh.draw(gl, timings);
       return this.popMatrix();
     };
@@ -22437,24 +22476,51 @@ quat4.str = function(quat) {
       }
     };
     Engine.prototype.initEngineShaders = function() {
-      var fragShader, gl, vertexShader;
+      var attName, fragShader, gl, name, prog, shader, uniName, vertexShader, _ref, _results;
       if ((gl = this.gl)) {
-        vertexShader = this.createVertexShader(smio.gfx.Shaders.coloredVertexShader);
-        fragShader = this.createFragmentShader(smio.gfx.Shaders.coloredFragmentShader);
-        this.shaderProgram = gl.createProgram();
-        gl.attachShader(this.shaderProgram, vertexShader);
-        gl.attachShader(this.shaderProgram, fragShader);
-        gl.linkProgram(this.shaderProgram);
-        if (!gl.getProgramParameter(this.shaderProgram, gl.LINK_STATUS)) {
-          alert('Could not link shader program.');
+        _ref = smio.gfx.Shaders;
+        _results = [];
+        for (name in _ref) {
+          shader = _ref[name];
+          _results.push((function() {
+            var _i, _j, _len, _len2, _ref2, _ref3, _results2;
+            if (!shader.disabled) {
+              vertexShader = this.createVertexShader(shader.vertex);
+              fragShader = this.createFragmentShader(shader.fragment);
+              this.shaders[name] = prog = gl.createProgram();
+              gl.attachShader(prog, vertexShader);
+              gl.attachShader(prog, fragShader);
+              gl.linkProgram(prog);
+              if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+                alert('Could not link shader program.');
+              }
+              gl.useProgram(prog);
+              if ((!shader.atts) || !shader.atts.length) {
+                shader.atts = ['aVertexPosition'];
+              } else if (!_.contains(shader.atts, 'aVertexPosition')) {
+                shader.atts.push('aVertexPosition');
+              }
+              prog.atts = {};
+              prog.uniforms = {
+                pMatrix: gl.getUniformLocation(prog, 'uPMatrix'),
+                mvMatrix: gl.getUniformLocation(prog, 'uMVMatrix')
+              };
+              _ref2 = shader.uniforms;
+              for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+                uniName = _ref2[_i];
+                prog.uniforms[uniName] = gl.getUniformLocation(prog, uniName);
+              }
+              _ref3 = shader.atts;
+              _results2 = [];
+              for (_j = 0, _len2 = _ref3.length; _j < _len2; _j++) {
+                attName = _ref3[_j];
+                _results2.push(gl.enableVertexAttribArray(prog.atts[attName] = gl.getAttribLocation(prog, attName)));
+              }
+              return _results2;
+            }
+          }).call(this));
         }
-        gl.useProgram(this.shaderProgram);
-        this.shaderProgram.myVertexPositionAttribute = gl.getAttribLocation(this.shaderProgram, 'aVertexPosition');
-        gl.enableVertexAttribArray(this.shaderProgram.myVertexPositionAttribute);
-        this.shaderProgram.myVertexColorAttribute = gl.getAttribLocation(this.shaderProgram, 'aVertexColor');
-        gl.enableVertexAttribArray(this.shaderProgram.myVertexColorAttribute);
-        this.shaderProgram.myPMatrixUniform = gl.getUniformLocation(this.shaderProgram, 'uPMatrix');
-        return this.shaderProgram.myMVMatrixUniform = gl.getUniformLocation(this.shaderProgram, 'uMVMatrix');
+        return _results;
       }
     };
     Engine.prototype.getSightDistance = function(eyeHeight) {
@@ -22489,18 +22555,19 @@ quat4.str = function(quat) {
       this.universe.mouseLook = true;
       return Engine.__super__.handleMouseMove.call(this, e);
     };
-    Engine.prototype.isContextLost = function() {
-      return this.gl.isContextLost;
-    };
     Engine.prototype.play = function() {
-      var getAnimFrame, now;
+      var getAnimFrame, now, timings;
       getAnimFrame = this.requestAnimFrame;
-      this.draw({
+      if (this.gl.isContextLost()) {
+        alert('context lost');
+      }
+      timings = {
         now: (now = new Date().getTime()),
         last: this.lastDrawTime,
         dif: now - this.lastDrawTime
-      });
-      this.fps = this.fps + 1;
+      };
+      this.drawTimes.push(timings.dif);
+      this.draw(timings);
       this.lastDrawTime = now;
       return getAnimFrame(this.play);
     };
@@ -22512,10 +22579,6 @@ quat4.str = function(quat) {
       copy = mat4.create();
       mat4.set(this.modelViewMatrix, copy);
       return this.matrixStack.push(copy);
-    };
-    Engine.prototype.setMatrixUniforms = function() {
-      this.gl.uniformMatrix4fv(this.shaderProgram.myPMatrixUniform, false, this.projectionMatrix);
-      return this.gl.uniformMatrix4fv(this.shaderProgram.myMVMatrixUniform, false, this.modelViewMatrix);
     };
     Engine.prototype.updateCanvasSize = function() {
       var height, width, _ref;
@@ -22530,6 +22593,7 @@ quat4.str = function(quat) {
         h22: height / 2.2,
         h15: height / 1.5
       };
+      document.title = "" + this.canvasSize.wpx + " x " + this.canvasSize.hpx;
       this.gl.viewport(0, 0, this.canvasSize.wpx, this.canvasSize.hpx);
       return mat4.perspective(45, this.canvasSize.wpx / this.canvasSize.hpx, 0.1, 100.0, this.projectionMatrix);
     };
@@ -22785,13 +22849,31 @@ quat4.str = function(quat) {
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_.flatten(this.vertices)), gl.STATIC_DRAW);
           }
         }
+        if (this.indices && this.indices.length) {
+          if ((createBuf = !this.indexBuffer)) {
+            this.indexBuffer = gl.createBuffer();
+          }
+          if ((!onlyIfCreated) || createBuf) {
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), gl.STATIC_DRAW);
+          }
+        }
         if (this.colors && this.colors.length) {
           if ((createBuf = !this.colorBuffer)) {
             this.colorBuffer = gl.createBuffer();
           }
           if ((!onlyIfCreated) || createBuf) {
             gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
-            return gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_.flatten(this.colors)), gl.STATIC_DRAW);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_.flatten(this.colors)), gl.STATIC_DRAW);
+          }
+        }
+        if (this.texCoords && this.texCoords.length) {
+          if ((createBuf = !this.texCoordsBuffer)) {
+            this.texCoordsBuffer = gl.createBuffer();
+          }
+          if ((!onlyIfCreated) || createBuf) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordsBuffer);
+            return gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_.flatten(this.texCoords)), gl.STATIC_DRAW);
           }
         }
       }
@@ -22818,7 +22900,7 @@ quat4.str = function(quat) {
       this.engine = engine;
       this.draw = __bind(this.draw, this);
       this.beforeDraw = __bind(this.beforeDraw, this);
-      MeshBillboard3.__super__.constructor.call(this, this.engine, 1.5, 0.0, -1.0);
+      MeshBillboard3.__super__.constructor.call(this, this.engine, 1.5, 0.0, -6.0);
       this.colors = [[1.0, 0.0, 0.0, 1.0], [0.0, 1.0, 0.0, 1.0], [0.0, 0.0, 1.0, 1.0]];
       this.vertices = [[0.0, 1.0, 0.0], [-1.0, -1.0, 0.0], [1.0, -1.0, 0.0]];
       this.rotDeg = 0;
@@ -22852,7 +22934,7 @@ quat4.str = function(quat) {
       this.engine = engine;
       this.draw = __bind(this.draw, this);
       this.beforeDraw = __bind(this.beforeDraw, this);
-      MeshBillboard4.__super__.constructor.call(this, this.engine, -1.5, 0.0, -1.0);
+      MeshBillboard4.__super__.constructor.call(this, this.engine, -1.5, 0.0, -6.0);
       this.colors = [[1.0, 1.0, 0.0, 1.0], [0.0, 1.0, 1.0, 1.0], [1.0, 0.0, 1.0, 1.0], [0.6, 0.3, 0.9, 1.0]];
       this.vertices = [[1.0, 1.0, 0.0], [-1.0, 1.0, 0.0], [1.0, -1.0, 0.0], [-1.0, -1.0, 0.0]];
       this.rotDeg = 0;
@@ -22865,6 +22947,49 @@ quat4.str = function(quat) {
       return gl.drawArrays(gl.TRIANGLE_STRIP, this.bufferIndex, this.vertices.length);
     };
     return MeshBillboard4;
+  })();
+}).call(this);
+
+/** server/pub/_scripts/gfx/MeshCube.js **/
+(function() {
+  var smio;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
+  };
+  smio = global.smoothio;
+  smio.gfx.MeshCube = (function() {
+    __extends(MeshCube, smio.gfx.Mesh);
+    function MeshCube(engine) {
+      var i;
+      this.engine = engine;
+      this.draw = __bind(this.draw, this);
+      this.beforeDraw = __bind(this.beforeDraw, this);
+      MeshCube.__super__.constructor.call(this, this.engine, 0.0, 0.0, -4.0);
+      if (false) {
+        this.colors = [];
+        for (i = 0; i < 24; i++) {
+          this.colors.push([Math.random(), Math.random(), Math.random(), 1.0]);
+        }
+      } else {
+        this.texCoords = [[0.0, 1.0], [1.0, 1.0], [1.0, 0.0], [0.0, 0.0], [1.0, 1.0], [1.0, 0.0], [0.0, 0.0], [0.0, 1.0], [0.0, 0.0], [0.0, 1.0], [1.0, 1.0], [1.0, 0.0], [1.0, 0.0], [0.0, 0.0], [0.0, 1.0], [1.0, 1.0], [1.0, 1.0], [1.0, 0.0], [0.0, 0.0], [0.0, 1.0], [0.0, 1.0], [1.0, 1.0], [1.0, 0.0], [0.0, 0.0]];
+      }
+      this.indices = [0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23];
+      this.vertices = [[-1.0, -1.0, 1.0], [1.0, -1.0, 1.0], [1.0, 1.0, 1.0], [-1.0, 1.0, 1.0], [-1.0, -1.0, -1.0], [-1.0, 1.0, -1.0], [1.0, 1.0, -1.0], [1.0, -1.0, -1.0], [-1.0, 1.0, -1.0], [-1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, -1.0], [-1.0, -1.0, -1.0], [1.0, -1.0, -1.0], [1.0, -1.0, 1.0], [-1.0, -1.0, 1.0], [1.0, -1.0, -1.0], [1.0, 1.0, -1.0], [1.0, 1.0, 1.0], [1.0, -1.0, 1.0], [-1.0, -1.0, -1.0], [-1.0, -1.0, 1.0], [-1.0, 1.0, 1.0], [-1.0, 1.0, -1.0]];
+      this.rotDeg = 0;
+      this.rotY = 0;
+    }
+    MeshCube.prototype.beforeDraw = function(gl, timings) {
+      return this.rotY = smio.Util.Number.degToRad(this.rotDeg += (45 * timings.dif) / 1000);
+    };
+    MeshCube.prototype.draw = function(gl, timings) {
+      return gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, this.bufferIndex);
+    };
+    return MeshCube;
   })();
 }).call(this);
 
@@ -22926,7 +23051,6 @@ quat4.str = function(quat) {
         if (mesh.rotZ) {
           mat4.rotateZ(this.engine.modelViewMatrix, mesh.rotZ);
         }
-        this.engine.setMatrixUniforms();
         mesh.draw(gl, timings);
         _results.push(this.engine.popMatrix());
       }
@@ -22957,6 +23081,40 @@ quat4.str = function(quat) {
       return MeshMerged.__super__.updateBuffers.call(this);
     };
     return MeshMerged;
+  })();
+}).call(this);
+
+/** server/pub/_scripts/gfx/MeshPyramid.js **/
+(function() {
+  var smio;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
+  };
+  smio = global.smoothio;
+  smio.gfx.MeshPyramid = (function() {
+    __extends(MeshPyramid, smio.gfx.Mesh);
+    function MeshPyramid(engine) {
+      this.engine = engine;
+      this.draw = __bind(this.draw, this);
+      this.beforeDraw = __bind(this.beforeDraw, this);
+      MeshPyramid.__super__.constructor.call(this, this.engine, 1, 0.0, -6.0);
+      this.colors = [[Math.random(), Math.random(), Math.random(), 1.0], [Math.random(), Math.random(), Math.random(), 1.0], [Math.random(), Math.random(), Math.random(), 1.0], [Math.random(), Math.random(), Math.random(), 1.0], [Math.random(), Math.random(), Math.random(), 1.0], [Math.random(), Math.random(), Math.random(), 1.0], [Math.random(), Math.random(), Math.random(), 1.0], [Math.random(), Math.random(), Math.random(), 1.0], [Math.random(), Math.random(), Math.random(), 1.0], [Math.random(), Math.random(), Math.random(), 1.0], [Math.random(), Math.random(), Math.random(), 1.0], [Math.random(), Math.random(), Math.random(), 1.0]];
+      this.vertices = [[0.0, 1.0, 0.0], [-1.0, -1.0, 1.0], [1.0, -1.0, 1.0], [0.0, 1.0, 0.0], [1.0, -1.0, 1.0], [1.0, -1.0, -1.0], [0.0, 1.0, 0.0], [1.0, -1.0, -1.0], [-1.0, -1.0, -1.0], [0.0, 1.0, 0.0], [-1.0, -1.0, -1.0], [-1.0, -1.0, 1.0]];
+      this.rotDeg = 0;
+      this.rotX = 0;
+    }
+    MeshPyramid.prototype.beforeDraw = function(gl, timings) {
+      return this.rotZ = this.rotY = this.rotX = smio.Util.Number.degToRad(this.rotDeg -= (135 * timings.dif) / 1000);
+    };
+    MeshPyramid.prototype.draw = function(gl, timings) {
+      return gl.drawArrays(gl.TRIANGLES, this.bufferIndex, this.vertices.length);
+    };
+    return MeshPyramid;
   })();
 }).call(this);
 
@@ -22992,10 +23150,23 @@ quat4.str = function(quat) {
   smio = global.smoothio;
   smio.gfx.Shaders = (function() {
     function Shaders() {}
-    Shaders.coloredFragmentShader = "#ifdef GL_ES\nprecision highp float;\n#endif\nvarying vec4 vColor;\nvoid main(void) {\n	gl_FragColor = vColor;\n}";
-    Shaders.defaultFragmentShader = "#ifdef GL_ES\nprecision highp float;\n#endif\nvoid main(void) {\n	gl_FragColor = vec4(1.0, 0.8, 0.0, 1.0);\n}";
-    Shaders.coloredVertexShader = "attribute vec3 aVertexPosition;\nattribute vec4 aVertexColor;\nuniform mat4 uMVMatrix;\nuniform mat4 uPMatrix;\nvarying vec4 vColor;\nvoid main(void) {\n	gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n	vColor = aVertexColor;\n}";
-    Shaders.defaultVertexShader = "attribute vec3 aVertexPosition;\nuniform mat4 uMVMatrix;\nuniform mat4 uPMatrix;\nvoid main(void) {\n	gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n}";
+    Shaders.Dummy = {
+      disabled: true,
+      vertex: "attribute vec3 aVertexPosition;\nuniform mat4 uMVMatrix;\nuniform mat4 uPMatrix;\nvoid main(void) {\n	gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n}",
+      fragment: "#ifdef GL_ES\nprecision highp float;\n#endif\nvoid main(void) {\n	gl_FragColor = vec4(1.0, 0.8, 0.0, 1.0);\n}"
+    };
+    Shaders.PlainColor = {
+      disabled: true,
+      atts: ['aVertexColor'],
+      vertex: "attribute vec3 aVertexPosition;\nattribute vec4 aVertexColor;\nuniform mat4 uMVMatrix;\nuniform mat4 uPMatrix;\nvarying vec4 vColor;\nvoid main(void) {\n	gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n	vColor = aVertexColor;\n}",
+      fragment: "#ifdef GL_ES\nprecision highp float;\n#endif\nvarying vec4 vColor;\nvoid main(void) {\n	gl_FragColor = vColor;\n}"
+    };
+    Shaders.Texured = {
+      atts: ['aTexCoord'],
+      uniforms: ['uSampler'],
+      vertex: "attribute vec3 aVertexPosition;\nattribute vec2 aTexCoord;\nuniform mat4 uMVMatrix;\nuniform mat4 uPMatrix;\nvarying vec2 vTexCoord;\nvoid main(void) {\n	gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n	vTexCoord = aTexCoord;\n}",
+      fragment: "#ifdef GL_ES\nprecision highp float;\n#endif\nuniform sampler2D uSampler;\nvarying vec2 vTexCoord;\nvoid main(void) {\n	gl_FragColor = texture2D(uSampler, vTexCoord);\n}"
+    };
     return Shaders;
   })();
 }).call(this);
@@ -23079,6 +23250,68 @@ quat4.str = function(quat) {
       return renderer.drawMesh(this.mesh);
     };
     return SphereSceneNode;
+  })();
+}).call(this);
+
+/** server/pub/_scripts/gfx/TextureManager.js **/
+(function() {
+  var smio;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  smio = global.smoothio;
+  smio.gfx.TextureManager = (function() {
+    function TextureManager(engine) {
+      this.engine = engine;
+      this.withTexture = __bind(this.withTexture, this);
+      this.remove = __bind(this.remove, this);
+      this.load = __bind(this.load, this);
+      this.texQuality = this.engine.gl.LINEAR;
+      this.textures = {};
+    }
+    TextureManager.prototype.load = function(name, url, forceReload) {
+      var gl, img, tex;
+      if ((gl = this.engine.gl) && ((!(tex = this.textures[url])) || forceReload)) {
+        if (!tex) {
+          tex = gl.createTexture();
+        }
+        img = new Image();
+        img.onerror = __bind(function() {
+          return this.load('/_/file/images/textures/particle.png', forceReload, url);
+        }, this);
+        img.onload = __bind(function() {
+          var quality;
+          this.textures[name] = tex;
+          quality = this.texQuality;
+          return this.withTexture(tex, function() {
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, quality);
+            return gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, quality);
+          });
+        }, this);
+        return img.src = url;
+      }
+    };
+    TextureManager.prototype.remove = function(url) {
+      var tex;
+      if ((tex = this.textures[url])) {
+        this.engine.deleteTexture(tex);
+        return delete this.textures[url];
+      }
+    };
+    TextureManager.prototype.withTexture = function(texOrUrl, fn) {
+      var tex;
+      if (_.isString(tex = texOrUrl)) {
+        tex = this.textures[texOrUrl];
+      }
+      if (tex) {
+        this.engine.gl.bindTexture(this.engine.gl.TEXTURE_2D, tex);
+        try {
+          return fn(tex);
+        } finally {
+          this.engine.gl.bindTexture(this.engine.gl.TEXTURE_2D, null);
+        }
+      }
+    };
+    return TextureManager;
   })();
 }).call(this);
 
@@ -24188,6 +24421,15 @@ quat4.str = function(quat) {
       }
     };
     Util.Number = {
+      average: function(nums) {
+        var sum, val, _i, _len;
+        sum = 0;
+        for (_i = 0, _len = nums.length; _i < _len; _i++) {
+          val = nums[_i];
+          sum = sum + val;
+        }
+        return sum / nums.length;
+      },
       degToRad: function(deg) {
         return deg * Math.PI / 180;
       },
@@ -25378,6 +25620,27 @@ quat4.str = function(quat) {
               'br .br0': {
                 html: ['']
               },
+              'span .tmp01': {
+                _: ['ms/d: ']
+              },
+              'input #drawdur .smio-textinput': {
+                type: 'text',
+                value: '0'
+              },
+              'br .br01': {
+                html: ['']
+              },
+              'input #lowq': {
+                type: 'checkbox',
+                onclick: 'smio.client.onWindowResize()'
+              },
+              'label': {
+                "for": this.id('lowq'),
+                _: ['LQ']
+              },
+              'br .br02': {
+                html: ['']
+              },
               'span .tmp1': {
                 _: ['Lon/X: ']
               },
@@ -25461,8 +25724,11 @@ quat4.str = function(quat) {
       return this.onWindowResize(this.client.pageWindow.width(), this.client.pageWindow.height());
     };
     Packs_Core_Earth_MainFrame.prototype.onEverySecond = function() {
-      document.getElementById('sm_fps').value = "" + this.engine.fps;
-      return this.engine.fps = 0;
+      var durs;
+      durs = this.engine.drawTimes;
+      this.engine.drawTimes = [];
+      document.getElementById('sm_fps').value = "" + durs.length;
+      return document.getElementById('sm_drawdur').value = "" + (Math.round(smio.Util.Number.average(durs)));
     };
     Packs_Core_Earth_MainFrame.prototype.onSleepy = function(sleepy) {
       if (sleepy) {
@@ -25470,10 +25736,12 @@ quat4.str = function(quat) {
       }
     };
     Packs_Core_Earth_MainFrame.prototype.onWindowResize = function(w, h) {
+      var q;
       h = h - this.sub('ctlpanel').height();
+      q = document.getElementById('sm_lowq').checked ? 2 : 1;
       this.engine.canvas.width(w).height(h);
-      this.engine.gl.canvas.width = w / 2;
-      this.engine.gl.canvas.height = h / 2;
+      this.engine.gl.canvas.width = w / q;
+      this.engine.gl.canvas.height = h / q;
       return this.engine.updateCanvasSize();
     };
     function Packs_Core_Earth_MainFrame(client, parent, args) {

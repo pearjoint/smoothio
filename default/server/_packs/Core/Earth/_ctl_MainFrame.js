@@ -35,6 +35,27 @@
               'br .br0': {
                 html: ['']
               },
+              'span .tmp01': {
+                _: ['ms/d: ']
+              },
+              'input #drawdur .smio-textinput': {
+                type: 'text',
+                value: '0'
+              },
+              'br .br01': {
+                html: ['']
+              },
+              'input #lowq': {
+                type: 'checkbox',
+                onclick: 'smio.client.onWindowResize()'
+              },
+              'label': {
+                "for": this.id('lowq'),
+                _: ['LQ']
+              },
+              'br .br02': {
+                html: ['']
+              },
               'span .tmp1': {
                 _: ['Lon/X: ']
               },
@@ -118,8 +139,11 @@
       return this.onWindowResize(this.client.pageWindow.width(), this.client.pageWindow.height());
     };
     Packs_Core_Earth_MainFrame.prototype.onEverySecond = function() {
-      document.getElementById('sm_fps').value = "" + this.engine.fps;
-      return this.engine.fps = 0;
+      var durs;
+      durs = this.engine.drawTimes;
+      this.engine.drawTimes = [];
+      document.getElementById('sm_fps').value = "" + durs.length;
+      return document.getElementById('sm_drawdur').value = "" + (Math.round(smio.Util.Number.average(durs)));
     };
     Packs_Core_Earth_MainFrame.prototype.onSleepy = function(sleepy) {
       if (sleepy) {
@@ -127,10 +151,12 @@
       }
     };
     Packs_Core_Earth_MainFrame.prototype.onWindowResize = function(w, h) {
+      var q;
       h = h - this.sub('ctlpanel').height();
+      q = document.getElementById('sm_lowq').checked ? 2 : 1;
       this.engine.canvas.width(w).height(h);
-      this.engine.gl.canvas.width = w / 2;
-      this.engine.gl.canvas.height = h / 2;
+      this.engine.gl.canvas.width = w / q;
+      this.engine.gl.canvas.height = h / q;
       return this.engine.updateCanvasSize();
     };
     function Packs_Core_Earth_MainFrame(client, parent, args) {

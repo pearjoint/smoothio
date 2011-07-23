@@ -159,6 +159,15 @@
       }
     };
     Util.Number = {
+      average: function(nums) {
+        var sum, val, _i, _len;
+        sum = 0;
+        for (_i = 0, _len = nums.length; _i < _len; _i++) {
+          val = nums[_i];
+          sum = sum + val;
+        }
+        return sum / nums.length;
+      },
       degToRad: function(deg) {
         return deg * Math.PI / 180;
       },

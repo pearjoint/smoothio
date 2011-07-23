@@ -3,12 +3,17 @@ smio = global.smoothio
 class smio.gfx.Engine #extends CL3D.CopperLicht
 
 	constructor: (@ctl, cid) ->
-		@fps = 0
+		@drawTimes = []
 		@lastDrawTime = 0
 		@pressedKeys = []
 		@matrixStack = []
-		@meshes = [new smio.gfx.MeshMerged(@, [new smio.gfx.MeshBillboard3(@), new smio.gfx.MeshBillboard4(@)])]
+		@shaders = {}
+		@meshes = [new smio.gfx.MeshCube(@)] # new smio.gfx.MeshPyramid(@)
 		if (@canvas = $("##{cid}")) and @canvas.length and (@canvEl = @canvas[0]) and @initEngine() and @requestAnimFrame
+			@texMan = new smio.gfx.TextureManager(@)
+			@texMan.load('stones', '/_/file/images/textures/stones.jpg')
+			@texMan.load('wood', '/_/file/images/textures/wood.jpg')
+			@texMan.load('sky3', '/_/file/images/textures/sky3.jpg')
 			@updateCanvasSize()
 			@play()
 			return
@@ -53,6 +58,8 @@ class smio.gfx.Engine #extends CL3D.CopperLicht
 		if (gl = @gl) and (canvas = gl.canvas)
 			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 			mat4.identity(@modelViewMatrix)
+			for name, shaderProg of @shaders
+				gl.uniformMatrix4fv(shaderProg.uniforms.pMatrix, false, @projectionMatrix)
 			for mesh in @meshes
 				if not mesh.hidden
 					@drawMesh(gl, mesh, timings)
@@ -69,11 +76,24 @@ class smio.gfx.Engine #extends CL3D.CopperLicht
 			mat4.rotateZ(@modelViewMatrix, mesh.rotZ)
 		if mesh.vertexBuffer
 			gl.bindBuffer(gl.ARRAY_BUFFER, mesh.vertexBuffer)
-			gl.vertexAttribPointer(@shaderProgram.myVertexPositionAttribute, mesh.vertices[0].length, gl.FLOAT, false, 0, 0)
+			for name, shader of @shaders
+				gl.vertexAttribPointer(shader.atts.aVertexPosition, mesh.vertices[0].length, gl.FLOAT, false, 0, 0)
 		if mesh.colorBuffer
 			gl.bindBuffer(gl.ARRAY_BUFFER, mesh.colorBuffer)
-			gl.vertexAttribPointer(@shaderProgram.myVertexColorAttribute, mesh.colors[0].length, gl.FLOAT, false, 0, 0)
-		@setMatrixUniforms()
+			for name, shader of @shaders
+				gl.vertexAttribPointer(shader.atts.aVertexColor, mesh.colors[0].length, gl.FLOAT, false, 0, 0)
+		if mesh.texCoordsBuffer
+			gl.bindBuffer(gl.ARRAY_BUFFER, mesh.texCoordsBuffer)
+			for name, shader of @shaders
+				gl.vertexAttribPointer(shader.atts.aTexCoord, mesh.texCoords[0].length, gl.FLOAT, false, 0, 0)
+			gl.activeTexture(gl.TEXTURE0)
+			gl.bindTexture(gl.TEXTURE_2D, @texMan.textures['sky3'])
+			for name, shader of @shaders
+				gl.uniform1i(shader.uniforms.uSampler, 0)
+		if mesh.indexBuffer
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.indexBuffer)
+		for name, shaderProg of @shaders
+			gl.uniformMatrix4fv(shaderProg.uniforms.mvMatrix, false, @modelViewMatrix)
 		mesh.draw(gl, timings)
 		@popMatrix()
 
@@ -103,21 +123,29 @@ class smio.gfx.Engine #extends CL3D.CopperLicht
 
 	initEngineShaders: =>
 		if (gl = @gl)
-			vertexShader = @createVertexShader(smio.gfx.Shaders.coloredVertexShader)
-			fragShader = @createFragmentShader(smio.gfx.Shaders.coloredFragmentShader)
-			@shaderProgram = gl.createProgram()
-			gl.attachShader(@shaderProgram, vertexShader)
-			gl.attachShader(@shaderProgram, fragShader)
-			gl.linkProgram(@shaderProgram)
-			if not gl.getProgramParameter(@shaderProgram, gl.LINK_STATUS)
-				alert('Could not link shader program.')
-			gl.useProgram(@shaderProgram)
-			@shaderProgram.myVertexPositionAttribute = gl.getAttribLocation(@shaderProgram, 'aVertexPosition')
-			gl.enableVertexAttribArray(@shaderProgram.myVertexPositionAttribute)
-			@shaderProgram.myVertexColorAttribute = gl.getAttribLocation(@shaderProgram, 'aVertexColor')
-			gl.enableVertexAttribArray(@shaderProgram.myVertexColorAttribute)
-			@shaderProgram.myPMatrixUniform = gl.getUniformLocation(@shaderProgram, 'uPMatrix')
-			@shaderProgram.myMVMatrixUniform = gl.getUniformLocation(@shaderProgram, 'uMVMatrix')
+			for name, shader of smio.gfx.Shaders
+				if not shader.disabled
+					vertexShader = @createVertexShader(shader.vertex)
+					fragShader = @createFragmentShader(shader.fragment)
+					@shaders[name] = prog = gl.createProgram()
+					gl.attachShader(prog, vertexShader)
+					gl.attachShader(prog, fragShader)
+					gl.linkProgram(prog)
+					if not gl.getProgramParameter(prog, gl.LINK_STATUS)
+						alert('Could not link shader program.')
+					gl.useProgram(prog)
+					if (not shader.atts) or not shader.atts.length
+						shader.atts = ['aVertexPosition']
+					else if not _.contains(shader.atts, 'aVertexPosition')
+						shader.atts.push('aVertexPosition')
+					prog.atts = {}
+					prog.uniforms =
+						pMatrix: gl.getUniformLocation(prog, 'uPMatrix')
+						mvMatrix: gl.getUniformLocation(prog, 'uMVMatrix')
+					for uniName in shader.uniforms
+						prog.uniforms[uniName] = gl.getUniformLocation(prog, uniName)
+					for attName in shader.atts
+						gl.enableVertexAttribArray(prog.atts[attName] = gl.getAttribLocation(prog, attName))
 
 	getSightDistance: (eyeHeight) =>
 		Math.sqrt((2 * smio.gfx.UniverseSceneNode.consts.earthRadius * eyeHeight) + (eyeHeight * eyeHeight))
@@ -142,13 +170,13 @@ class smio.gfx.Engine #extends CL3D.CopperLicht
 		@universe.mouseLook = true
 		super(e)
 
-	isContextLost: =>
-		@gl.isContextLost
-
 	play: =>
 		getAnimFrame = @requestAnimFrame
-		@draw(now: (now = new Date().getTime()), last: @lastDrawTime, dif: (now - @lastDrawTime))
-		@fps = @fps + 1
+		if @gl.isContextLost()
+			alert 'context lost'
+		timings = now: (now = new Date().getTime()), last: @lastDrawTime, dif: (now - @lastDrawTime)
+		@drawTimes.push(timings.dif)
+		@draw(timings)
 		@lastDrawTime = now
 		getAnimFrame(@play)
 
@@ -160,13 +188,10 @@ class smio.gfx.Engine #extends CL3D.CopperLicht
 		mat4.set(@modelViewMatrix, copy)
 		@matrixStack.push(copy)
 
-	setMatrixUniforms: =>
-		@gl.uniformMatrix4fv(@shaderProgram.myPMatrixUniform, false, @projectionMatrix);
-		@gl.uniformMatrix4fv(@shaderProgram.myMVMatrixUniform, false, @modelViewMatrix);
-
 	updateCanvasSize: =>
 		[width, height] = [@canvas.width(), @canvas.height()]
 		@canvasSize = wpx: @gl.drawingBufferWidth or @gl.canvas.width, hpx: @gl.drawingBufferHeight or @gl.canvas.height, w: width, h: height, w2: (width / 2), w4: (width / 4), h22: (height / 2.2), h15: (height / 1.5)
+		document.title = "#{@canvasSize.wpx} x #{@canvasSize.hpx}"
 		@gl.viewport(0, 0, @canvasSize.wpx, @canvasSize.hpx)
 		mat4.perspective(45, @canvasSize.wpx / @canvasSize.hpx, 0.1, 100.0, @projectionMatrix)
 

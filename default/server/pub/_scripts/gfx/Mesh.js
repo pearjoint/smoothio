@@ -42,13 +42,31 @@
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_.flatten(this.vertices)), gl.STATIC_DRAW);
           }
         }
+        if (this.indices && this.indices.length) {
+          if ((createBuf = !this.indexBuffer)) {
+            this.indexBuffer = gl.createBuffer();
+          }
+          if ((!onlyIfCreated) || createBuf) {
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), gl.STATIC_DRAW);
+          }
+        }
         if (this.colors && this.colors.length) {
           if ((createBuf = !this.colorBuffer)) {
             this.colorBuffer = gl.createBuffer();
           }
           if ((!onlyIfCreated) || createBuf) {
             gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
-            return gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_.flatten(this.colors)), gl.STATIC_DRAW);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_.flatten(this.colors)), gl.STATIC_DRAW);
+          }
+        }
+        if (this.texCoords && this.texCoords.length) {
+          if ((createBuf = !this.texCoordsBuffer)) {
+            this.texCoordsBuffer = gl.createBuffer();
+          }
+          if ((!onlyIfCreated) || createBuf) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordsBuffer);
+            return gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_.flatten(this.texCoords)), gl.STATIC_DRAW);
           }
         }
       }

@@ -26,7 +26,7 @@ class smio.gfx.MeshMerged extends smio.gfx.Mesh
 				mat4.rotateY(@engine.modelViewMatrix, mesh.rotY)
 			if mesh.rotZ
 				mat4.rotateZ(@engine.modelViewMatrix, mesh.rotZ)
-			@engine.setMatrixUniforms()
+			#@engine.updateShaderModelViewMatrix()
 			mesh.draw(gl, timings)
 			@engine.popMatrix()
 
