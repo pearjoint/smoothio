@@ -13,7 +13,7 @@ class smio.gfx.Engine #extends CL3D.CopperLicht
 			@texMan = new smio.gfx.TextureManager(@)
 			@texMan.load('stones', '/_/file/images/textures/stones.jpg')
 			@texMan.load('wood', '/_/file/images/textures/wood.jpg')
-			@texMan.load('sky3', '/_/file/images/textures/sky3.jpg')
+			@texMan.load('sky3', '/_/file/images/textures/skydn.jpg')
 			@updateCanvasSize()
 			@play()
 			return
@@ -104,7 +104,7 @@ class smio.gfx.Engine #extends CL3D.CopperLicht
 		@projectionMatrix = mat4.create()
 		for name in names
 			try
-				gl = canvas.getContext(name, alpha: true, depth: true, stencil: true, antialias: true, premultipliedAlpha: true, preserveDrawingBuffer: false)
+				gl = canvas.getContext(name, alpha: false, depth: true, stencil: true, antialias: true, premultipliedAlpha: false, preserveDrawingBuffer: false)
 			if gl
 				break
 		if (@gl = gl)
@@ -112,8 +112,6 @@ class smio.gfx.Engine #extends CL3D.CopperLicht
 			@initEngineBuffers()
 			gl.clearColor(0.1, 0.2, 0.3, 1.0)
 			gl.enable(gl.DEPTH_TEST)
-			try
-				gl.enable(gl.TEXTURE_2D)
 		gl
 
 	initEngineBuffers: =>

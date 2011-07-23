@@ -51,10 +51,10 @@ class smio.gfx.MeshCube extends smio.gfx.Mesh
 		]
 		@vertices = [[-1.0, -1.0,  1.0], [1.0, -1.0,  1.0], [1.0,  1.0,  1.0], [-1.0,  1.0,  1.0], [-1.0, -1.0, -1.0], [-1.0,  1.0, -1.0], [1.0,  1.0, -1.0], [1.0, -1.0, -1.0], [-1.0,  1.0, -1.0], [-1.0,  1.0,  1.0], [1.0,  1.0,  1.0], [1.0,  1.0, -1.0], [-1.0, -1.0, -1.0], [1.0, -1.0, -1.0], [1.0, -1.0,  1.0], [-1.0, -1.0,  1.0], [1.0, -1.0, -1.0], [1.0,  1.0, -1.0], [1.0,  1.0,  1.0], [1.0, -1.0,  1.0], [-1.0, -1.0, -1.0], [-1.0, -1.0,  1.0], [-1.0,  1.0,  1.0], [-1.0,  1.0, -1.0]]
 		@rotDeg = 0
-		@rotY = 0
+		@roxX = @rotZ = @rotY = 0
 
 	beforeDraw: (gl, timings) =>
-		@rotY = smio.Util.Number.degToRad(@rotDeg += ((45 * timings.dif) / 1000))
+		@roxX = @rotZ = @rotY = smio.Util.Number.degToRad(@rotDeg += ((45 * timings.dif) / 1000))
 
 	draw: (gl, timings) =>
 		gl.drawElements(gl.TRIANGLES, @indices.length, gl.UNSIGNED_SHORT, @bufferIndex)

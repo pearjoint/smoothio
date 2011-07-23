@@ -43,7 +43,7 @@
 		</script>
 		<link rel="stylesheet" href="/_/file/_merged/_smoothio.css?r=<%= smio.Util.Number.randomInt(999999)%>"/>
 		<link rel="shortcut icon" type="image/png" id="smio_favicon" href="/_/file/images/smoothio.png" />
-		<style type="text/css"> span.smio-noscript { display: none; } </style>
+		<style type="text/css"> span.smio-noscript { display: none; } canvas.smio-canvas3d { cursor: url('/_/file/images/crosshair.gif') !important; } </style>
 	</head>
 	<body id="smio_body" onload="onSmoothioPageLoad();" onblur="onSmoothioSleepy(true);" onfocus="onSmoothioSleepy(false);">
 		<div id="smio_offline" class="smio-offline"><span id="smio_offline_msg"><%r:maintemplate_loading%></span>&nbsp;<span class="smio-blink">&#x273F;</span></div>

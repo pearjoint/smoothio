@@ -66,7 +66,7 @@ class smio.gfx.Shaders
 			uniform sampler2D uSampler;
 			varying vec2 vTexCoord;
 			void main(void) {
-				gl_FragColor = texture2D(uSampler, vTexCoord);
+				gl_FragColor = texture2D(uSampler, vTexCoord) * vec4(vTexCoord.t * 10.0, vTexCoord.s * 10.0, vTexCoord.s * 10.0, 1.0);
 			}
 		"""
 

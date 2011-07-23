@@ -32,7 +32,7 @@
         this.texMan = new smio.gfx.TextureManager(this);
         this.texMan.load('stones', '/_/file/images/textures/stones.jpg');
         this.texMan.load('wood', '/_/file/images/textures/wood.jpg');
-        this.texMan.load('sky3', '/_/file/images/textures/sky3.jpg');
+        this.texMan.load('sky3', '/_/file/images/textures/skydn.jpg');
         this.updateCanvasSize();
         this.play();
         return;
@@ -163,11 +163,11 @@
         name = names[_i];
         try {
           gl = canvas.getContext(name, {
-            alpha: true,
+            alpha: false,
             depth: true,
             stencil: true,
             antialias: true,
-            premultipliedAlpha: true,
+            premultipliedAlpha: false,
             preserveDrawingBuffer: false
           });
         } catch (_e) {}
@@ -180,9 +180,6 @@
         this.initEngineBuffers();
         gl.clearColor(0.1, 0.2, 0.3, 1.0);
         gl.enable(gl.DEPTH_TEST);
-        try {
-          gl.enable(gl.TEXTURE_2D);
-        } catch (_e) {}
       }
       return gl;
     };

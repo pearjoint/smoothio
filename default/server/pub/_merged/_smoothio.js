@@ -22309,7 +22309,7 @@ quat4.str = function(quat) {
         this.texMan = new smio.gfx.TextureManager(this);
         this.texMan.load('stones', '/_/file/images/textures/stones.jpg');
         this.texMan.load('wood', '/_/file/images/textures/wood.jpg');
-        this.texMan.load('sky3', '/_/file/images/textures/sky3.jpg');
+        this.texMan.load('sky3', '/_/file/images/textures/skydn.jpg');
         this.updateCanvasSize();
         this.play();
         return;
@@ -22440,11 +22440,11 @@ quat4.str = function(quat) {
         name = names[_i];
         try {
           gl = canvas.getContext(name, {
-            alpha: true,
+            alpha: false,
             depth: true,
             stencil: true,
             antialias: true,
-            premultipliedAlpha: true,
+            premultipliedAlpha: false,
             preserveDrawingBuffer: false
           });
         } catch (_e) {}
@@ -22457,9 +22457,6 @@ quat4.str = function(quat) {
         this.initEngineBuffers();
         gl.clearColor(0.1, 0.2, 0.3, 1.0);
         gl.enable(gl.DEPTH_TEST);
-        try {
-          gl.enable(gl.TEXTURE_2D);
-        } catch (_e) {}
       }
       return gl;
     };
@@ -22981,10 +22978,10 @@ quat4.str = function(quat) {
       this.indices = [0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23];
       this.vertices = [[-1.0, -1.0, 1.0], [1.0, -1.0, 1.0], [1.0, 1.0, 1.0], [-1.0, 1.0, 1.0], [-1.0, -1.0, -1.0], [-1.0, 1.0, -1.0], [1.0, 1.0, -1.0], [1.0, -1.0, -1.0], [-1.0, 1.0, -1.0], [-1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, -1.0], [-1.0, -1.0, -1.0], [1.0, -1.0, -1.0], [1.0, -1.0, 1.0], [-1.0, -1.0, 1.0], [1.0, -1.0, -1.0], [1.0, 1.0, -1.0], [1.0, 1.0, 1.0], [1.0, -1.0, 1.0], [-1.0, -1.0, -1.0], [-1.0, -1.0, 1.0], [-1.0, 1.0, 1.0], [-1.0, 1.0, -1.0]];
       this.rotDeg = 0;
-      this.rotY = 0;
+      this.roxX = this.rotZ = this.rotY = 0;
     }
     MeshCube.prototype.beforeDraw = function(gl, timings) {
-      return this.rotY = smio.Util.Number.degToRad(this.rotDeg += (45 * timings.dif) / 1000);
+      return this.roxX = this.rotZ = this.rotY = smio.Util.Number.degToRad(this.rotDeg += (45 * timings.dif) / 1000);
     };
     MeshCube.prototype.draw = function(gl, timings) {
       return gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, this.bufferIndex);
@@ -23165,7 +23162,7 @@ quat4.str = function(quat) {
       atts: ['aTexCoord'],
       uniforms: ['uSampler'],
       vertex: "attribute vec3 aVertexPosition;\nattribute vec2 aTexCoord;\nuniform mat4 uMVMatrix;\nuniform mat4 uPMatrix;\nvarying vec2 vTexCoord;\nvoid main(void) {\n	gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n	vTexCoord = aTexCoord;\n}",
-      fragment: "#ifdef GL_ES\nprecision highp float;\n#endif\nuniform sampler2D uSampler;\nvarying vec2 vTexCoord;\nvoid main(void) {\n	gl_FragColor = texture2D(uSampler, vTexCoord);\n}"
+      fragment: "#ifdef GL_ES\nprecision highp float;\n#endif\nuniform sampler2D uSampler;\nvarying vec2 vTexCoord;\nvoid main(void) {\n	gl_FragColor = texture2D(uSampler, vTexCoord) * vec4(vTexCoord.t * 10.0, vTexCoord.s * 10.0, vTexCoord.s * 10.0, 1.0);\n}"
     };
     return Shaders;
   })();
@@ -23264,7 +23261,7 @@ quat4.str = function(quat) {
       this.withTexture = __bind(this.withTexture, this);
       this.remove = __bind(this.remove, this);
       this.load = __bind(this.load, this);
-      this.texQuality = this.engine.gl.LINEAR;
+      this.texQuality = 2;
       this.textures = {};
     }
     TextureManager.prototype.load = function(name, url, forceReload) {
@@ -23278,13 +23275,17 @@ quat4.str = function(quat) {
           return this.load('/_/file/images/textures/particle.png', forceReload, url);
         }, this);
         img.onload = __bind(function() {
-          var quality;
+          var linear, mipmap;
           this.textures[name] = tex;
-          quality = this.texQuality;
+          mipmap = this.texQuality === 2;
+          linear = this.texQuality !== 0;
           return this.withTexture(tex, function() {
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, quality);
-            return gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, quality);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, linear ? gl.LINEAR : gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, mipmap ? gl.LINEAR_MIPMAP_NEAREST : linear ? gl.LINEAR : gl.NEAREST);
+            if (mipmap) {
+              return gl.generateMipmap(gl.TEXTURE_2D);
+            }
           });
         }, this);
         return img.src = url;

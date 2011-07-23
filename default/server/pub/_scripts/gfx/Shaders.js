@@ -18,7 +18,7 @@
       atts: ['aTexCoord'],
       uniforms: ['uSampler'],
       vertex: "attribute vec3 aVertexPosition;\nattribute vec2 aTexCoord;\nuniform mat4 uMVMatrix;\nuniform mat4 uPMatrix;\nvarying vec2 vTexCoord;\nvoid main(void) {\n	gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n	vTexCoord = aTexCoord;\n}",
-      fragment: "#ifdef GL_ES\nprecision highp float;\n#endif\nuniform sampler2D uSampler;\nvarying vec2 vTexCoord;\nvoid main(void) {\n	gl_FragColor = texture2D(uSampler, vTexCoord);\n}"
+      fragment: "#ifdef GL_ES\nprecision highp float;\n#endif\nuniform sampler2D uSampler;\nvarying vec2 vTexCoord;\nvoid main(void) {\n	gl_FragColor = texture2D(uSampler, vTexCoord) * vec4(vTexCoord.t * 10.0, vTexCoord.s * 10.0, vTexCoord.s * 10.0, 1.0);\n}"
     };
     return Shaders;
   })();

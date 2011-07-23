@@ -3,7 +3,7 @@ smio = global.smoothio
 class smio.gfx.TextureManager
 
 	constructor: (@engine) ->
-		@texQuality = @engine.gl.LINEAR # LINEAR or NEAREST
+		@texQuality = 2 # @engine.gl.LINEAR # LINEAR or NEAREST
 		@textures = {}
 
 	load: (name, url, forceReload) =>
@@ -15,11 +15,14 @@ class smio.gfx.TextureManager
 				@load('/_/file/images/textures/particle.png', forceReload, url)
 			img.onload = =>
 				@textures[name] = tex
-				quality = @texQuality
+				mipmap = @texQuality is 2
+				linear = @texQuality isnt 0
 				@withTexture tex, ->
 					gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img)
-					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, quality)
-					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, quality)
+					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, if linear then gl.LINEAR else  gl.NEAREST)
+					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, if mipmap then gl.LINEAR_MIPMAP_NEAREST else if linear then gl.LINEAR else gl.NEAREST)
+					if mipmap
+						gl.generateMipmap(gl.TEXTURE_2D)
 			img.src = url
 
 	remove: (url) =>

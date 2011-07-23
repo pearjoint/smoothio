@@ -8,7 +8,7 @@
       this.withTexture = __bind(this.withTexture, this);
       this.remove = __bind(this.remove, this);
       this.load = __bind(this.load, this);
-      this.texQuality = this.engine.gl.LINEAR;
+      this.texQuality = 2;
       this.textures = {};
     }
     TextureManager.prototype.load = function(name, url, forceReload) {
@@ -22,13 +22,17 @@
           return this.load('/_/file/images/textures/particle.png', forceReload, url);
         }, this);
         img.onload = __bind(function() {
-          var quality;
+          var linear, mipmap;
           this.textures[name] = tex;
-          quality = this.texQuality;
+          mipmap = this.texQuality === 2;
+          linear = this.texQuality !== 0;
           return this.withTexture(tex, function() {
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, quality);
-            return gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, quality);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, linear ? gl.LINEAR : gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, mipmap ? gl.LINEAR_MIPMAP_NEAREST : linear ? gl.LINEAR : gl.NEAREST);
+            if (mipmap) {
+              return gl.generateMipmap(gl.TEXTURE_2D);
+            }
           });
         }, this);
         return img.src = url;
