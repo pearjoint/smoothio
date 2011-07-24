@@ -3,6 +3,9 @@ smio = global.smoothio
 class smio.gfx.Engine #extends CL3D.CopperLicht
 
 	constructor: (@ctl, cid) ->
+		@ambientLight = [1, 1, 1]
+		@directLight = [4, 0, 0]
+		@lightDirection = [0, 1, 0]
 		@drawTimes = []
 		@lastDrawTime = 0
 		@pressedKeys = []
@@ -11,9 +14,7 @@ class smio.gfx.Engine #extends CL3D.CopperLicht
 		@meshes = [new smio.gfx.MeshCube(@)] # new smio.gfx.MeshPyramid(@)
 		if (@canvas = $("##{cid}")) and @canvas.length and (@canvEl = @canvas[0]) and @initEngine() and @requestAnimFrame
 			@texMan = new smio.gfx.TextureManager(@)
-			@texMan.load('stones', '/_/file/images/textures/stones.jpg')
-			@texMan.load('wood', '/_/file/images/textures/wood.jpg')
-			@texMan.load('sky3', '/_/file/images/textures/skydn.jpg')
+			@texMan.load('sky3', '/_/file/images/textures/stones.jpg')
 			@updateCanvasSize()
 			@play()
 			return
@@ -82,6 +83,16 @@ class smio.gfx.Engine #extends CL3D.CopperLicht
 			gl.bindBuffer(gl.ARRAY_BUFFER, mesh.colorBuffer)
 			for name, shader of @shaders
 				gl.vertexAttribPointer(shader.atts.aVertexColor, mesh.colors[0].length, gl.FLOAT, false, 0, 0)
+		if mesh.normalBuffer
+			gl.bindBuffer(gl.ARRAY_BUFFER, mesh.normalBuffer)
+			dirLight = vec3.create()
+			vec3.normalize(@lightDirection, dirLight)
+			vec3.scale(dirLight, -1)
+			for name, shader of @shaders
+				gl.vertexAttribPointer(shader.atts.aVertexNormal, mesh.normals[0].length, gl.FLOAT, false, 0, 0)
+				gl.uniform3f(shader.uniforms.uAmbient, @ambientLight[0], @ambientLight[1], @ambientLight[2])
+				gl.uniform3fv(shader.uniforms.uLightDirection, dirLight)
+				gl.uniform3f(shader.uniforms.uDirect, @directLight[0], @directLight[1], @directLight[2])
 		if mesh.texCoordsBuffer
 			gl.bindBuffer(gl.ARRAY_BUFFER, mesh.texCoordsBuffer)
 			for name, shader of @shaders
@@ -92,8 +103,11 @@ class smio.gfx.Engine #extends CL3D.CopperLicht
 				gl.uniform1i(shader.uniforms.uSampler, 0)
 		if mesh.indexBuffer
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.indexBuffer)
+		mat4.toInverseMat3(@modelViewMatrix, normalMatrix = mat3.create())
+		mat3.transpose(normalMatrix)
 		for name, shaderProg of @shaders
 			gl.uniformMatrix4fv(shaderProg.uniforms.mvMatrix, false, @modelViewMatrix)
+			gl.uniformMatrix3fv(shaderProg.uniforms.uNormalMatrix, false, normalMatrix)
 		mesh.draw(gl, timings)
 		@popMatrix()
 

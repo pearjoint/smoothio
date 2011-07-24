@@ -22299,6 +22299,9 @@ quat4.str = function(quat) {
       this.createShader = __bind(this.createShader, this);
       this.createVertexShader = __bind(this.createVertexShader, this);
       this.createFragmentShader = __bind(this.createFragmentShader, this);
+      this.ambientLight = [1, 1, 1];
+      this.directLight = [4, 0, 0];
+      this.lightDirection = [0, 1, 0];
       this.drawTimes = [];
       this.lastDrawTime = 0;
       this.pressedKeys = [];
@@ -22307,9 +22310,7 @@ quat4.str = function(quat) {
       this.meshes = [new smio.gfx.MeshCube(this)];
       if ((this.canvas = $("#" + cid)) && this.canvas.length && (this.canvEl = this.canvas[0]) && this.initEngine() && this.requestAnimFrame) {
         this.texMan = new smio.gfx.TextureManager(this);
-        this.texMan.load('stones', '/_/file/images/textures/stones.jpg');
-        this.texMan.load('wood', '/_/file/images/textures/wood.jpg');
-        this.texMan.load('sky3', '/_/file/images/textures/skydn.jpg');
+        this.texMan.load('sky3', '/_/file/images/textures/stones.jpg');
         this.updateCanvasSize();
         this.play();
         return;
@@ -22375,7 +22376,7 @@ quat4.str = function(quat) {
       }
     };
     Engine.prototype.drawMesh = function(gl, mesh, timings) {
-      var name, shader, shaderProg, _ref, _ref2, _ref3, _ref4, _ref5;
+      var dirLight, name, normalMatrix, shader, shaderProg, _ref, _ref2, _ref3, _ref4, _ref5, _ref6;
       this.pushMatrix();
       mesh.beforeDraw(gl, timings);
       mat4.translate(this.modelViewMatrix, [mesh.posX, mesh.posY, mesh.posZ]);
@@ -22404,28 +22405,45 @@ quat4.str = function(quat) {
           gl.vertexAttribPointer(shader.atts.aVertexColor, mesh.colors[0].length, gl.FLOAT, false, 0, 0);
         }
       }
-      if (mesh.texCoordsBuffer) {
-        gl.bindBuffer(gl.ARRAY_BUFFER, mesh.texCoordsBuffer);
+      if (mesh.normalBuffer) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, mesh.normalBuffer);
+        dirLight = vec3.create();
+        vec3.normalize(this.lightDirection, dirLight);
+        vec3.scale(dirLight, -1);
         _ref3 = this.shaders;
         for (name in _ref3) {
           shader = _ref3[name];
+          gl.vertexAttribPointer(shader.atts.aVertexNormal, mesh.normals[0].length, gl.FLOAT, false, 0, 0);
+          gl.uniform3f(shader.uniforms.uAmbient, this.ambientLight[0], this.ambientLight[1], this.ambientLight[2]);
+          gl.uniform3fv(shader.uniforms.uLightDirection, dirLight);
+          gl.uniform3f(shader.uniforms.uDirect, this.directLight[0], this.directLight[1], this.directLight[2]);
+        }
+      }
+      if (mesh.texCoordsBuffer) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, mesh.texCoordsBuffer);
+        _ref4 = this.shaders;
+        for (name in _ref4) {
+          shader = _ref4[name];
           gl.vertexAttribPointer(shader.atts.aTexCoord, mesh.texCoords[0].length, gl.FLOAT, false, 0, 0);
         }
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this.texMan.textures['sky3']);
-        _ref4 = this.shaders;
-        for (name in _ref4) {
-          shader = _ref4[name];
+        _ref5 = this.shaders;
+        for (name in _ref5) {
+          shader = _ref5[name];
           gl.uniform1i(shader.uniforms.uSampler, 0);
         }
       }
       if (mesh.indexBuffer) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.indexBuffer);
       }
-      _ref5 = this.shaders;
-      for (name in _ref5) {
-        shaderProg = _ref5[name];
+      mat4.toInverseMat3(this.modelViewMatrix, normalMatrix = mat3.create());
+      mat3.transpose(normalMatrix);
+      _ref6 = this.shaders;
+      for (name in _ref6) {
+        shaderProg = _ref6[name];
         gl.uniformMatrix4fv(shaderProg.uniforms.mvMatrix, false, this.modelViewMatrix);
+        gl.uniformMatrix3fv(shaderProg.uniforms.uNormalMatrix, false, normalMatrix);
       }
       mesh.draw(gl, timings);
       return this.popMatrix();
@@ -22826,9 +22844,21 @@ quat4.str = function(quat) {
           gl.deleteBuffer(this.colorBuffer);
           delete this.colorBuffer;
         }
+        if (this.normalBuffer) {
+          gl.deleteBuffer(this.normalBuffer);
+          delete this.normalBuffer;
+        }
         if (this.vertexBuffer) {
           gl.deleteBuffer(this.vertexBuffer);
-          return delete this.vertexBuffer;
+          delete this.vertexBuffer;
+        }
+        if (this.texCoordsBuffer) {
+          gl.deleteBuffer(this.texCoordsBuffer);
+          delete this.texCoordsBuffer;
+        }
+        if (this.indexBuffer) {
+          gl.deleteBuffer(this.indexBuffer);
+          return delete this.indexBuffer;
         }
       }
     };
@@ -22844,6 +22874,15 @@ quat4.str = function(quat) {
           if ((!onlyIfCreated) || createBuf) {
             gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_.flatten(this.vertices)), gl.STATIC_DRAW);
+          }
+        }
+        if (this.normals && this.normals.length) {
+          if ((createBuf = !this.normalBuffer)) {
+            this.normalBuffer = gl.createBuffer();
+          }
+          if ((!onlyIfCreated) || createBuf) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_.flatten(this.normals)), gl.STATIC_DRAW);
           }
         }
         if (this.indices && this.indices.length) {
@@ -22976,6 +23015,7 @@ quat4.str = function(quat) {
         this.texCoords = [[0.0, 1.0], [1.0, 1.0], [1.0, 0.0], [0.0, 0.0], [1.0, 1.0], [1.0, 0.0], [0.0, 0.0], [0.0, 1.0], [0.0, 0.0], [0.0, 1.0], [1.0, 1.0], [1.0, 0.0], [1.0, 0.0], [0.0, 0.0], [0.0, 1.0], [1.0, 1.0], [1.0, 1.0], [1.0, 0.0], [0.0, 0.0], [0.0, 1.0], [0.0, 1.0], [1.0, 1.0], [1.0, 0.0], [0.0, 0.0]];
       }
       this.indices = [0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23];
+      this.normals = [[0.0, 0.0, 1.0], [0.0, 0.0, 1.0], [0.0, 0.0, 1.0], [0.0, 0.0, 1.0], [0.0, 0.0, -1.0], [0.0, 0.0, -1.0], [0.0, 0.0, -1.0], [0.0, 0.0, -1.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, 1.0, 0.0], [0.0, -1.0, 0.0], [0.0, -1.0, 0.0], [0.0, -1.0, 0.0], [0.0, -1.0, 0.0], [1.0, 0.0, 0.0], [1.0, 0.0, 0.0], [1.0, 0.0, 0.0], [1.0, 0.0, 0.0], [-1.0, 0.0, 0.0], [-1.0, 0.0, 0.0], [-1.0, 0.0, 0.0], [-1.0, 0.0, 0.0]];
       this.vertices = [[-1.0, -1.0, 1.0], [1.0, -1.0, 1.0], [1.0, 1.0, 1.0], [-1.0, 1.0, 1.0], [-1.0, -1.0, -1.0], [-1.0, 1.0, -1.0], [1.0, 1.0, -1.0], [1.0, -1.0, -1.0], [-1.0, 1.0, -1.0], [-1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, -1.0], [-1.0, -1.0, -1.0], [1.0, -1.0, -1.0], [1.0, -1.0, 1.0], [-1.0, -1.0, 1.0], [1.0, -1.0, -1.0], [1.0, 1.0, -1.0], [1.0, 1.0, 1.0], [1.0, -1.0, 1.0], [-1.0, -1.0, -1.0], [-1.0, -1.0, 1.0], [-1.0, 1.0, 1.0], [-1.0, 1.0, -1.0]];
       this.rotDeg = 0;
       this.roxX = this.rotZ = this.rotY = 0;
@@ -23159,10 +23199,10 @@ quat4.str = function(quat) {
       fragment: "#ifdef GL_ES\nprecision highp float;\n#endif\nvarying vec4 vColor;\nvoid main(void) {\n	gl_FragColor = vColor;\n}"
     };
     Shaders.Texured = {
-      atts: ['aTexCoord'],
-      uniforms: ['uSampler'],
-      vertex: "attribute vec3 aVertexPosition;\nattribute vec2 aTexCoord;\nuniform mat4 uMVMatrix;\nuniform mat4 uPMatrix;\nvarying vec2 vTexCoord;\nvoid main(void) {\n	gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n	vTexCoord = aTexCoord;\n}",
-      fragment: "#ifdef GL_ES\nprecision highp float;\n#endif\nuniform sampler2D uSampler;\nvarying vec2 vTexCoord;\nvoid main(void) {\n	gl_FragColor = texture2D(uSampler, vTexCoord) * vec4(vTexCoord.t * 10.0, vTexCoord.s * 10.0, vTexCoord.s * 10.0, 1.0);\n}"
+      atts: ['aTexCoord', 'aVertexPosition', 'aVertexNormal'],
+      uniforms: ['uAmbient', 'uDirect', 'uLightDirection', 'uNormalMatrix', 'uSampler'],
+      vertex: "attribute vec3 aVertexPosition;\nattribute vec3 aVertexNormal;\nattribute vec2 aTexCoord;\nuniform vec3 uAmbient;\nuniform vec3 uLightDirection;\nuniform vec3 uDirect;\nuniform mat3 uNormalMatrix;\nuniform mat4 uMVMatrix;\nuniform mat4 uPMatrix;\nvarying vec2 vTexCoord;\nvarying vec3 vLightWeighting;\nvoid main(void) {\n	gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n	vTexCoord = aTexCoord;\n	vec3 transformedNormal = uNormalMatrix * aVertexNormal;\n	float directionalLightWeighting = max(dot(transformedNormal, uLightDirection), 0.0);\n	vLightWeighting = uAmbient + uDirect * directionalLightWeighting;\n}",
+      fragment: "#ifdef GL_ES\nprecision highp float;\n#endif\nuniform sampler2D uSampler;\nvarying vec2 vTexCoord;\nvarying vec3 vLightWeighting;\nvoid main(void) {\n	vec4 unlightedColor = texture2D(uSampler, vTexCoord);\n	gl_FragColor = vec4(unlightedColor.rgb * vLightWeighting, unlightedColor.a);\n}"
     };
     return Shaders;
   })();

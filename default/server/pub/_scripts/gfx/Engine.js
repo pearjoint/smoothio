@@ -22,6 +22,9 @@
       this.createShader = __bind(this.createShader, this);
       this.createVertexShader = __bind(this.createVertexShader, this);
       this.createFragmentShader = __bind(this.createFragmentShader, this);
+      this.ambientLight = [1, 1, 1];
+      this.directLight = [4, 0, 0];
+      this.lightDirection = [0, 1, 0];
       this.drawTimes = [];
       this.lastDrawTime = 0;
       this.pressedKeys = [];
@@ -30,9 +33,7 @@
       this.meshes = [new smio.gfx.MeshCube(this)];
       if ((this.canvas = $("#" + cid)) && this.canvas.length && (this.canvEl = this.canvas[0]) && this.initEngine() && this.requestAnimFrame) {
         this.texMan = new smio.gfx.TextureManager(this);
-        this.texMan.load('stones', '/_/file/images/textures/stones.jpg');
-        this.texMan.load('wood', '/_/file/images/textures/wood.jpg');
-        this.texMan.load('sky3', '/_/file/images/textures/skydn.jpg');
+        this.texMan.load('sky3', '/_/file/images/textures/stones.jpg');
         this.updateCanvasSize();
         this.play();
         return;
@@ -98,7 +99,7 @@
       }
     };
     Engine.prototype.drawMesh = function(gl, mesh, timings) {
-      var name, shader, shaderProg, _ref, _ref2, _ref3, _ref4, _ref5;
+      var dirLight, name, normalMatrix, shader, shaderProg, _ref, _ref2, _ref3, _ref4, _ref5, _ref6;
       this.pushMatrix();
       mesh.beforeDraw(gl, timings);
       mat4.translate(this.modelViewMatrix, [mesh.posX, mesh.posY, mesh.posZ]);
@@ -127,28 +128,45 @@
           gl.vertexAttribPointer(shader.atts.aVertexColor, mesh.colors[0].length, gl.FLOAT, false, 0, 0);
         }
       }
-      if (mesh.texCoordsBuffer) {
-        gl.bindBuffer(gl.ARRAY_BUFFER, mesh.texCoordsBuffer);
+      if (mesh.normalBuffer) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, mesh.normalBuffer);
+        dirLight = vec3.create();
+        vec3.normalize(this.lightDirection, dirLight);
+        vec3.scale(dirLight, -1);
         _ref3 = this.shaders;
         for (name in _ref3) {
           shader = _ref3[name];
+          gl.vertexAttribPointer(shader.atts.aVertexNormal, mesh.normals[0].length, gl.FLOAT, false, 0, 0);
+          gl.uniform3f(shader.uniforms.uAmbient, this.ambientLight[0], this.ambientLight[1], this.ambientLight[2]);
+          gl.uniform3fv(shader.uniforms.uLightDirection, dirLight);
+          gl.uniform3f(shader.uniforms.uDirect, this.directLight[0], this.directLight[1], this.directLight[2]);
+        }
+      }
+      if (mesh.texCoordsBuffer) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, mesh.texCoordsBuffer);
+        _ref4 = this.shaders;
+        for (name in _ref4) {
+          shader = _ref4[name];
           gl.vertexAttribPointer(shader.atts.aTexCoord, mesh.texCoords[0].length, gl.FLOAT, false, 0, 0);
         }
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this.texMan.textures['sky3']);
-        _ref4 = this.shaders;
-        for (name in _ref4) {
-          shader = _ref4[name];
+        _ref5 = this.shaders;
+        for (name in _ref5) {
+          shader = _ref5[name];
           gl.uniform1i(shader.uniforms.uSampler, 0);
         }
       }
       if (mesh.indexBuffer) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.indexBuffer);
       }
-      _ref5 = this.shaders;
-      for (name in _ref5) {
-        shaderProg = _ref5[name];
+      mat4.toInverseMat3(this.modelViewMatrix, normalMatrix = mat3.create());
+      mat3.transpose(normalMatrix);
+      _ref6 = this.shaders;
+      for (name in _ref6) {
+        shaderProg = _ref6[name];
         gl.uniformMatrix4fv(shaderProg.uniforms.mvMatrix, false, this.modelViewMatrix);
+        gl.uniformMatrix3fv(shaderProg.uniforms.uNormalMatrix, false, normalMatrix);
       }
       mesh.draw(gl, timings);
       return this.popMatrix();

@@ -22,9 +22,21 @@
           gl.deleteBuffer(this.colorBuffer);
           delete this.colorBuffer;
         }
+        if (this.normalBuffer) {
+          gl.deleteBuffer(this.normalBuffer);
+          delete this.normalBuffer;
+        }
         if (this.vertexBuffer) {
           gl.deleteBuffer(this.vertexBuffer);
-          return delete this.vertexBuffer;
+          delete this.vertexBuffer;
+        }
+        if (this.texCoordsBuffer) {
+          gl.deleteBuffer(this.texCoordsBuffer);
+          delete this.texCoordsBuffer;
+        }
+        if (this.indexBuffer) {
+          gl.deleteBuffer(this.indexBuffer);
+          return delete this.indexBuffer;
         }
       }
     };
@@ -40,6 +52,15 @@
           if ((!onlyIfCreated) || createBuf) {
             gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_.flatten(this.vertices)), gl.STATIC_DRAW);
+          }
+        }
+        if (this.normals && this.normals.length) {
+          if ((createBuf = !this.normalBuffer)) {
+            this.normalBuffer = gl.createBuffer();
+          }
+          if ((!onlyIfCreated) || createBuf) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_.flatten(this.normals)), gl.STATIC_DRAW);
           }
         }
         if (this.indices && this.indices.length) {

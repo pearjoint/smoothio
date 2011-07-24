@@ -12,9 +12,18 @@ class smio.gfx.Mesh
 			if @colorBuffer
 				gl.deleteBuffer(@colorBuffer)
 				delete @colorBuffer
+			if @normalBuffer
+				gl.deleteBuffer(@normalBuffer)
+				delete @normalBuffer
 			if @vertexBuffer
 				gl.deleteBuffer(@vertexBuffer)
 				delete @vertexBuffer
+			if @texCoordsBuffer
+				gl.deleteBuffer(@texCoordsBuffer)
+				delete @texCoordsBuffer
+			if @indexBuffer
+				gl.deleteBuffer(@indexBuffer)
+				delete @indexBuffer
 
 	draw: (gl, timings) =>
 
@@ -27,6 +36,12 @@ class smio.gfx.Mesh
 				if (not onlyIfCreated) or createBuf
 					gl.bindBuffer(gl.ARRAY_BUFFER, @vertexBuffer)
 					gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_.flatten(@vertices)), gl.STATIC_DRAW)
+			if @normals and @normals.length
+				if (createBuf = not @normalBuffer)
+					@normalBuffer = gl.createBuffer()
+				if (not onlyIfCreated) or createBuf
+					gl.bindBuffer(gl.ARRAY_BUFFER, @normalBuffer)
+					gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_.flatten(@normals)), gl.STATIC_DRAW)
 			if @indices and @indices.length
 				if (createBuf = not @indexBuffer)
 					@indexBuffer = gl.createBuffer()
